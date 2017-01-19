@@ -1,0 +1,8 @@
+*.swp
+*.swo
+*.swn
+*~
+.gitignore
+tags
+*.diff
+file
