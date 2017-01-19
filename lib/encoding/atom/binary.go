@@ -19,17 +19,18 @@ import (
 	"reflect"
 )
 
+// AtomContainer object, paired with its end byte position in the stream
 type cont struct {
 	Atom
 	end uint32
 }
 
-// simple LIFO stack of containers. Not concurrency safe.
-type stack []cont
+// LIFO stack of Atoms of type container.
+type containerStack []cont
 
 // Return a pointer to the last (top) element of the stack, without removing
 // the element. Second return value is false if stack is empty.
-func (s stack) Peek() (value *cont, ok bool) {
+func (s containerStack) Peek() (value *cont, ok bool) {
 	if len(s) == 0 {
 		value, ok = &(cont{}), false
 	} else {
@@ -37,11 +38,30 @@ func (s stack) Peek() (value *cont, ok bool) {
 	}
 	return
 }
-func (s *stack) Push(c cont) { (*s) = append((*s), c) }
-func (s *stack) Pop() cont {
+func (s *containerStack) Push(c cont) { (*s) = append((*s), c) }
+func (s *containerStack) Pop() cont {
 	d := (*s)[len(*s)-1]
 	(*s) = (*s)[:len(*s)-1]
 	return d
+}
+
+// Pop fully-read containers off the container stack, as they're now closed.
+// FIXME: handle corrupt container case where cont length is incorrect
+func (s *containerStack) PopCompleted(pos uint32) []Atom {
+	var closedConts []Atom
+	// Pop until the given byte offset precedes the top object's end position.
+	for p, ok := s.Peek(); ok; p, ok = s.Peek() {
+		if pos == p.end {
+			closedConts = append(closedConts, s.Pop().Atom)
+			continue // next CONT might end too
+		}
+		if pos > p.end {
+			panic(fmt.Errorf("%s:CONT wanted to end at byte %d, but read position is now %d", p.Name, p.end, pos))
+		}
+		break
+	}
+
+	return closedConts
 }
 
 // atomHeader models the binary encoding values that start every ADE
@@ -57,7 +77,9 @@ var headerBytes uint32 = uint32(reflect.TypeOf(atomHeader{}).Size())
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
 // It can be used to rehydrate an Atom starting from the zero value of Atom.
 func (a *Atom) UnmarshalBinary(data []byte) error {
-	return a.UnmarshalFromReader(bytes.NewReader(data))
+	err := a.UnmarshalFromReader(bytes.NewReader(data))
+	fmt.Printf("UnmarshalBinary got %v\n", a)
+	return err
 }
 
 func (a *Atom) UnmarshalFromReader(r io.Reader) error {
@@ -77,26 +99,19 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	return err
 }
 
-// FIXME watch for cases where EOF is handled before last Atom object is created, thus dropping some data
+// FIXME watch for cases where EOF is handled before last Atom object is
+// created, thus dropping some data
 func ReadAtomsFromBinaryStream(r io.Reader) (atoms []Atom, err error) {
 	var (
 		bytesRead  uint32
 		CONT       [4]byte
-		containers stack
+		containers containerStack
 		a          Atom
 	)
 	copy(CONT[:], "CONT")
 
 	for {
-		// End all open containers whose length has been fully read
-		// FIXME: handle corrupt container case where cont length is incorrect
-		for cp, ok := containers.Peek(); ok; cp, ok = containers.Peek() {
-			if bytesRead == cp.end {
-				containers.Pop()
-				continue // next container might end too
-			}
-			break
-		}
+		containers.PopCompleted(bytesRead)
 
 		// Read next atom
 		h, err := readAtomHeader(r, &bytesRead)
@@ -112,12 +127,15 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []Atom, err error) {
 			checkError(err)
 			a = Atom{Name: string(h.Name[:]), Type: string(h.Type[:]), Data: data}
 		}
-		fmt.Println("Got atom ", a)
+		//		fmt.Println("Got atom ", a)
 
 		// Add new atom to children of parent container, if any
-		if cp, ok := containers.Peek(); ok {
-			(*cp).addChild(a)
+		if p, ok := containers.Peek(); ok {
+			fmt.Printf("Got child atom: %v\n", a)
+			(*p).addChild(a)
+			fmt.Printf("Got parent (%v) now has children : %v\n", p.Name, len(p.Children))
 		} else {
+			fmt.Printf("Got top atom: %v\n", a)
 			atoms = append(atoms, a)
 		}
 
@@ -126,6 +144,7 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []Atom, err error) {
 		}
 	}
 	fmt.Printf("Finished reading %d bytes from stream\n", bytesRead)
+	fmt.Printf("Got atoms: %v\n", atoms[0])
 
 	if err == io.EOF {
 		err = nil

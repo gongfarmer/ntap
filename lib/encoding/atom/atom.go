@@ -34,11 +34,9 @@ func (a Atom) String() string {
 	)
 	switch a.Type {
 	case "CONT":
-		output.WriteString(fmt.Sprintf("% *s", depth*2, a.Name))
-		output.WriteString(fmt.Sprintf(":CONT with %d children\n", len(a.Children)))
-		depth++ // FIXME make all this truly recursive
+		output.WriteString(fmt.Sprintf("% *s:CONT", depth*2, a.Name))
+		depth++ // FIXME make all this recursive
 		for _, c := range a.Children {
-			fmt.Println("Yup im in here") // FIXME never reached
 			output.WriteString(fmt.Sprintf("% *s\n", depth*2, c.String()))
 		}
 		output.Truncate(output.Len() - 1) // strip newline
@@ -53,9 +51,7 @@ func (a Atom) String() string {
 
 func (c *Atom) addChild(a Atom) {
 	if c.Type == "CONT" {
-		fmt.Println("b4: Now there are this many children: ", len(c.Children))
 		c.Children = append(c.Children, a)
-		fmt.Println("ar: Now there are this many children: ", len(c.Children))
 	} else {
 		panic(fmt.Errorf("Cannot add child to non-CONT atom %s:%s", c.Name, c.Type))
 	}
