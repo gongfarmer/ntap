@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gongfarmer/ade"
+	"github.com/gongfarmer/ntap/lib/encoding/atom"
 	"log"
 	"os"
 )
@@ -10,7 +10,7 @@ import (
 func main() {
 	var files = os.Args[1:]
 	for _, path := range files {
-		atom, err := ade.FromFile(path)
+		atom, err := atom.FromFile(path)
 		if err != nil {
 			log.Fatal(err)
 		}
