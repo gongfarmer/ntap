@@ -83,6 +83,3 @@ func FromFile(path string) (a Atom, err error) {
 	err = a.UnmarshalBinary(buf)
 	return
 }
-
-// func fromFile(path string)
-// func fromFile(fh *os.File)

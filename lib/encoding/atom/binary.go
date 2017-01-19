@@ -16,6 +16,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"reflect"
 )
 
 type cont struct {
@@ -51,7 +52,7 @@ type atomHeader struct {
 	Type [4]byte
 }
 
-const headerBytes uint32 = 12 // bytes in an atomHeader
+var headerBytes uint32 = uint32(reflect.TypeOf(atomHeader{}).Size())
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
 // It can be used to rehydrate an Atom starting from the zero value of Atom.
@@ -67,7 +68,7 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 
 	switch len(atoms) {
 	case 1:
-		*a = atoms[0]
+		(*a) = atoms[0]
 	case 0:
 		panic(fmt.Errorf("Binary stream contained no atoms"))
 	default:

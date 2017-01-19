@@ -14,6 +14,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(atom)
+		fmt.Println(atom.String())
 	}
 }
