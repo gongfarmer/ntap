@@ -84,7 +84,6 @@ var headerBytes uint32 = uint32(reflect.TypeOf(atomHeader{}).Size())
 // It can be used to rehydrate an Atom starting from the zero value of Atom.
 func (a *Atom) UnmarshalBinary(data []byte) error {
 	err := a.UnmarshalFromReader(bytes.NewReader(data))
-	fmt.Printf("UnmarshalBinary got %v\n", a)
 	return err
 }
 
@@ -96,7 +95,7 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 
 	switch len(atoms) {
 	case 1:
-		a = atoms[0]
+		*a = *atoms[0]
 	case 0:
 		panic(fmt.Errorf("Binary stream contained no atoms"))
 	default:
@@ -105,20 +104,14 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	return err
 }
 
-// FIXME watch for cases where EOF is handled before last Atom object is
-// created, thus dropping some data
 func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 	var (
 		bytesRead  uint32
 		CONT       = [4]byte{'C', 'O', 'N', 'T'}
 		containers containerStack
 	)
-	count := 0
 	for err := error(nil); err != io.EOF; {
-		if count > 5 {
-			break
-		}
-		// read binary header
+		// read binary header for next atom
 		h, err := readAtomHeader(r, &bytesRead)
 		if checkError(err) == io.EOF {
 			break
@@ -136,9 +129,6 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 
 		// add atom to parent.Children, or to atoms list if no parent
 		if parent, ok := containers.Peek(); ok {
-			fmt.Printf("add atom %s:%s to parent %s\n",
-				h.Name, h.Type, parent.atomPtr.Name)
-
 			parent.atomPtr.addChild(&a)
 		} else {
 			atoms = append(atoms, &a)
@@ -152,24 +142,7 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 
 		// pop fully read containers off stack
 		containers.PopCompleted(bytesRead)
-		top, ok := containers.Peek()
-		if ok {
-			fmt.Printf("containers(size %d, top %s has %d children) atoms(size %d)\n",
-				len(containers), top.atomPtr.Name,
-				len(top.atomPtr.Children),
-				len(atoms))
-		}
-		fmt.Printf("containers: ")
-		for _, c := range containers {
-			fmt.Printf("[%s,kids:%d]", c.atomPtr.Name, len(c.atomPtr.Children))
-		}
-		fmt.Println("")
-		fmt.Printf("ROOT ELEMENT String(): <<<%s>>>\n\n", containers[0].atomPtr.String())
-		count++
 	}
-	fmt.Printf("Got atoms: <<%s>>\n", atoms[0].String())
-	fmt.Println("===================================")
-
 	return atoms, err // err is never set after initialization
 }
 
