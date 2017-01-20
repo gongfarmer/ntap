@@ -21,8 +21,8 @@ import (
 
 // AtomContainer object, paired with its end byte position in the stream
 type cont struct {
-	Atom
-	end uint32
+	atomPtr *Atom
+	end     uint32
 }
 
 // LIFO stack of Atoms of type container.
@@ -30,33 +30,39 @@ type containerStack []cont
 
 // Return a pointer to the last (top) element of the stack, without removing
 // the element. Second return value is false if stack is empty.
-func (s containerStack) Peek() (value *cont, ok bool) {
-	if len(s) == 0 {
+func (s *containerStack) Peek() (value *cont, ok bool) {
+	if len(*s) == 0 {
 		value, ok = &(cont{}), false
 	} else {
-		value, ok = &(s[len(s)-1]), true
+		value, ok = &((*s)[len(*s)-1]), true
 	}
 	return
 }
-func (s *containerStack) Push(c cont) { (*s) = append((*s), c) }
+func (s *containerStack) Empty() bool {
+	return len(*s) == 0
+}
+func (s *containerStack) Push(c cont) {
+	(*s) = append((*s), c)
+}
 func (s *containerStack) Pop() cont {
 	d := (*s)[len(*s)-1]
 	(*s) = (*s)[:len(*s)-1]
 	return d
 }
 
-// Pop fully-read containers off the container stack, as they're now closed.
+// Pop fully-read containers off the container stack based on the given byte
+// position.
 // FIXME: handle corrupt container case where cont length is incorrect
-func (s *containerStack) PopCompleted(pos uint32) []Atom {
-	var closedConts []Atom
+func (s *containerStack) PopCompleted(pos uint32) []*Atom {
+	var closedConts []*Atom
 	// Pop until the given byte offset precedes the top object's end position.
 	for p, ok := s.Peek(); ok; p, ok = s.Peek() {
 		if pos == p.end {
-			closedConts = append(closedConts, s.Pop().Atom)
+			closedConts = append(closedConts, s.Pop().atomPtr)
 			continue // next CONT might end too
 		}
 		if pos > p.end {
-			panic(fmt.Errorf("%s:CONT wanted to end at byte %d, but read position is now %d", p.Name, p.end, pos))
+			panic(fmt.Errorf("%s:CONT wanted to end at byte %d, but read position is now %d", p.atomPtr.Name, p.end, pos))
 		}
 		break
 	}
@@ -65,7 +71,7 @@ func (s *containerStack) PopCompleted(pos uint32) []Atom {
 }
 
 // atomHeader models the binary encoding values that start every ADE
-// AtomContainer.  Must have fixed size.
+// AtomContainer. Must have fixed size for initialization by encoding/binary.
 type atomHeader struct {
 	Size uint32
 	Name [4]byte
@@ -90,7 +96,7 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 
 	switch len(atoms) {
 	case 1:
-		(*a) = atoms[0]
+		a = atoms[0]
 	case 0:
 		panic(fmt.Errorf("Binary stream contained no atoms"))
 	default:
@@ -101,55 +107,70 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 
 // FIXME watch for cases where EOF is handled before last Atom object is
 // created, thus dropping some data
-func ReadAtomsFromBinaryStream(r io.Reader) (atoms []Atom, err error) {
+func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 	var (
 		bytesRead  uint32
-		CONT       [4]byte
+		CONT       = [4]byte{'C', 'O', 'N', 'T'}
 		containers containerStack
-		a          Atom
 	)
-	copy(CONT[:], "CONT")
-
-	for {
-		containers.PopCompleted(bytesRead)
-
-		// Read next atom
+	count := 0
+	for err := error(nil); err != io.EOF; {
+		if count > 5 {
+			break
+		}
+		// read binary header
 		h, err := readAtomHeader(r, &bytesRead)
-		// FIXME what if EOF happens here? Not possible in well-formed atomcontainer.
-		if h.Type == CONT { // new AtomContainer
-			endIndex := bytesRead + h.Size - headerBytes
+		if checkError(err) == io.EOF {
+			break
+		}
+
+		// construct complete Atom object (with data if any)
+		var a Atom
+		if h.Type == CONT {
 			a = Atom{Name: string(h.Name[:]), Type: string(h.Type[:])}
-			if endIndex != bytesRead { // empty Container ends immediately
-				containers.Push(cont{a, endIndex})
-			}
 		} else {
 			data, err := readAtomData(r, h.Size-headerBytes, &bytesRead)
 			checkError(err)
 			a = Atom{Name: string(h.Name[:]), Type: string(h.Type[:]), Data: data}
 		}
-		//		fmt.Println("Got atom ", a)
 
-		// Add new atom to children of parent container, if any
-		if p, ok := containers.Peek(); ok {
-			fmt.Printf("Got child atom: %v\n", a)
-			(*p).addChild(a)
-			fmt.Printf("Got parent (%v) now has children : %v\n", p.Name, len(p.Children))
+		// add atom to parent.Children, or to atoms list if no parent
+		if parent, ok := containers.Peek(); ok {
+			fmt.Printf("add atom %s:%s to parent %s\n",
+				h.Name, h.Type, parent.atomPtr.Name)
+
+			parent.atomPtr.addChild(&a)
 		} else {
-			fmt.Printf("Got top atom: %v\n", a)
-			atoms = append(atoms, a)
+			atoms = append(atoms, &a)
 		}
 
-		if io.EOF == err {
-			break
+		// push container onto stack
+		if h.Type == CONT {
+			endPos := bytesRead + h.Size - headerBytes
+			containers.Push(cont{&a, endPos})
 		}
-	}
-	fmt.Printf("Finished reading %d bytes from stream\n", bytesRead)
-	fmt.Printf("Got atoms: %v\n", atoms[0])
 
-	if err == io.EOF {
-		err = nil
+		// pop fully read containers off stack
+		containers.PopCompleted(bytesRead)
+		top, ok := containers.Peek()
+		if ok {
+			fmt.Printf("containers(size %d, top %s has %d children) atoms(size %d)\n",
+				len(containers), top.atomPtr.Name,
+				len(top.atomPtr.Children),
+				len(atoms))
+		}
+		fmt.Printf("containers: ")
+		for _, c := range containers {
+			fmt.Printf("[%s,kids:%d]", c.atomPtr.Name, len(c.atomPtr.Children))
+		}
+		fmt.Println("")
+		fmt.Printf("ROOT ELEMENT String(): <<<%s>>>\n\n", containers[0].atomPtr.String())
+		count++
 	}
-	return atoms, err
+	fmt.Printf("Got atoms: <<%s>>\n", atoms[0].String())
+	fmt.Println("===================================")
+
+	return atoms, err // err is never set after initialization
 }
 
 // Panic if an unexpected error is encountered here.

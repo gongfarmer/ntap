@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gongfarmer/ntap/lib/encoding/atom"
+	"github.com/gongfarmer/ntap/encoding/atom"
 	"log"
 	"os"
 )

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"unicode"
 )
 
 // Verify that atom meets encoding interfaces at compile time
@@ -27,31 +28,51 @@ type Atom struct {
 	Children []Atom
 }
 
-func (a Atom) String() string {
-	var (
-		output bytes.Buffer
-		depth  int
-	)
-	switch a.Type {
-	case "CONT":
-		output.WriteString(fmt.Sprintf("% *s:CONT", depth*2, a.Name))
-		depth++ // FIXME make all this recursive
-		for _, c := range a.Children {
-			output.WriteString(fmt.Sprintf("% *s\n", depth*2, c.String()))
+// Return true if string is printable, false otherwise
+func isPrint(s string) bool {
+	for _, r := range s {
+		if !unicode.IsPrint(r) {
+			return false
 		}
-		output.Truncate(output.Len() - 1) // strip newline
-	//case "UI32":
-	//	output.WriteString(fmt.Sprintf("%s:%s:", a.Name, a.Type))
-	default:
-		output.WriteString(fmt.Sprintf("% *s:%s:", depth*2, a.Name, a.Type))
 	}
+	return true
+}
 
+func (a Atom) String() string {
+	output := buildString(&a, 0)
 	return output.String()
 }
 
-func (c *Atom) addChild(a Atom) {
+func buildString(a *Atom, depth int) bytes.Buffer {
+	var (
+		output        bytes.Buffer
+		printableName string
+	)
+	// print this atom
+	if isPrint(a.Name) {
+		printableName = a.Name
+	} else {
+		printableName = fmt.Sprintf("0x%+08X", a.Name)
+	}
+	fmt.Fprintf(&output, "% *s:%s:", depth*2, printableName, a.Type)
+	// FIXME add printing of data here
+
+	// print children
+	if a.Type == "CONT" {
+		fmt.Printf("CONT %s has %d children\n", a.Name, len(a.Children))
+		for _, child := range a.Children {
+			fmt.Printf("[print child %s:%p,kids %d]", child.Name, child, len(child.Children))
+			//fmt.Fprint(&output, "\n", buildString(&child, depth+1))
+			childBuffer := buildString(&child, depth+1)
+			output.WriteString(childBuffer.String())
+		}
+	}
+	return output
+}
+
+func (c *Atom) addChild(a *Atom) {
 	if c.Type == "CONT" {
-		c.Children = append(c.Children, a)
+		c.Children = append(c.Children, *a)
 	} else {
 		panic(fmt.Errorf("Cannot add child to non-CONT atom %s:%s", c.Name, c.Type))
 	}
