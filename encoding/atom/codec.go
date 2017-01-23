@@ -8,43 +8,46 @@ import (
 	"reflect"
 )
 
+type ADEType int
+
 // ADE Data types
 // Defined in 112-0002_r4.0B_StorageGRID_Data_Types
 // The ADE code C-type mappings are in OSL_Types.h
 const (
-	UI01 = iota // unsigned int / bool
-	UI08        // unsigned int
-	SI08        // signed int
-	UI16        // unsigned int
-	SI16        // signed int
-	UI32        // unsigned int
-	SI32        // signed int
-	UI64        // unsigned int
-	SI64        // signed int
-	FP32        // floating point
-	FP64        // floating point
-	UF32        // unsigned fixed point (integer part / fractional part)
-	SF32        // signed fixed point   (integer part / fractional part)
-	UF64        // unsigned fixed point (integer part / fractional part)
-	SF64        // signed fixed point   (integer part / fractional part)
-	UR32        // unsigned fraction
-	SR32        // signed fraction
-	UR64        // unsigned fraction
-	SR64        // unsigned fraction
-	FC32        // four char string
-	IP32        // ipv4 address
-	IPAD        // ipv4 or ipv6 address
-	CSTR        // C string
-	USTR        // unicode string
-	DATA        // Raw data or equivalent
-	ENUM        // Enumeration
-	UUID        // output: DEC88E51-D85B-4425-8808-2168BC362443, input: same or hex
-	NULL        // NULL type, must have empty data section
-	CNCT        // binary data printed as hexadecimal value with leading 0x
+	UI01 ADEType = iota // unsigned int / bool
+	UI08                // unsigned int
+	SI08                // signed int
+	UI16                // unsigned int
+	SI16                // signed int
+	UI32                // unsigned int
+	SI32                // signed int
+	UI64                // unsigned int
+	SI64                // signed int
+	FP32                // floating point
+	FP64                // floating point
+	UF32                // unsigned fixed point (integer part / fractional part)
+	SF32                // signed fixed point   (integer part / fractional part)
+	UF64                // unsigned fixed point (integer part / fractional part)
+	SF64                // signed fixed point   (integer part / fractional part)
+	UR32                // unsigned fraction
+	SR32                // signed fraction
+	UR64                // unsigned fraction
+	SR64                // unsigned fraction
+	FC32                // four char string
+	IP32                // ipv4 address
+	IPAD                // ipv4 or ipv6 address
+	CSTR                // C string
+	USTR                // unicode string
+	DATA                // Raw data or equivalent
+	ENUM                // Enumeration
+	UUID                // UUID
+	NULL                // NULL type, must have empty data section
+	CNCT                // binary data printed as hexadecimal value with leading 0x
 	CONT
 )
 
-var adeTypeMap = map[string]int{
+// FIXME replace with stringer and code generation as per 'go generate?'
+var adeTypeMap = map[string]ADEType{
 	"UI01": UI01,
 	"UI08": UI08,
 	"SI08": SI08,
@@ -392,7 +395,7 @@ func (a Atom) SetUI32(path string, value uint32) (err error) {
 }
 
 // bounds checking is implicit since uint32 cannot hold invalid values for UI32
-func (a Atom) SetValue(adeType int, value interface{}) (err error) {
+func (a Atom) SetValue(adeType ADEType, value interface{}) (err error) {
 	v := reflect.ValueOf(value)
 	switch adeType {
 	case CONT, NULL:
