@@ -8,7 +8,9 @@ import (
 	"reflect"
 )
 
-// original ADE code C-type mappings are in OSL_Types.h
+// ADE Data types
+// Defined in 112-0002_r4.0B_StorageGRID_Data_Types
+// The ADE code C-type mappings are in OSL_Types.h
 const (
 	UI01 = iota // unsigned int / bool
 	UI08        // unsigned int
@@ -74,45 +76,11 @@ var adeTypeMap = map[string]int{
 	"CNCT": CNCT,
 }
 
-// // ADE Data types
-// // Defined in 112-0002_r4.0B_StorageGRID_Data_Types
-// type UI01 bool        // unsigned int
-// type UI08 uint8       // unsigned int
-// type SI08 int8        // signed int
-// type UI16 uint16      // unsigned int
-// type SI16 int16       // signed int
-// type UI32 uint32      // unsigned int
-// type SI32 int32       // signed int
-// type UI64 uint64      // unsigned int
-// type SI64 int64       // signed int
-// type FP32 float32     // floating point
-// type FP64 float64     // floating point
-// type UF32 [2]uint16   // unsigned fixed point (integer part / fractional part)
-// type SF32 [2]int16    // signed fixed point   (integer part / fractional part)
-// type UF64 [2]uint32   // unsigned fixed point (integer part / fractional part)
-// type SF64 [2]int32    // signed fixed point   (integer part / fractional part)
-// type UR32 [2]uint16   // unsigned fraction
-// type SR32 [2]int16    // signed fraction
-// type UR64 [2]uint32   // unsigned fraction
-// type SR64 [2]int32    // unsigned fraction
-// type FC32 [4]byte     // four char string
-// type IP32 [4]byte     // ipv4 address
-// type IPAD string      // ipv4 or ipv6 address
-// type CSTR string      // C string
-// type USTR string      // unicode string
-// type DATA []byte      // Raw data or equivalent
-// type ENUM int32       // Enumeration
-// type UUID [16]byte    // output: DEC88E51-D85B-4425-8808-2168BC362443, input: same or hex
-// type NULL interface{} // NULL type, must have empty data section
-// type CNCT []byte      // binary data printed as hexadecimal value with leading 0x
-
 /**********************************************************/
 
 // decOp is the signature of a decoding operator for a given type.
-//type decOp func(i *decInstr, state *decoderState, v reflect.Value)
 type decOp func(buf []byte, value *reflect.Value)
 
-// Index by Go types.
 var decOpTable = [...]decOp{
 	UI01: decUI01,
 	UI08: decUI08,
@@ -135,14 +103,13 @@ var decOpTable = [...]decOp{
 	SR64: decSR64,
 	FC32: decFC32,
 	IP32: decIP32,
-	//	IPAD: decIPAD,
+	IPAD: decIPAD,
 	CSTR: decCSTR,
 	USTR: decUSTR,
 	DATA: decDATA,
 	CNCT: decDATA,
 	ENUM: decENUM,
-	//	UUID: decUUID,
-	//	NULL: decNULL,
+	UUID: decUUID,
 }
 
 /**********************************************************/
@@ -305,7 +272,7 @@ func decUR32(buf []byte, value *reflect.Value) {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(numerator) / float64(denominator)
+	var v = [2]uint16{numerator, denominator}
 	*value = reflect.ValueOf(v)
 }
 func decUR64(buf []byte, value *reflect.Value) {
@@ -318,7 +285,7 @@ func decUR64(buf []byte, value *reflect.Value) {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(numerator) / float64(denominator)
+	var v = [2]uint32{numerator, denominator}
 	*value = reflect.ValueOf(v)
 }
 func decSR32(buf []byte, value *reflect.Value) {
@@ -331,7 +298,7 @@ func decSR32(buf []byte, value *reflect.Value) {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(numerator) / float64(denominator)
+	var v = [2]int16{numerator, denominator}
 	*value = reflect.ValueOf(v)
 }
 func decSR64(buf []byte, value *reflect.Value) {
@@ -344,7 +311,7 @@ func decSR64(buf []byte, value *reflect.Value) {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(numerator) / float64(denominator)
+	var v = [2]int32{numerator, denominator}
 	*value = reflect.ValueOf(v)
 }
 func decFC32(buf []byte, value *reflect.Value) {
@@ -365,6 +332,15 @@ func decIP32(buf []byte, value *reflect.Value) {
 	s := fmt.Sprintf("%d.%d.%d.%d", v[0], v[1], v[2], v[3])
 	*value = reflect.ValueOf(s)
 }
+func decIPAD(buf []byte, value *reflect.Value) {
+	var v []byte
+	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
+	if err != io.EOF && err != nil {
+		panic(err)
+	}
+	s := string(v)
+	*value = reflect.ValueOf(s)
+}
 func decENUM(buf []byte, value *reflect.Value) {
 	var v int32
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
@@ -374,29 +350,40 @@ func decENUM(buf []byte, value *reflect.Value) {
 	*value = reflect.ValueOf(v)
 }
 func decCSTR(buf []byte, value *reflect.Value) {
-	var v []byte
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	*value = reflect.ValueOf(v)
+	s := string(buf)
+	*value = reflect.ValueOf(s)
 }
 func decUSTR(buf []byte, value *reflect.Value) {
-	var v []byte
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	s := string(v)
+	s := string(buf)
 	*value = reflect.ValueOf(s)
 }
 func decDATA(buf []byte, value *reflect.Value) {
-	var v []byte
+	*value = reflect.ValueOf(buf)
+}
+
+// UUID - 128 bit
+// variant must be RFC4122/DCE (10b==2d)
+// high 2 bits of octet 8 are variant as per RFC
+// version must be one of the five defined in the RFC (1d-5d)
+// high 4 bits of octet 6 are version as per RFC
+// UUID_NULL_STRING "00000000-0000-0000-0000-000000000000"
+func decUUID(buf []byte, value *reflect.Value) {
+	var v struct {
+		TimeLow          uint32
+		TimeMid          uint16
+		TimeHiAndVersion uint16
+		ClkSeqHiRes      uint8
+		ClkSeqLow        uint8
+		NodePart1        uint16 // there's no uint48, must get node in 2 parts
+		NodePart2        uint32
+	}
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	*value = reflect.ValueOf(v)
+	node := uint64(v.NodePart1)<<32 + uint64(v.NodePart2)
+	var s = fmt.Sprintf("%08X-%04X-%04X-%02X%02X-%012X", v.TimeLow, v.TimeMid, v.TimeHiAndVersion, v.ClkSeqHiRes, v.ClkSeqLow, node)
+	*value = reflect.ValueOf(s)
 }
 
 /**********************************************************/
@@ -418,11 +405,11 @@ func (a Atom) SetValue(adeType int, value interface{}) (err error) {
 			if v.Bool() == true {
 				binary.BigEndian.PutUint32(a.Data, uint32(1))
 			} else {
-				binary.BigEndian.PutUint32(a.Data, uint32(1))
+				binary.BigEndian.PutUint32(a.Data, uint32(0))
 			}
-		case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			fallthrough
-		case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		case
+			reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			if v.Uint() == 0 || v.Uint() == 1 {
 				v := uint32(v.Uint())
 				binary.BigEndian.PutUint32(a.Data, v)

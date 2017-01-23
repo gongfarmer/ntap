@@ -72,15 +72,16 @@ func (a Atom) goType() reflect.Type {
 		p = reflect.ValueOf(new(uint64))
 	case SI08, SI16, SI32, SI64:
 		p = reflect.ValueOf(new(int64))
-	case FP32, FP64,
-		UF32, UF64, SF32, SF64,
-		UR32, UR64, SR32, SR64:
+	case FP32, FP64, UF32, UF64, SF32, SF64:
 		p = reflect.ValueOf(new(float64)) // FIXME signed float64 has smaller max value than UF64
+	case UR32, UR64:
+		p = reflect.ValueOf(new([2]uint64))
+	case SR32, SR64:
+		p = reflect.ValueOf(new([2]int64))
 	case FC32, IP32, IPAD, CSTR, USTR, UUID:
 		p = reflect.ValueOf(new(string)) // FIXME signed float64 has smaller max value than UF64
 	case DATA, CNCT:
-		// FIXME: no type conversion necessary here
-		p = reflect.ValueOf(new([]byte)) // FIXME signed float64 has smaller max value than UF64
+		p = reflect.ValueOf(a.Data) // FIXME signed float64 has smaller max value than UF64
 	case ENUM:
 		p = reflect.ValueOf(new(int32))
 	default:
