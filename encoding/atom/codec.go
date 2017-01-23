@@ -374,15 +374,13 @@ func decUUID(buf []byte, value *reflect.Value) {
 		TimeHiAndVersion uint16
 		ClkSeqHiRes      uint8
 		ClkSeqLow        uint8
-		NodePart1        uint16 // there's no uint48, must get node in 2 parts
-		NodePart2        uint32
+		Node             [6]byte
 	}
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	node := uint64(v.NodePart1)<<32 + uint64(v.NodePart2)
-	var s = fmt.Sprintf("%08X-%04X-%04X-%02X%02X-%012X", v.TimeLow, v.TimeMid, v.TimeHiAndVersion, v.ClkSeqHiRes, v.ClkSeqLow, node)
+	var s = fmt.Sprintf("%08X-%04X-%04X-%02X%02X-%012X", v.TimeLow, v.TimeMid, v.TimeHiAndVersion, v.ClkSeqHiRes, v.ClkSeqLow, v.Node)
 	*value = reflect.ValueOf(s)
 }
 
