@@ -82,17 +82,17 @@ END
 
 // Attempt to design a go type that could be automatically converted
 // into an Atom object
-type attributeRows [uint32]interface{}
+type attributeRows map[uint32]interface{}
 type avalContainer struct {
 	index uint32 `atom: 0x00000000:UI32`
 	attributeRows
 }
+type AttributeBranches []AttributeBranch
 
 // FIXME how to succintly define AVTP?
-type attributeBranches [string]Attribute
-type attributeBranch struct {
-	AVER ui32
-	ATIM ui64   `atom: CTIM:UI32` // eg. allowing name and/or type to be explicitly defined instead of assumed from go type and var name
+type AttributeBranch struct {
+	AVER uint32
+	ATIM uint64 `atom: CTIM:UI32` // eg. allowing name and/or type to be explicitly defined instead of assumed from go type and var name
 	AVTP string `atom: AVTP:CSTR`
 	APER string `atom: APER:CSTR` // otherwise default to CSTR i suppose
 	AVAL avalContainer
@@ -100,19 +100,21 @@ type attributeBranch struct {
 
 // FIXME: can I actually get struct field names? It must be possible because Fprintf("%+v", myStructInstance) does it
 
-func (a *AttributeBranch) New(name string, avtp string, aper string) {
-	*a = AttributeBranch{0, 0, avtp, aper}
+func NewAttributeBranch(name string, avtp string, aper string) *AttributeBranch {
+	ab := AttributeBranch{AVER: 0, ATIM: 0, AVTP: avtp, APER: aper}
+	return &ab
 }
 
-func (a *AttributeContainer) New(name string, containers ...[string]AttributeBranch) {
-	*a = AttributeContainer{0, 0, avtp, aper}
+func NewAttributeContainer(name string, containers ...AttributeBranch) *AttributeContainer {
+	abs := AttributeBranches(containers)
+	return &AttributeContainer{name: name, AttributeBranches: abs}
 }
 func (a *AttributeContainer) AddRow(values ...interface{}) {
 }
 
 // Confirm that this struct conforms to attribute container structure
 func (a *AttributeContainer) validate() error {
-	err = Error{}
+	var err error
 	return err
 }
 func (a *AttributeContainer) EncodeBinary() {
@@ -120,17 +122,19 @@ func (a *AttributeContainer) EncodeBinary() {
 func (a *AttributeContainer) EncodeText() {
 }
 
+// FIXME: where to put the Atom object?
 type AttributeContainer struct {
+	name string
 	BVER uint32
 	BTIM uint64
-	attributeBranches
+	AttributeBranches
 }
 
 // substitute for main, just to experiment with this syntax
 func attrScratchSpace() {
-	var gods = AttributeContainer.New("GODS",
-		attributeBranch.New("GOPT", "CSTR", "READ"),
-		attributeBranch.New("GOVL", "CSTR", "READ"),
+	gods := NewAttributeContainer("GODS",
+		*NewAttributeBranch("GOPT", "CSTR", "READ"),
+		*NewAttributeBranch("GOVL", "CSTR", "READ"),
 	)
 	gods.AddRow("MyDog", "HasFleas")
 

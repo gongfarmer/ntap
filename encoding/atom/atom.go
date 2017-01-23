@@ -6,7 +6,6 @@
 package atom
 
 import (
-	"bytes"
 	"encoding"
 	"encoding/binary"
 	"fmt"
@@ -42,8 +41,11 @@ func isPrint(s string) bool {
 }
 
 func (a Atom) String() string {
-	output := buildString(&a, 0)
-	return output.String()
+	buf, err := a.MarshalText()
+	if err != nil {
+		panic(fmt.Errorf("Failed to write Atom '%s:%s' to text: %s", a.Name, a.Type, err))
+	}
+	return string(buf)
 }
 
 func (a Atom) Value() reflect.Value {
@@ -88,42 +90,6 @@ func (a Atom) goType() reflect.Type {
 		panic(fmt.Errorf("Don't know how to handle type %s", a.Type))
 	}
 	return p.Type()
-}
-
-// FIXME Rename because its not a string
-func buildString(a *Atom, depth int) bytes.Buffer {
-	var (
-		output        bytes.Buffer
-		printableName string
-	)
-	// print atom name + type
-	if isPrint(a.Name) {
-		printableName = a.Name
-	} else {
-		printableName = fmt.Sprintf("0x%+08X", a.Name)
-	}
-	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", printableName, a.Type)
-	if a.hasValue() {
-		fmt.Fprintln(&output, a.Value())
-	} else {
-		fmt.Fprintln(&output)
-	}
-
-	// print children
-	if a.Type == "CONT" {
-		for _, childPtr := range a.Children {
-			buf := buildString(childPtr, depth+1)
-			output.WriteString(buf.String())
-		}
-	}
-	return output
-}
-
-func (a *Atom) hasValue() bool {
-	if a.Type == "CONT" || a.Type == "NULL" {
-		return false
-	}
-	return true
 }
 
 func (c *Atom) addChild(a *Atom) {
