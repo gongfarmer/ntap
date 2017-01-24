@@ -120,11 +120,11 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 		// construct complete Atom object (with data if any)
 		var a Atom
 		if h.Type == CONT {
-			a = Atom{Name: string(h.Name[:]), Type: string(h.Type[:])}
+			a = Atom{Name: string(h.Name[:]), Type: ADEType(h.Type[:])}
 		} else {
 			data, err := readAtomData(r, h.Size-headerBytes, &bytesRead)
 			checkError(err)
-			a = Atom{Name: string(h.Name[:]), Type: string(h.Type[:]), Data: data}
+			a = Atom{Name: string(h.Name[:]), Type: ADEType(h.Type[:]), Data: data}
 		}
 
 		// add atom to parent.Children, or to atoms list if no parent

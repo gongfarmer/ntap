@@ -18,17 +18,19 @@ import (
 // Verify that atom meets encoding interfaces at compile time
 var _ encoding.BinaryUnmarshaler = &(Atom{})
 
-// var _ encoding.BinaryMarshaler = Atom{} // TODO
-// var _ encoding.TextUnmarshaler = Atom{} // TODO
-// var _ encoding.TextMarshaler = Atom{} // TODO
+// var _ encoding.BinaryMarshaler = Atom{}
+// var _ encoding.TextUnmarshaler = Atom{}
+var _ encoding.TextMarshaler = &(Atom{})
 
 // GOAL: make this concurrency-safe, perhaps immutable
+
 type Atom struct {
 	Name     string
-	Type     string
+	Type     ADEType
 	Data     []byte
 	Children []*Atom
 }
+type ADEType string
 
 // Return true if string is printable, false otherwise
 func isPrint(s string) bool {
@@ -59,9 +61,12 @@ func (a Atom) Value() reflect.Value {
 		panic(fmt.Errorf("Atom type %s has no value", a.Type))
 	}
 	var ptr reflect.Value = reflect.New(a.goType().Elem())
-	decoderFunc := decOpTable[a.Type]
-	decoderFunc(a.Data, &ptr)
+	opTable[a.Type].Decode(a.Data, &ptr)
 	return ptr
+}
+
+func (a Atom) ValueString() string {
+	return opTable[a.Type].String(a.Data)
 }
 
 // Return a go type suitable for holding a value of the given ADE Atom type
