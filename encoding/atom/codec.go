@@ -8,83 +8,48 @@ import (
 	"reflect"
 )
 
-type ADEType int
-
 // ADE Data types
 // Defined in 112-0002_r4.0B_StorageGRID_Data_Types
 // The ADE code C-type mappings are in OSL_Types.h
 const (
-	UI01 ADEType = iota // unsigned int / bool
-	UI08                // unsigned int
-	SI08                // signed int
-	UI16                // unsigned int
-	SI16                // signed int
-	UI32                // unsigned int
-	SI32                // signed int
-	UI64                // unsigned int
-	SI64                // signed int
-	FP32                // floating point
-	FP64                // floating point
-	UF32                // unsigned fixed point (integer part / fractional part)
-	SF32                // signed fixed point   (integer part / fractional part)
-	UF64                // unsigned fixed point (integer part / fractional part)
-	SF64                // signed fixed point   (integer part / fractional part)
-	UR32                // unsigned fraction
-	SR32                // signed fraction
-	UR64                // unsigned fraction
-	SR64                // unsigned fraction
-	FC32                // four char string
-	IP32                // ipv4 address
-	IPAD                // ipv4 or ipv6 address
-	CSTR                // C string
-	USTR                // unicode string
-	DATA                // Raw data or equivalent
-	ENUM                // Enumeration
-	UUID                // UUID
-	NULL                // NULL type, must have empty data section
-	CNCT                // binary data printed as hexadecimal value with leading 0x
-	CONT
+	UI01 = "UI01" // unsigned int / bool
+	UI08 = "UI08" // unsigned int
+	SI08 = "SI08" // signed int
+	UI16 = "UI16" // unsigned int
+	SI16 = "SI16" // signed int
+	UI32 = "UI32" // unsigned int
+	SI32 = "SI32" // signed int
+	UI64 = "UI64" // unsigned int
+	SI64 = "SI64" // signed int
+	FP32 = "FP32" // floating point
+	FP64 = "FP64" // floating point
+	UF32 = "UF32" // unsigned fixed point (integer part / fractional part)
+	SF32 = "SF32" // signed fixed point   (integer part / fractional part)
+	UF64 = "UF64" // unsigned fixed point (integer part / fractional part)
+	SF64 = "SF64" // signed fixed point   (integer part / fractional part)
+	UR32 = "UR32" // unsigned fraction
+	SR32 = "SR32" // signed fraction
+	UR64 = "UR64" // unsigned fraction
+	SR64 = "SR64" // unsigned fraction
+	FC32 = "FC32" // four char string
+	IP32 = "IP32" // ipv4 address
+	IPAD = "IPAD" // ipv4 or ipv6 address
+	CSTR = "CSTR" // C string
+	USTR = "USTR" // unicode string
+	DATA = "DATA" // Raw data or equivalent
+	ENUM = "ENUM" // Enumeration
+	UUID = "UUID" // UUID
+	NULL = "NULL" // NULL type, must have empty data section
+	CNCT = "CNCT" // binary data printed as hexadecimal value with leading 0x
+	CONT = "CONT"
 )
-
-// FIXME replace with stringer and code generation as per 'go generate?'
-var adeTypeMap = map[string]ADEType{
-	"UI01": UI01,
-	"UI08": UI08,
-	"SI08": SI08,
-	"UI16": UI16,
-	"SI16": SI16,
-	"UI32": UI32,
-	"SI32": SI32,
-	"UI64": UI64,
-	"SI64": SI64,
-	"FP32": FP32,
-	"FP64": FP64,
-	"UF32": UF32,
-	"SF32": SF32,
-	"UF64": UF64,
-	"SF64": SF64,
-	"UR32": UR32,
-	"SR32": SR32,
-	"UR64": UR64,
-	"SR64": SR64,
-	"FC32": FC32,
-	"IP32": IP32,
-	"IPAD": IPAD,
-	"CSTR": CSTR,
-	"USTR": USTR,
-	"DATA": DATA,
-	"ENUM": ENUM,
-	"UUID": UUID,
-	"NULL": NULL,
-	"CNCT": CNCT,
-}
 
 /**********************************************************/
 
 // decOp is the signature of a decoding operator for a given type.
 type decOp func(buf []byte, value *reflect.Value)
 
-var decOpTable = [...]decOp{
+var decOpTable = map[string]decOp{
 	UI01: decUI01,
 	UI08: decUI08,
 	UI16: decUI16,
@@ -336,12 +301,7 @@ func decIP32(buf []byte, value *reflect.Value) {
 	*value = reflect.ValueOf(s)
 }
 func decIPAD(buf []byte, value *reflect.Value) {
-	var v []byte
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	s := string(v)
+	s := string(buf)
 	*value = reflect.ValueOf(s)
 }
 func decENUM(buf []byte, value *reflect.Value) {
@@ -395,7 +355,7 @@ func (a Atom) SetUI32(path string, value uint32) (err error) {
 }
 
 // bounds checking is implicit since uint32 cannot hold invalid values for UI32
-func (a Atom) SetValue(adeType ADEType, value interface{}) (err error) {
+func (a Atom) SetValue(adeType string, value interface{}) (err error) {
 	v := reflect.ValueOf(value)
 	switch adeType {
 	case CONT, NULL:

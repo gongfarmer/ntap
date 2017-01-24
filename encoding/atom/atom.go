@@ -59,7 +59,7 @@ func (a Atom) Value() reflect.Value {
 		panic(fmt.Errorf("Atom type %s has no value", a.Type))
 	}
 	var ptr reflect.Value = reflect.New(a.goType().Elem())
-	decoderFunc := decOpTable[adeTypeMap[a.Type]]
+	decoderFunc := decOpTable[a.Type]
 	decoderFunc(a.Data, &ptr)
 	return ptr
 }
@@ -67,7 +67,7 @@ func (a Atom) Value() reflect.Value {
 // Return a go type suitable for holding a value of the given ADE Atom type
 func (a Atom) goType() reflect.Type {
 	var p reflect.Value
-	switch adeTypeMap[a.Type] {
+	switch a.Type {
 	case UI01:
 		p = reflect.ValueOf(new(bool))
 	case UI08, UI16, UI32, UI64:
