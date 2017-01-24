@@ -1,7 +1,7 @@
 package atom
 
 // Enable reading and writing of binary format ADE AtomContainers by fulfilling
-// these interfaces:
+// these interfaces from stdlib encoding/:
 //
 // type BinaryMarshaler interface {
 // 	MarshalBinary() (data []byte, err error)
@@ -107,25 +107,19 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 	var (
 		bytesRead  uint32
-		CONT       = [4]byte{'C', 'O', 'N', 'T'}
 		containers containerStack
 	)
 	for err := error(nil); err != io.EOF; {
-		// read binary header for next atom
+		// read next atom header
 		h, err := readAtomHeader(r, &bytesRead)
 		if checkError(err) == io.EOF {
 			break
 		}
 
-		// construct complete Atom object (with data if any)
-		var a Atom
-		if h.Type == CONT {
-			a = Atom{Name: string(h.Name[:]), Type: ADEType(h.Type[:])}
-		} else {
-			data, err := readAtomData(r, h.Size-headerBytes, &bytesRead)
-			checkError(err)
-			a = Atom{Name: string(h.Name[:]), Type: ADEType(h.Type[:]), Data: data}
-		}
+		// construct Atom object, read data
+		data, err := readAtomData(r, h.Size-headerBytes, &bytesRead)
+		checkError(err)
+		var a = Atom{Name: string(h.Name[:]), Type: ADEType(h.Type[:]), Data: data}
 
 		// add atom to parent.Children, or to atoms list if no parent
 		if parent, ok := containers.Peek(); ok {
@@ -135,7 +129,7 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 		}
 
 		// push container onto stack
-		if h.Type == CONT {
+		if a.Type == CONT {
 			endPos := bytesRead + h.Size - headerBytes
 			containers.Push(cont{&a, endPos})
 		}
@@ -167,6 +161,9 @@ func readAtomHeader(r io.Reader, bytesRead *uint32) (h atomHeader, err error) {
 
 func readAtomData(r io.Reader, length uint32, bytesRead *uint32) (data []byte, err error) {
 	data = make([]byte, length)
+	if length == 0 {
+		return
+	}
 	err = binary.Read(r, binary.BigEndian, &data)
 	*bytesRead += length
 	return

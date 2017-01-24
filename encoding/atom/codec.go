@@ -42,7 +42,7 @@ const (
 	UUID ADEType = "UUID" // UUID
 	NULL ADEType = "NULL" // NULL type, must have empty data section
 	CNCT ADEType = "CNCT" // binary data printed as hexadecimal value with leading 0x
-	CONT ADEType = "CONT"
+	CONT ADEType = "CONT" // AtomContainer
 )
 
 /**********************************************************/
@@ -80,21 +80,23 @@ var opTable = map[ADEType]Operators{
 	SR64: Operators{decSR64, strSR64},
 	FC32: Operators{decFC32, strFC32},
 	IP32: Operators{decIP32, strIP32},
-	IPAD: Operators{decIPAD, strIPAD},
+	IPAD: Operators{decIPAD, strUSTR},
 	CSTR: Operators{decCSTR, strCSTR},
 	USTR: Operators{decUSTR, strUSTR},
 	DATA: Operators{decDATA, strDATA},
 	CNCT: Operators{decDATA, strDATA},
-	ENUM: Operators{decENUM, strENUM},
+	ENUM: Operators{decENUM, strSI32},
 	UUID: Operators{decUUID, strUUID},
+	NULL: Operators{decNULL, strNULL},
+	CONT: Operators{decNULL, strNULL},
 }
 
 /**********************************************************/
 func strUI01(buf []byte) string {
-	return fmt.Sprintf(binary.BigEndian.Uint32(buf))
+	return fmt.Sprint(binary.BigEndian.Uint32(buf))
 }
 func strUI08(buf []byte) string {
-	return fmt.Sprintf(buf)
+	return fmt.Sprint(buf)
 }
 func strUI16(buf []byte) string {
 	return fmt.Sprint(binary.BigEndian.Uint16(buf))
@@ -143,9 +145,7 @@ func strUF32(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(integer)
-	v += (1.0 / float64(fractional))
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d.%d", integer, fractional)
 }
 func strUF64(buf []byte) string {
 	var integer, fractional uint32
@@ -157,9 +157,7 @@ func strUF64(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(integer)
-	v += (1.0 / float64(fractional))
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d.%d", integer, fractional)
 }
 func strSF32(buf []byte) string {
 	var integer, fractional int16
@@ -171,9 +169,7 @@ func strSF32(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(integer)
-	v += (1.0 / float64(fractional))
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d.%d", integer, fractional)
 }
 func strSF64(buf []byte) string {
 	var integer, fractional int32
@@ -185,9 +181,7 @@ func strSF64(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v float64 = float64(integer)
-	v += (1.0 / float64(fractional))
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d.%d", integer, fractional)
 }
 func strUR32(buf []byte) string {
 	var numerator, denominator uint16
@@ -199,8 +193,7 @@ func strUR32(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v = [2]uint16{numerator, denominator}
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strUR64(buf []byte) string {
 	var numerator, denominator uint32
@@ -212,8 +205,7 @@ func strUR64(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v = [2]uint32{numerator, denominator}
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strSR32(buf []byte) string {
 	var numerator, denominator int16
@@ -225,8 +217,7 @@ func strSR32(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v = [2]int16{numerator, denominator}
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strSR64(buf []byte) string {
 	var numerator, denominator int32
@@ -238,8 +229,7 @@ func strSR64(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var v = [2]int32{numerator, denominator}
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strFC32(buf []byte) string {
 	var v [4]byte
@@ -247,8 +237,7 @@ func strFC32(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var s = string(v[:])
-	*value = reflect.ValueOf(s)
+	return string(v[:])
 }
 func strIP32(buf []byte) string {
 	var v [4]byte
@@ -256,31 +245,16 @@ func strIP32(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	s := fmt.Sprintf("%d.%d.%d.%d", v[0], v[1], v[2], v[3])
-	*value = reflect.ValueOf(s)
-}
-func strIPAD(buf []byte) string {
-	s := string(buf)
-	*value = reflect.ValueOf(s)
-}
-func strENUM(buf []byte) string {
-	var v int32
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	*value = reflect.ValueOf(v)
+	return fmt.Sprintf("%d.%d.%d.%d", v[0], v[1], v[2], v[3])
 }
 func strCSTR(buf []byte) string {
-	s := string(buf)
-	*value = reflect.ValueOf(s)
+	return string(buf)
 }
 func strUSTR(buf []byte) string {
-	s := string(buf)
-	*value = reflect.ValueOf(s)
+	return string(buf)
 }
 func strDATA(buf []byte) string {
-	*value = reflect.ValueOf(buf)
+	return fmt.Sprintf("0x%X", buf)
 }
 
 // UUID - 128 bit
@@ -302,8 +276,17 @@ func strUUID(buf []byte) string {
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	var s = fmt.Sprintf("%08X-%04X-%04X-%02X%02X-%012X", v.TimeLow, v.TimeMid, v.TimeHiAndVersion, v.ClkSeqHiRes, v.ClkSeqLow, v.Node)
-	*value = reflect.ValueOf(s)
+	return fmt.Sprintf(
+		"%08X-%04X-%04X-%02X%02X-%012X",
+		v.TimeLow,
+		v.TimeMid,
+		v.TimeHiAndVersion,
+		v.ClkSeqHiRes, v.ClkSeqLow,
+		v.Node)
+}
+
+func strNULL(_ []byte) string {
+	return ""
 }
 
 /**********************************************************/
@@ -573,15 +556,20 @@ func decUUID(buf []byte, value *reflect.Value) {
 	*value = reflect.ValueOf(s)
 }
 
+func decNULL(buf []byte, value *reflect.Value) {
+	*value = reflect.ValueOf(nil)
+}
+
 /**********************************************************/
 
 // Called on a container, create atom at the given path if not exist, and set to given value
+// FIXME is it useful to write this?
 func (a Atom) SetUI32(path string, value uint32) (err error) {
 	return
 }
 
 // bounds checking is implicit since uint32 cannot hold invalid values for UI32
-func (a Atom) SetValue(adeType string, value interface{}) (err error) {
+func (a Atom) SetValue(adeType ADEType, value interface{}) (err error) {
 	v := reflect.ValueOf(value)
 	switch adeType {
 	case CONT, NULL:

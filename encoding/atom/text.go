@@ -6,7 +6,7 @@ import (
 )
 
 // Enable reading and writing of text format ADE AtomContainers by fulfilling
-// the following interfaces:
+// these interfaces from stdlib encoding/:
 
 // TextMarshaler is the interface implemented by an object that can marshal
 // itself into a textual form.
@@ -58,6 +58,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 		for _, childPtr := range a.Children {
 			buf := atomToTextBuffer(childPtr, depth+1)
 			output.Write(buf.Bytes())
+			fmt.Print(buf.String())
 		}
 	}
 	return output
