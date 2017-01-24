@@ -127,12 +127,12 @@ func strSI64(buf []byte) string {
 }
 func strFP32(buf []byte) string {
 	var v = reflect.ValueOf(*new(float32))
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
+	binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	return fmt.Sprint(v)
 }
 func strFP64(buf []byte) string {
 	var v = reflect.ValueOf(*new(float64))
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
+	binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	return fmt.Sprint(v)
 }
 func strUF32(buf []byte) string {
@@ -232,12 +232,11 @@ func strSR64(buf []byte) string {
 	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strFC32(buf []byte) string {
-	var v [4]byte
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
+	if isPrintableBytes(buf) {
+		return string(buf)
+	} else {
+		return fmt.Sprintf("%#08X", buf)
 	}
-	return string(v[:])
 }
 func strIP32(buf []byte) string {
 	var v [4]byte

@@ -31,8 +31,7 @@ import (
 // Write Atom object to a byte slice in ADE ContainerText format.
 func (a *Atom) MarshalText() (text []byte, err error) {
 	buf := atomToTextBuffer(a, 0)
-	text = buf.Bytes()
-	return text, err
+	return buf.Bytes(), err
 }
 
 func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
@@ -40,44 +39,16 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 		output        bytes.Buffer
 		printableName string
 	)
-	// print atom name + type
-	if isPrint(a.Name) {
-		printableName = a.Name
-	} else {
-		printableName = fmt.Sprintf("0x%+08X", a.Name)
-	}
+	// print atom name,type,data
+	printableName = strFC32([]byte(a.Name))
 	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", printableName, a.Type)
-	if a.hasValue() {
-		fmt.Fprintln(&output, a.Value())
-	} else {
-		fmt.Fprintln(&output)
-	}
+	fmt.Fprintln(&output, a.ValueString())
 
 	// print children
-	if a.Type == "CONT" {
-		for _, childPtr := range a.Children {
-			buf := atomToTextBuffer(childPtr, depth+1)
-			output.Write(buf.Bytes())
-			fmt.Print(buf.String())
-		}
+	for _, childPtr := range a.Children {
+		fmt.Println(" =>%s ", childPtr.Name) // DEBUG
+		buf := atomToTextBuffer(childPtr, depth+1)
+		output.Write(buf.Bytes())
 	}
 	return output
-}
-
-func (a *Atom) hasValue() bool {
-	if a.Type == "CONT" || a.Type == "NULL" {
-		return false
-	}
-	return true
-}
-
-func (a *Atom) ValueAsText() (buf []byte) {
-	if !a.hasValue() {
-		return
-	}
-
-	v := a.Value()
-	switch v.Type() {
-	}
-	return
 }

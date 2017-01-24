@@ -6,6 +6,7 @@
 package atom
 
 import (
+	"bytes"
 	"encoding"
 	"encoding/binary"
 	"fmt"
@@ -33,8 +34,16 @@ type Atom struct {
 type ADEType string
 
 // Return true if string is printable, false otherwise
-func isPrint(s string) bool {
+func isPrintableString(s string) bool {
 	for _, r := range s {
+		if !unicode.IsPrint(r) {
+			return false
+		}
+	}
+	return true
+}
+func isPrintableBytes(buf []byte) bool {
+	for _, r := range bytes.Runes(buf) {
 		if !unicode.IsPrint(r) {
 			return false
 		}
@@ -57,9 +66,6 @@ func (a Atom) Value() reflect.Value {
 			panic(err)
 		}
 	}()
-	if !a.hasValue() {
-		panic(fmt.Errorf("Atom type %s has no value", a.Type))
-	}
 	var ptr reflect.Value = reflect.New(a.goType().Elem())
 	opTable[a.Type].Decode(a.Data, &ptr)
 	return ptr
@@ -106,24 +112,23 @@ func (c *Atom) addChild(a *Atom) {
 }
 
 func FromFile(path string) (a Atom, err error) {
-	var (
-		buf []byte
-	)
-
 	fstat, err := os.Stat(path)
 	if err != nil {
 		return
 	}
 
-	buf, err = ioutil.ReadFile(path)
+	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return
 	}
-	var encoded_size int64 = int64(binary.BigEndian.Uint32(buf[0:4]))
+	var encoded_size = int64(binary.BigEndian.Uint32(buf[0:4]))
 	if encoded_size != fstat.Size() {
-		fmt.Errorf("Invalid AtomContainer file (encoded size does not match filesize)")
+		err = fmt.Errorf("Invalid AtomContainer file (encoded size does not match filesize)")
+		return
 	}
 
 	err = a.UnmarshalBinary(buf)
+	fmt.Printf("container has %d children.\n", len(a.Children))
+	fmt.Printf("container: %+v\n", a)
 	return
 }
