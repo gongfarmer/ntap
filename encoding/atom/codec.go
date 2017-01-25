@@ -122,22 +122,22 @@ func strSI64(buf []byte) string {
 	return fmt.Sprint(decSI64(buf))
 }
 func strFP32(buf []byte) string {
-	return fmt.Sprintf("%0.8E", decFP32(buf).Interface().(float32))
+	return fmt.Sprintf("%0.8E", decFP32(buf).Float())
 }
 func strFP64(buf []byte) string {
-	return fmt.Sprintf("%0.17E", decFP64(buf).Interface().(float64))
+	return fmt.Sprintf("%0.17E", decFP64(buf).Float())
 }
 func strUF32(buf []byte) string {
-	return fmt.Sprintf("%0.4f", decUF32(buf).Interface().(float32))
+	return fmt.Sprintf("%0.4f", decUF32(buf).Float())
 }
 func strUF64(buf []byte) string {
-	return fmt.Sprintf("%0.8f", decUF64(buf).Interface().(float64))
+	return fmt.Sprintf("%0.8f", decUF64(buf).Float())
 }
 func strSF32(buf []byte) string {
-	return fmt.Sprintf("%0.4f", decSF32(buf).Interface().(float32))
+	return fmt.Sprintf("%0.4f", decSF32(buf).Float())
 }
 func strSF64(buf []byte) string {
-	return fmt.Sprintf("%0.9f", decSF64(buf).Interface().(float64))
+	return fmt.Sprintf("%0.9f", decSF64(buf).Float())
 }
 func strUR32(buf []byte) string {
 	arr := decUR32(buf).Interface().([2]uint16)
@@ -421,7 +421,7 @@ func asPrintableString(buf []byte) string {
 	if isPrintableBytes(buf) {
 		return string(buf[:])
 	} else {
-		i := decUI32(buf).Interface().(uint32)
+		i := decUI32(buf).Uint()
 		return fmt.Sprintf("0x%08X", i)
 	}
 }
