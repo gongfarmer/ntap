@@ -50,7 +50,7 @@ const SHIFT8 = 0x100000000
 /**********************************************************/
 
 // decOp is the signature of a decoding operator for a given type.
-type decOp func(buf []byte) (value reflect.Value)
+type decOp func(buf []byte) reflect.Value
 
 // decOp is the signature of a function that prints value as a string for a given type
 type strOp func(buf []byte) string
@@ -82,7 +82,7 @@ var opTable = map[ADEType]Operators{
 	SR64: Operators{decSR64, strSR64},
 	FC32: Operators{decFC32, strFC32},
 	IP32: Operators{decIP32, strIP32},
-	IPAD: Operators{decUSTR, strUSTR},
+	IPAD: Operators{decUSTR, strCSTR},
 	CSTR: Operators{decCSTR, strCSTR},
 	USTR: Operators{decUSTR, strUSTR},
 	DATA: Operators{decDATA, strDATA},
@@ -141,36 +141,33 @@ func strSF64(buf []byte) string {
 }
 func strUR32(buf []byte) string {
 	arr := decUR32(buf).Interface().([2]uint16)
-	var numerator, denominator uint16 = arr[0], arr[1]
-	return fmt.Sprintf("%d/%d", numerator, denominator)
+	return fmt.Sprintf("%d/%d", arr)
 }
 func strUR64(buf []byte) string {
 	arr := decUR64(buf).Interface().([2]uint32)
-	var numerator, denominator uint32 = arr[0], arr[1]
-	return fmt.Sprintf("%d/%d", numerator, denominator)
+	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strSR32(buf []byte) string {
 	arr := decSR32(buf).Interface().([2]int16)
-	var numerator, denominator int16 = arr[0], arr[1]
-	return fmt.Sprintf("%d/%d", numerator, denominator)
+	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strSR64(buf []byte) string {
 	arr := decSR64(buf).Interface().([2]int32)
-	var numerator, denominator int32 = arr[0], arr[1]
-	return fmt.Sprintf("%d/%d", numerator, denominator)
+	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strFC32(buf []byte) string {
 	if isPrintableBytes(buf) {
 		return fmt.Sprintf("'%s'", string(buf))
 	} else {
-		return fmt.Sprintf("%#08X", buf)
+		return fmt.Sprintf("0x%08X", buf)
 	}
 }
 func strIP32(buf []byte) string {
 	return fmt.Sprintf("%d.%d.%d.%d", buf[0], buf[1], buf[2], buf[3])
 }
 func strCSTR(buf []byte) string {
-	return fmt.Sprintf("\"%q\"", string(buf))
+	trimmed := buf[0 : len(buf)-1]
+	return fmt.Sprintf("%q", string(trimmed))
 }
 func strUSTR(buf []byte) string {
 	return fmt.Sprintf("\"%s\"", string(buf))
@@ -213,7 +210,7 @@ func strNULL(_ []byte) string {
 
 /**********************************************************/
 
-func decUI01(buf []byte) (value reflect.Value) {
+func decUI01(buf []byte) reflect.Value {
 	var v uint32
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
@@ -223,196 +220,166 @@ func decUI01(buf []byte) (value reflect.Value) {
 	if v == 1 {
 		t = true
 	}
-	value = reflect.ValueOf(t)
-	return
+	return reflect.ValueOf(t)
 }
-func decUI08(buf []byte) (value reflect.Value) {
+func decUI08(buf []byte) reflect.Value {
 	var v uint8
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decUI16(buf []byte) (value reflect.Value) {
+func decUI16(buf []byte) reflect.Value {
 	var v uint16
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decUI32(buf []byte) (value reflect.Value) {
+func decUI32(buf []byte) reflect.Value {
 	var v uint32
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decUI64(buf []byte) (value reflect.Value) {
+func decUI64(buf []byte) reflect.Value {
 	var v uint64
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decSF32(buf []byte) (value reflect.Value) {
+func decSF32(buf []byte) reflect.Value {
 	v := float32(decSI32(buf).Interface().(int32)) / SHIFT4
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decSF64(buf []byte) (value reflect.Value) {
+func decSF64(buf []byte) reflect.Value {
 	v := float64(decSI64(buf).Interface().(int64)) / SHIFT8
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decSI08(buf []byte) (value reflect.Value) {
+func decSI08(buf []byte) reflect.Value {
 	var v int8
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decSI16(buf []byte) (value reflect.Value) {
+func decSI16(buf []byte) reflect.Value {
 	var v int16
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decSI32(buf []byte) (value reflect.Value) {
+func decSI32(buf []byte) reflect.Value {
 	var v int32
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decSI64(buf []byte) (value reflect.Value) {
+func decSI64(buf []byte) reflect.Value {
 	var v int64
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decFP32(buf []byte) (value reflect.Value) {
+func decFP32(buf []byte) reflect.Value {
 	var v float32
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decFP64(buf []byte) (value reflect.Value) {
+func decFP64(buf []byte) reflect.Value {
 	var v float64
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decUF32(buf []byte) (value reflect.Value) {
+func decUF32(buf []byte) reflect.Value {
 	var v float32 = float32(decUI32(buf).Uint()) / SHIFT4
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
-func decUF64(buf []byte) (value reflect.Value) {
+func decUF64(buf []byte) reflect.Value {
 	var v float64 = float64(decUI64(buf).Uint()) / SHIFT8
-	value = reflect.ValueOf(v)
-	return
+	return reflect.ValueOf(v)
 }
 
-func decUR32(buf []byte) (value reflect.Value) {
+func decUR32(buf []byte) reflect.Value {
 	var arr [2]uint16
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(arr)
-	return
+	return reflect.ValueOf(arr)
 }
-func decUR64(buf []byte) (value reflect.Value) {
+func decUR64(buf []byte) reflect.Value {
 	var arr [2]uint32
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(arr)
-	return
+	return reflect.ValueOf(arr)
 }
 
 // ADE ccat puts the sign on the denominator
-func decSR32(buf []byte) (value reflect.Value) {
+func decSR32(buf []byte) reflect.Value {
 	var arr [2]int16
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(arr)
-	return
+	return reflect.ValueOf(arr)
 }
-
-func decSR64(buf []byte) (value reflect.Value) {
+func decSR64(buf []byte) reflect.Value {
 	var arr [2]int32
 	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
-	value = reflect.ValueOf(arr)
-	return
+	return reflect.ValueOf(arr)
 }
-func decFC32(buf []byte) (value reflect.Value) {
+func decFC32(buf []byte) reflect.Value {
 	var s = string(buf[:])
-	value = reflect.ValueOf(s)
-	return
+	return reflect.ValueOf(s)
 }
 
 // Return [4]byte, same way IPv4 is represented in Go's net/ library
-func decIP32(buf []byte) (value reflect.Value) {
-	value = reflect.ValueOf(buf)
-	return
+func decIP32(buf []byte) reflect.Value {
+	return reflect.ValueOf(buf)
+}
+func decIPAD(buf []byte) reflect.Value {
+	s := string(buf)
+	return reflect.ValueOf(s)
 }
 
-// FIXME: has invisible NULL char at end
-func decIPAD(buf []byte) (value reflect.Value) {
+func decCSTR(buf []byte) reflect.Value {
 	s := string(buf)
-	value = reflect.ValueOf(s)
-	return
+	return reflect.ValueOf(s)
 }
-
-// FIXME: has invisible NULL char at end
-func decCSTR(buf []byte) (value reflect.Value) {
+func decUSTR(buf []byte) reflect.Value {
 	s := string(buf)
-	value = reflect.ValueOf(s)
-	return
+	return reflect.ValueOf(s)
 }
-func decUSTR(buf []byte) (value reflect.Value) {
-	s := string(buf)
-	value = reflect.ValueOf(s)
-	return
+func decDATA(buf []byte) reflect.Value {
+	return reflect.ValueOf(buf)
 }
-func decDATA(buf []byte) (value reflect.Value) {
-	value = reflect.ValueOf(buf)
-	return
-}
-func decNULL(buf []byte) (value reflect.Value) {
-	value = reflect.ValueOf(nil)
-	return
+func decNULL(buf []byte) reflect.Value {
+	return reflect.ValueOf(nil)
 }
 
 /**********************************************************/
