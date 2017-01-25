@@ -78,6 +78,10 @@ type atomHeader struct {
 	Type [4]byte
 }
 
+func (h atomHeader) isContainer() bool {
+	return ADEType(h.Type[:]) == CONT
+}
+
 var headerBytes uint32 = uint32(reflect.TypeOf(atomHeader{}).Size())
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
@@ -117,9 +121,15 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 		}
 
 		// construct Atom object, read data
-		data, err := readAtomData(r, h.Size-headerBytes, &bytesRead)
-		checkError(err)
-		var a = Atom{Name: string(h.Name[:]), Type: ADEType(h.Type[:]), Data: data}
+		var data []byte
+		if !h.isContainer() {
+			data, err = readAtomData(r, h.Size-headerBytes, &bytesRead)
+			checkError(err)
+		}
+		var a = Atom{
+			Name: asPrintableString(h.Name[:]),
+			Type: ADEType(h.Type[:]),
+			Data: data}
 
 		// add atom to parent.Children, or to atoms list if no parent
 		if parent, ok := containers.Peek(); ok {
@@ -143,13 +153,10 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 // Panic if an unexpected error is encountered here.
 // Return the same error if it's expected.
 func checkError(err error) error {
-	switch err {
-	case nil, io.EOF:
+	if err == nil || err == io.EOF {
 		return err
-	default:
-		panic(fmt.Errorf("unable to read from byte stream: %s", err))
 	}
-	return nil
+	panic(fmt.Errorf("unable to read from byte stream: %s", err))
 }
 
 func readAtomHeader(r io.Reader, bytesRead *uint32) (h atomHeader, err error) {
@@ -161,9 +168,6 @@ func readAtomHeader(r io.Reader, bytesRead *uint32) (h atomHeader, err error) {
 
 func readAtomData(r io.Reader, length uint32, bytesRead *uint32) (data []byte, err error) {
 	data = make([]byte, length)
-	if length == 0 {
-		return
-	}
 	err = binary.Read(r, binary.BigEndian, &data)
 	*bytesRead += length
 	return

@@ -35,20 +35,19 @@ func (a *Atom) MarshalText() (text []byte, err error) {
 }
 
 func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
-	var (
-		output        bytes.Buffer
-		printableName string
-	)
+	var output bytes.Buffer
 	// print atom name,type,data
-	printableName = strFC32([]byte(a.Name))
-	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", printableName, a.Type)
+	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", a.Name, a.Type)
 	fmt.Fprintln(&output, a.ValueString())
 
 	// print children
-	for _, childPtr := range a.Children {
-		fmt.Println(" =>%s ", childPtr.Name) // DEBUG
-		buf := atomToTextBuffer(childPtr, depth+1)
-		output.Write(buf.Bytes())
+	if a.Type == CONT {
+		for _, childPtr := range a.Children {
+			buf := atomToTextBuffer(childPtr, depth+1)
+			output.Write(buf.Bytes())
+		}
+		fmt.Fprintf(&output, "% *sEND\n", depth*4, "")
 	}
+
 	return output
 }

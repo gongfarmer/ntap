@@ -59,6 +59,8 @@ func (a Atom) String() string {
 	return string(buf)
 }
 
+// Return as a reflect.Value which can be printed
+// String values are returned without ADE quoting
 func (a Atom) Value() reflect.Value {
 	defer func() {
 		if r := recover(); r != nil {
@@ -66,11 +68,10 @@ func (a Atom) Value() reflect.Value {
 			panic(err)
 		}
 	}()
-	var ptr reflect.Value = reflect.New(a.goType().Elem())
-	opTable[a.Type].Decode(a.Data, &ptr)
-	return ptr
+	return opTable[a.Type].Decode(a.Data)
 }
 
+// This returns the value as a string following the ADE quoting rules
 func (a Atom) ValueString() string {
 	return opTable[a.Type].String(a.Data)
 }
@@ -128,7 +129,5 @@ func FromFile(path string) (a Atom, err error) {
 	}
 
 	err = a.UnmarshalBinary(buf)
-	fmt.Printf("container has %d children.\n", len(a.Children))
-	fmt.Printf("container: %+v\n", a)
 	return
 }
