@@ -122,50 +122,40 @@ func strSI64(buf []byte) string {
 	return fmt.Sprint(decSI64(buf))
 }
 func strFP32(buf []byte) string {
-	f := decFP32(buf).Interface().(float32)
-	return fmt.Sprintf("%0.8E", f)
+	return fmt.Sprintf("%0.8E", decFP32(buf).Interface().(float32))
 }
 func strFP64(buf []byte) string {
-	f := decFP64(buf).Interface().(float64)
-	return fmt.Sprintf("%0.17E", f)
+	return fmt.Sprintf("%0.17E", decFP64(buf).Interface().(float64))
 }
 func strUF32(buf []byte) string {
-	f := decUF32(buf).Interface().(float32)
-	return fmt.Sprintf("%0.4f", f)
+	return fmt.Sprintf("%0.4f", decUF32(buf).Interface().(float32))
 }
 func strUF64(buf []byte) string {
-	f := decUF64(buf).Interface().(float64)
-	return fmt.Sprintf("%0.8f", f)
+	return fmt.Sprintf("%0.8f", decUF64(buf).Interface().(float64))
 }
 func strSF32(buf []byte) string {
-	value := decSF32(buf).Interface().(float32)
-	return fmt.Sprintf("%0.4f", value)
+	return fmt.Sprintf("%0.4f", decSF32(buf).Interface().(float32))
 }
 func strSF64(buf []byte) string {
-	value := decSF64(buf).Interface().(float64)
-	return fmt.Sprintf("%0.9f", value)
+	return fmt.Sprintf("%0.9f", decSF64(buf).Interface().(float64))
 }
 func strUR32(buf []byte) string {
-	value := decUR32(buf)
-	arr := value.Interface().([2]uint16)
+	arr := decUR32(buf).Interface().([2]uint16)
 	var numerator, denominator uint16 = arr[0], arr[1]
 	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strUR64(buf []byte) string {
-	value := decUR64(buf)
-	arr := value.Interface().([2]uint32)
+	arr := decUR64(buf).Interface().([2]uint32)
 	var numerator, denominator uint32 = arr[0], arr[1]
 	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strSR32(buf []byte) string {
-	value := decSR32(buf)
-	arr := value.Interface().([2]int16)
+	arr := decSR32(buf).Interface().([2]int16)
 	var numerator, denominator int16 = arr[0], arr[1]
 	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
 func strSR64(buf []byte) string {
-	value := decSR64(buf)
-	arr := value.Interface().([2]int32)
+	arr := decSR64(buf).Interface().([2]int32)
 	var numerator, denominator int32 = arr[0], arr[1]
 	return fmt.Sprintf("%d/%d", numerator, denominator)
 }
@@ -397,11 +387,15 @@ func decIP32(buf []byte) (value reflect.Value) {
 	value = reflect.ValueOf(buf)
 	return
 }
+
+// FIXME: has invisible NULL char at end
 func decIPAD(buf []byte) (value reflect.Value) {
 	s := string(buf)
 	value = reflect.ValueOf(s)
 	return
 }
+
+// FIXME: has invisible NULL char at end
 func decCSTR(buf []byte) (value reflect.Value) {
 	s := string(buf)
 	value = reflect.ValueOf(s)
