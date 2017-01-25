@@ -150,15 +150,6 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 	return atoms, err // err is never set after initialization
 }
 
-// Panic if an unexpected error is encountered here.
-// Return the same error if it's expected.
-func checkError(err error) error {
-	if err == nil || err == io.EOF {
-		return err
-	}
-	panic(fmt.Errorf("unable to read from byte stream: %s", err))
-}
-
 func readAtomHeader(r io.Reader, bytesRead *uint32) (h atomHeader, err error) {
 	h = atomHeader{}
 	err = binary.Read(r, binary.BigEndian, &h)

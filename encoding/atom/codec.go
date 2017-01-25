@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"reflect"
 )
 
@@ -93,7 +92,138 @@ var opTable = map[ADEType]Operators{
 	CONT: Operators{decNULL, strNULL},
 }
 
-/**********************************************************/
+/**********************************************************
+   decoder methods.
+	 Convert atom.Data byte slices into a reflect.Value that wraps
+	 a Settable variable with an appropriate underlying go type.
+***********************************************************/
+func decUI01(buf []byte) reflect.Value {
+	var v uint32
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decUI08(buf []byte) reflect.Value {
+	var v uint8
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decUI16(buf []byte) reflect.Value {
+	var v uint16
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decUI32(buf []byte) reflect.Value {
+	var v uint32
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decUI64(buf []byte) reflect.Value {
+	var v uint64
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decSF32(buf []byte) reflect.Value {
+	v := float32(decSI32(buf).Interface().(int32)) / SHIFT4
+	return reflect.ValueOf(v)
+}
+func decSF64(buf []byte) reflect.Value {
+	v := float64(decSI64(buf).Interface().(int64)) / SHIFT8
+	return reflect.ValueOf(v)
+}
+func decSI08(buf []byte) reflect.Value {
+	var v int8
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decSI16(buf []byte) reflect.Value {
+	var v int16
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decSI32(buf []byte) reflect.Value {
+	var v int32
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decSI64(buf []byte) reflect.Value {
+	var v int64
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decFP32(buf []byte) reflect.Value {
+	var v float32
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decFP64(buf []byte) reflect.Value {
+	var v float64
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	return reflect.ValueOf(v)
+}
+func decUF32(buf []byte) reflect.Value {
+	var v float32 = float32(decUI32(buf).Uint()) / SHIFT4
+	return reflect.ValueOf(v)
+}
+func decUF64(buf []byte) reflect.Value {
+	var v float64 = float64(decUI64(buf).Uint()) / SHIFT8
+	return reflect.ValueOf(v)
+}
+func decUR32(buf []byte) reflect.Value {
+	var arr [2]uint16
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr))
+	return reflect.ValueOf(arr)
+}
+func decUR64(buf []byte) reflect.Value {
+	var arr [2]uint32
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr))
+	return reflect.ValueOf(arr)
+}
+
+// ADE ccat puts the sign on the denominator
+func decSR32(buf []byte) reflect.Value {
+	var arr [2]int16
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr))
+	return reflect.ValueOf(arr)
+}
+func decSR64(buf []byte) reflect.Value {
+	var arr [2]int32
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr))
+	return reflect.ValueOf(arr)
+}
+func decFC32(buf []byte) reflect.Value {
+	var s = string(buf[:])
+	return reflect.ValueOf(s)
+}
+
+// Store as [4]byte, same way IPv4 is represented in Go's net/ library
+func decIP32(buf []byte) reflect.Value {
+	return reflect.ValueOf(buf)
+}
+func decIPAD(buf []byte) reflect.Value {
+	s := string(buf)
+	return reflect.ValueOf(s)
+}
+func decCSTR(buf []byte) reflect.Value {
+	s := string(buf)
+	return reflect.ValueOf(s)
+}
+func decUSTR(buf []byte) reflect.Value {
+	s := string(buf)
+	return reflect.ValueOf(s)
+}
+func decDATA(buf []byte) reflect.Value {
+	return reflect.ValueOf(buf)
+}
+func decNULL(buf []byte) reflect.Value {
+	return reflect.ValueOf(nil)
+}
+
+/**********************************************************
+   string methods.
+	 Convert atom.Data byte slices into a string conforming to
+	 ADE formatting rules in doc 112-0002, "StorageGRID Data Types".
+***********************************************************/
+
 func strUI01(buf []byte) string {
 	return fmt.Sprint(binary.BigEndian.Uint32(buf))
 }
@@ -191,10 +321,7 @@ func strUUID(buf []byte) string {
 		ClkSeqLow        uint8
 		Node             [6]byte
 	}
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
 	return fmt.Sprintf(
 		"%08X-%04X-%04X-%02X%02X-%012X",
 		v.TimeLow,
@@ -206,180 +333,6 @@ func strUUID(buf []byte) string {
 
 func strNULL(_ []byte) string {
 	return ""
-}
-
-/**********************************************************/
-
-func decUI01(buf []byte) reflect.Value {
-	var v uint32
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	t := false
-	if v == 1 {
-		t = true
-	}
-	return reflect.ValueOf(t)
-}
-func decUI08(buf []byte) reflect.Value {
-	var v uint8
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decUI16(buf []byte) reflect.Value {
-	var v uint16
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decUI32(buf []byte) reflect.Value {
-	var v uint32
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decUI64(buf []byte) reflect.Value {
-	var v uint64
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decSF32(buf []byte) reflect.Value {
-	v := float32(decSI32(buf).Interface().(int32)) / SHIFT4
-	return reflect.ValueOf(v)
-}
-func decSF64(buf []byte) reflect.Value {
-	v := float64(decSI64(buf).Interface().(int64)) / SHIFT8
-	return reflect.ValueOf(v)
-}
-func decSI08(buf []byte) reflect.Value {
-	var v int8
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decSI16(buf []byte) reflect.Value {
-	var v int16
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decSI32(buf []byte) reflect.Value {
-	var v int32
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decSI64(buf []byte) reflect.Value {
-	var v int64
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decFP32(buf []byte) reflect.Value {
-	var v float32
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decFP64(buf []byte) reflect.Value {
-	var v float64
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(v)
-}
-func decUF32(buf []byte) reflect.Value {
-	var v float32 = float32(decUI32(buf).Uint()) / SHIFT4
-	return reflect.ValueOf(v)
-}
-func decUF64(buf []byte) reflect.Value {
-	var v float64 = float64(decUI64(buf).Uint()) / SHIFT8
-	return reflect.ValueOf(v)
-}
-
-func decUR32(buf []byte) reflect.Value {
-	var arr [2]uint16
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(arr)
-}
-func decUR64(buf []byte) reflect.Value {
-	var arr [2]uint32
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(arr)
-}
-
-// ADE ccat puts the sign on the denominator
-func decSR32(buf []byte) reflect.Value {
-	var arr [2]int16
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(arr)
-}
-func decSR64(buf []byte) reflect.Value {
-	var arr [2]int32
-	err := binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
-	if err != io.EOF && err != nil {
-		panic(err)
-	}
-	return reflect.ValueOf(arr)
-}
-func decFC32(buf []byte) reflect.Value {
-	var s = string(buf[:])
-	return reflect.ValueOf(s)
-}
-
-// Return [4]byte, same way IPv4 is represented in Go's net/ library
-func decIP32(buf []byte) reflect.Value {
-	return reflect.ValueOf(buf)
-}
-func decIPAD(buf []byte) reflect.Value {
-	s := string(buf)
-	return reflect.ValueOf(s)
-}
-
-func decCSTR(buf []byte) reflect.Value {
-	s := string(buf)
-	return reflect.ValueOf(s)
-}
-func decUSTR(buf []byte) reflect.Value {
-	s := string(buf)
-	return reflect.ValueOf(s)
-}
-func decDATA(buf []byte) reflect.Value {
-	return reflect.ValueOf(buf)
-}
-func decNULL(buf []byte) reflect.Value {
-	return reflect.ValueOf(nil)
 }
 
 /**********************************************************/
@@ -399,7 +352,9 @@ func (a Atom) SetUI32(path string, value uint32) (err error) {
 	return
 }
 
-// bounds checking is implicit since uint32 cannot hold invalid values for UI32
+// FIXME: replace this massive func with this:
+//  v := // (somehow convert user-given interface{} to Value)
+//  atom.value.Set(v) // this has all the sanity/bounds-checking built in!
 func (a Atom) SetValue(adeType ADEType, value interface{}) (err error) {
 	v := reflect.ValueOf(value)
 	switch adeType {
