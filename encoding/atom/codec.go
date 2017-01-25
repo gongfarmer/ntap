@@ -271,7 +271,7 @@ func strSF64(buf []byte) string {
 }
 func strUR32(buf []byte) string {
 	arr := decUR32(buf).Interface().([2]uint16)
-	return fmt.Sprintf("%d/%d", arr)
+	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strUR64(buf []byte) string {
 	arr := decUR64(buf).Interface().([2]uint32)
@@ -375,7 +375,7 @@ func (a Atom) SetValue(adeType ADEType, value interface{}) (err error) {
 				v := uint32(v.Uint())
 				binary.BigEndian.PutUint32(a.Data, v)
 			} else {
-				err = fmt.Errorf("Invalid value for type %s: %d", adeType, v)
+				err = fmt.Errorf("Invalid value for type %s: %s", adeType, v.Kind())
 			}
 		default:
 			err = fmt.Errorf("Invalid go type (%s) given for conversion to ADE type %d", v.Type(), adeType)

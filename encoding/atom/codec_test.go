@@ -14,10 +14,10 @@ type decodeTest struct {
 }
 
 // The specification says explicitly not to store UINT01 as a bool.
-// 112-0002_r4.0B_StorageGRID_Data_Types
+// See 112-0002_r4.0B_StorageGRID_Data_Types
 func TestDecUI01(t *testing.T) {
 	tests := []decodeTest{
-		// Not a mistake, we really do use 4 bytes for this type
+		// Yes, we really do use 4 bytes for this type!
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(uint32(0))},
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(uint32(1))},
 	}
@@ -136,14 +136,15 @@ func TestDecSF64(t *testing.T) {
 	}
 }
 func TestDecSI08(t *testing.T) {
-	Min := int8(math.MinInt8)
 
 	tests := []decodeTest{
 		decodeTest{[]byte{0}, reflect.ValueOf(int8(0))},
 		decodeTest{[]byte{math.MaxInt8}, reflect.ValueOf(int8(127))},
 	}
 
-	// add test of min value for this type
+	// test min value for this type
+	// (buffer is needed to force a signed int8 to be an unsigned byte.)
+	var Min int8 = math.MinInt8
 	var buf = bytes.NewBuffer(make([]byte, 0, 2))
 	binary.Write(buf, binary.BigEndian, &Min)
 	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Min)})
@@ -157,10 +158,6 @@ func TestDecSI08(t *testing.T) {
 	}
 }
 func TestDecSI16(t *testing.T) {
-	Min := int16(math.MinInt16)
-	Max := int16(math.MaxInt16)
-
-	// sanity check of some handcoded values
 	tests := []decodeTest{
 		decodeTest{[]byte{0x00, 0x00}, reflect.ValueOf(int16(0))},
 		decodeTest{[]byte{0x00, 0x01}, reflect.ValueOf(int16(1))},
@@ -169,12 +166,14 @@ func TestDecSI16(t *testing.T) {
 		decodeTest{[]byte{0xFF, 0xFF}, reflect.ValueOf(int16(-1))},
 	}
 
-	// add test of min value for this type
+	// test min value
+	var Min int16 = math.MinInt16
 	var buf = bytes.NewBuffer(make([]byte, 0, 2))
 	binary.Write(buf, binary.BigEndian, &Min)
 	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Min)})
 
-	// add test of max value for this type
+	// test max value
+	var Max int16 = math.MaxInt16
 	buf = bytes.NewBuffer(make([]byte, 0, 2))
 	binary.Write(buf, binary.BigEndian, &Max)
 	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Max)})
@@ -187,12 +186,7 @@ func TestDecSI16(t *testing.T) {
 		}
 	}
 }
-
 func TestDecSI32(t *testing.T) {
-	Min := int32(math.MinInt32)
-	Max := int32(math.MaxInt32)
-
-	// sanity check of some handcoded values
 	tests := []decodeTest{
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(int32(0))},
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(int32(1))},
@@ -201,12 +195,14 @@ func TestDecSI32(t *testing.T) {
 		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(int32(-1))},
 	}
 
-	// add test of min value for this type
+	// test min value
+	var Min int32 = math.MinInt32
 	buf := bytes.NewBuffer(make([]byte, 0, 2))
 	binary.Write(buf, binary.BigEndian, &Min)
 	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Min)})
 
-	// add test of max value for this type
+	// test max value
+	var Max int32 = math.MaxInt32
 	buf = bytes.NewBuffer(make([]byte, 0, 2))
 	binary.Write(buf, binary.BigEndian, &Max)
 	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Max)})
@@ -221,10 +217,6 @@ func TestDecSI32(t *testing.T) {
 }
 
 func TestDecSI64(t *testing.T) {
-	Min := int64(math.MinInt64)
-	Max := int64(math.MaxInt64)
-
-	// sanity check of some handcoded values
 	tests := []decodeTest{
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(int64(0))},
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(int64(1))},
@@ -232,12 +224,14 @@ func TestDecSI64(t *testing.T) {
 		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(int64(-1))},
 	}
 
-	// add test of min value for this type
+	// test min value
+	var Min int64 = math.MinInt64
 	buf := bytes.NewBuffer(make([]byte, 0, 2))
 	binary.Write(buf, binary.BigEndian, &Min)
 	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Min)})
 
-	// add test of max value for this type
+	// test max value
+	var Max int64 = math.MaxInt64
 	buf = bytes.NewBuffer(make([]byte, 0, 2))
 	binary.Write(buf, binary.BigEndian, &Max)
 	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Max)})
@@ -253,7 +247,39 @@ func TestDecSI64(t *testing.T) {
 
 /*
 func TestDecFP32(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float32(0))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float32(1.5258789e-05))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0xFF}, reflect.ValueOf(float32(0.0038909912))},
+		decodeTest{[]byte{0x00, 0x00, 0xFF, 0x00}, reflect.ValueOf(float32(0.99609375))},
+		decodeTest{[]byte{0x00, 0xFF, 0x00, 0x00}, reflect.ValueOf(float32(255.0))},
+		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float32(-1.5258789e-05))},
+	}
+	for _, test := range tests {
+		got := decFP32(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decFP32(%q) = %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
 func TestDecFP64(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float64(0))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float64(2.3283064365386963e-10))},
+		decodeTest{[]byte{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}, reflect.ValueOf(float64(1.684300900392157e+07))},
+		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float64(-2.3283064365386963e-10))},
+	}
+	for _, test := range tests {
+		got := decFP64(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decFP64(%q) = %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
 func TestDecUF32(t *testing.T) {
 func TestDecUF64(t *testing.T) {
 func TestDecUR32(t *testing.T) {
