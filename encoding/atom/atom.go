@@ -69,11 +69,18 @@ func (a Atom) Value() reflect.Value {
 			panic(err)
 		}
 	}()
+
+	if _, ok := opTable[a.Type]; !ok {
+		panic(fmt.Errorf("Unknown ADE type: %s", a.Type))
+	}
 	return opTable[a.Type].Decode(a.Data)
 }
 
 // This returns the value as a string following the ADE quoting rules
 func (a Atom) ValueString() string {
+	if _, ok := opTable[a.Type]; !ok {
+		panic(fmt.Errorf("Unknown ADE type: %s", a.Type))
+	}
 	return opTable[a.Type].String(a.Data)
 }
 

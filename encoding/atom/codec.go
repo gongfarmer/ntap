@@ -41,6 +41,7 @@ const (
 	UUID ADEType = "UUID" // UUID
 	NULL ADEType = "NULL" // NULL type, must have empty data section
 	CNCT ADEType = "CNCT" // binary data printed as hexadecimal value with leading 0x
+	Cnct ADEType = "cnct" // alias for CNCT
 	CONT ADEType = "CONT" // AtomContainer
 )
 const SHIFT4 = 0x00010000
@@ -49,9 +50,11 @@ const SHIFT8 = 0x100000000
 /**********************************************************/
 
 // decOp is the signature of a decoding operator for a given type.
+// Returns a reflect.Value containing the data within a go type suitable for
+// the data.
 type decOp func(buf []byte) reflect.Value
 
-// decOp is the signature of a function that prints value as a string for a given type
+// decOp is the signature of a function that prints value as a string.
 type strOp func(buf []byte) string
 
 type Operators struct {
@@ -86,6 +89,7 @@ var opTable = map[ADEType]Operators{
 	USTR: Operators{decUSTR, strUSTR},
 	DATA: Operators{decDATA, strDATA},
 	CNCT: Operators{decDATA, strDATA},
+	Cnct: Operators{decDATA, strDATA},
 	ENUM: Operators{decSI32, strSI32},
 	UUID: Operators{decDATA, strUUID},
 	NULL: Operators{decNULL, strNULL},
