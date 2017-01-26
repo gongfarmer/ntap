@@ -244,17 +244,24 @@ func TestDecSI64(t *testing.T) {
 		}
 	}
 }
-
-/*
 func TestDecFP32(t *testing.T) {
 	tests := []decodeTest{
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float32(0))},
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float32(1.5258789e-05))},
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0xFF}, reflect.ValueOf(float32(0.0038909912))},
-		decodeTest{[]byte{0x00, 0x00, 0xFF, 0x00}, reflect.ValueOf(float32(0.99609375))},
-		decodeTest{[]byte{0x00, 0xFF, 0x00, 0x00}, reflect.ValueOf(float32(255.0))},
-		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float32(-1.5258789e-05))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0xFF}, reflect.ValueOf(float32(3.57e-43))},
 	}
+
+	// test max value
+	var Max float32 = math.MaxFloat32
+	buf := bytes.NewBuffer(make([]byte, 0, 4))
+	binary.Write(buf, binary.BigEndian, &Max)
+	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Max)})
+
+	// test min value
+	var Min float32 = math.SmallestNonzeroFloat32
+	buf = bytes.NewBuffer(make([]byte, 0, 4))
+	binary.Write(buf, binary.BigEndian, &Min)
+	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Min)})
+
 	for _, test := range tests {
 		got := decFP32(test.Input).Interface()
 		want := test.Want.Interface()
@@ -267,10 +274,21 @@ func TestDecFP32(t *testing.T) {
 func TestDecFP64(t *testing.T) {
 	tests := []decodeTest{
 		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float64(0))},
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float64(2.3283064365386963e-10))},
-		decodeTest{[]byte{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}, reflect.ValueOf(float64(1.684300900392157e+07))},
-		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float64(-2.3283064365386963e-10))},
+		decodeTest{[]byte{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}, reflect.ValueOf(float64(7.748604185489348e-304))},
 	}
+
+	// test max value
+	var Max float64 = math.MaxFloat64
+	buf := bytes.NewBuffer(make([]byte, 0, 4))
+	binary.Write(buf, binary.BigEndian, &Max)
+	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Max)})
+
+	// test min value
+	var Min float64 = math.SmallestNonzeroFloat64
+	buf = bytes.NewBuffer(make([]byte, 0, 4))
+	binary.Write(buf, binary.BigEndian, &Min)
+	tests = append(tests, decodeTest{buf.Bytes(), reflect.ValueOf(Min)})
+
 	for _, test := range tests {
 		got := decFP64(test.Input).Interface()
 		want := test.Want.Interface()
@@ -281,6 +299,24 @@ func TestDecFP64(t *testing.T) {
 }
 
 func TestDecUF32(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float32(0))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float32(1.5258789e-05))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0xFF}, reflect.ValueOf(float32(0.0038909912))},
+		decodeTest{[]byte{0x00, 0x00, 0xFF, 0x00}, reflect.ValueOf(float32(0.99609375))},
+		decodeTest{[]byte{0x00, 0xFF, 0x00, 0x00}, reflect.ValueOf(float32(255.0))},
+		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float32(65536))},
+	}
+	for _, test := range tests {
+		got := decUF32(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decUF32(%q) = %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
+/*
 func TestDecUF64(t *testing.T) {
 func TestDecUR32(t *testing.T) {
 func TestDecUR64(t *testing.T) {

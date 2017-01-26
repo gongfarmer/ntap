@@ -125,7 +125,9 @@ func FromFile(path string) (a Atom, err error) {
 	}
 	var encoded_size = int64(binary.BigEndian.Uint32(buf[0:4]))
 	if encoded_size != fstat.Size() {
-		err = fmt.Errorf("Invalid AtomContainer file (encoded size does not match filesize)")
+		err = fmt.Errorf(
+			"Invalid AtomContainer file, encoded size %d does not match file size %d.",
+			encoded_size, fstat.Size())
 		return
 	}
 
