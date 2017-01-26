@@ -1,0 +1,16 @@
+# -----------------------------------------------------------------
+# Grid Task Management Module - Grid Task Management Bundle, Revision 5
+# This is just an empty bundle. The rest of the branches generated
+#  dynamically, as tasks are created.
+# -----------------------------------------------------------------
+# 2004-08-16 DS : Rev 2 - Removed bundle version (NMS issue)
+# 2004-11-10 WP : Rev 3 - Readded bundle version as per doc (not sent to nms)
+# 2004-11-10 WP : Rev 4 - Task branch changed from TASK to TSKB
+# 2005-05-10 MM : Set BTIM
+# -----------------------------------------------------------------
+GTMB:CONT:
+	BVER:UI32:1
+	BTIM:UI64:1
+	TSKB:CONT:
+	END
+END

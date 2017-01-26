@@ -1,0 +1,3604 @@
+STRD:CONT:
+	BTIM:UI64:1
+	BVER:UI32:1
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.1"
+		ENUS:CSTR:"Network Management System"
+		ZHCN:CSTR:"网制工艺 办理 组织"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.2"
+		ENUS:CSTR:"System Status"
+		ZHCN:CSTR:"组织 状态"
+		ENBR:CSTR:"⠎⠽⠎⠞⠑⠍⠀⠎⠞⠁⠞⠥⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.3"
+		ENUS:CSTR:"Last Refreshed"
+		ZHCN:CSTR:"最后的 恢复精神的"
+		ENBR:CSTR:"⠇⠁⠎⠞⠀⠗⠑⠋⠗⠑⠎⠓⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.4"
+		ENUS:CSTR:"Updated"
+		ZHCN:CSTR:"[英国:Updated]"
+		ENBR:CSTR:"⠥⠏⠙⠁⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.5"
+		ENUS:CSTR:"to"
+		ZHCN:CSTR:"到"
+		ENBR:CSTR:"⠞⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.6"
+		ENUS:CSTR:"Actions"
+		ZHCN:CSTR:"作用"
+		ENBR:CSTR:"⠁⠉⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.7"
+		ENUS:CSTR:"Insert"
+		ZHCN:CSTR:"插进"
+		ENBR:CSTR:"⠊⠝⠎⠑⠗⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.8"
+		ENUS:CSTR:"Delete"
+		ZHCN:CSTR:"删除"
+		ENBR:CSTR:"⠙⠑⠇⠑⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.9"
+		ENUS:CSTR:"Are you sure you want to delete this entry?"
+		ZHCN:CSTR:"是 喂! 的确的 喂! 要 到 删除 这 入?"
+		ENBR:CSTR:"⠁⠗⠑⠀⠽⠕⠥⠀⠎⠥⠗⠑⠀⠽⠕⠥⠀⠺⠁⠝⠞⠀⠞⠕⠀⠙⠑⠇⠑⠞⠑⠀⠞⠓⠊⠎⠀⠑⠝⠞⠗⠽⠦"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.10"
+		ENUS:CSTR:"Edit"
+		ZHCN:CSTR:"编辑"
+		ENBR:CSTR:"⠑⠙⠊⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.11"
+		ENUS:CSTR:"Apply Changes"
+		ZHCN:CSTR:"申请 变迁"
+		ENBR:CSTR:"⠁⠏⠏⠇⠽⠀⠉⠓⠁⠝⠛⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.12"
+		ENUS:CSTR:"No String Found."
+		ZHCN:CSTR:"带 打基础."
+		ENBR:CSTR:"⠝⠕⠀⠎⠞⠗⠊⠝⠛⠀⠋⠕⠥⠝⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.15"
+		ENUS:CSTR:"Not Applicable"
+		ZHCN:CSTR:"放于分词 可适用的"
+		ENBR:CSTR:"⠝⠕⠞⠀⠁⠏⠏⠇⠊⠉⠁⠃⠇⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.16"
+		ENUS:CSTR:"Undo"
+		ZHCN:CSTR:"撤消"
+		ENBR:CSTR:"⠥⠝⠙⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.1"
+		ENUS:CSTR:"us"
+		ZHCN:CSTR:"我们"
+		ENBR:CSTR:"⠥⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.2"
+		ENUS:CSTR:"s"
+		ZHCN:CSTR:"he"
+		ENBR:CSTR:"⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.3"
+		ENUS:CSTR:"microsecond"
+		ZHCN:CSTR:"一百万分之一秒"
+		ENBR:CSTR:"⠍⠊⠉⠗⠕⠎⠑⠉⠕⠝⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.4"
+		ENUS:CSTR:"microseconds"
+		ZHCN:CSTR:"[英国:microseconds]"
+		ENBR:CSTR:"⠍⠊⠉⠗⠕⠎⠑⠉⠕⠝⠙⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.5"
+		ENUS:CSTR:"millisecond"
+		ZHCN:CSTR:"千分之一秒"
+		ENBR:CSTR:"⠍⠊⠇⠇⠊⠎⠑⠉⠕⠝⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.6"
+		ENUS:CSTR:"milliseconds"
+		ZHCN:CSTR:"[英国:milliseconds]"
+		ENBR:CSTR:"⠍⠊⠇⠇⠊⠎⠑⠉⠕⠝⠙⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.7"
+		ENUS:CSTR:"second"
+		ZHCN:CSTR:"第二的"
+		ENBR:CSTR:"⠎⠑⠉⠕⠝⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.8"
+		ENUS:CSTR:"seconds"
+		ZHCN:CSTR:"[英国:seconds]"
+		ENBR:CSTR:"⠎⠑⠉⠕⠝⠙⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.9"
+		ENUS:CSTR:"minute"
+		ZHCN:CSTR:"分"
+		ENBR:CSTR:"⠍⠊⠝⠥⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.10"
+		ENUS:CSTR:"minutes"
+		ZHCN:CSTR:"[英国:minutes]"
+		ENBR:CSTR:"⠍⠊⠝⠥⠞⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.11"
+		ENUS:CSTR:"hour"
+		ZHCN:CSTR:"一小时"
+		ENBR:CSTR:"⠓⠕⠥⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.12"
+		ENUS:CSTR:"hours"
+		ZHCN:CSTR:"[英国:hours]"
+		ENBR:CSTR:"⠓⠕⠥⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.13"
+		ENUS:CSTR:"day"
+		ZHCN:CSTR:"日"
+		ENBR:CSTR:"⠙⠁⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.14"
+		ENUS:CSTR:"days"
+		ZHCN:CSTR:"天"
+		ENBR:CSTR:"⠙⠁⠽⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.15"
+		ENUS:CSTR:"year"
+		ZHCN:CSTR:"年"
+		ENBR:CSTR:"⠽⠑⠁⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.16"
+		ENUS:CSTR:"years"
+		ZHCN:CSTR:"[英国:years]"
+		ENBR:CSTR:"⠽⠑⠁⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.17"
+		ENUS:CSTR:"weeks"
+		ZHCN:CSTR:"[英国:weeks]"
+		ENBR:CSTR:"⠺⠑⠑⠅⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.18"
+		ENUS:CSTR:"months"
+		ZHCN:CSTR:"月"
+		ENBR:CSTR:"⠍⠕⠝⠞⠓⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.1"
+		ENUS:CSTR:"1/s"
+		ZHCN:CSTR:"1/he"
+		ENBR:CSTR:"⠁⠀⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.2"
+		ENUS:CSTR:"B/s"
+		ZHCN:CSTR:"l\x09/he"
+		ENBR:CSTR:"⠃⠀⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.3"
+		ENUS:CSTR:"b/s"
+		ZHCN:CSTR:"l\x09/he"
+		ENBR:CSTR:"⠃⠀⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.4"
+		ENUS:CSTR:"ppm/s"
+		ZHCN:CSTR:"ppm/he"
+		ENBR:CSTR:"⠏⠏⠍⠀⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.1"
+		ENUS:CSTR:"Deg C"
+		ZHCN:CSTR:"[英国:Deg] A"
+		ENBR:CSTR:"⠙⠑⠛⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.2"
+		ENUS:CSTR:"Deg F"
+		ZHCN:CSTR:"[英国:Deg] [英国:F]"
+		ENBR:CSTR:"⠙⠑⠛⠀⠋"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.3"
+		ENUS:CSTR:"m"
+		ZHCN:CSTR:"[英国:m]"
+		ENBR:CSTR:"⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.4"
+		ENUS:CSTR:"Byte"
+		ZHCN:CSTR:"字节"
+		ENBR:CSTR:"⠃⠽⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.5"
+		ENUS:CSTR:"Bytes"
+		ZHCN:CSTR:"[英国:Bytes]"
+		ENBR:CSTR:"⠃⠽⠞⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.6"
+		ENUS:CSTR:"Bit"
+		ZHCN:CSTR:"一小片"
+		ENBR:CSTR:"⠃⠊⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.7"
+		ENUS:CSTR:"Bits"
+		ZHCN:CSTR:"比特"
+		ENBR:CSTR:"⠃⠊⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.8"
+		ENUS:CSTR:"%"
+		ZHCN:CSTR:"[英国:%]"
+		ENBR:CSTR:"⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.9"
+		ENUS:CSTR:"ppm"
+		ZHCN:CSTR:"[英国:ppm]"
+		ENBR:CSTR:"⠏⠏⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.10"
+		ENUS:CSTR:"rad"
+		ZHCN:CSTR:"[英国:rad]"
+		ENBR:CSTR:"⠗⠁⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.1"
+		ENUS:CSTR:"K"
+		ZHCN:CSTR:"[英国:K]"
+		ENBR:CSTR:"⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.2"
+		ENUS:CSTR:"M"
+		ZHCN:CSTR:"[英国:M]"
+		ENBR:CSTR:"⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.3"
+		ENUS:CSTR:"G"
+		ZHCN:CSTR:"[英国:G]"
+		ENBR:CSTR:"⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.4"
+		ENUS:CSTR:"T"
+		ZHCN:CSTR:"[英国:T]"
+		ENBR:CSTR:"⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.5"
+		ENUS:CSTR:"P"
+		ZHCN:CSTR:"[英国:P]"
+		ENBR:CSTR:"⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.6"
+		ENUS:CSTR:"Ki"
+		ZHCN:CSTR:"足少阴肾经"
+		ENBR:CSTR:"⠅⠊"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.7"
+		ENUS:CSTR:"Mi"
+		ZHCN:CSTR:"大音阶的第三音"
+		ENBR:CSTR:"⠍⠊"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.8"
+		ENUS:CSTR:"Gi"
+		ZHCN:CSTR:"官方补给的"
+		ENBR:CSTR:"⠛⠊"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.9"
+		ENUS:CSTR:"Ti"
+		ZHCN:CSTR:"[英国:Ti]"
+		ENBR:CSTR:"⠞⠊"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.10"
+		ENUS:CSTR:"Pe"
+		ZHCN:CSTR:"[英国:Pe]"
+		ENBR:CSTR:"⠏⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.11"
+		ENUS:CSTR:"Peta"
+		ZHCN:CSTR:"[英国:Peta]"
+		ENBR:CSTR:"⠏⠑⠞⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.12"
+		ENUS:CSTR:"Tera"
+		ZHCN:CSTR:"[英国:Tera]"
+		ENBR:CSTR:"⠞⠑⠗⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.13"
+		ENUS:CSTR:"Giga"
+		ZHCN:CSTR:"[英国:Giga]"
+		ENBR:CSTR:"⠛⠊⠛⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.14"
+		ENUS:CSTR:"Kilo"
+		ZHCN:CSTR:"公斤"
+		ENBR:CSTR:"⠅⠊⠇⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.15"
+		ENUS:CSTR:"Si"
+		ZHCN:CSTR:"[英国:Si]"
+		ENBR:CSTR:"⠎⠊"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.16"
+		ENUS:CSTR:"Milli"
+		ZHCN:CSTR:"毫"
+		ENBR:CSTR:"⠍⠊⠇⠇⠊"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.17"
+		ENUS:CSTR:"Micro"
+		ZHCN:CSTR:"微"
+		ENBR:CSTR:"⠍⠊⠉⠗⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.18"
+		ENUS:CSTR:"Nano"
+		ZHCN:CSTR:"简写为"
+		ENBR:CSTR:"⠝⠁⠝⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.19"
+		ENUS:CSTR:"m"
+		ZHCN:CSTR:"[英国:m]"
+		ENBR:CSTR:"⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.1"
+		ENUS:CSTR:"Select an attribute and then either a Quick Query or a Custom Query"
+		ZHCN:CSTR:"选择 意 归因 和 那时 任一 c\x09 快的 质问 或 c\x09 习惯 质问"
+		ENBR:CSTR:"⠎⠑⠇⠑⠉⠞⠀⠁⠝⠀⠁⠞⠞⠗⠊⠃⠥⠞⠑⠀⠁⠝⠙⠀⠞⠓⠑⠝⠀⠑⠊⠞⠓⠑⠗⠀⠁⠀⠟⠥⠊⠉⠅⠀⠟⠥⠑⠗⠽⠀⠕⠗⠀⠁⠀⠉⠥⠎⠞⠕⠍⠀⠟⠥⠑⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.2"
+		ENUS:CSTR:"Attribute"
+		ZHCN:CSTR:"归因"
+		ENBR:CSTR:"⠁⠞⠞⠗⠊⠃⠥⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.3"
+		ENUS:CSTR:"Quick Query"
+		ZHCN:CSTR:"快的 质问"
+		ENBR:CSTR:"⠟⠥⠊⠉⠅⠀⠟⠥⠑⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.4"
+		ENUS:CSTR:"Last 5 Minutes"
+		ZHCN:CSTR:"最后的 [英国:5] 分钟"
+		ENBR:CSTR:"⠇⠁⠎⠞⠀⠑⠀⠍⠊⠝⠥⠞⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.5"
+		ENUS:CSTR:"Last Hour"
+		ZHCN:CSTR:"最后的 一小时"
+		ENBR:CSTR:"⠇⠁⠎⠞⠀⠓⠕⠥⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.6"
+		ENUS:CSTR:"Last Day"
+		ZHCN:CSTR:"最后的 日"
+		ENBR:CSTR:"⠇⠁⠎⠞⠀⠙⠁⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.7"
+		ENUS:CSTR:"Last Week"
+		ZHCN:CSTR:"最后的 周"
+		ENBR:CSTR:"⠇⠁⠎⠞⠀⠺⠑⠑⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.8"
+		ENUS:CSTR:"Last Month"
+		ZHCN:CSTR:"最后的 月"
+		ENBR:CSTR:"⠇⠁⠎⠞⠀⠍⠕⠝⠞⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.9"
+		ENUS:CSTR:"Custom Query"
+		ZHCN:CSTR:"习惯 质问"
+		ENBR:CSTR:"⠉⠥⠎⠞⠕⠍⠀⠟⠥⠑⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.10"
+		ENUS:CSTR:"Start Date"
+		ZHCN:CSTR:"开始 年月日"
+		ENBR:CSTR:"⠎⠞⠁⠗⠞⠀⠙⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.11"
+		ENUS:CSTR:"End Date"
+		ZHCN:CSTR:"终 年月日"
+		ENBR:CSTR:"⠑⠝⠙⠀⠙⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.12"
+		ENUS:CSTR:"Last Year"
+		ZHCN:CSTR:"最后的 年"
+		ENBR:CSTR:"⠇⠁⠎⠞⠀⠽⠑⠁⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.13"
+		ENUS:CSTR:"All"
+		ZHCN:CSTR:"整个的"
+		ENBR:CSTR:"⠁⠇⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.1"
+		ENUS:CSTR:"Information Region"
+		ZHCN:CSTR:"通知 地方"
+		ENBR:CSTR:"⠊⠝⠋⠕⠗⠍⠁⠞⠊⠕⠝⠀⠗⠑⠛⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.2"
+		ENUS:CSTR:"Logout"
+		ZHCN:CSTR:"注销"
+		ENBR:CSTR:"⠇⠕⠛⠕⠥⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.3"
+		ENUS:CSTR:"Refresh Page"
+		ZHCN:CSTR:"刷新 佩奇"
+		ENBR:CSTR:"⠗⠑⠋⠗⠑⠎⠓⠀⠏⠁⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.1"
+		ENUS:CSTR:"Account Management"
+		ZHCN:CSTR:"帐户 办理"
+		ENBR:CSTR:"⠁⠉⠉⠕⠥⠝⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.2"
+		ENUS:CSTR:"Accounts"
+		ZHCN:CSTR:"[英国:Accounts]"
+		ENBR:CSTR:"⠁⠉⠉⠕⠥⠝⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.3"
+		ENUS:CSTR:"User Accounts"
+		ZHCN:CSTR:"使用者 [英国:Accounts]"
+		ENBR:CSTR:"⠥⠎⠑⠗⠀⠁⠉⠉⠕⠥⠝⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.4"
+		ENUS:CSTR:"Group Accounts"
+		ZHCN:CSTR:"群 [英国:Accounts]"
+		ENBR:CSTR:"⠛⠗⠕⠥⠏⠀⠁⠉⠉⠕⠥⠝⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.2"
+		ENUS:CSTR:"Management Interface version"
+		ZHCN:CSTR:"办理 界面 翻译"
+		ENBR:CSTR:"⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠊⠝⠞⠑⠗⠋⠁⠉⠑⠀⠧⠑⠗⠎⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.3"
+		ENUS:CSTR:"Build"
+		ZHCN:CSTR:"建"
+		ENBR:CSTR:"⠃⠥⠊⠇⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.4"
+		ENUS:CSTR:"This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit."
+		ZHCN:CSTR:"这 产物 包含 软体 发展了的 在侧 这 [英国:OpenSSL] 设计 向 使用 向里面 这 [英国:OpenSSL] 工具包."
+		ENBR:CSTR:"⠞⠓⠊⠎⠀⠏⠗⠕⠙⠥⠉⠞⠀⠊⠝⠉⠇⠥⠙⠑⠎⠀⠎⠕⠋⠞⠺⠁⠗⠑⠀⠙⠑⠧⠑⠇⠕⠏⠑⠙⠀⠃⠽⠀⠞⠓⠑⠀⠕⠏⠑⠝⠎⠎⠇⠀⠏⠗⠕⠚⠑⠉⠞⠀⠋⠕⠗⠀⠥⠎⠑⠀⠊⠝⠀⠞⠓⠑⠀⠕⠏⠑⠝⠎⠎⠇⠀⠞⠕⠕⠇⠅⠊⠞⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.5"
+		ENUS:CSTR:"Copyright"
+		ZHCN:CSTR:"有版权的"
+		ENBR:CSTR:"⠉⠕⠏⠽⠗⠊⠛⠓⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.6"
+		ENUS:CSTR:"All rights reserved."
+		ZHCN:CSTR:"整个的 权利 保留的."
+		ENBR:CSTR:"⠁⠇⠇⠀⠗⠊⠛⠓⠞⠎⠀⠗⠑⠎⠑⠗⠧⠑⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.1"
+		ENUS:CSTR:"Alarm Severity Changed to"
+		ZHCN:CSTR:"惊慌 严格 改变了 到"
+		ENBR:CSTR:"⠁⠇⠁⠗⠍⠀⠎⠑⠧⠑⠗⠊⠞⠽⠀⠉⠓⠁⠝⠛⠑⠙⠀⠞⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.2"
+		ENUS:CSTR:"New"
+		ZHCN:CSTR:"新的"
+		ENBR:CSTR:"⠝⠑⠺"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.3"
+		ENUS:CSTR:"Alarm"
+		ZHCN:CSTR:"惊慌"
+		ENBR:CSTR:"⠁⠇⠁⠗⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.4"
+		ENUS:CSTR:"Alert"
+		ZHCN:CSTR:"警惕的"
+		ENBR:CSTR:"⠁⠇⠑⠗⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.5"
+		ENUS:CSTR:"Time"
+		ZHCN:CSTR:"时间"
+		ENBR:CSTR:"⠞⠊⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.6"
+		ENUS:CSTR:"UTC"
+		ZHCN:CSTR:"[英国:UTC]"
+		ENBR:CSTR:"⠥⠞⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.7"
+		ENUS:CSTR:"Current Value"
+		ZHCN:CSTR:"当前的 计算结果"
+		ENBR:CSTR:"⠉⠥⠗⠗⠑⠝⠞⠀⠧⠁⠇⠥⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.8"
+		ENUS:CSTR:"Attribute"
+		ZHCN:CSTR:"归因"
+		ENBR:CSTR:"⠁⠞⠞⠗⠊⠃⠥⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.9"
+		ENUS:CSTR:"Alarm Cleared"
+		ZHCN:CSTR:"惊慌 清除的"
+		ENBR:CSTR:"⠁⠇⠁⠗⠍⠀⠉⠇⠑⠁⠗⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.10"
+		ENUS:CSTR:"State Changed"
+		ZHCN:CSTR:"国 改变了"
+		ENBR:CSTR:"⠎⠞⠁⠞⠑⠀⠉⠓⠁⠝⠛⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.11"
+		ENUS:CSTR:"to"
+		ZHCN:CSTR:"到"
+		ENBR:CSTR:"⠞⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.12"
+		ENUS:CSTR:"Results (e-mail)"
+		ZHCN:CSTR:"结果 [英国:(e-mail)]"
+		ENBR:CSTR:"⠗⠑⠎⠥⠇⠞⠎⠀⠀⠑⠀⠍⠁⠊⠇⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.1"
+		ENUS:CSTR:"Languages"
+		ZHCN:CSTR:"[英国:Languages]"
+		ENBR:CSTR:"⠇⠁⠝⠛⠥⠁⠛⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.2"
+		ENUS:CSTR:"United States - English"
+		ZHCN:CSTR:"联合的 [英国:States] [英国:-] 英文"
+		ENBR:CSTR:"⠥⠝⠊⠞⠑⠙⠀⠎⠞⠁⠞⠑⠎⠀⠀⠀⠑⠝⠛⠇⠊⠎⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.3"
+		ENUS:CSTR:"Japan - Japanese"
+		ZHCN:CSTR:"日本 [英国:-] 日本"
+		ENBR:CSTR:"⠚⠁⠏⠁⠝⠀⠀⠀⠚⠁⠏⠁⠝⠑⠎⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.4"
+		ENUS:CSTR:"Braille - English"
+		ZHCN:CSTR:"盲人用点字法 [英国:-] 英文"
+		ENBR:CSTR:"⠃⠗⠁⠊⠇⠇⠑⠀⠀⠀⠑⠝⠛⠇⠊⠎⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.5"
+		ENUS:CSTR:"China - Chinese"
+		ZHCN:CSTR:"中国 [英国:-] 中国人"
+		ENBR:CSTR:"⠉⠓⠊⠝⠁⠀⠀⠀⠉⠓⠊⠝⠑⠎⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.1"
+		ENUS:CSTR:"Devices Tab Bar"
+		ZHCN:CSTR:"[英国:Devices] 制表符 杆"
+		ENBR:CSTR:"⠙⠑⠧⠊⠉⠑⠎⠀⠞⠁⠃⠀⠃⠁⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.2"
+		ENUS:CSTR:"Overview"
+		ZHCN:CSTR:"总的看法"
+		ENBR:CSTR:"⠕⠧⠑⠗⠧⠊⠑⠺"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.3"
+		ENUS:CSTR:"Main"
+		ZHCN:CSTR:"重要的"
+		ENBR:CSTR:"⠍⠁⠊⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.4"
+		ENUS:CSTR:"Alarms"
+		ZHCN:CSTR:"[英国:Alarms]"
+		ENBR:CSTR:"⠁⠇⠁⠗⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.5"
+		ENUS:CSTR:"History"
+		ZHCN:CSTR:"历史记录"
+		ENBR:CSTR:"⠓⠊⠎⠞⠕⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.6"
+		ENUS:CSTR:"Reports"
+		ZHCN:CSTR:"[英国:Reports]"
+		ENBR:CSTR:"⠗⠑⠏⠕⠗⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.7"
+		ENUS:CSTR:"Charts"
+		ZHCN:CSTR:"[英国:Charts]"
+		ENBR:CSTR:"⠉⠓⠁⠗⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.8"
+		ENUS:CSTR:"Text"
+		ZHCN:CSTR:"本文"
+		ENBR:CSTR:"⠞⠑⠭⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.9"
+		ENUS:CSTR:"Configuration"
+		ZHCN:CSTR:"配置"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.10"
+		ENUS:CSTR:"Notification"
+		ZHCN:CSTR:"通知"
+		ENBR:CSTR:"⠝⠕⠞⠊⠋⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.11"
+		ENUS:CSTR:"Account Management"
+		ZHCN:CSTR:"帐户 办理"
+		ENBR:CSTR:"⠁⠉⠉⠕⠥⠝⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.12"
+		ENUS:CSTR:"Information"
+		ZHCN:CSTR:"通知"
+		ENBR:CSTR:"⠊⠝⠋⠕⠗⠍⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.13"
+		ENUS:CSTR:"Tree"
+		ZHCN:CSTR:"树"
+		ENBR:CSTR:"⠞⠗⠑⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.1"
+		ENUS:CSTR:"Sign In"
+		ZHCN:CSTR:"志 向里面"
+		ENBR:CSTR:"⠎⠊⠛⠝⠀⠊⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.2"
+		ENUS:CSTR:"Access denied."
+		ZHCN:CSTR:"接近 否认."
+		ENBR:CSTR:"⠁⠉⠉⠑⠎⠎⠀⠙⠑⠝⠊⠑⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.3"
+		ENUS:CSTR:"Your account has been suspended.  Please contact your account administrator."
+		ZHCN:CSTR:"你的 帐户 有 是 悬吊的. 使高兴 接触 你的 帐户 管理人."
+		ENBR:CSTR:"⠽⠕⠥⠗⠀⠁⠉⠉⠕⠥⠝⠞⠀⠓⠁⠎⠀⠃⠑⠑⠝⠀⠎⠥⠎⠏⠑⠝⠙⠑⠙⠲⠀⠀⠏⠇⠑⠁⠎⠑⠀⠉⠕⠝⠞⠁⠉⠞⠀⠽⠕⠥⠗⠀⠁⠉⠉⠕⠥⠝⠞⠀⠁⠙⠍⠊⠝⠊⠎⠞⠗⠁⠞⠕⠗⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.4"
+		ENUS:CSTR:"Your account has been disabled.  Please contact your account administrator."
+		ZHCN:CSTR:"你的 帐户 有 是 残. 使高兴 接触 你的 帐户 管理人."
+		ENBR:CSTR:"⠽⠕⠥⠗⠀⠁⠉⠉⠕⠥⠝⠞⠀⠓⠁⠎⠀⠃⠑⠑⠝⠀⠙⠊⠎⠁⠃⠇⠑⠙⠲⠀⠀⠏⠇⠑⠁⠎⠑⠀⠉⠕⠝⠞⠁⠉⠞⠀⠽⠕⠥⠗⠀⠁⠉⠉⠕⠥⠝⠞⠀⠁⠙⠍⠊⠝⠊⠎⠞⠗⠁⠞⠕⠗⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.5"
+		ENUS:CSTR:"Invalid user name.  Please enter a valid user name and password."
+		ZHCN:CSTR:"病人 使用者 名. 使高兴 入 c\x09 有效的 使用者 名 和 密码."
+		ENBR:CSTR:"⠊⠝⠧⠁⠇⠊⠙⠀⠥⠎⠑⠗⠀⠝⠁⠍⠑⠲⠀⠀⠏⠇⠑⠁⠎⠑⠀⠑⠝⠞⠑⠗⠀⠁⠀⠧⠁⠇⠊⠙⠀⠥⠎⠑⠗⠀⠝⠁⠍⠑⠀⠁⠝⠙⠀⠏⠁⠎⠎⠺⠕⠗⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.6"
+		ENUS:CSTR:"Invalid password.  Please enter a valid user name and password."
+		ZHCN:CSTR:"病人 密码. 使高兴 入 c\x09 有效的 使用者 名 和 密码."
+		ENBR:CSTR:"⠊⠝⠧⠁⠇⠊⠙⠀⠏⠁⠎⠎⠺⠕⠗⠙⠲⠀⠀⠏⠇⠑⠁⠎⠑⠀⠑⠝⠞⠑⠗⠀⠁⠀⠧⠁⠇⠊⠙⠀⠥⠎⠑⠗⠀⠝⠁⠍⠑⠀⠁⠝⠙⠀⠏⠁⠎⠎⠺⠕⠗⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.7"
+		ENUS:CSTR:"Name"
+		ZHCN:CSTR:"名称"
+		ENBR:CSTR:"⠝⠁⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.8"
+		ENUS:CSTR:"Password"
+		ZHCN:CSTR:"口令"
+		ENBR:CSTR:"⠏⠁⠎⠎⠺⠕⠗⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.9"
+		ENUS:CSTR:"Logged out."
+		ZHCN:CSTR:"笨重的 向外面."
+		ENBR:CSTR:"⠇⠕⠛⠛⠑⠙⠀⠕⠥⠞⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.10"
+		ENUS:CSTR:"Waiting for Configuration"
+		ZHCN:CSTR:"等候 向 配置"
+		ENBR:CSTR:"⠺⠁⠊⠞⠊⠝⠛⠀⠋⠕⠗⠀⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.11"
+		ENUS:CSTR:"Continue"
+		ZHCN:CSTR:"继续"
+		ENBR:CSTR:"⠉⠕⠝⠞⠊⠝⠥⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.6.1"
+		ENUS:CSTR:"Overview Region"
+		ZHCN:CSTR:"总的看法 地方"
+		ENBR:CSTR:"⠕⠧⠑⠗⠧⠊⠑⠺⠀⠗⠑⠛⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.6.2"
+		ENUS:CSTR:"View current alarms."
+		ZHCN:CSTR:"视查 通用的 [英国:alarms.]"
+		ENBR:CSTR:"⠧⠊⠑⠺⠀⠉⠥⠗⠗⠑⠝⠞⠀⠁⠇⠁⠗⠍⠎⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.6.3"
+		ENUS:CSTR:"Chart this attribute over the last hour."
+		ZHCN:CSTR:"画图 这 归因 在...之上 这 最后的 一小时."
+		ENBR:CSTR:"⠉⠓⠁⠗⠞⠀⠞⠓⠊⠎⠀⠁⠞⠞⠗⠊⠃⠥⠞⠑⠀⠕⠧⠑⠗⠀⠞⠓⠑⠀⠇⠁⠎⠞⠀⠓⠕⠥⠗⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.1"
+		ENUS:CSTR:"Alarms Region"
+		ZHCN:CSTR:"[英国:Alarms] 地方"
+		ENBR:CSTR:"⠁⠇⠁⠗⠍⠎⠀⠗⠑⠛⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.2"
+		ENUS:CSTR:"Severity"
+		ZHCN:CSTR:"严格"
+		ENBR:CSTR:"⠎⠑⠧⠑⠗⠊⠞⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.3"
+		ENUS:CSTR:"Attribute Code"
+		ZHCN:CSTR:"归因 法典"
+		ENBR:CSTR:"⠁⠞⠞⠗⠊⠃⠥⠞⠑⠀⠉⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.4"
+		ENUS:CSTR:"CId"
+		ZHCN:CSTR:"头领"
+		ENBR:CSTR:"⠉⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.5"
+		ENUS:CSTR:"Node ID"
+		ZHCN:CSTR:"结点 遗传素质"
+		ENBR:CSTR:"⠝⠕⠙⠑⠀⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.6"
+		ENUS:CSTR:"Description"
+		ZHCN:CSTR:"记述"
+		ENBR:CSTR:"⠙⠑⠎⠉⠗⠊⠏⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.7"
+		ENUS:CSTR:"Alarm Time"
+		ZHCN:CSTR:"惊慌 时间"
+		ENBR:CSTR:"⠁⠇⠁⠗⠍⠀⠞⠊⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.8"
+		ENUS:CSTR:"Current Value"
+		ZHCN:CSTR:"当前的 计算结果"
+		ENBR:CSTR:"⠉⠥⠗⠗⠑⠝⠞⠀⠧⠁⠇⠥⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.9"
+		ENUS:CSTR:"Normal"
+		ZHCN:CSTR:"标准"
+		ENBR:CSTR:"⠝⠕⠗⠍⠁⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.10"
+		ENUS:CSTR:"Unknown"
+		ZHCN:CSTR:"未知的"
+		ENBR:CSTR:"⠥⠝⠅⠝⠕⠺⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.11"
+		ENUS:CSTR:"Notice"
+		ZHCN:CSTR:"注意"
+		ENBR:CSTR:"⠝⠕⠞⠊⠉⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.12"
+		ENUS:CSTR:"Minor"
+		ZHCN:CSTR:"未成年人"
+		ENBR:CSTR:"⠍⠊⠝⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.13"
+		ENUS:CSTR:"Major"
+		ZHCN:CSTR:"较大的"
+		ENBR:CSTR:"⠍⠁⠚⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.14"
+		ENUS:CSTR:"Critical"
+		ZHCN:CSTR:"评论的"
+		ENBR:CSTR:"⠉⠗⠊⠞⠊⠉⠁⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.15"
+		ENUS:CSTR:"Cleared"
+		ZHCN:CSTR:"清除的"
+		ENBR:CSTR:"⠉⠇⠑⠁⠗⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.16"
+		ENUS:CSTR:"Alarms History"
+		ZHCN:CSTR:"[英国:Alarms] 历史记录"
+		ENBR:CSTR:"⠁⠇⠁⠗⠍⠎⠀⠓⠊⠎⠞⠕⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.17"
+		ENUS:CSTR:"System History"
+		ZHCN:CSTR:"组织 历史记录"
+		ENBR:CSTR:"⠎⠽⠎⠞⠑⠍⠀⠓⠊⠎⠞⠕⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.18"
+		ENUS:CSTR:"Id"
+		ZHCN:CSTR:"[英国:Id]"
+		ENBR:CSTR:"⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.19"
+		ENUS:CSTR:"Active"
+		ZHCN:CSTR:"活动的"
+		ENBR:CSTR:"⠁⠉⠞⠊⠧⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.20"
+		ENUS:CSTR:"Primary Message"
+		ZHCN:CSTR:"第一的 传话"
+		ENBR:CSTR:"⠏⠗⠊⠍⠁⠗⠽⠀⠍⠑⠎⠎⠁⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.21"
+		ENUS:CSTR:"Secondary Message"
+		ZHCN:CSTR:"第二的 传话"
+		ENBR:CSTR:"⠎⠑⠉⠕⠝⠙⠁⠗⠽⠀⠍⠑⠎⠎⠁⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.22"
+		ENUS:CSTR:"Op"
+		ZHCN:CSTR:"[英国:Op]"
+		ENBR:CSTR:"⠕⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.23"
+		ENUS:CSTR:"Value"
+		ZHCN:CSTR:"计算结果"
+		ENBR:CSTR:"⠧⠁⠇⠥⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.24"
+		ENUS:CSTR:"Value Type"
+		ZHCN:CSTR:"计算结果 样式"
+		ENBR:CSTR:"⠧⠁⠇⠥⠑⠀⠞⠽⠏⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.25"
+		ENUS:CSTR:"Email"
+		ZHCN:CSTR:"电邮"
+		ENBR:CSTR:"⠑⠍⠁⠊⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.26"
+		ENUS:CSTR:"Offline"
+		ZHCN:CSTR:"脱机的"
+		ENBR:CSTR:"⠕⠋⠋⠇⠊⠝⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.27"
+		ENUS:CSTR:"Indeterminate"
+		ZHCN:CSTR:"不定"
+		ENBR:CSTR:"⠊⠝⠙⠑⠞⠑⠗⠍⠊⠝⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.28"
+		ENUS:CSTR:"EQ"
+		ZHCN:CSTR:"[英国:EQ]"
+		ENBR:CSTR:"⠑⠟"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.29"
+		ENUS:CSTR:"GE"
+		ZHCN:CSTR:"通用电器"
+		ENBR:CSTR:"⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.30"
+		ENUS:CSTR:"LE"
+		ZHCN:CSTR:"[英国:LE]"
+		ENBR:CSTR:"⠇⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.31"
+		ENUS:CSTR:"NE"
+		ZHCN:CSTR:"旧姓的"
+		ENBR:CSTR:"⠝⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.1"
+		ENUS:CSTR:"Report Region"
+		ZHCN:CSTR:"通知 地方"
+		ENBR:CSTR:"⠗⠑⠏⠕⠗⠞⠀⠗⠑⠛⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.2"
+		ENUS:CSTR:"Vertical Scaling"
+		ZHCN:CSTR:"垂直的 缩放比例"
+		ENBR:CSTR:"⠧⠑⠗⠞⠊⠉⠁⠇⠀⠎⠉⠁⠇⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.3"
+		ENUS:CSTR:"Text Results for"
+		ZHCN:CSTR:"本文 结果 向"
+		ENBR:CSTR:"⠞⠑⠭⠞⠀⠗⠑⠎⠥⠇⠞⠎⠀⠋⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.4"
+		ENUS:CSTR:"vs"
+		ZHCN:CSTR:"对"
+		ENBR:CSTR:"⠧⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.1"
+		ENUS:CSTR:"Configuration Region"
+		ZHCN:CSTR:"配置 地方"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝⠀⠗⠑⠛⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.2"
+		ENUS:CSTR:"Move Up"
+		ZHCN:CSTR:"感动 向上"
+		ENBR:CSTR:"⠍⠕⠧⠑⠀⠥⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.3"
+		ENUS:CSTR:"Move Down"
+		ZHCN:CSTR:"感动 唐"
+		ENBR:CSTR:"⠍⠕⠧⠑⠀⠙⠕⠺⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.1"
+		ENUS:CSTR:"Input Validation"
+		ZHCN:CSTR:"输入 确认"
+		ENBR:CSTR:"⠊⠝⠏⠥⠞⠀⠧⠁⠇⠊⠙⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.2"
+		ENUS:CSTR:"Input Error"
+		ZHCN:CSTR:"输入 失误"
+		ENBR:CSTR:"⠊⠝⠏⠥⠞⠀⠑⠗⠗⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.3"
+		ENUS:CSTR:"The following fields contain errors."
+		ZHCN:CSTR:"这 下面的 域 含有 [英国:errors.]"
+		ENBR:CSTR:"⠞⠓⠑⠀⠋⠕⠇⠇⠕⠺⠊⠝⠛⠀⠋⠊⠑⠇⠙⠎⠀⠉⠕⠝⠞⠁⠊⠝⠀⠑⠗⠗⠕⠗⠎⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.4"
+		ENUS:CSTR:"Invalid numeric value entered."
+		ZHCN:CSTR:"病人 数值的 价值 进入的."
+		ENBR:CSTR:"⠊⠝⠧⠁⠇⠊⠙⠀⠝⠥⠍⠑⠗⠊⠉⠀⠧⠁⠇⠥⠑⠀⠑⠝⠞⠑⠗⠑⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.5"
+		ENUS:CSTR:"Invalid text entered."
+		ZHCN:CSTR:"病人 本文 进入的."
+		ENBR:CSTR:"⠊⠝⠧⠁⠇⠊⠙⠀⠞⠑⠭⠞⠀⠑⠝⠞⠑⠗⠑⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.6"
+		ENUS:CSTR:"No Object To Pass."
+		ZHCN:CSTR:"物体 到 经过."
+		ENBR:CSTR:"⠝⠕⠀⠕⠃⠚⠑⠉⠞⠀⠞⠕⠀⠏⠁⠎⠎⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.7"
+		ENUS:CSTR:"Device Not Connected To MPX."
+		ZHCN:CSTR:"设计 放于分词 连接 到 [英国:MPX.]"
+		ENBR:CSTR:"⠙⠑⠧⠊⠉⠑⠀⠝⠕⠞⠀⠉⠕⠝⠝⠑⠉⠞⠑⠙⠀⠞⠕⠀⠍⠏⠭⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.8"
+		ENUS:CSTR:"MPX / RMI Not Running."
+		ZHCN:CSTR:"[英国:MPX] [英国:/] [英国:RMI] 放于分词 跑的."
+		ENBR:CSTR:"⠍⠏⠭⠀⠀⠀⠗⠍⠊⠀⠝⠕⠞⠀⠗⠥⠝⠝⠊⠝⠛⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.9"
+		ENUS:CSTR:"RMI Error!"
+		ZHCN:CSTR:"[英国:RMI] 失误!"
+		ENBR:CSTR:"⠗⠍⠊⠀⠑⠗⠗⠕⠗⠖"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.10"
+		ENUS:CSTR:"Invalid Input. Please Try Again!"
+		ZHCN:CSTR:"病人 输入. 使高兴 试 再!"
+		ENBR:CSTR:"⠊⠝⠧⠁⠇⠊⠙⠀⠊⠝⠏⠥⠞⠲⠀⠏⠇⠑⠁⠎⠑⠀⠞⠗⠽⠀⠁⠛⠁⠊⠝⠖"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.11"
+		ENUS:CSTR:"Password Confirmation"
+		ZHCN:CSTR:"口令 确定"
+		ENBR:CSTR:"⠏⠁⠎⠎⠺⠕⠗⠙⠀⠉⠕⠝⠋⠊⠗⠍⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.12"
+		ENUS:CSTR:"Confirm Password"
+		ZHCN:CSTR:"确认 口令"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠗⠍⠀⠏⠁⠎⠎⠺⠕⠗⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.13"
+		ENUS:CSTR:"Password"
+		ZHCN:CSTR:"口令"
+		ENBR:CSTR:"⠏⠁⠎⠎⠺⠕⠗⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.14"
+		ENUS:CSTR:"Passwords do not match.  Please enter and confirm a password."
+		ZHCN:CSTR:"[英国:Passwords] 做 放于分词 火柴. 使高兴 入 和 证实 c\x09 密码."
+		ENBR:CSTR:"⠏⠁⠎⠎⠺⠕⠗⠙⠎⠀⠙⠕⠀⠝⠕⠞⠀⠍⠁⠞⠉⠓⠲⠀⠀⠏⠇⠑⠁⠎⠑⠀⠑⠝⠞⠑⠗⠀⠁⠝⠙⠀⠉⠕⠝⠋⠊⠗⠍⠀⠁⠀⠏⠁⠎⠎⠺⠕⠗⠙⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.15"
+		ENUS:CSTR:"OK"
+		ZHCN:CSTR:"美好"
+		ENBR:CSTR:"⠕⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.1"
+		ENUS:CSTR:"ADC"
+		ZHCN:CSTR:"[英国:ADC]"
+		ENBR:CSTR:"⠁⠙⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.10"
+		ENUS:CSTR:"FSG"
+		ZHCN:CSTR:"[英国:FSG]"
+		ENBR:CSTR:"⠋⠎⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.2"
+		ENUS:CSTR:"LDR"
+		ZHCN:CSTR:"[英国:LDR]"
+		ENBR:CSTR:"⠇⠙⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.3"
+		ENUS:CSTR:"CMS"
+		ZHCN:CSTR:"[英国:CMS]"
+		ENBR:CSTR:"⠉⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.4"
+		ENUS:CSTR:"NMS"
+		ZHCN:CSTR:"网络管理系统"
+		ENBR:CSTR:"⠝⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.5"
+		ENUS:CSTR:"AMS"
+		ZHCN:CSTR:"[英国:AMS]"
+		ENBR:CSTR:"⠁⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.6"
+		ENUS:CSTR:"SSM"
+		ZHCN:CSTR:"面对面导弹"
+		ENBR:CSTR:"⠎⠎⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.7"
+		ENUS:CSTR:"CLB"
+		ZHCN:CSTR:"[英国:CLB]"
+		ENBR:CSTR:"⠉⠇⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.8"
+		ENUS:CSTR:"CMN"
+		ZHCN:CSTR:"[英国:CMN]"
+		ENBR:CSTR:"⠉⠍⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.9"
+		ENUS:CSTR:"ARC"
+		ZHCN:CSTR:"弧"
+		ENBR:CSTR:"⠁⠗⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.1"
+		ENUS:CSTR:"DICOM"
+		ZHCN:CSTR:"[英国:DICOM]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.10"
+		ENUS:CSTR:"DICOM Advanced"
+		ZHCN:CSTR:"[英国:DICOM] 高等的"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠁⠙⠧⠁⠝⠉⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.11"
+		ENUS:CSTR:"DICOM Indexed"
+		ZHCN:CSTR:"[英国:DICOM] [英国:Indexed]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠊⠝⠙⠑⠭⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.12"
+		ENUS:CSTR:"FSG Groups"
+		ZHCN:CSTR:"[英国:FSG] [英国:Groups]"
+		ENBR:CSTR:"⠋⠎⠛⠀⠛⠗⠕⠥⠏⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.13"
+		ENUS:CSTR:"Grid Options"
+		ZHCN:CSTR:"栅 [英国:Options]"
+		ENBR:CSTR:"⠛⠗⠊⠙⠀⠕⠏⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.14"
+		ENUS:CSTR:"NMS Entities"
+		ZHCN:CSTR:"网络管理系统 [英国:Entities]"
+		ENBR:CSTR:"⠝⠍⠎⠀⠑⠝⠞⠊⠞⠊⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.15"
+		ENUS:CSTR:"Grid Tasks"
+		ZHCN:CSTR:"栅 [英国:Tasks]"
+		ENBR:CSTR:"⠛⠗⠊⠙⠀⠞⠁⠎⠅⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.16"
+		ENUS:CSTR:"Storage"
+		ZHCN:CSTR:"储藏"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.17"
+		ENUS:CSTR:"Replication"
+		ZHCN:CSTR:"回答"
+		ENBR:CSTR:"⠗⠑⠏⠇⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.18"
+		ENUS:CSTR:"Backup"
+		ZHCN:CSTR:"后援"
+		ENBR:CSTR:"⠃⠁⠉⠅⠥⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.19"
+		ENUS:CSTR:"Client Services"
+		ZHCN:CSTR:"委托人 [英国:Services]"
+		ENBR:CSTR:"⠉⠇⠊⠑⠝⠞⠀⠎⠑⠗⠧⠊⠉⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.2"
+		ENUS:CSTR:"HTTP"
+		ZHCN:CSTR:"超文本传输协定"
+		ENBR:CSTR:"⠓⠞⠞⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.20"
+		ENUS:CSTR:"Database"
+		ZHCN:CSTR:"数据库"
+		ENBR:CSTR:"⠙⠁⠞⠁⠃⠁⠎⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.21"
+		ENUS:CSTR:"Volumes"
+		ZHCN:CSTR:"[英国:Volumes]"
+		ENBR:CSTR:"⠧⠕⠇⠥⠍⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.22"
+		ENUS:CSTR:"Services"
+		ZHCN:CSTR:"[英国:Services]"
+		ENBR:CSTR:"⠎⠑⠗⠧⠊⠉⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.23"
+		ENUS:CSTR:"Timing"
+		ZHCN:CSTR:"定时"
+		ENBR:CSTR:"⠞⠊⠍⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.24"
+		ENUS:CSTR:"Network"
+		ZHCN:CSTR:"网制工艺"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.25"
+		ENUS:CSTR:"RAID"
+		ZHCN:CSTR:"袭击"
+		ENBR:CSTR:"⠗⠁⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.26"
+		ENUS:CSTR:"Content"
+		ZHCN:CSTR:"内容"
+		ENBR:CSTR:"⠉⠕⠝⠞⠑⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.27"
+		ENUS:CSTR:"Database"
+		ZHCN:CSTR:"数据库"
+		ENBR:CSTR:"⠙⠁⠞⠁⠃⠁⠎⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.28"
+		ENUS:CSTR:"DICOM"
+		ZHCN:CSTR:"[英国:DICOM]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.29"
+		ENUS:CSTR:"Synchronization"
+		ZHCN:CSTR:"同步"
+		ENBR:CSTR:"⠎⠽⠝⠉⠓⠗⠕⠝⠊⠵⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.30"
+		ENUS:CSTR:"Verification"
+		ZHCN:CSTR:"确认"
+		ENBR:CSTR:"⠧⠑⠗⠊⠋⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.31"
+		ENUS:CSTR:"Replication"
+		ZHCN:CSTR:"回答"
+		ENBR:CSTR:"⠗⠑⠏⠇⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.32"
+		ENUS:CSTR:"Outbound"
+		ZHCN:CSTR:"出站"
+		ENBR:CSTR:"⠕⠥⠞⠃⠕⠥⠝⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.33"
+		ENUS:CSTR:"Inbound"
+		ZHCN:CSTR:"回内地的"
+		ENBR:CSTR:"⠊⠝⠃⠕⠥⠝⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.34"
+		ENUS:CSTR:"Middleware"
+		ZHCN:CSTR:"[英国:Middleware]"
+		ENBR:CSTR:"⠍⠊⠙⠙⠇⠑⠺⠁⠗⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.3"
+		ENUS:CSTR:"Connectivity"
+		ZHCN:CSTR:"连通度"
+		ENBR:CSTR:"⠉⠕⠝⠝⠑⠉⠞⠊⠧⠊⠞⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.4"
+		ENUS:CSTR:"Events"
+		ZHCN:CSTR:"[英国:Events]"
+		ENBR:CSTR:"⠑⠧⠑⠝⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.5"
+		ENUS:CSTR:"Audit"
+		ZHCN:CSTR:"审计"
+		ENBR:CSTR:"⠁⠥⠙⠊⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.6"
+		ENUS:CSTR:"IP Ranges"
+		ZHCN:CSTR:"网际协定 [英国:Ranges]"
+		ENBR:CSTR:"⠊⠏⠀⠗⠁⠝⠛⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.7"
+		ENUS:CSTR:"HTTP"
+		ZHCN:CSTR:"超文本传输协定"
+		ENBR:CSTR:"⠓⠞⠞⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.8"
+		ENUS:CSTR:"HTTP Advanced"
+		ZHCN:CSTR:"超文本传输协定 高等的"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠁⠙⠧⠁⠝⠉⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.9"
+		ENUS:CSTR:"DICOM"
+		ZHCN:CSTR:"[英国:DICOM]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.1"
+		ENUS:CSTR:"Node Information"
+		ZHCN:CSTR:"结点 通知"
+		ENBR:CSTR:"⠝⠕⠙⠑⠀⠊⠝⠋⠕⠗⠍⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.10"
+		ENUS:CSTR:"HTTP DELETE"
+		ZHCN:CSTR:"超文本传输协定 删除"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠙⠑⠇⠑⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.11"
+		ENUS:CSTR:"HTTP OPTION"
+		ZHCN:CSTR:"超文本传输协定 选择"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠕⠏⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.12"
+		ENUS:CSTR:"Grid Information"
+		ZHCN:CSTR:"栅 通知"
+		ENBR:CSTR:"⠛⠗⠊⠙⠀⠊⠝⠋⠕⠗⠍⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.13"
+		ENUS:CSTR:"File System Operations"
+		ZHCN:CSTR:"夹纸板 组织 操作"
+		ENBR:CSTR:"⠋⠊⠇⠑⠀⠎⠽⠎⠞⠑⠍⠀⠕⠏⠑⠗⠁⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.14"
+		ENUS:CSTR:"Store to Grid"
+		ZHCN:CSTR:"积蓄 到 栅"
+		ENBR:CSTR:"⠎⠞⠕⠗⠑⠀⠞⠕⠀⠛⠗⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.15"
+		ENUS:CSTR:"Retrieve From Grid"
+		ZHCN:CSTR:"回复 从... 栅"
+		ENBR:CSTR:"⠗⠑⠞⠗⠊⠑⠧⠑⠀⠋⠗⠕⠍⠀⠛⠗⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.16"
+		ENUS:CSTR:"Remove From Grid"
+		ZHCN:CSTR:"移动 从... 栅"
+		ENBR:CSTR:"⠗⠑⠍⠕⠧⠑⠀⠋⠗⠕⠍⠀⠛⠗⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.17"
+		ENUS:CSTR:"Primary"
+		ZHCN:CSTR:"第一的"
+		ENBR:CSTR:"⠏⠗⠊⠍⠁⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.18"
+		ENUS:CSTR:"Secondary"
+		ZHCN:CSTR:"第二的"
+		ENBR:CSTR:"⠎⠑⠉⠕⠝⠙⠁⠗⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.19"
+		ENUS:CSTR:"Backup Schedule"
+		ZHCN:CSTR:"后援 附表"
+		ENBR:CSTR:"⠃⠁⠉⠅⠥⠏⠀⠎⠉⠓⠑⠙⠥⠇⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.2"
+		ENUS:CSTR:"System Status"
+		ZHCN:CSTR:"组织 状态"
+		ENBR:CSTR:"⠎⠽⠎⠞⠑⠍⠀⠎⠞⠁⠞⠥⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.20"
+		ENUS:CSTR:"Current Backup"
+		ZHCN:CSTR:"当前的 后援"
+		ENBR:CSTR:"⠉⠥⠗⠗⠑⠝⠞⠀⠃⠁⠉⠅⠥⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.21"
+		ENUS:CSTR:"Previous Backup"
+		ZHCN:CSTR:"早先的 后援"
+		ENBR:CSTR:"⠏⠗⠑⠧⠊⠕⠥⠎⠀⠃⠁⠉⠅⠥⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.22"
+		ENUS:CSTR:"Background Verification"
+		ZHCN:CSTR:"背景 确认"
+		ENBR:CSTR:"⠃⠁⠉⠅⠛⠗⠕⠥⠝⠙⠀⠧⠑⠗⠊⠋⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.23"
+		ENUS:CSTR:"DICOM C-ECHO"
+		ZHCN:CSTR:"[英国:DICOM] [英国:C-ECHO]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠉⠀⠑⠉⠓⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.24"
+		ENUS:CSTR:"DICOM C-STORE"
+		ZHCN:CSTR:"[英国:DICOM] [英国:C-STORE]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠉⠀⠎⠞⠕⠗⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.25"
+		ENUS:CSTR:"DICOM C-FIND"
+		ZHCN:CSTR:"[英国:DICOM] [英国:C-FIND]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠉⠀⠋⠊⠝⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.26"
+		ENUS:CSTR:"DICOM C-MOVE"
+		ZHCN:CSTR:"[英国:DICOM] [英国:C-MOVE]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠉⠀⠍⠕⠧⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.27"
+		ENUS:CSTR:"DICOM Storage Commitment"
+		ZHCN:CSTR:"[英国:DICOM] 储藏 委托"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠎⠞⠕⠗⠁⠛⠑⠀⠉⠕⠍⠍⠊⠞⠍⠑⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.28"
+		ENUS:CSTR:"Configuration"
+		ZHCN:CSTR:"配置"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.29"
+		ENUS:CSTR:"Tablespace"
+		ZHCN:CSTR:"表空间"
+		ENBR:CSTR:"⠞⠁⠃⠇⠑⠎⠏⠁⠉⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.3"
+		ENUS:CSTR:"Connectivity Status"
+		ZHCN:CSTR:"连通度 状态"
+		ENBR:CSTR:"⠉⠕⠝⠝⠑⠉⠞⠊⠧⠊⠞⠽⠀⠎⠞⠁⠞⠥⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.30"
+		ENUS:CSTR:"Server Status"
+		ZHCN:CSTR:"服务器 状态"
+		ENBR:CSTR:"⠎⠑⠗⠧⠑⠗⠀⠎⠞⠁⠞⠥⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.31"
+		ENUS:CSTR:"System Events"
+		ZHCN:CSTR:"组织 [英国:Events]"
+		ENBR:CSTR:"⠎⠽⠎⠞⠑⠍⠀⠑⠧⠑⠝⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.32"
+		ENUS:CSTR:"GPS Status"
+		ZHCN:CSTR:"环球定位系统 状态"
+		ENBR:CSTR:"⠛⠏⠎⠀⠎⠞⠁⠞⠥⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.33"
+		ENUS:CSTR:"Destinations"
+		ZHCN:CSTR:"[英国:Destinations]"
+		ENBR:CSTR:"⠙⠑⠎⠞⠊⠝⠁⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.34"
+		ENUS:CSTR:"DICOM"
+		ZHCN:CSTR:"[英国:DICOM]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.35"
+		ENUS:CSTR:"Ingest Overview"
+		ZHCN:CSTR:"摄取 总的看法"
+		ENBR:CSTR:"⠊⠝⠛⠑⠎⠞⠀⠕⠧⠑⠗⠧⠊⠑⠺"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.36"
+		ENUS:CSTR:"Information Lifecycle Management"
+		ZHCN:CSTR:"通知 生命周期 办理"
+		ENBR:CSTR:"⠊⠝⠋⠕⠗⠍⠁⠞⠊⠕⠝⠀⠇⠊⠋⠑⠉⠽⠉⠇⠑⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.37"
+		ENUS:CSTR:"Content Replication"
+		ZHCN:CSTR:"内容 回答"
+		ENBR:CSTR:"⠉⠕⠝⠞⠑⠝⠞⠀⠗⠑⠏⠇⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.38"
+		ENUS:CSTR:"Content Purging"
+		ZHCN:CSTR:"内容 [英国:Purging]"
+		ENBR:CSTR:"⠉⠕⠝⠞⠑⠝⠞⠀⠏⠥⠗⠛⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.39"
+		ENUS:CSTR:"Database Statistics"
+		ZHCN:CSTR:"数据库 统计"
+		ENBR:CSTR:"⠙⠁⠞⠁⠃⠁⠎⠑⠀⠎⠞⠁⠞⠊⠎⠞⠊⠉⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.4"
+		ENUS:CSTR:"DICOM Associations"
+		ZHCN:CSTR:"[英国:DICOM] [英国:Associations]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠁⠎⠎⠕⠉⠊⠁⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.40"
+		ENUS:CSTR:"InnoDB Tablespace"
+		ZHCN:CSTR:"[英国:InnoDB] 表空间"
+		ENBR:CSTR:"⠊⠝⠝⠕⠙⠃⠀⠞⠁⠃⠇⠑⠎⠏⠁⠉⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.41"
+		ENUS:CSTR:"Processing"
+		ZHCN:CSTR:"处理"
+		ENBR:CSTR:"⠏⠗⠕⠉⠑⠎⠎⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.42"
+		ENUS:CSTR:"Sending"
+		ZHCN:CSTR:"发送"
+		ENBR:CSTR:"⠎⠑⠝⠙⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.43"
+		ENUS:CSTR:"Verification Configuration"
+		ZHCN:CSTR:"确认 配置"
+		ENBR:CSTR:"⠧⠑⠗⠊⠋⠊⠉⠁⠞⠊⠕⠝⠀⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.44"
+		ENUS:CSTR:"Verification Progress"
+		ZHCN:CSTR:"确认 特权"
+		ENBR:CSTR:"⠧⠑⠗⠊⠋⠊⠉⠁⠞⠊⠕⠝⠀⠏⠗⠕⠛⠗⠑⠎⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.45"
+		ENUS:CSTR:"Verification Results"
+		ZHCN:CSTR:"确认 结果"
+		ENBR:CSTR:"⠧⠑⠗⠊⠋⠊⠉⠁⠞⠊⠕⠝⠀⠗⠑⠎⠥⠇⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.46"
+		ENUS:CSTR:"Inbound Replication"
+		ZHCN:CSTR:"回内地的 回答"
+		ENBR:CSTR:"⠊⠝⠃⠕⠥⠝⠙⠀⠗⠑⠏⠇⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.47"
+		ENUS:CSTR:"Outbound Replication"
+		ZHCN:CSTR:"出站 回答"
+		ENBR:CSTR:"⠕⠥⠞⠃⠕⠥⠝⠙⠀⠗⠑⠏⠇⠊⠉⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.48"
+		ENUS:CSTR:"Archive Store Overview"
+		ZHCN:CSTR:"档案 积蓄 总的看法"
+		ENBR:CSTR:"⠁⠗⠉⠓⠊⠧⠑⠀⠎⠞⠕⠗⠑⠀⠕⠧⠑⠗⠧⠊⠑⠺"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.49"
+		ENUS:CSTR:"Staging Volume"
+		ZHCN:CSTR:"脚手架 书"
+		ENBR:CSTR:"⠎⠞⠁⠛⠊⠝⠛⠀⠧⠕⠇⠥⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.50"
+		ENUS:CSTR:"Archive Retrieve Overview"
+		ZHCN:CSTR:"档案 回复 总的看法"
+		ENBR:CSTR:"⠁⠗⠉⠓⠊⠧⠑⠀⠗⠑⠞⠗⠊⠑⠧⠑⠀⠕⠧⠑⠗⠧⠊⠑⠺"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.51"
+		ENUS:CSTR:"Archive Retrieve Statistics"
+		ZHCN:CSTR:"档案 回复 统计"
+		ENBR:CSTR:"⠁⠗⠉⠓⠊⠧⠑⠀⠗⠑⠞⠗⠊⠑⠧⠑⠀⠎⠞⠁⠞⠊⠎⠞⠊⠉⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.52"
+		ENUS:CSTR:"Middleware Overview"
+		ZHCN:CSTR:"[英国:Middleware] 总的看法"
+		ENBR:CSTR:"⠍⠊⠙⠙⠇⠑⠺⠁⠗⠑⠀⠕⠧⠑⠗⠧⠊⠑⠺"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.53"
+		ENUS:CSTR:"Middleware Account"
+		ZHCN:CSTR:"[英国:Middleware] 帐户"
+		ENBR:CSTR:"⠍⠊⠙⠙⠇⠑⠺⠁⠗⠑⠀⠁⠉⠉⠕⠥⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.5"
+		ENUS:CSTR:"HTTP Sessions"
+		ZHCN:CSTR:"超文本传输协定 [英国:Sessions]"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠎⠑⠎⠎⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.6"
+		ENUS:CSTR:"HTTP GET"
+		ZHCN:CSTR:"超文本传输协定 得"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠛⠑⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.7"
+		ENUS:CSTR:"HTTP PUT"
+		ZHCN:CSTR:"超文本传输协定 置"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠏⠥⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.8"
+		ENUS:CSTR:"HTTP POST"
+		ZHCN:CSTR:"超文本传输协定 邮政"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠏⠕⠎⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.9"
+		ENUS:CSTR:"HTTP HEAD"
+		ZHCN:CSTR:"超文本传输协定 脑力"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠓⠑⠁⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.1"
+		ENUS:CSTR:"Connections"
+		ZHCN:CSTR:"连接点"
+		ENBR:CSTR:"⠉⠕⠝⠝⠑⠉⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.10"
+		ENUS:CSTR:"DICOM Profiles"
+		ZHCN:CSTR:"[英国:DICOM] 档案资料"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠏⠗⠕⠋⠊⠇⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.11"
+		ENUS:CSTR:"Coerce Tag Profiles"
+		ZHCN:CSTR:"逼迫 标签 档案资料"
+		ENBR:CSTR:"⠉⠕⠑⠗⠉⠑⠀⠞⠁⠛⠀⠏⠗⠕⠋⠊⠇⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.12"
+		ENUS:CSTR:"Advanced Config Profiles"
+		ZHCN:CSTR:"高等的 [英国:Config] 档案资料"
+		ENBR:CSTR:"⠁⠙⠧⠁⠝⠉⠑⠙⠀⠉⠕⠝⠋⠊⠛⠀⠏⠗⠕⠋⠊⠇⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.13"
+		ENUS:CSTR:"DICOM Indexed Tags"
+		ZHCN:CSTR:"[英国:DICOM] [英国:Indexed] 标签"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠊⠝⠙⠑⠭⠑⠙⠀⠞⠁⠛⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.14"
+		ENUS:CSTR:"File System Gateway Groups"
+		ZHCN:CSTR:"夹纸板 组织 门 [英国:Groups]"
+		ENBR:CSTR:"⠋⠊⠇⠑⠀⠎⠽⠎⠞⠑⠍⠀⠛⠁⠞⠑⠺⠁⠽⠀⠛⠗⠕⠥⠏⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.15"
+		ENUS:CSTR:"Pending"
+		ZHCN:CSTR:"未定的"
+		ENBR:CSTR:"⠏⠑⠝⠙⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.16"
+		ENUS:CSTR:"Active"
+		ZHCN:CSTR:"活动的"
+		ENBR:CSTR:"⠁⠉⠞⠊⠧⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.17"
+		ENUS:CSTR:"Historical"
+		ZHCN:CSTR:"历史的"
+		ENBR:CSTR:"⠓⠊⠎⠞⠕⠗⠊⠉⠁⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.18"
+		ENUS:CSTR:"NMS Entities"
+		ZHCN:CSTR:"网络管理系统 [英国:Entities]"
+		ENBR:CSTR:"⠝⠍⠎⠀⠑⠝⠞⠊⠞⠊⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.19"
+		ENUS:CSTR:"Client Services"
+		ZHCN:CSTR:"委托人 [英国:Services]"
+		ENBR:CSTR:"⠉⠇⠊⠑⠝⠞⠀⠎⠑⠗⠧⠊⠉⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.2"
+		ENUS:CSTR:"Audit Levels"
+		ZHCN:CSTR:"审计 [英国:Levels]"
+		ENBR:CSTR:"⠁⠥⠙⠊⠞⠀⠇⠑⠧⠑⠇⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.20"
+		ENUS:CSTR:"Object Stores"
+		ZHCN:CSTR:"物体 备用品"
+		ENBR:CSTR:"⠕⠃⠚⠑⠉⠞⠀⠎⠞⠕⠗⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.21"
+		ENUS:CSTR:"Processors"
+		ZHCN:CSTR:"[英国:Processors]"
+		ENBR:CSTR:"⠏⠗⠕⠉⠑⠎⠎⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.22"
+		ENUS:CSTR:"Volumes"
+		ZHCN:CSTR:"[英国:Volumes]"
+		ENBR:CSTR:"⠧⠕⠇⠥⠍⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.23"
+		ENUS:CSTR:"Services"
+		ZHCN:CSTR:"[英国:Services]"
+		ENBR:CSTR:"⠎⠑⠗⠧⠊⠉⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.24"
+		ENUS:CSTR:"Packages"
+		ZHCN:CSTR:"[英国:Packages]"
+		ENBR:CSTR:"⠏⠁⠉⠅⠁⠛⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.25"
+		ENUS:CSTR:"Devices"
+		ZHCN:CSTR:"[英国:Devices]"
+		ENBR:CSTR:"⠙⠑⠧⠊⠉⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.26"
+		ENUS:CSTR:"Receive"
+		ZHCN:CSTR:"接受"
+		ENBR:CSTR:"⠗⠑⠉⠑⠊⠧⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.27"
+		ENUS:CSTR:"Transmit"
+		ZHCN:CSTR:"传送"
+		ENBR:CSTR:"⠞⠗⠁⠝⠎⠍⠊⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.28"
+		ENUS:CSTR:"Controllers"
+		ZHCN:CSTR:"[英国:Controllers]"
+		ENBR:CSTR:"⠉⠕⠝⠞⠗⠕⠇⠇⠑⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.29"
+		ENUS:CSTR:"Enclosures"
+		ZHCN:CSTR:"[英国:Enclosures]"
+		ENBR:CSTR:"⠑⠝⠉⠇⠕⠎⠥⠗⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.3"
+		ENUS:CSTR:"Allowable IP Ranges"
+		ZHCN:CSTR:"可以容许的 网际协定 [英国:Ranges]"
+		ENBR:CSTR:"⠁⠇⠇⠕⠺⠁⠃⠇⠑⠀⠊⠏⠀⠗⠁⠝⠛⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.30"
+		ENUS:CSTR:"Arrays"
+		ZHCN:CSTR:"[英国:Arrays]"
+		ENBR:CSTR:"⠁⠗⠗⠁⠽⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.31"
+		ENUS:CSTR:"Drives"
+		ZHCN:CSTR:"[英国:Drives]"
+		ENBR:CSTR:"⠙⠗⠊⠧⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.32"
+		ENUS:CSTR:"Established Connections"
+		ZHCN:CSTR:"定 连接点"
+		ENBR:CSTR:"⠑⠎⠞⠁⠃⠇⠊⠎⠓⠑⠙⠀⠉⠕⠝⠝⠑⠉⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.4"
+		ENUS:CSTR:"Locations"
+		ZHCN:CSTR:"定位件"
+		ENBR:CSTR:"⠇⠕⠉⠁⠞⠊⠕⠝⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.5"
+		ENUS:CSTR:"HTTP Entities"
+		ZHCN:CSTR:"超文本传输协定 [英国:Entities]"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠑⠝⠞⠊⠞⠊⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.6"
+		ENUS:CSTR:"HTTP /CBID Namespace"
+		ZHCN:CSTR:"超文本传输协定 [英国:/CBID] [英国:Namespace]"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠀⠉⠃⠊⠙⠀⠝⠁⠍⠑⠎⠏⠁⠉⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.7"
+		ENUS:CSTR:"HTTP /UUID Namespace"
+		ZHCN:CSTR:"超文本传输协定 [英国:/UUID] [英国:Namespace]"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠀⠥⠥⠊⠙⠀⠝⠁⠍⠑⠎⠏⠁⠉⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.8"
+		ENUS:CSTR:"HTTP /DICOM Namespace"
+		ZHCN:CSTR:"超文本传输协定 [英国:/DICOM] [英国:Namespace]"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠀⠙⠊⠉⠕⠍⠀⠝⠁⠍⠑⠎⠏⠁⠉⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.9"
+		ENUS:CSTR:"DICOM AEs"
+		ZHCN:CSTR:"[英国:DICOM] [英国:AEs]"
+		ENBR:CSTR:"⠙⠊⠉⠕⠍⠀⠁⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.33"
+		ENUS:CSTR:"HTTP /GRID Namespace"
+		ZHCN:CSTR:"超文本传输协定 [英国:/GRID] [英国:Namespace]"
+		ENBR:CSTR:"⠓⠞⠞⠏⠀⠀⠛⠗⠊⠙⠀⠝⠁⠍⠑⠎⠏⠁⠉⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.34"
+		ENUS:CSTR:"Inbound Replication Summaries"
+		ZHCN:CSTR:"回内地的 回答 [英国:Summaries]"
+		ENBR:CSTR:"⠊⠝⠃⠕⠥⠝⠙⠀⠗⠑⠏⠇⠊⠉⠁⠞⠊⠕⠝⠀⠎⠥⠍⠍⠁⠗⠊⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.35"
+		ENUS:CSTR:"Outbound Replication Summaries"
+		ZHCN:CSTR:"出站 回答 [英国:Summaries]"
+		ENBR:CSTR:"⠕⠥⠞⠃⠕⠥⠝⠙⠀⠗⠑⠏⠇⠊⠉⠁⠞⠊⠕⠝⠀⠎⠥⠍⠍⠁⠗⠊⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.36"
+		ENUS:CSTR:"Active Volumes"
+		ZHCN:CSTR:"活动的 [英国:Volumes]"
+		ENBR:CSTR:"⠁⠉⠞⠊⠧⠑⠀⠧⠕⠇⠥⠍⠑⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.1"
+		ENUS:CSTR:"Administrative Domain Controller (ADC)"
+		ZHCN:CSTR:"管理的 领土 控制器 [英国:(ADC)]"
+		ENBR:CSTR:"⠁⠙⠍⠊⠝⠊⠎⠞⠗⠁⠞⠊⠧⠑⠀⠙⠕⠍⠁⠊⠝⠀⠉⠕⠝⠞⠗⠕⠇⠇⠑⠗⠀⠀⠁⠙⠉⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.10"
+		ENUS:CSTR:"Server Status Monitor (SSM)"
+		ZHCN:CSTR:"服务器 状态 显示器 [英国:(SSM)]"
+		ENBR:CSTR:"⠎⠑⠗⠧⠑⠗⠀⠎⠞⠁⠞⠥⠎⠀⠍⠕⠝⠊⠞⠕⠗⠀⠀⠎⠎⠍⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.11"
+		ENUS:CSTR:"Time Synchronization"
+		ZHCN:CSTR:"时间 同步"
+		ENBR:CSTR:"⠞⠊⠍⠑⠀⠎⠽⠝⠉⠓⠗⠕⠝⠊⠵⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.12"
+		ENUS:CSTR:"Database Engine"
+		ZHCN:CSTR:"数据库 引擎"
+		ENBR:CSTR:"⠙⠁⠞⠁⠃⠁⠎⠑⠀⠑⠝⠛⠊⠝⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.13"
+		ENUS:CSTR:"System Logging"
+		ZHCN:CSTR:"组织 登录"
+		ENBR:CSTR:"⠎⠽⠎⠞⠑⠍⠀⠇⠕⠛⠛⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.14"
+		ENUS:CSTR:"RAID Monitor"
+		ZHCN:CSTR:"袭击 显示器"
+		ENBR:CSTR:"⠗⠁⠊⠙⠀⠍⠕⠝⠊⠞⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.15"
+		ENUS:CSTR:"Server Status Display"
+		ZHCN:CSTR:"服务器 状态 给...看"
+		ENBR:CSTR:"⠎⠑⠗⠧⠑⠗⠀⠎⠞⠁⠞⠥⠎⠀⠙⠊⠎⠏⠇⠁⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.16"
+		ENUS:CSTR:"Server Manager"
+		ZHCN:CSTR:"服务器 经理"
+		ENBR:CSTR:"⠎⠑⠗⠧⠑⠗⠀⠍⠁⠝⠁⠛⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.2"
+		ENUS:CSTR:"Archive Node (ARC)"
+		ZHCN:CSTR:"档案 结点 [英国:(ARC)]"
+		ENBR:CSTR:"⠁⠗⠉⠓⠊⠧⠑⠀⠝⠕⠙⠑⠀⠀⠁⠗⠉⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.3"
+		ENUS:CSTR:"Audit Management System (AMS)"
+		ZHCN:CSTR:"审计 办理 组织 [英国:(AMS)]"
+		ENBR:CSTR:"⠁⠥⠙⠊⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍⠀⠀⠁⠍⠎⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.4"
+		ENUS:CSTR:"Connection Load Balancer (CLB)"
+		ZHCN:CSTR:"连接 装载 秤称的人 [英国:(CLB)]"
+		ENBR:CSTR:"⠉⠕⠝⠝⠑⠉⠞⠊⠕⠝⠀⠇⠕⠁⠙⠀⠃⠁⠇⠁⠝⠉⠑⠗⠀⠀⠉⠇⠃⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.5"
+		ENUS:CSTR:"Configuration Management Node (CMN)"
+		ZHCN:CSTR:"配置 办理 结点 [英国:(CMN)]"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠝⠕⠙⠑⠀⠀⠉⠍⠝⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.6"
+		ENUS:CSTR:"Content Management System (CMS)"
+		ZHCN:CSTR:"内容 办理 组织 [英国:(CMS)]"
+		ENBR:CSTR:"⠉⠕⠝⠞⠑⠝⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍⠀⠀⠉⠍⠎⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.7"
+		ENUS:CSTR:"Network Management System (NMS)"
+		ZHCN:CSTR:"网制工艺 办理 组织 [英国:(NMS)]"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍⠀⠀⠝⠍⠎⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.8"
+		ENUS:CSTR:"Storage Node (LDR)"
+		ZHCN:CSTR:"储藏 结点 [英国:(LDR)]"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑⠀⠝⠕⠙⠑⠀⠀⠇⠙⠗⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.9"
+		ENUS:CSTR:"File System Gateway (FSG)"
+		ZHCN:CSTR:"夹纸板 组织 门 [英国:(FSG)]"
+		ENBR:CSTR:"⠋⠊⠇⠑⠀⠎⠽⠎⠞⠑⠍⠀⠛⠁⠞⠑⠺⠁⠽⠀⠀⠋⠎⠛⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.10.1"
+		ENUS:CSTR:"BAE Systems"
+		ZHCN:CSTR:"[英国:BAE] [英国:Systems]"
+		ENBR:CSTR:"⠃⠁⠑⠀⠎⠽⠎⠞⠑⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.11.1"
+		ENUS:CSTR:"DEBUG"
+		ZHCN:CSTR:"[英国:DEBUG]"
+		ENBR:CSTR:"⠙⠑⠃⠥⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.1"
+		ENUS:CSTR:"IDE Errors"
+		ZHCN:CSTR:"集成设备电路 [英国:Errors]"
+		ENBR:CSTR:"⠊⠙⠑⠀⠑⠗⠗⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.2"
+		ENUS:CSTR:"I/O Errors"
+		ZHCN:CSTR:"鄙人/a\x09 [英国:Errors]"
+		ENBR:CSTR:"⠊⠀⠕⠀⠑⠗⠗⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.3"
+		ENUS:CSTR:"SCSI Errors"
+		ZHCN:CSTR:"[英国:SCSI] [英国:Errors]"
+		ENBR:CSTR:"⠎⠉⠎⠊⠀⠑⠗⠗⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.4"
+		ENUS:CSTR:"File System Errors"
+		ZHCN:CSTR:"夹纸板 组织 [英国:Errors]"
+		ENBR:CSTR:"⠋⠊⠇⠑⠀⠎⠽⠎⠞⠑⠍⠀⠑⠗⠗⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.5"
+		ENUS:CSTR:"Network Receive Errors"
+		ZHCN:CSTR:"网制工艺 接受 [英国:Errors]"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠀⠗⠑⠉⠑⠊⠧⠑⠀⠑⠗⠗⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.6"
+		ENUS:CSTR:"Network Transmit Errors"
+		ZHCN:CSTR:"网制工艺 传送 [英国:Errors]"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠀⠞⠗⠁⠝⠎⠍⠊⠞⠀⠑⠗⠗⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.7"
+		ENUS:CSTR:"Kernel Errors"
+		ZHCN:CSTR:"果仁 [英国:Errors]"
+		ENBR:CSTR:"⠅⠑⠗⠝⠑⠇⠀⠑⠗⠗⠕⠗⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.8"
+		ENUS:CSTR:"Kernel Memory Allocation Failure"
+		ZHCN:CSTR:"果仁 记忆 配置 失败"
+		ENBR:CSTR:"⠅⠑⠗⠝⠑⠇⠀⠍⠑⠍⠕⠗⠽⠀⠁⠇⠇⠕⠉⠁⠞⠊⠕⠝⠀⠋⠁⠊⠇⠥⠗⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.9"
+		ENUS:CSTR:"Peer TCP Protocol Violation"
+		ZHCN:CSTR:"透过...看 传输控制协定 协议 家庭用品"
+		ENBR:CSTR:"⠏⠑⠑⠗⠀⠞⠉⠏⠀⠏⠗⠕⠞⠕⠉⠕⠇⠀⠧⠊⠕⠇⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.1"
+		ENUS:CSTR:"Administrative Domain Controller"
+		ZHCN:CSTR:"管理的 领土 控制器"
+		ENBR:CSTR:"⠁⠙⠍⠊⠝⠊⠎⠞⠗⠁⠞⠊⠧⠑⠀⠙⠕⠍⠁⠊⠝⠀⠉⠕⠝⠞⠗⠕⠇⠇⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.10"
+		ENUS:CSTR:"File System Gateway"
+		ZHCN:CSTR:"夹纸板 组织 门"
+		ENBR:CSTR:"⠋⠊⠇⠑⠀⠎⠽⠎⠞⠑⠍⠀⠛⠁⠞⠑⠺⠁⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.2"
+		ENUS:CSTR:"Local Distribution Router"
+		ZHCN:CSTR:"地方性的 分配 路由器"
+		ENBR:CSTR:"⠇⠕⠉⠁⠇⠀⠙⠊⠎⠞⠗⠊⠃⠥⠞⠊⠕⠝⠀⠗⠕⠥⠞⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.3"
+		ENUS:CSTR:"Content Management System"
+		ZHCN:CSTR:"内容 办理 组织"
+		ENBR:CSTR:"⠉⠕⠝⠞⠑⠝⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.4"
+		ENUS:CSTR:"Network Management System"
+		ZHCN:CSTR:"网制工艺 办理 组织"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.5"
+		ENUS:CSTR:"Audit Management System"
+		ZHCN:CSTR:"审计 办理 组织"
+		ENBR:CSTR:"⠁⠥⠙⠊⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.6"
+		ENUS:CSTR:"Server Status Monitor"
+		ZHCN:CSTR:"服务器 状态 显示器"
+		ENBR:CSTR:"⠎⠑⠗⠧⠑⠗⠀⠎⠞⠁⠞⠥⠎⠀⠍⠕⠝⠊⠞⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.7"
+		ENUS:CSTR:"Connection Load Balancer"
+		ZHCN:CSTR:"连接 装载 秤称的人"
+		ENBR:CSTR:"⠉⠕⠝⠝⠑⠉⠞⠊⠕⠝⠀⠇⠕⠁⠙⠀⠃⠁⠇⠁⠝⠉⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.8"
+		ENUS:CSTR:"Configuration Management Node"
+		ZHCN:CSTR:"配置 办理 结点"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.9"
+		ENUS:CSTR:"Archive Node"
+		ZHCN:CSTR:"档案 结点"
+		ENBR:CSTR:"⠁⠗⠉⠓⠊⠧⠑⠀⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.1"
+		ENUS:CSTR:"System"
+		ZHCN:CSTR:"组织"
+		ENBR:CSTR:"⠎⠽⠎⠞⠑⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.2"
+		ENUS:CSTR:"Object Storage"
+		ZHCN:CSTR:"物体 储藏"
+		ENBR:CSTR:"⠕⠃⠚⠑⠉⠞⠀⠎⠞⠕⠗⠁⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.3"
+		ENUS:CSTR:"Volume Management"
+		ZHCN:CSTR:"书 办理"
+		ENBR:CSTR:"⠧⠕⠇⠥⠍⠑⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.4"
+		ENUS:CSTR:"Protocol - DICOM"
+		ZHCN:CSTR:"协议 [英国:-] [英国:DICOM]"
+		ENBR:CSTR:"⠏⠗⠕⠞⠕⠉⠕⠇⠀⠀⠀⠙⠊⠉⠕⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.5"
+		ENUS:CSTR:"Protocol - HTTP"
+		ZHCN:CSTR:"协议 [英国:-] 超文本传输协定"
+		ENBR:CSTR:"⠏⠗⠕⠞⠕⠉⠕⠇⠀⠀⠀⠓⠞⠞⠏"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.6"
+		ENUS:CSTR:"Protocol - File"
+		ZHCN:CSTR:"协议 [英国:-] 夹纸板"
+		ENBR:CSTR:"⠏⠗⠕⠞⠕⠉⠕⠇⠀⠀⠀⠋⠊⠇⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.1"
+		ENUS:CSTR:"SOP Class UID"
+		ZHCN:CSTR:"面包片 种 [英国:UID]"
+		ENBR:CSTR:"⠎⠕⠏⠀⠉⠇⠁⠎⠎⠀⠥⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.10"
+		ENUS:CSTR:"Station Name"
+		ZHCN:CSTR:"车站 名称"
+		ENBR:CSTR:"⠎⠞⠁⠞⠊⠕⠝⠀⠝⠁⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.11"
+		ENUS:CSTR:"Study Description"
+		ZHCN:CSTR:"用功 记述"
+		ENBR:CSTR:"⠎⠞⠥⠙⠽⠀⠙⠑⠎⠉⠗⠊⠏⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.12"
+		ENUS:CSTR:"Manufacturer Model Name"
+		ZHCN:CSTR:"制造者 模式 名称"
+		ENBR:CSTR:"⠍⠁⠝⠥⠋⠁⠉⠞⠥⠗⠑⠗⠀⠍⠕⠙⠑⠇⠀⠝⠁⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.13"
+		ENUS:CSTR:"Patient Name"
+		ZHCN:CSTR:"病人 名称"
+		ENBR:CSTR:"⠏⠁⠞⠊⠑⠝⠞⠀⠝⠁⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.14"
+		ENUS:CSTR:"Patient ID"
+		ZHCN:CSTR:"病人 遗传素质"
+		ENBR:CSTR:"⠏⠁⠞⠊⠑⠝⠞⠀⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.15"
+		ENUS:CSTR:"Patient Birth Date"
+		ZHCN:CSTR:"病人 出生 年月日"
+		ENBR:CSTR:"⠏⠁⠞⠊⠑⠝⠞⠀⠃⠊⠗⠞⠓⠀⠙⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.16"
+		ENUS:CSTR:"Patient's Sex"
+		ZHCN:CSTR:"病人'he\x09 性"
+		ENBR:CSTR:"⠏⠁⠞⠊⠑⠝⠞⠀⠎⠀⠎⠑⠭"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.17"
+		ENUS:CSTR:"Patient's Age"
+		ZHCN:CSTR:"病人'he\x09 年龄"
+		ENBR:CSTR:"⠏⠁⠞⠊⠑⠝⠞⠀⠎⠀⠁⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.18"
+		ENUS:CSTR:"Study Instance UID"
+		ZHCN:CSTR:"用功 例证 [英国:UID]"
+		ENBR:CSTR:"⠎⠞⠥⠙⠽⠀⠊⠝⠎⠞⠁⠝⠉⠑⠀⠥⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.19"
+		ENUS:CSTR:"Series Instance UID"
+		ZHCN:CSTR:"一连串 例证 [英国:UID]"
+		ENBR:CSTR:"⠎⠑⠗⠊⠑⠎⠀⠊⠝⠎⠞⠁⠝⠉⠑⠀⠥⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.2"
+		ENUS:CSTR:"SOP Instance UID"
+		ZHCN:CSTR:"面包片 例证 [英国:UID]"
+		ENBR:CSTR:"⠎⠕⠏⠀⠊⠝⠎⠞⠁⠝⠉⠑⠀⠥⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.20"
+		ENUS:CSTR:"Series Number"
+		ZHCN:CSTR:"一连串 总数"
+		ENBR:CSTR:"⠎⠑⠗⠊⠑⠎⠀⠝⠥⠍⠃⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.21"
+		ENUS:CSTR:"Instance (Image) Number"
+		ZHCN:CSTR:"例证 [英国:(Image)] 总数"
+		ENBR:CSTR:"⠊⠝⠎⠞⠁⠝⠉⠑⠀⠀⠊⠍⠁⠛⠑⠀⠀⠝⠥⠍⠃⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.22"
+		ENUS:CSTR:"Study ID"
+		ZHCN:CSTR:"用功 遗传素质"
+		ENBR:CSTR:"⠎⠞⠥⠙⠽⠀⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.3"
+		ENUS:CSTR:"Study Date"
+		ZHCN:CSTR:"用功 年月日"
+		ENBR:CSTR:"⠎⠞⠥⠙⠽⠀⠙⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.4"
+		ENUS:CSTR:"Study Time"
+		ZHCN:CSTR:"用功 时间"
+		ENBR:CSTR:"⠎⠞⠥⠙⠽⠀⠞⠊⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.5"
+		ENUS:CSTR:"Accession Number"
+		ZHCN:CSTR:"亲近 总数"
+		ENBR:CSTR:"⠁⠉⠉⠑⠎⠎⠊⠕⠝⠀⠝⠥⠍⠃⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.6"
+		ENUS:CSTR:"Modality"
+		ZHCN:CSTR:"样式"
+		ENBR:CSTR:"⠍⠕⠙⠁⠇⠊⠞⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.7"
+		ENUS:CSTR:"Manufacturer"
+		ZHCN:CSTR:"制造者"
+		ENBR:CSTR:"⠍⠁⠝⠥⠋⠁⠉⠞⠥⠗⠑⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.8"
+		ENUS:CSTR:"Institution Name"
+		ZHCN:CSTR:"公共团体 名称"
+		ENBR:CSTR:"⠊⠝⠎⠞⠊⠞⠥⠞⠊⠕⠝⠀⠝⠁⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.9"
+		ENUS:CSTR:"Referring Physician Name"
+		ZHCN:CSTR:"谈及 医师 名称"
+		ENBR:CSTR:"⠗⠑⠋⠑⠗⠗⠊⠝⠛⠀⠏⠓⠽⠎⠊⠉⠊⠁⠝⠀⠝⠁⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.8.1"
+		ENUS:CSTR:"Disabled"
+		ZHCN:CSTR:"残"
+		ENBR:CSTR:"⠙⠊⠎⠁⠃⠇⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.8.2"
+		ENUS:CSTR:"Daily"
+		ZHCN:CSTR:"每日的"
+		ENBR:CSTR:"⠙⠁⠊⠇⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.8.3"
+		ENUS:CSTR:"Weekly"
+		ZHCN:CSTR:"周刊"
+		ENBR:CSTR:"⠺⠑⠑⠅⠇⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.8.4"
+		ENUS:CSTR:"Monthly"
+		ZHCN:CSTR:"每月的"
+		ENBR:CSTR:"⠍⠕⠝⠞⠓⠇⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.8.5"
+		ENUS:CSTR:"Custom"
+		ZHCN:CSTR:"习惯"
+		ENBR:CSTR:"⠉⠥⠎⠞⠕⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.1"
+		ENUS:CSTR:"Grid Task Manager started"
+		ZHCN:CSTR:"栅 工作 经理 [英国:started]"
+		ENBR:CSTR:"⠛⠗⠊⠙⠀⠞⠁⠎⠅⠀⠍⠁⠝⠁⠛⠑⠗⠀⠎⠞⠁⠗⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.10"
+		ENUS:CSTR:"Completed"
+		ZHCN:CSTR:"完成"
+		ENBR:CSTR:"⠉⠕⠍⠏⠇⠑⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.11"
+		ENUS:CSTR:"Failed"
+		ZHCN:CSTR:"已失效的"
+		ENBR:CSTR:"⠋⠁⠊⠇⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.12"
+		ENUS:CSTR:"Aborted"
+		ZHCN:CSTR:"流产的"
+		ENBR:CSTR:"⠁⠃⠕⠗⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.13"
+		ENUS:CSTR:"Unknown"
+		ZHCN:CSTR:"未知的"
+		ENBR:CSTR:"⠥⠝⠅⠝⠕⠺⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.14"
+		ENUS:CSTR:"Submit a new task by pasting in a Signed Task Text Block"
+		ZHCN:CSTR:"使服从 c\x09 新的 工作 在侧 [英国:pasting] 向里面 c\x09 有符号的 工作 本文 建筑用石头"
+		ENBR:CSTR:"⠎⠥⠃⠍⠊⠞⠀⠁⠀⠝⠑⠺⠀⠞⠁⠎⠅⠀⠃⠽⠀⠏⠁⠎⠞⠊⠝⠛⠀⠊⠝⠀⠁⠀⠎⠊⠛⠝⠑⠙⠀⠞⠁⠎⠅⠀⠞⠑⠭⠞⠀⠃⠇⠕⠉⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.15"
+		ENUS:CSTR:"Loaded"
+		ZHCN:CSTR:"装载"
+		ENBR:CSTR:"⠇⠕⠁⠙⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.2"
+		ENUS:CSTR:"Task ID:"
+		ZHCN:CSTR:"工作 遗传素质:"
+		ENBR:CSTR:"⠞⠁⠎⠅⠀⠊⠙⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.3"
+		ENUS:CSTR:"Load Failed"
+		ZHCN:CSTR:"装载 已失效的"
+		ENBR:CSTR:"⠇⠕⠁⠙⠀⠋⠁⠊⠇⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.4"
+		ENUS:CSTR:"Started"
+		ZHCN:CSTR:"[英国:Started]"
+		ENBR:CSTR:"⠎⠞⠁⠗⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.5"
+		ENUS:CSTR:"Completed"
+		ZHCN:CSTR:"完成"
+		ENBR:CSTR:"⠉⠕⠍⠏⠇⠑⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.6"
+		ENUS:CSTR:"Failed"
+		ZHCN:CSTR:"已失效的"
+		ENBR:CSTR:"⠋⠁⠊⠇⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.7"
+		ENUS:CSTR:"Aborted"
+		ZHCN:CSTR:"流产的"
+		ENBR:CSTR:"⠁⠃⠕⠗⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.8"
+		ENUS:CSTR:"Cancelled"
+		ZHCN:CSTR:"取消"
+		ENBR:CSTR:"⠉⠁⠝⠉⠑⠇⠇⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.9"
+		ENUS:CSTR:"Started"
+		ZHCN:CSTR:"[英国:Started]"
+		ENBR:CSTR:"⠎⠞⠁⠗⠞⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.12.1"
+		ENUS:CSTR:"CIFS Filesharing"
+		ZHCN:CSTR:"[英国:CIFS] [英国:Filesharing]"
+		ENBR:CSTR:"⠉⠊⠋⠎⠀⠋⠊⠇⠑⠎⠓⠁⠗⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.12.2"
+		ENUS:CSTR:"NFS Filesharing"
+		ZHCN:CSTR:"网络文件系统 [英国:Filesharing]"
+		ENBR:CSTR:"⠝⠋⠎⠀⠋⠊⠇⠑⠎⠓⠁⠗⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.1"
+		ENUS:CSTR:"Node ID:"
+		ZHCN:CSTR:"结点 遗传素质:"
+		ENBR:CSTR:"⠝⠕⠙⠑⠀⠊⠙⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.10"
+		ENUS:CSTR:"ARC"
+		ZHCN:CSTR:"弧"
+		ENBR:CSTR:"⠁⠗⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.11"
+		ENUS:CSTR:"FSG"
+		ZHCN:CSTR:"[英国:FSG]"
+		ENBR:CSTR:"⠋⠎⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.12"
+		ENUS:CSTR:"StorageNode Decommission"
+		ZHCN:CSTR:"[英国:StorageNode] 使退役"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑⠝⠕⠙⠑⠀⠙⠑⠉⠕⠍⠍⠊⠎⠎⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.13"
+		ENUS:CSTR:"StorageNode Lost"
+		ZHCN:CSTR:"[英国:StorageNode] 失去的"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑⠝⠕⠙⠑⠀⠇⠕⠎⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.14"
+		ENUS:CSTR:"Certificate Update"
+		ZHCN:CSTR:"证明书 更新"
+		ENBR:CSTR:"⠉⠑⠗⠞⠊⠋⠊⠉⠁⠞⠑⠀⠥⠏⠙⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.15"
+		ENUS:CSTR:"Debug Print"
+		ZHCN:CSTR:"[英国:Debug] 盖印"
+		ENBR:CSTR:"⠙⠑⠃⠥⠛⠀⠏⠗⠊⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.16"
+		ENUS:CSTR:"Enables DICOM Functionality"
+		ZHCN:CSTR:"[英国:Enables] [英国:DICOM] 功能性"
+		ENBR:CSTR:"⠑⠝⠁⠃⠇⠑⠎⠀⠙⠊⠉⠕⠍⠀⠋⠥⠝⠉⠞⠊⠕⠝⠁⠇⠊⠞⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.17"
+		ENUS:CSTR:"Resources Update"
+		ZHCN:CSTR:"产 更新"
+		ENBR:CSTR:"⠗⠑⠎⠕⠥⠗⠉⠑⠎⠀⠥⠏⠙⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.19"
+		ENUS:CSTR:"Unknown Task"
+		ZHCN:CSTR:"未知的 工作"
+		ENBR:CSTR:"⠥⠝⠅⠝⠕⠺⠝⠀⠞⠁⠎⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.2"
+		ENUS:CSTR:"ADC"
+		ZHCN:CSTR:"[英国:ADC]"
+		ENBR:CSTR:"⠁⠙⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.3"
+		ENUS:CSTR:"LDR"
+		ZHCN:CSTR:"[英国:LDR]"
+		ENBR:CSTR:"⠇⠙⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.4"
+		ENUS:CSTR:"CMS"
+		ZHCN:CSTR:"[英国:CMS]"
+		ENBR:CSTR:"⠉⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.5"
+		ENUS:CSTR:"NMS"
+		ZHCN:CSTR:"网络管理系统"
+		ENBR:CSTR:"⠝⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.6"
+		ENUS:CSTR:"AMS"
+		ZHCN:CSTR:"[英国:AMS]"
+		ENBR:CSTR:"⠁⠍⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.7"
+		ENUS:CSTR:"SSM"
+		ZHCN:CSTR:"面对面导弹"
+		ENBR:CSTR:"⠎⠎⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.8"
+		ENUS:CSTR:"CLB"
+		ZHCN:CSTR:"[英国:CLB]"
+		ENBR:CSTR:"⠉⠇⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.9"
+		ENUS:CSTR:"CMN"
+		ZHCN:CSTR:"[英国:CMN]"
+		ENBR:CSTR:"⠉⠍⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.1"
+		ENUS:CSTR:"LDR and CMS version check"
+		ZHCN:CSTR:"[英国:LDR] 和 [英国:CMS] 翻译 制止"
+		ENBR:CSTR:"⠇⠙⠗⠀⠁⠝⠙⠀⠉⠍⠎⠀⠧⠑⠗⠎⠊⠕⠝⠀⠉⠓⠑⠉⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.10"
+		ENUS:CSTR:"CMS version check"
+		ZHCN:CSTR:"[英国:CMS] 翻译 制止"
+		ENBR:CSTR:"⠉⠍⠎⠀⠧⠑⠗⠎⠊⠕⠝⠀⠉⠓⠑⠉⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.11"
+		ENUS:CSTR:"Node Lost"
+		ZHCN:CSTR:"结点 失去的"
+		ENBR:CSTR:"⠝⠕⠙⠑⠀⠇⠕⠎⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.12"
+		ENUS:CSTR:"ADC version check"
+		ZHCN:CSTR:"[英国:ADC] 翻译 制止"
+		ENBR:CSTR:"⠁⠙⠉⠀⠧⠑⠗⠎⠊⠕⠝⠀⠉⠓⠑⠉⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.13"
+		ENUS:CSTR:"Certificate Update"
+		ZHCN:CSTR:"证明书 更新"
+		ENBR:CSTR:"⠉⠑⠗⠞⠊⠋⠊⠉⠁⠞⠑⠀⠥⠏⠙⠁⠞⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.14"
+		ENUS:CSTR:"Node version check"
+		ZHCN:CSTR:"结点 翻译 制止"
+		ENBR:CSTR:"⠝⠕⠙⠑⠀⠧⠑⠗⠎⠊⠕⠝⠀⠉⠓⠑⠉⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.15"
+		ENUS:CSTR:"Print Debug Message"
+		ZHCN:CSTR:"盖印 [英国:Debug] 传话"
+		ENBR:CSTR:"⠏⠗⠊⠝⠞⠀⠙⠑⠃⠥⠛⠀⠍⠑⠎⠎⠁⠛⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.16"
+		ENUS:CSTR:"Resources Preload"
+		ZHCN:CSTR:"产 预装入"
+		ENBR:CSTR:"⠗⠑⠎⠕⠥⠗⠉⠑⠎⠀⠏⠗⠑⠇⠕⠁⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.17"
+		ENUS:CSTR:"Resources Wait For Unload"
+		ZHCN:CSTR:"产 等候 向 卸货"
+		ENBR:CSTR:"⠗⠑⠎⠕⠥⠗⠉⠑⠎⠀⠺⠁⠊⠞⠀⠋⠕⠗⠀⠥⠝⠇⠕⠁⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.18"
+		ENUS:CSTR:"Resources Wait For Version"
+		ZHCN:CSTR:"产 等候 向 版本"
+		ENBR:CSTR:"⠗⠑⠎⠕⠥⠗⠉⠑⠎⠀⠺⠁⠊⠞⠀⠋⠕⠗⠀⠧⠑⠗⠎⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.2"
+		ENUS:CSTR:"LDR storage state lock"
+		ZHCN:CSTR:"[英国:LDR] 储藏 国 锁"
+		ENBR:CSTR:"⠇⠙⠗⠀⠎⠞⠕⠗⠁⠛⠑⠀⠎⠞⠁⠞⠑⠀⠇⠕⠉⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.3"
+		ENUS:CSTR:"LDR storage read only"
+		ZHCN:CSTR:"[英国:LDR] 储藏 读 无先例的"
+		ENBR:CSTR:"⠇⠙⠗⠀⠎⠞⠕⠗⠁⠛⠑⠀⠗⠑⠁⠙⠀⠕⠝⠇⠽"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.4"
+		ENUS:CSTR:"CMS migrate content (1)"
+		ZHCN:CSTR:"[英国:CMS] 迁居 满足 [英国:(1)]"
+		ENBR:CSTR:"⠉⠍⠎⠀⠍⠊⠛⠗⠁⠞⠑⠀⠉⠕⠝⠞⠑⠝⠞⠀⠀⠁⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.5"
+		ENUS:CSTR:"LDR Verify Data"
+		ZHCN:CSTR:"[英国:LDR] 作证 材料"
+		ENBR:CSTR:"⠇⠙⠗⠀⠧⠑⠗⠊⠋⠽⠀⠙⠁⠞⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.6"
+		ENUS:CSTR:"CMS migrate content (2)"
+		ZHCN:CSTR:"[英国:CMS] 迁居 满足 [英国:(2)]"
+		ENBR:CSTR:"⠉⠍⠎⠀⠍⠊⠛⠗⠁⠞⠑⠀⠉⠕⠝⠞⠑⠝⠞⠀⠀⠃⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.7"
+		ENUS:CSTR:"LDR storage offline"
+		ZHCN:CSTR:"[英国:LDR] 储藏 脱机的"
+		ENBR:CSTR:"⠇⠙⠗⠀⠎⠞⠕⠗⠁⠛⠑⠀⠕⠋⠋⠇⠊⠝⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.8"
+		ENUS:CSTR:"FAIL/ABORT - LDR storage online"
+		ZHCN:CSTR:"缺乏/流产 [英国:-] [英国:LDR] 储藏 联机"
+		ENBR:CSTR:"⠋⠁⠊⠇⠀⠁⠃⠕⠗⠞⠀⠀⠀⠇⠙⠗⠀⠎⠞⠕⠗⠁⠛⠑⠀⠕⠝⠇⠊⠝⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.9"
+		ENUS:CSTR:"FAIL/ABORT - LDR storage state unlock"
+		ZHCN:CSTR:"缺乏/流产 [英国:-] [英国:LDR] 储藏 国 开门锁"
+		ENBR:CSTR:"⠋⠁⠊⠇⠀⠁⠃⠕⠗⠞⠀⠀⠀⠇⠙⠗⠀⠎⠞⠕⠗⠁⠛⠑⠀⠎⠞⠁⠞⠑⠀⠥⠝⠇⠕⠉⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.4.1"
+		ENUS:CSTR:"No Events"
+		ZHCN:CSTR:"[英国:Events]"
+		ENBR:CSTR:"⠝⠕⠀⠑⠧⠑⠝⠞⠎"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.4.2"
+		ENUS:CSTR:"Unable to open fifo"
+		ZHCN:CSTR:"不能... 到 开放的 [英国:fifo]"
+		ENBR:CSTR:"⠥⠝⠁⠃⠇⠑⠀⠞⠕⠀⠕⠏⠑⠝⠀⠋⠊⠋⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.1.1"
+		ENUS:CSTR:"Shutdown"
+		ZHCN:CSTR:"关掉"
+		ENBR:CSTR:"⠎⠓⠥⠞⠙⠕⠺⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.1.2"
+		ENUS:CSTR:"Start All"
+		ZHCN:CSTR:"开始 整个的"
+		ENBR:CSTR:"⠎⠞⠁⠗⠞⠀⠁⠇⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.1.3"
+		ENUS:CSTR:"Restart"
+		ZHCN:CSTR:"重新启动"
+		ENBR:CSTR:"⠗⠑⠎⠞⠁⠗⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.1.4"
+		ENUS:CSTR:"Stop All"
+		ZHCN:CSTR:"使停止 整个的"
+		ENBR:CSTR:"⠎⠞⠕⠏⠀⠁⠇⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.1"
+		ENUS:CSTR:"Running"
+		ZHCN:CSTR:"跑的"
+		ENBR:CSTR:"⠗⠥⠝⠝⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.10"
+		ENUS:CSTR:"Status: Running"
+		ZHCN:CSTR:"状态: 跑的"
+		ENBR:CSTR:"⠎⠞⠁⠞⠥⠎⠀⠀⠗⠥⠝⠝⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.11"
+		ENUS:CSTR:"Status: Error"
+		ZHCN:CSTR:"状态: 失误"
+		ENBR:CSTR:"⠎⠞⠁⠞⠥⠎⠀⠀⠑⠗⠗⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.2"
+		ENUS:CSTR:"Error"
+		ZHCN:CSTR:"失误"
+		ENBR:CSTR:"⠑⠗⠗⠕⠗"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.3"
+		ENUS:CSTR:"Starting..."
+		ZHCN:CSTR:"[英国:Starting...]"
+		ENBR:CSTR:"⠎⠞⠁⠗⠞⠊⠝⠛⠲⠲⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.4"
+		ENUS:CSTR:"Stopping..."
+		ZHCN:CSTR:"停止..."
+		ENBR:CSTR:"⠎⠞⠕⠏⠏⠊⠝⠛⠲⠲⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.5"
+		ENUS:CSTR:"Stopped"
+		ZHCN:CSTR:"停止"
+		ENBR:CSTR:"⠎⠞⠕⠏⠏⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.6"
+		ENUS:CSTR:"Verifying..."
+		ZHCN:CSTR:"[英国:Verifying...]"
+		ENBR:CSTR:"⠧⠑⠗⠊⠋⠽⠊⠝⠛⠲⠲⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.7"
+		ENUS:CSTR:"Verified"
+		ZHCN:CSTR:"属实"
+		ENBR:CSTR:"⠧⠑⠗⠊⠋⠊⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.8"
+		ENUS:CSTR:"Unverified"
+		ZHCN:CSTR:"[英国:Unverified]"
+		ENBR:CSTR:"⠥⠝⠧⠑⠗⠊⠋⠊⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.9"
+		ENUS:CSTR:"n/a"
+		ZHCN:CSTR:"n/c"
+		ENBR:CSTR:"⠝⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.12"
+		ENUS:CSTR:"Status: Stopped"
+		ZHCN:CSTR:"状态: 停止"
+		ENBR:CSTR:"⠎⠞⠁⠞⠥⠎⠀⠀⠎⠞⠕⠏⠏⠑⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.1"
+		ENUS:CSTR:"Operating System Kernel"
+		ZHCN:CSTR:"操作 组织 果仁"
+		ENBR:CSTR:"⠕⠏⠑⠗⠁⠞⠊⠝⠛⠀⠎⠽⠎⠞⠑⠍⠀⠅⠑⠗⠝⠑⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.10"
+		ENUS:CSTR:"Administrative Domain Controller (ADC)"
+		ZHCN:CSTR:"管理的 领土 控制器 [英国:(ADC)]"
+		ENBR:CSTR:"⠁⠙⠍⠊⠝⠊⠎⠞⠗⠁⠞⠊⠧⠑⠀⠙⠕⠍⠁⠊⠝⠀⠉⠕⠝⠞⠗⠕⠇⠇⠑⠗⠀⠀⠁⠙⠉⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.11"
+		ENUS:CSTR:"Server Status Monitor (SSM)"
+		ZHCN:CSTR:"服务器 状态 显示器 [英国:(SSM)]"
+		ENBR:CSTR:"⠎⠑⠗⠧⠑⠗⠀⠎⠞⠁⠞⠥⠎⠀⠍⠕⠝⠊⠞⠕⠗⠀⠀⠎⠎⠍⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.12"
+		ENUS:CSTR:"Network Management System (NMS)"
+		ZHCN:CSTR:"网制工艺 办理 组织 [英国:(NMS)]"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍⠀⠀⠝⠍⠎⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.13"
+		ENUS:CSTR:"File System Gateway (FSG)"
+		ZHCN:CSTR:"夹纸板 组织 门 [英国:(FSG)]"
+		ENBR:CSTR:"⠋⠊⠇⠑⠀⠎⠽⠎⠞⠑⠍⠀⠛⠁⠞⠑⠺⠁⠽⠀⠀⠋⠎⠛⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.14"
+		ENUS:CSTR:"Connection Load Balancer (CLB)"
+		ZHCN:CSTR:"连接 装载 秤称的人 [英国:(CLB)]"
+		ENBR:CSTR:"⠉⠕⠝⠝⠑⠉⠞⠊⠕⠝⠀⠇⠕⠁⠙⠀⠃⠁⠇⠁⠝⠉⠑⠗⠀⠀⠉⠇⠃⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.15"
+		ENUS:CSTR:"Audit Management System (AMS)"
+		ZHCN:CSTR:"审计 办理 组织 [英国:(AMS)]"
+		ENBR:CSTR:"⠁⠥⠙⠊⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍⠀⠀⠁⠍⠎⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.16"
+		ENUS:CSTR:"Archive Node (ARC)"
+		ZHCN:CSTR:"档案 结点 [英国:(ARC)]"
+		ENBR:CSTR:"⠁⠗⠉⠓⠊⠧⠑⠀⠝⠕⠙⠑⠀⠀⠁⠗⠉⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.17"
+		ENUS:CSTR:"Configuration Management Node (CMN)"
+		ZHCN:CSTR:"配置 办理 结点 [英国:(CMN)]"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠝⠕⠙⠑⠀⠀⠉⠍⠝⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.18"
+		ENUS:CSTR:"Network Management Infrastructure"
+		ZHCN:CSTR:"网制工艺 办理 架构"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠊⠝⠋⠗⠁⠎⠞⠗⠥⠉⠞⠥⠗⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.19"
+		ENUS:CSTR:"Host Name:"
+		ZHCN:CSTR:"主人 名称:"
+		ENBR:CSTR:"⠓⠕⠎⠞⠀⠝⠁⠍⠑⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.2"
+		ENUS:CSTR:"Operating System Environment"
+		ZHCN:CSTR:"操作 组织 围绕"
+		ENBR:CSTR:"⠕⠏⠑⠗⠁⠞⠊⠝⠛⠀⠎⠽⠎⠞⠑⠍⠀⠑⠝⠧⠊⠗⠕⠝⠍⠑⠝⠞"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.20"
+		ENUS:CSTR:"IP Addresses:"
+		ZHCN:CSTR:"网际协定 [英国:Addresses:]"
+		ENBR:CSTR:"⠊⠏⠀⠁⠙⠙⠗⠑⠎⠎⠑⠎⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.3"
+		ENUS:CSTR:"Storage Subsystem"
+		ZHCN:CSTR:"储藏 次要系统"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑⠀⠎⠥⠃⠎⠽⠎⠞⠑⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.4"
+		ENUS:CSTR:"Networking"
+		ZHCN:CSTR:"网络化"
+		ENBR:CSTR:"⠝⠑⠞⠺⠕⠗⠅⠊⠝⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.5"
+		ENUS:CSTR:"Time Synchronization"
+		ZHCN:CSTR:"时间 同步"
+		ENBR:CSTR:"⠞⠊⠍⠑⠀⠎⠽⠝⠉⠓⠗⠕⠝⠊⠵⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.6"
+		ENUS:CSTR:"Database Engine"
+		ZHCN:CSTR:"数据库 引擎"
+		ENBR:CSTR:"⠙⠁⠞⠁⠃⠁⠎⠑⠀⠑⠝⠛⠊⠝⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.7"
+		ENUS:CSTR:"Content Management System (CMS)"
+		ZHCN:CSTR:"内容 办理 组织 [英国:(CMS)]"
+		ENBR:CSTR:"⠉⠕⠝⠞⠑⠝⠞⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍⠀⠀⠉⠍⠎⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.8"
+		ENUS:CSTR:"Local Distribution Router (LDR)"
+		ZHCN:CSTR:"地方性的 分配 路由器 [英国:(LDR)]"
+		ENBR:CSTR:"⠇⠕⠉⠁⠇⠀⠙⠊⠎⠞⠗⠊⠃⠥⠞⠊⠕⠝⠀⠗⠕⠥⠞⠑⠗⠀⠀⠇⠙⠗⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.9"
+		ENUS:CSTR:"Configuration Management Node (CMN)"
+		ZHCN:CSTR:"配置 办理 结点 [英国:(CMN)]"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠛⠥⠗⠁⠞⠊⠕⠝⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠝⠕⠙⠑⠀⠀⠉⠍⠝⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.3.21"
+		ENUS:CSTR:"Node Type:"
+		ZHCN:CSTR:"结点 样式:"
+		ENBR:CSTR:"⠝⠕⠙⠑⠀⠞⠽⠏⠑⠀"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.4.1"
+		ENUS:CSTR:"Are you sure you want to restart the server?"
+		ZHCN:CSTR:"是 喂! 的确的 喂! 要 到 重新启动 这 服务器?"
+		ENBR:CSTR:"⠁⠗⠑⠀⠽⠕⠥⠀⠎⠥⠗⠑⠀⠽⠕⠥⠀⠺⠁⠝⠞⠀⠞⠕⠀⠗⠑⠎⠞⠁⠗⠞⠀⠞⠓⠑⠀⠎⠑⠗⠧⠑⠗⠦"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.4.2"
+		ENUS:CSTR:"Are you sure you want to stop all services?"
+		ZHCN:CSTR:"是 喂! 的确的 喂! 要 到 使停止 所有的 [英国:services?]"
+		ENBR:CSTR:"⠁⠗⠑⠀⠽⠕⠥⠀⠎⠥⠗⠑⠀⠽⠕⠥⠀⠺⠁⠝⠞⠀⠞⠕⠀⠎⠞⠕⠏⠀⠁⠇⠇⠀⠎⠑⠗⠧⠊⠉⠑⠎⠦"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.4.3"
+		ENUS:CSTR:"Are you sure you want to start all services?"
+		ZHCN:CSTR:"是 喂! 的确的 喂! 要 到 出发动身 所有的 [英国:services?]"
+		ENBR:CSTR:"⠁⠗⠑⠀⠽⠕⠥⠀⠎⠥⠗⠑⠀⠽⠕⠥⠀⠺⠁⠝⠞⠀⠞⠕⠀⠎⠞⠁⠗⠞⠀⠁⠇⠇⠀⠎⠑⠗⠧⠊⠉⠑⠎⠦"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.4.4"
+		ENUS:CSTR:"Are you sure you want to shutdown the server?"
+		ZHCN:CSTR:"是 喂! 的确的 喂! 要 到 关掉 这 服务器?"
+		ENBR:CSTR:"⠁⠗⠑⠀⠽⠕⠥⠀⠎⠥⠗⠑⠀⠽⠕⠥⠀⠺⠁⠝⠞⠀⠞⠕⠀⠎⠓⠥⠞⠙⠕⠺⠝⠀⠞⠓⠑⠀⠎⠑⠗⠧⠑⠗⠦"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.4.5"
+		ENUS:CSTR:"Confirmation"
+		ZHCN:CSTR:"确定"
+		ENBR:CSTR:"⠉⠕⠝⠋⠊⠗⠍⠁⠞⠊⠕⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.4.6"
+		ENUS:CSTR:"OK"
+		ZHCN:CSTR:"美好"
+		ENBR:CSTR:"⠕⠅"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.4.7"
+		ENUS:CSTR:"Cancel"
+		ZHCN:CSTR:"撤消"
+		ENBR:CSTR:"⠉⠁⠝⠉⠑⠇"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.5.1"
+		ENUS:CSTR:"AdminNODE"
+		ZHCN:CSTR:"[英国:AdminNODE]"
+		ENBR:CSTR:"⠁⠙⠍⠊⠝⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.5.2"
+		ENUS:CSTR:"ControlNODE"
+		ZHCN:CSTR:"[英国:ControlNODE]"
+		ENBR:CSTR:"⠉⠕⠝⠞⠗⠕⠇⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.5.3"
+		ENUS:CSTR:"GatewayNODE"
+		ZHCN:CSTR:"[英国:GatewayNODE]"
+		ENBR:CSTR:"⠛⠁⠞⠑⠺⠁⠽⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.5.4"
+		ENUS:CSTR:"StorageNODE"
+		ZHCN:CSTR:"[英国:StorageNODE]"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.6.1"
+		ENUS:CSTR:""
+		ZHCN:CSTR:""
+		ENBR:CSTR:""
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.13"
+		ENUS:CSTR:"StorageGRID 5.2"
+		ZHCN:CSTR:"[英国:StorageGRID] [英国:5.2]"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑⠛⠗⠊⠙⠀⠑⠲⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.14"
+		ENUS:CSTR:"Bycast StorageGRID"
+		ZHCN:CSTR:"[英国:Bycast] [英国:StorageGRID]"
+		ENBR:CSTR:"⠃⠽⠉⠁⠎⠞⠀⠎⠞⠕⠗⠁⠛⠑⠛⠗⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.1"
+		ENUS:CSTR:"Bycast Network Management System"
+		ZHCN:CSTR:"[英国:Bycast] 网制工艺 办理 组织"
+		ENBR:CSTR:"⠃⠽⠉⠁⠎⠞⠀⠝⠑⠞⠺⠕⠗⠅⠀⠍⠁⠝⠁⠛⠑⠍⠑⠝⠞⠀⠎⠽⠎⠞⠑⠍"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.5.1"
+		ENUS:CSTR:"Sign In"
+		ZHCN:CSTR:"志 向里面"
+		ENBR:CSTR:"⠎⠊⠛⠝⠀⠊⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.5.11"
+		ENUS:CSTR:"Continue"
+		ZHCN:CSTR:"继续"
+		ENBR:CSTR:"⠉⠕⠝⠞⠊⠝⠥⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.3.3.1"
+		ENUS:CSTR:"Bycast Inc."
+		ZHCN:CSTR:"[英国:Bycast] 公司."
+		ENBR:CSTR:"⠃⠽⠉⠁⠎⠞⠀⠊⠝⠉⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.3.7.1"
+		ENUS:CSTR:"Bycast StorageGRID"
+		ZHCN:CSTR:"[英国:Bycast] [英国:StorageGRID]"
+		ENBR:CSTR:"⠃⠽⠉⠁⠎⠞⠀⠎⠞⠕⠗⠁⠛⠑⠛⠗⠊⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.4.3.1"
+		ENUS:CSTR:"Bycast Inc."
+		ZHCN:CSTR:"[英国:Bycast] 公司."
+		ENBR:CSTR:"⠃⠽⠉⠁⠎⠞⠀⠊⠝⠉⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.5.6.1"
+		ENUS:CSTR:"Use tab to select the button, and enter to activate it."
+		ZHCN:CSTR:"使用 垂片 到 选择 这 扣子, 和 入 到 活动 人称代名词."
+		ENBR:CSTR:"⠥⠎⠑⠀⠞⠁⠃⠀⠞⠕⠀⠎⠑⠇⠑⠉⠞⠀⠞⠓⠑⠀⠃⠥⠞⠞⠕⠝⠂⠀⠁⠝⠙⠀⠑⠝⠞⠑⠗⠀⠞⠕⠀⠁⠉⠞⠊⠧⠁⠞⠑⠀⠊⠞⠲"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.1.1.1.1"
+		ENUS:CSTR:"HP Medical Archive"
+		ZHCN:CSTR:"惠普公司 医学的 档案"
+		ENBR:CSTR:"⠓⠏⠀⠍⠑⠙⠊⠉⠁⠇⠀⠁⠗⠉⠓⠊⠧⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.1.5.1"
+		ENUS:CSTR:"log in"
+		ZHCN:CSTR:"圆形木材 向里面"
+		ENBR:CSTR:"⠇⠕⠛⠀⠊⠝"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.1.5.11"
+		ENUS:CSTR:"go"
+		ZHCN:CSTR:"前往"
+		ENBR:CSTR:"⠛⠕"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.1.5.7"
+		ENUS:CSTR:"username"
+		ZHCN:CSTR:"用户名"
+		ENBR:CSTR:"⠥⠎⠑⠗⠝⠁⠍⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.1.5.8"
+		ENUS:CSTR:"password"
+		ZHCN:CSTR:"密码"
+		ENBR:CSTR:"⠏⠁⠎⠎⠺⠕⠗⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.3.1"
+		ENUS:CSTR:"Hewlett-Packard"
+		ZHCN:CSTR:"[英国:Hewlett-Packard]"
+		ENBR:CSTR:"⠓⠑⠺⠇⠑⠞⠞⠀⠏⠁⠉⠅⠁⠗⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1"
+		ENUS:CSTR:"HP Medical Archive"
+		ZHCN:CSTR:"惠普公司 医学的 档案"
+		ENBR:CSTR:"⠓⠏⠀⠍⠑⠙⠊⠉⠁⠇⠀⠁⠗⠉⠓⠊⠧⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1"
+		ENUS:CSTR:"Site A"
+		ZHCN:CSTR:"位置 c"
+		ENBR:CSTR:"⠎⠊⠞⠑⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1"
+		ENUS:CSTR:"A-1"
+		ZHCN:CSTR:"[英国:A-1]"
+		ENBR:CSTR:"⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.1"
+		ENUS:CSTR:"AN1-A-1"
+		ZHCN:CSTR:"[英国:AN1-A-1]"
+		ENBR:CSTR:"⠁⠝⠁⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.10"
+		ENUS:CSTR:"CSN1-A-1"
+		ZHCN:CSTR:"[英国:CSN1-A-1]"
+		ENBR:CSTR:"⠉⠎⠝⠁⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.11"
+		ENUS:CSTR:"CSN2-A-1"
+		ZHCN:CSTR:"[英国:CSN2-A-1]"
+		ENBR:CSTR:"⠉⠎⠝⠃⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.2"
+		ENUS:CSTR:"GN1-A-1"
+		ZHCN:CSTR:"[英国:GN1-A-1]"
+		ENBR:CSTR:"⠛⠝⠁⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.4"
+		ENUS:CSTR:"CN1-A-1"
+		ZHCN:CSTR:"[英国:CN1-A-1]"
+		ENBR:CSTR:"⠉⠝⠁⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.5"
+		ENUS:CSTR:"CN2-A-1"
+		ZHCN:CSTR:"[英国:CN2-A-1]"
+		ENBR:CSTR:"⠉⠝⠃⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.6"
+		ENUS:CSTR:"SN1-A-1"
+		ZHCN:CSTR:"[英国:SN1-A-1]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.7"
+		ENUS:CSTR:"SN2-A-1"
+		ZHCN:CSTR:"[英国:SN2-A-1]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.8"
+		ENUS:CSTR:"SN3-A-1"
+		ZHCN:CSTR:"[英国:SN3-A-1]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.1.9"
+		ENUS:CSTR:"SN4-A-1"
+		ZHCN:CSTR:"[英国:SN4-A-1]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2"
+		ENUS:CSTR:"A-2"
+		ZHCN:CSTR:"[英国:A-2]"
+		ENBR:CSTR:"⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.2"
+		ENUS:CSTR:"GN1-A-2"
+		ZHCN:CSTR:"[英国:GN1-A-2]"
+		ENBR:CSTR:"⠛⠝⠁⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.3"
+		ENUS:CSTR:"GN2-A-2"
+		ZHCN:CSTR:"[英国:GN2-A-2]"
+		ENBR:CSTR:"⠛⠝⠃⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.4"
+		ENUS:CSTR:"CN1-A-2"
+		ZHCN:CSTR:"[英国:CN1-A-2]"
+		ENBR:CSTR:"⠉⠝⠁⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.5"
+		ENUS:CSTR:"CN2-A-2"
+		ZHCN:CSTR:"[英国:CN2-A-2]"
+		ENBR:CSTR:"⠉⠝⠃⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.6"
+		ENUS:CSTR:"SN1-A-2"
+		ZHCN:CSTR:"[英国:SN1-A-2]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.7"
+		ENUS:CSTR:"SN2-A-2"
+		ZHCN:CSTR:"[英国:SN2-A-2]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.8"
+		ENUS:CSTR:"SN3-A-2"
+		ZHCN:CSTR:"[英国:SN3-A-2]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.2.9"
+		ENUS:CSTR:"SN4-A-2"
+		ZHCN:CSTR:"[英国:SN4-A-2]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.3"
+		ENUS:CSTR:"A-3"
+		ZHCN:CSTR:"[英国:A-3]"
+		ENBR:CSTR:"⠁⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.3.6"
+		ENUS:CSTR:"SN1-A-3"
+		ZHCN:CSTR:"[英国:SN1-A-3]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.3.7"
+		ENUS:CSTR:"SN2-A-3"
+		ZHCN:CSTR:"[英国:SN2-A-3]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.3.8"
+		ENUS:CSTR:"SN3-A-3"
+		ZHCN:CSTR:"[英国:SN3-A-3]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.3.9"
+		ENUS:CSTR:"SN4-A-3"
+		ZHCN:CSTR:"[英国:SN4-A-3]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.4"
+		ENUS:CSTR:"A-4"
+		ZHCN:CSTR:"[英国:A-4]"
+		ENBR:CSTR:"⠁⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.4.6"
+		ENUS:CSTR:"SN1-A-4"
+		ZHCN:CSTR:"[英国:SN1-A-4]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.4.7"
+		ENUS:CSTR:"SN2-A-4"
+		ZHCN:CSTR:"[英国:SN2-A-4]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.4.8"
+		ENUS:CSTR:"SN3-A-4"
+		ZHCN:CSTR:"[英国:SN3-A-4]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.4.9"
+		ENUS:CSTR:"SN4-A-4"
+		ZHCN:CSTR:"[英国:SN4-A-4]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.5"
+		ENUS:CSTR:"A-5"
+		ZHCN:CSTR:"[英国:A-5]"
+		ENBR:CSTR:"⠁⠀⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.5.6"
+		ENUS:CSTR:"SN1-A-5"
+		ZHCN:CSTR:"[英国:SN1-A-5]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.5.7"
+		ENUS:CSTR:"SN2-A-5"
+		ZHCN:CSTR:"[英国:SN2-A-5]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.5.8"
+		ENUS:CSTR:"SN3-A-5"
+		ZHCN:CSTR:"[英国:SN3-A-5]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.5.9"
+		ENUS:CSTR:"SN4-A-5"
+		ZHCN:CSTR:"[英国:SN4-A-5]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.6"
+		ENUS:CSTR:"A-6"
+		ZHCN:CSTR:"[英国:A-6]"
+		ENBR:CSTR:"⠁⠀⠋"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.6.6"
+		ENUS:CSTR:"SN1-A-6"
+		ZHCN:CSTR:"[英国:SN1-A-6]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠋"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.6.7"
+		ENUS:CSTR:"SN2-A-6"
+		ZHCN:CSTR:"[英国:SN2-A-6]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠋"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.6.8"
+		ENUS:CSTR:"SN3-A-6"
+		ZHCN:CSTR:"[英国:SN3-A-6]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠋"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.6.9"
+		ENUS:CSTR:"SN4-A-6"
+		ZHCN:CSTR:"[英国:SN4-A-6]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠋"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.7"
+		ENUS:CSTR:"A-7"
+		ZHCN:CSTR:"[英国:A-7]"
+		ENBR:CSTR:"⠁⠀⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.7.6"
+		ENUS:CSTR:"SN1-A-7"
+		ZHCN:CSTR:"[英国:SN1-A-7]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.7.7"
+		ENUS:CSTR:"SN2-A-7"
+		ZHCN:CSTR:"[英国:SN2-A-7]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.7.8"
+		ENUS:CSTR:"SN3-A-7"
+		ZHCN:CSTR:"[英国:SN3-A-7]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.7.9"
+		ENUS:CSTR:"SN4-A-7"
+		ZHCN:CSTR:"[英国:SN4-A-7]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.8"
+		ENUS:CSTR:"A-8"
+		ZHCN:CSTR:"[英国:A-8]"
+		ENBR:CSTR:"⠁⠀⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.8.6"
+		ENUS:CSTR:"SN1-A-8"
+		ZHCN:CSTR:"[英国:SN1-A-8]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠁⠀⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.8.7"
+		ENUS:CSTR:"SN2-A-8"
+		ZHCN:CSTR:"[英国:SN2-A-8]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠁⠀⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.8.8"
+		ENUS:CSTR:"SN3-A-8"
+		ZHCN:CSTR:"[英国:SN3-A-8]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠁⠀⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.1.8.9"
+		ENUS:CSTR:"SN4-A-8"
+		ZHCN:CSTR:"[英国:SN4-A-8]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠁⠀⠓"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2"
+		ENUS:CSTR:"Site B"
+		ZHCN:CSTR:"位置 l"
+		ENBR:CSTR:"⠎⠊⠞⠑⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1"
+		ENUS:CSTR:"B-1"
+		ZHCN:CSTR:"[英国:B-1]"
+		ENBR:CSTR:"⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.1"
+		ENUS:CSTR:"AN1-B-1"
+		ZHCN:CSTR:"[英国:AN1-B-1]"
+		ENBR:CSTR:"⠁⠝⠁⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.10"
+		ENUS:CSTR:"CSN1-A-1"
+		ZHCN:CSTR:"[英国:CSN1-A-1]"
+		ENBR:CSTR:"⠉⠎⠝⠁⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.11"
+		ENUS:CSTR:"CSN2-A-1"
+		ZHCN:CSTR:"[英国:CSN2-A-1]"
+		ENBR:CSTR:"⠉⠎⠝⠃⠀⠁⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.2"
+		ENUS:CSTR:"GN1-B-1"
+		ZHCN:CSTR:"[英国:GN1-B-1]"
+		ENBR:CSTR:"⠛⠝⠁⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.4"
+		ENUS:CSTR:"CN1-B-1"
+		ZHCN:CSTR:"[英国:CN1-B-1]"
+		ENBR:CSTR:"⠉⠝⠁⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.5"
+		ENUS:CSTR:"CN2-B-1"
+		ZHCN:CSTR:"[英国:CN2-B-1]"
+		ENBR:CSTR:"⠉⠝⠃⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.6"
+		ENUS:CSTR:"SN1-B-1"
+		ZHCN:CSTR:"[英国:SN1-B-1]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.7"
+		ENUS:CSTR:"SN2-B-1"
+		ZHCN:CSTR:"[英国:SN2-B-1]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.8"
+		ENUS:CSTR:"SN3-B-1"
+		ZHCN:CSTR:"[英国:SN3-B-1]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.1.9"
+		ENUS:CSTR:"SN4-B-1"
+		ZHCN:CSTR:"[英国:SN4-B-1]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠃⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2"
+		ENUS:CSTR:"B-2"
+		ZHCN:CSTR:"[英国:B-2]"
+		ENBR:CSTR:"⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.2"
+		ENUS:CSTR:"GN1-B-2"
+		ZHCN:CSTR:"[英国:GN1-B-2]"
+		ENBR:CSTR:"⠛⠝⠁⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.3"
+		ENUS:CSTR:"GN2-B-2"
+		ZHCN:CSTR:"[英国:GN2-B-2]"
+		ENBR:CSTR:"⠛⠝⠃⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.4"
+		ENUS:CSTR:"CN1-B-2"
+		ZHCN:CSTR:"[英国:CN1-B-2]"
+		ENBR:CSTR:"⠉⠝⠁⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.5"
+		ENUS:CSTR:"CN2-B-2"
+		ZHCN:CSTR:"[英国:CN2-B-2]"
+		ENBR:CSTR:"⠉⠝⠃⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.6"
+		ENUS:CSTR:"SN1-B-2"
+		ZHCN:CSTR:"[英国:SN1-B-2]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.7"
+		ENUS:CSTR:"SN2-B-2"
+		ZHCN:CSTR:"[英国:SN2-B-2]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.8"
+		ENUS:CSTR:"SN3-B-2"
+		ZHCN:CSTR:"[英国:SN3-B-2]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.2.9"
+		ENUS:CSTR:"SN4-B-2"
+		ZHCN:CSTR:"[英国:SN4-B-2]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠃⠀⠃"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.3"
+		ENUS:CSTR:"B-3"
+		ZHCN:CSTR:"[英国:B-3]"
+		ENBR:CSTR:"⠃⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.3.6"
+		ENUS:CSTR:"SN1-B-3"
+		ZHCN:CSTR:"[英国:SN1-B-3]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠃⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.3.7"
+		ENUS:CSTR:"SN2-B-3"
+		ZHCN:CSTR:"[英国:SN2-B-3]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠃⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.3.8"
+		ENUS:CSTR:"SN3-B-3"
+		ZHCN:CSTR:"[英国:SN3-B-3]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠃⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.3.9"
+		ENUS:CSTR:"SN4-B-3"
+		ZHCN:CSTR:"[英国:SN4-B-3]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠃⠀⠉"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.4"
+		ENUS:CSTR:"B-4"
+		ZHCN:CSTR:"[英国:B-4]"
+		ENBR:CSTR:"⠃⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.4.6"
+		ENUS:CSTR:"SN1-B-4"
+		ZHCN:CSTR:"[英国:SN1-B-4]"
+		ENBR:CSTR:"⠎⠝⠁⠀⠃⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.4.7"
+		ENUS:CSTR:"SN2-B-4"
+		ZHCN:CSTR:"[英国:SN2-B-4]"
+		ENBR:CSTR:"⠎⠝⠃⠀⠃⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.4.8"
+		ENUS:CSTR:"SN3-B-4"
+		ZHCN:CSTR:"[英国:SN3-B-4]"
+		ENBR:CSTR:"⠎⠝⠉⠀⠃⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.3.7.1.2.4.9"
+		ENUS:CSTR:"SN4-B-4"
+		ZHCN:CSTR:"[英国:SN4-B-4]"
+		ENBR:CSTR:"⠎⠝⠙⠀⠃⠀⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.4.3.1"
+		ENUS:CSTR:"Hewlett-Packard"
+		ZHCN:CSTR:"[英国:Hewlett-Packard]"
+		ENBR:CSTR:"⠓⠑⠺⠇⠑⠞⠞⠀⠏⠁⠉⠅⠁⠗⠙"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.5.5.1"
+		ENUS:CSTR:"Admin Node"
+		ZHCN:CSTR:"[英国:Admin] 结点"
+		ENBR:CSTR:"⠁⠙⠍⠊⠝⠀⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.5.5.2"
+		ENUS:CSTR:"Control Node"
+		ZHCN:CSTR:"支配 结点"
+		ENBR:CSTR:"⠉⠕⠝⠞⠗⠕⠇⠀⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.5.5.3"
+		ENUS:CSTR:"Gateway Node"
+		ZHCN:CSTR:"门 结点"
+		ENBR:CSTR:"⠛⠁⠞⠑⠺⠁⠽⠀⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.5.5.4"
+		ENUS:CSTR:"Storage Node"
+		ZHCN:CSTR:"储藏 结点"
+		ENBR:CSTR:"⠎⠞⠕⠗⠁⠛⠑⠀⠝⠕⠙⠑"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.6.1.1"
+		ENUS:CSTR:"SITE_A"
+		ZHCN:CSTR:"位置_c"
+		ENBR:CSTR:"⠎⠊⠞⠑⠀⠁"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.6.2.1"
+		ENUS:CSTR:"HPMA_FSG"
+		ZHCN:CSTR:"[英国:HPMA_FSG]"
+		ENBR:CSTR:"⠓⠏⠍⠁⠀⠋⠎⠛"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.2.6.3.1"
+		ENUS:CSTR:"HP Medical Archive"
+		ZHCN:CSTR:"惠普公司 医学的 档案"
+		ENBR:CSTR:"⠓⠏⠀⠍⠑⠙⠊⠉⠁⠇⠀⠁⠗⠉⠓⠊⠧⠑"
+	END
+END

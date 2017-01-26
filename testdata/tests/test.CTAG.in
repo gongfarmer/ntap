@@ -1,0 +1,78 @@
+# -----------------------------------------------------------------
+# DICOM Advanced - Coerce Tag Profiles, Version 2 Revision 3
+# -----------------------------------------------------------------
+# 2004-04-05 DS : Updated to reflect changes to clarify behaviour
+# 2004-07-09 DS : Rev 4 - Fixed Coerce Tag Profile Name in wrong field
+# 2004-08-06 DS : Rev 5 - Added bundle version
+# 2004-08-15 DS : Rev 6 - Removed bundle version (NMS issue)
+# 2005-01-13 TA : Rev 7 - Updated TAGL,TAGT,TAGV's attribute value range to correct regex
+# 2005-01-13 TA : Rev 8 - forgot to change ARAN to HEX
+# 2005-01-27 TA : Rev 9 - Updated TAGL's attribute value range to correct regex
+# 2005-04-12 MM : Updated to Version 2 Rev 1 (new attribute format; TAGL->TAGN, TAGD->TAGP)
+# 2005-04-22 MM : Removed AUTP
+# 2005-05-10 MM : Set BTIM/ATIM
+# -----------------------------------------------------------------
+CTAG:CONT:
+	BVER:UI32:2
+	BTIM:UI64:1
+	TAGN:CONT:
+#		"Coerce Tag Profile Name"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END	
+	TAGT:CONT:
+#		"Tag"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'CSTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END	
+	TAGV:CONT:
+#		"Tag Value"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'CSTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	TAGQ:CONT:
+#		"Query"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'ENUM'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	TAGI:CONT:
+#		"Ingest"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'ENUM'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	TAGP:CONT:
+#		"Description"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+END

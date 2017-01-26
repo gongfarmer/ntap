@@ -1,0 +1,26 @@
+# SAMPLE TEST FILE
+:::::CONT:
+	TEXT:CSTR:"Container is named '::::'"
+	ACPN:CONT:
+		NOTE:CSTR:"All chars are valid in a name except for the escape char '\\'."
+		NOTE:CSTR:"Also, a name can't start with # or it's a comment!"
+		A:E::CSTR:"This CSTR is named 'A:E:' "
+		AT:::CSTR:"This CSTR is named 'AT::' "
+		::AL:CSTR:"This CSTR is named '::AL' "
+		0x:::CSTR:"This CSTR is named '0x::' "
+		:T:M:CSTR:"This CSTR is named ':T:M' "
+		0xffffffff:CSTR:"This CSTR is named '0xffffff' "
+		0xFF:CSTR:"This CSTR is named '0xFF' "
+		0xff:CSTR:"This CSTR is named '0xff' "
+		'::':CSTR:"This CSTR is named ''::'' "
+		~`!@:CSTR:"This CSTR is named '~`!@' "
+		$#%^:CSTR:"This CSTR is named '$#%^' "
+		&*():CSTR:"This CSTR is named '&*()' "
+		_-+=:CSTR:"This CSTR is named '_-+=' "
+		{}[]:CSTR:"This CSTR is named '{}[]' "
+		'<,>:CSTR:"This CSTR is named ''<,>' "
+		|:;":CSTR:"This CSTR is named '|:;\"' "
+		".?/:CSTR:"This CSTR is named '".?/' "
+		
+	END
+END

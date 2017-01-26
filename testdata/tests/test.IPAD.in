@@ -1,0 +1,7 @@
+TEST:CONT:
+        SENT:CONT:
+                addr:IP32:192.168.110.225
+			 	# This next one is actually an array specifying the IP range 127.0.0.1 to 127.0.0.1.
+                ipad:IP32:0x7F0000017F000001
+        END
+END

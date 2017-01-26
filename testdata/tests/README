@@ -1,0 +1,33 @@
+CCAT BINARY TO [XML/TEXT] TEST FILES
+
+Each test has four files associated with it. For example, the SQSB test file has the following:
+	SQSB.bin : The binary container file used as input for ccat 
+	SQSB.in  : the original container text file that SQSB.bin was generated from 
+	SQSB.xml : Expected XML output from running ccat -x on SQSB.bin
+	SQSB.txt : Expected TXT output from running ccat on SQSB.bin
+
+The binary (*.bin) container files used in these tests were all generated from
+the original *.in files, which are included here (but not actually used in the
+testing process.)
+
+The numbered testXX.in files were designed to exercise all parts of the library
+and reproduce bugs.  All other *.in test files are real-world samples taken
+from the source tree.
+
+test01.in : - Lots of weird, tricky container names, most with colons
+test02.in : - Containers with and without a trailing colon
+			- Empty containers
+test03.in : - Examples of boundary values for every type
+			- Multiple leaf nodes with the same name
+			- blank lines
+			- whitespace-only lines
+			- uses both spaces and tabs for indenting
+test04.in : - tests negative values in ENUMs
+test05.in : - tests IP32 Arrays
+test06.in : - Uses hex in node names
+
+
+Tests are run on the binary files (*.bin), which are generated from their
+corresponding text files (*.in).  The xml files are known good versions of the
+XML files produced by running a binary to xml conversion on each binary file.
+

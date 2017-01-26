@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="TEST">
+		<container name="SENT">
+			<atom name="addr" type="IP32" value="192.168.110.225"/>
+			<atom name="ipad" type="IP32" value="0x7F0000017F000001"/>
+		</container>
+	</container>
+</containerxml>

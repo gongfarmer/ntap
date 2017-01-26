@@ -1,0 +1,59 @@
+# -----------------------------------------------------------------
+# HTTP Advanced - HTTP /DICOM Namespace, Version 2 Revision 3
+# -----------------------------------------------------------------
+# 2004-04-05 DS : Rev 3 - Updated to reflect changes to clarify behaviour
+# 2004-08-06 DS : Rev 4 - Added bundle version
+# 2004-08-15 DS : Rev 5 - Removed bundle version (NMS issue)
+# 2005-01-13 TA : Rev 6 - Updated HDLB's attribute value range to correct regex
+# 2005-01-13 TA : Rev 7 - Updated HDAE's, HCTP's attribute value range to correct regex
+# 2005-01-13 TA : Rev 8 - forgot to change ARAN to HEX
+# 2005-01-27 TA : Rev 9 - Updated HDLB's attribute value range to correct regex
+# 2005-01-31 TA : Rev 10 - Updated HCTP's attribute value range to correct regex
+# 2005-04-12 MM : Updated to Version 2 Rev 1 (new attribute format; HDLB->HDPN, HCTP->HDCT)
+# 2005-04-22 MM : Removed AUTP
+# 2005-05-10 MM : Set BTIM/ATIM
+# -----------------------------------------------------------------
+HDNB:CONT:
+	BVER:UI32:2
+	BTIM:UI64:1
+	HDPN:CONT:
+#		"Profile Name"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	HDAE:CONT:
+#		"AE Title"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'CSTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	HDCT:CONT:
+#		"Coerce Tag Profile Name"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	HDPT:CONT:
+#		"PUT"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'ENUM'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+END

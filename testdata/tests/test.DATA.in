@@ -1,0 +1,126 @@
+# -----------------------------------------------------------------
+# FSG resources.in Template
+# -----------------------------------------------------------------
+# 2004-05-12 DS : Updated to work with the latest Provo changes
+# 2004-05-17 DS : Temp disable to workaround ACON issue. Fix in 4.5
+# 2004-07-06 DS : Simplified startup script and removed shutdown
+# 2004-12-06 KJ : Added SCON branch for Service Control module
+# 2004-12-31 TA : Rev 5 - Updated /mods/PATM/vers to 0x04060000 from 0x00010002
+# 2005-01-02 DS : Rev 6 - Removed now unused DTYA atom from mods/MFWD/INIT
+# 2005-01-19 MM : Change defaults as specified by TAm
+# 2005-01-19 DS : Rev 8 - Lowered NCWM watermark to 10 GB
+# 2005-02-07 MM : Change ingest watermarks from 30/20 to 20/15
+# 2005-04-22 WP : Rev 10 - Added attribute override in mods/PSVR/SVRS/NCON
+# 2005-05-02 MM : Rev 11 - OID for MFWD/INIT/DTNA
+# 2005-05-03 KJ : Rev 12 - OIDs for SCON/svrs/[CIFS,NFSD]/SNAM
+# 2005-05-17 MM : Removed old startup script (CSCR)
+# 2005-11-14 MM : Updated for Nightcrawler (4.8.0)
+# -----------------------------------------------------------------
+mods:CONT:
+	CERT:CONT:
+#		cact:DATA:"../../CA/cacert.der"
+#		prik:DATA:"../../certs/{NODE}/{NODE}key.der"
+		CETB:CONT:
+#			CERB:CONT:
+#				cert:DATA:"../../certs/{NODE}/{NODE}cert.der"
+#			END
+#			CERB:CONT:
+#				cert:DATA:"../../certs/<First ADC Cert>.der"
+#			END
+#			CERB:CONT:
+#				cert:DATA:"../../certs/<Nth ADC Cert>.der"
+#			END
+		END
+	END
+	PATM:CONT:
+		vers:UI32:0x04080000
+	END
+	CONM:CONT:
+		SPRT:UI32:1410
+ 		SLIP:IP32:127.0.0.1
+		SIPA:CONT:
+			ipad:IP32:0x7F0000017F000001
+		END
+	END
+	TLS2:CONT:
+		prof:CONT:
+			NCON:CONT:
+				CSET:CSTR:"AES128-SHA"
+				CCRT:CONT:
+				END
+				usec:CONT:
+				END
+			END
+		END
+	END
+	RAUT:CONT:
+		autf:UI32:0
+	END
+	MFWD:CONT:
+		INIT:CONT:
+			DMDA:CSTR:"BFSGDeviceModel.xml"
+	 		DTNA:CSTR:"{OID='2.16.124.113590.3.0.3.4.10','File System Gateway'}"
+		END
+	END
+	ARNI:CONT:
+		URLY:UI32:1
+		PATH:CSTR:"/var/local/audit/fsg"
+	END
+	CMNC:CONT:
+		conf:CONT:
+			SDIS:CONT:
+			END
+			NIPR:CONT:
+			END
+			FSGR:CONT:
+			END
+		END
+	END
+	FSGC:CONT:
+# MODE may be WORM or RDWR	
+		MODE:FC32:'RDWR'
+		DPTH:CSTR:"/fsg"
+		LPTH:CSTR:"/var/local/fsg"
+# STPL is Subtree Partitioning Level. Setting to UINT32MAX disables the feature.		
+		STPL:UI32:3
+	END
+	SWPO:CONT:
+# Watermarks must be in descending order for the logic to work as desired.	
+		FSWM:UI64:50000000000
+		NCWM:UI64:10000000000
+	END
+	NEWF:CONT:
+		MXIM:UI32:20
+		MNIM:UI32:15
+# Set IDLY to make ingest process wait until file hasn't been used for this # of seconds
+		IDLY:UI32:10
+	END
+	FRPM:CONT:
+		WINS:UI32:1140
+# Set WINL non-zero to enable backups.		
+		WINL:UI32:0
+# WDYM and MDYM are bitmasks; a 1 in bit-position N enables backups on day-of-(week,month) N+1		
+		WDYM:UI32:127
+		MDYM:UI32:2147483647
+	END
+	SCON:CONT:
+		svrs:CONT:
+			CIFS:CONT:
+				SNAM:CSTR:"{OID='2.16.124.113590.3.0.3.12.1','CIFS Filesharing'}"
+				SCTL:CSTR:"/etc/init.d/samba"
+				SPRG:CSTR:"smbd"
+				SPRG:CSTR:"nmbd"
+				SSRT:DATA:0x5374617274696E672053616D6261206461656D6F6E733A206E6D626420736D62642E0A
+				SSTP:DATA:0x53746F7070696E672053616D6261206461656D6F6E733A206E6D626420736D62642E0A
+    
+			END
+			NFSD:CONT:
+				SNAM:CSTR:"{OID='2.16.124.113590.3.0.3.12.2','NFS Filesharing'}"
+				SCTL:CSTR:"/etc/init.d/nfs-kernel-server"
+				SPRG:CSTR:"nfsd"
+				SSRT:DATA:0x4578706F7274696E67206469726563746F7269657320666F72204E4653206B65726E656C206461656D6F6E2E2E2E646F6E652E0A5374617274696E67204E4653206B65726E656C206461656D6F6E3A206E667364206D6F756E74642E0A
+				SSTP:DATA:0x53746F7070696E67204E4653206B65726E656C206461656D6F6E3A206D6F756E7464206E6673642E0A556E6578706F7274696E67206469726563746F7269657320666F72204E4653206B65726E656C206461656D6F6E2E2E2E646F6E652E0A
+			END
+		END
+	END
+END

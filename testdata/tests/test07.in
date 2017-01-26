@@ -1,0 +1,3 @@
+ROOT:CONT
+	xxxx:CSTR:"tab	,space ,newline\n,cr\r,vt\x0b,ff\x0c,amp&,lt<,gt>,quot\",bs\\,binary\xff,control\x01"
+END

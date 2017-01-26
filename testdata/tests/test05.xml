@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="STRD">
+		<container name="SENT">
+			<atom name="IPST" type="IP32" value="127.0.0.1"/>
+			<atom name="IPHX" type="IP32" value="127.0.0.1"/>
+			<atom name="IPLG" type="IP32" value="0x7F0000017F000001"/>
+			<atom name="IPLG" type="IP32" value="0x7F0000017F0000017F000001"/>
+			<atom name="IPLG" type="IP32" value="0x7F0000017F0000017F0000017F000001"/>
+			<atom name="UINT" type="UI32" value="25545"/>
+		</container>
+	</container>
+</containerxml>

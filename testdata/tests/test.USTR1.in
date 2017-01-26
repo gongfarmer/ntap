@@ -1,0 +1,6 @@
+STRD:CONT:
+        SENT:CONT:
+                ZHCN:CSTR:"l\x09/he"
+                ZHCN:USTR:"blah escape \n blah"
+        END
+END

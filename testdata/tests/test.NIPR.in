@@ -1,0 +1,54 @@
+# -----------------------------------------------------------------
+# N/A - Neighbour IP Addresses, Version 2 Revision 3
+# -----------------------------------------------------------------
+# 2004-08-06 DS : Rev 4 - Added bundle version
+# 2004-08-15 DS : Rev 5 - Removed bundle version (NMS issue)
+# 2005-04-12 MM : Updated to Version 2 Rev 1 (new attribute format; AINM->AINA, LOCN->LCNM)
+# 2005-04-14 MM : Updated changed attribute codes for attributes that conflict with another bundle (AIPR). AINA->NCRN, SIPA->NCIR, LCNM->NCLC
+# 2005-04-22 MM : Removed AUTP
+# 2005-05-10 MM : Set BTIM/ATIM
+# -----------------------------------------------------------------
+NIPR:CONT:
+	BVER:UI32:2
+	BTIM:UI64:1
+	NCRN:CONT:
+#		"IP Range Name"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END	
+	NCIR:CONT:
+#		"IP Range"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'CSTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	NCLC:CONT:
+#		"Location"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+	NCON:CONT:
+#		"NCON"
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'ENUM'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:1
+		END
+	END
+END
