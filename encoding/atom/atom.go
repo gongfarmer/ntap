@@ -24,8 +24,6 @@ var _ encoding.BinaryUnmarshaler = &(Atom{})
 // var _ encoding.TextUnmarshaler = Atom{}
 var _ encoding.TextMarshaler = &(Atom{})
 
-// GOAL: make this concurrency-safe, perhaps immutable
-
 type Atom struct {
 	Name     string
 	Type     ADEType

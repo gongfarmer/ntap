@@ -86,9 +86,9 @@ var headerBytes uint32 = uint32(reflect.TypeOf(atomHeader{}).Size())
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
 // It can be used to rehydrate an Atom starting from the zero value of Atom.
+// FIXME: rewrite to handle a stream with multiple top-level atoms
 func (a *Atom) UnmarshalBinary(data []byte) error {
-	err := a.UnmarshalFromReader(bytes.NewReader(data))
-	return err
+	return a.UnmarshalFromReader(bytes.NewReader(data))
 }
 
 func (a *Atom) UnmarshalFromReader(r io.Reader) error {
