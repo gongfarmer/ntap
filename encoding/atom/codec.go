@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
+	"math/big"
 	"reflect"
 )
 
@@ -44,6 +45,9 @@ const (
 	CNCT ADEType = "CNCT" // binary data printed as hexadecimal value with leading 0x
 	Cnct ADEType = "cnct" // alias for CNCT
 	CONT ADEType = "CONT" // Atom Container
+
+	MaxUint16Plus1 = math.MaxUint16 + 1
+	MaxUint32Plus1 = math.MaxUint32 + 1
 )
 
 /**********************************************************/
@@ -100,6 +104,7 @@ var opTable = map[ADEType]Operators{
 	 Convert atom.Data byte slices into a reflect.Value that wraps
 	 a Settable variable with an appropriate underlying go type.
 ***********************************************************/
+// FIXME: assert buffer size before decoding?
 func decUI01(buf []byte) reflect.Value {
 	var v uint32
 	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
@@ -126,11 +131,11 @@ func decUI64(buf []byte) reflect.Value {
 	return reflect.ValueOf(v)
 }
 func decSF32(buf []byte) reflect.Value {
-	v := float32(decSI32(buf).Interface().(int32)) / (math.MaxUint16 + 1)
+	v := float32(decSI32(buf).Interface().(int32)) / MaxUint16Plus1
 	return reflect.ValueOf(v)
 }
 func decSF64(buf []byte) reflect.Value {
-	v := float64(decSI64(buf).Interface().(int64)) / (math.MaxUint32 + 1)
+	v := float64(decSI64(buf).Interface().(int64)) / MaxUint32Plus1
 	return reflect.ValueOf(v)
 }
 func decSI08(buf []byte) reflect.Value {
@@ -154,22 +159,35 @@ func decSI64(buf []byte) reflect.Value {
 	return reflect.ValueOf(v)
 }
 func decFP32(buf []byte) reflect.Value {
-	var v float32
-	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	var ui32 uint32 = uint32(decUI32(buf).Uint())
+	var v float32 = math.Float32frombits(ui32)
 	return reflect.ValueOf(v)
 }
 func decFP64(buf []byte) reflect.Value {
-	var v float64
-	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	//var v float64
+	//checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
+	var ui64 = decUI64(buf).Uint()
+	var v float64 = math.Float64frombits(ui64)
 	return reflect.ValueOf(v)
 }
 func decUF32(buf []byte) reflect.Value {
-	var v float32 = float32(decUI32(buf).Uint()) / (math.MaxUint16 + 1)
+	ui32 := uint32(decUI32(buf).Uint())
+	v := float64(ui32) / float64(MaxUint16Plus1)
 	return reflect.ValueOf(v)
 }
 func decUF64(buf []byte) reflect.Value {
-	var v float64 = float64(decUI64(buf).Uint()) / (math.MaxUint32 + 1)
-	return reflect.ValueOf(v)
+	p := new(big.Int)
+	p.SetBytes(buf)
+	q := new(big.Int)
+	mod := new(big.Int)
+	q.DivMod(p, big.NewInt(MaxUint32Plus1), mod)
+	fmt.Println("Got modulus ", mod)
+	i := *p
+	// ui64 := decUI64(buf).Uint()
+	// //pv := new(big.Float)
+	// //pv.SetFloat64
+	// r := big.NewRat(ui64, uint64(MaxUint32Plus1))
+	return reflect.ValueOf(i)
 }
 func decUR32(buf []byte) reflect.Value {
 	var arr [2]uint16
@@ -264,7 +282,9 @@ func strUF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decUF32(buf).Float())
 }
 func strUF64(buf []byte) string {
-	return fmt.Sprintf("%0.8f", decUF64(buf).Float())
+	i := decUF64(buf).Interface().(big.Int)
+	return i.Text(10)
+	//return fmt.Sprintf("%0.8f", decUF64(buf))
 }
 func strSF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decSF32(buf).Float())

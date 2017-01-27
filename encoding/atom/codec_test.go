@@ -316,8 +316,25 @@ func TestDecUF32(t *testing.T) {
 	}
 }
 
-/*
 func TestDecUF64(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float32(0))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float32(1.5258789e-05))},
+		decodeTest{[]byte{0x00, 0x00, 0x00, 0xFF}, reflect.ValueOf(float32(0.0038909912))},
+		decodeTest{[]byte{0x00, 0x00, 0xFF, 0x00}, reflect.ValueOf(float32(0.99609375))},
+		decodeTest{[]byte{0x00, 0xFF, 0x00, 0x00}, reflect.ValueOf(float32(255.0))},
+		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float32(65536))},
+	}
+	for _, test := range tests {
+		got := decUF32(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decUF32(%q) = %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
+/*
 func TestDecUR32(t *testing.T) {
 func TestDecUR64(t *testing.T) {
 func TestDecSR32(t *testing.T) {
