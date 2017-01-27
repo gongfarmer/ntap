@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
 
-// FIXME add feature to read and parse atomcontainer from binary string?
-// would allow CNCT containers to be easily inspected, not to mention weird
-// stuff like CMS database entries that encapsulate atoms
+// FIXME Support parsing of files containing hex, since hex+binary are
+// supported on STDIN they should both be allowed within files.
 
 func printAtom(a atom.Atom) {
 	buf, err := a.MarshalText()
@@ -33,6 +36,14 @@ func readContainerFromFile(path string) (a atom.Atom, err error) {
 	return
 }
 
+func readAtomsFromHexStream(r io.Reader) (atoms []*atom.Atom, err error) {
+	var buf []byte
+	err = binary.Read(r, binary.BigEndian, &buf)
+
+	fmt.Println(buf)
+	return
+}
+
 func main() {
 	rc := 0
 
@@ -41,7 +52,7 @@ func main() {
 	for _, path := range files {
 		a, err := readContainerFromFile(path)
 		if err != nil {
-			fmt.Printf("Failed to read from %s: %s\n", path, err)
+			fmt.Printf("failed to read from %s: %s\n", path, err)
 			rc = 1
 			continue
 		}
@@ -52,14 +63,30 @@ func main() {
 		os.Exit(rc)
 	}
 
-	// Read from STDIN
-	// FIXME should handle multiple atoms, not just one
-
-	atoms, err := atom.ReadAtomsFromBinaryStream(os.Stdin)
-	if err != nil {
-		fmt.Printf("Unable to read binary from STDIN: %s", err)
-		rc = 1
+	// Read entire STDIN
+	var buffer []byte
+	buffer, err := ioutil.ReadAll(os.Stdin)
+	if err != nil && err != io.EOF {
+		fmt.Println(err)
+		os.Exit(1)
 	}
+
+	// Parse input as binary stream
+	atoms, err := atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+	if err != nil && err != atom.ErrInvalidInput {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// Parse input as hex stream
+	moreAtoms, err := atom.ReadAtomsFromHex(bytes.NewReader(buffer))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	atoms = append(atoms, moreAtoms...)
+
+	// Print atoms collected from STDIN
 	for _, a := range atoms {
 		printAtom(*a)
 	}

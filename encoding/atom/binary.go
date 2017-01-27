@@ -14,8 +14,11 @@ package atom
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"reflect"
 )
 
@@ -24,6 +27,8 @@ type cont struct {
 	atomPtr *Atom
 	end     uint32
 }
+
+var ErrInvalidInput = errors.New("Input is invalid for conversion to Atom")
 
 // LIFO stack of Atoms of type container.
 type containerStack []cont
@@ -92,7 +97,7 @@ func (a *Atom) UnmarshalBinary(data []byte) error {
 }
 
 func (a *Atom) UnmarshalFromReader(r io.Reader) error {
-	atoms, err := ReadAtomsFromBinaryStream(r)
+	atoms, err := ReadAtomsFromBinary(r)
 	if err != nil {
 		panic(fmt.Errorf("Failed to parse binary stream: %s", err))
 	}
@@ -108,7 +113,13 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	return err
 }
 
-func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
+func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
+	defer func() {
+		if p := recover(); p != nil {
+			err = p.(error)
+		}
+	}()
+
 	var (
 		bytesRead  uint32
 		containers containerStack
@@ -124,7 +135,9 @@ func ReadAtomsFromBinaryStream(r io.Reader) (atoms []*Atom, err error) {
 		var data []byte
 		if !h.isContainer() {
 			data, err = readAtomData(r, h.Size-headerBytes, &bytesRead)
-			checkError(err)
+			if err != nil {
+				return atoms, ErrInvalidInput
+			}
 		}
 		var a = Atom{
 			Name: asPrintableString(h.Name[:]),
@@ -162,4 +175,51 @@ func readAtomData(r io.Reader, length uint32, bytesRead *uint32) (data []byte, e
 	err = binary.Read(r, binary.BigEndian, &data)
 	*bytesRead += length
 	return
+}
+
+func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
+	var buffer []byte
+
+	buffer, err = ioutil.ReadAll(r)
+	if err != nil {
+		panic(err)
+	}
+
+	// Strip trailing newline
+	if buffer[len(buffer)-1] == '\n' {
+		buffer = buffer[:len(buffer)-1]
+	}
+
+	// Strip leading 0x
+	if string(buffer[0:2]) == "0x" {
+		buffer = buffer[2:]
+	}
+
+	// Strip all spaces
+	buffer = bytes.Replace(buffer, []byte(" "), nil, -1)
+
+	// Don't attempt hex conversion without even length at this point
+	if 0 != len(buffer)%2 {
+		err = hex.ErrLength
+		return
+	}
+
+	// Convert pairs of hex values to single bytes
+	buffer, err = hex.DecodeString(string(buffer))
+	if err != nil && err != io.ErrUnexpectedEOF {
+		return
+	}
+
+	// Attempt conversion of the bytes buffer
+	atoms, err = ReadAtomsFromBinary(bytes.NewReader(buffer))
+	if err == nil {
+		return // success!
+	}
+
+	// Conversion failed. Reverse endianness and try one more time.
+	for i := 0; i < len(buffer); i += 2 {
+		buffer[i], buffer[i+1] = buffer[i+1], buffer[i]
+	}
+
+	return ReadAtomsFromBinary(bytes.NewReader(buffer))
 }
