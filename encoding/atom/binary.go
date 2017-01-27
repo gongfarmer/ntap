@@ -185,28 +185,27 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 		panic(err)
 	}
 
-	// Strip trailing newline
-	if buffer[len(buffer)-1] == '\n' {
-		buffer = buffer[:len(buffer)-1]
-	}
+	// Strip all newlines
+	buffer = bytes.Replace(buffer, []byte("\n"), nil, -1)
+	buffer = bytes.Replace(buffer, []byte("\r"), nil, -1)
+
+	// Strip all spaces
+	buffer = bytes.Replace(buffer, []byte(" "), nil, -1)
 
 	// Strip leading 0x
 	if string(buffer[0:2]) == "0x" {
 		buffer = buffer[2:]
 	}
 
-	// Strip all spaces
-	buffer = bytes.Replace(buffer, []byte(" "), nil, -1)
+	// Convert pairs of hex values to single bytes
+	buffer, err = hex.DecodeString(string(buffer))
+	if err != nil && err != io.ErrUnexpectedEOF {
+		return
+	}
 
 	// Don't attempt hex conversion without even length at this point
 	if 0 != len(buffer)%2 {
 		err = hex.ErrLength
-		return
-	}
-
-	// Convert pairs of hex values to single bytes
-	buffer, err = hex.DecodeString(string(buffer))
-	if err != nil && err != io.ErrUnexpectedEOF {
 		return
 	}
 

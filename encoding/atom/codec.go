@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -42,10 +43,8 @@ const (
 	NULL ADEType = "NULL" // NULL type, must have empty data section
 	CNCT ADEType = "CNCT" // binary data printed as hexadecimal value with leading 0x
 	Cnct ADEType = "cnct" // alias for CNCT
-	CONT ADEType = "CONT" // AtomContainer
+	CONT ADEType = "CONT" // Atom Container
 )
-const SHIFT4 = 0x00010000
-const SHIFT8 = 0x100000000
 
 /**********************************************************/
 
@@ -127,11 +126,11 @@ func decUI64(buf []byte) reflect.Value {
 	return reflect.ValueOf(v)
 }
 func decSF32(buf []byte) reflect.Value {
-	v := float32(decSI32(buf).Interface().(int32)) / SHIFT4
+	v := float32(decSI32(buf).Interface().(int32)) / (math.MaxUint16 + 1)
 	return reflect.ValueOf(v)
 }
 func decSF64(buf []byte) reflect.Value {
-	v := float64(decSI64(buf).Interface().(int64)) / SHIFT8
+	v := float64(decSI64(buf).Interface().(int64)) / (math.MaxUint32 + 1)
 	return reflect.ValueOf(v)
 }
 func decSI08(buf []byte) reflect.Value {
@@ -165,11 +164,11 @@ func decFP64(buf []byte) reflect.Value {
 	return reflect.ValueOf(v)
 }
 func decUF32(buf []byte) reflect.Value {
-	var v float32 = float32(decUI32(buf).Uint()) / SHIFT4
+	var v float32 = float32(decUI32(buf).Uint()) / (math.MaxUint16 + 1)
 	return reflect.ValueOf(v)
 }
 func decUF64(buf []byte) reflect.Value {
-	var v float64 = float64(decUI64(buf).Uint()) / SHIFT8
+	var v float64 = float64(decUI64(buf).Uint()) / (math.MaxUint32 + 1)
 	return reflect.ValueOf(v)
 }
 func decUR32(buf []byte) reflect.Value {
@@ -223,9 +222,9 @@ func decNULL(buf []byte) reflect.Value {
 }
 
 /**********************************************************
-   string methods.
-	 Convert atom.Data byte slices into a string conforming to
-	 ADE formatting rules in doc 112-0002, "StorageGRID Data Types".
+ string methods.
+ Convert atom.Data byte slices into a string conforming to
+ ADE formatting rules in doc 112-0002, "StorageGRID Data Types".
 ***********************************************************/
 
 func strUI01(buf []byte) string {
