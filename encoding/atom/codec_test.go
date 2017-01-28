@@ -300,12 +300,12 @@ func TestDecFP64(t *testing.T) {
 
 func TestDecUF32(t *testing.T) {
 	tests := []decodeTest{
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float32(0))},
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float32(1.5258789e-05))},
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0xFF}, reflect.ValueOf(float32(0.0038909912))},
-		decodeTest{[]byte{0x00, 0x00, 0xFF, 0x00}, reflect.ValueOf(float32(0.99609375))},
-		decodeTest{[]byte{0x00, 0xFF, 0x00, 0x00}, reflect.ValueOf(float32(255.0))},
-		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float32(65536))},
+		decodeTest{[]byte("\x00\x00\x00\x00"), reflect.ValueOf(float64(0))},
+		decodeTest{[]byte("\x00\x00\x00\x01"), reflect.ValueOf(float64(1.52587890625e-05))},
+		decodeTest{[]byte("\x00\x00\x00\xFF"), reflect.ValueOf(float64(0.0038909912109375))},
+		decodeTest{[]byte("\x00\x00\xFF\x00"), reflect.ValueOf(float64(0.99609375))},
+		decodeTest{[]byte("\x00\xFF\x00\x00"), reflect.ValueOf(float64(255.0))},
+		decodeTest{[]byte("\xFF\xFF\xFF\xFF"), reflect.ValueOf(float64(65535.99998474121))},
 	}
 	for _, test := range tests {
 		got := decUF32(test.Input).Interface()
@@ -318,18 +318,21 @@ func TestDecUF32(t *testing.T) {
 
 func TestDecUF64(t *testing.T) {
 	tests := []decodeTest{
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0x00}, reflect.ValueOf(float32(0))},
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0x01}, reflect.ValueOf(float32(1.5258789e-05))},
-		decodeTest{[]byte{0x00, 0x00, 0x00, 0xFF}, reflect.ValueOf(float32(0.0038909912))},
-		decodeTest{[]byte{0x00, 0x00, 0xFF, 0x00}, reflect.ValueOf(float32(0.99609375))},
-		decodeTest{[]byte{0x00, 0xFF, 0x00, 0x00}, reflect.ValueOf(float32(255.0))},
-		decodeTest{[]byte{0xFF, 0xFF, 0xFF, 0xFF}, reflect.ValueOf(float32(65536))},
+		decodeTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), reflect.ValueOf(float64(0))},
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), reflect.ValueOf(float64(1))},
+		decodeTest{[]byte("\x00\x00\x00\x00\x00\x06\x8D\xB8"), reflect.ValueOf(float64(0.0001))},
+		decodeTest{[]byte("\x00\x00\x00\x00\x00\x41\x89\x37"), reflect.ValueOf(float64(0.001))},
+		decodeTest{[]byte("\x00\x01\x00\x00\x00\x00\x00\x00"), reflect.ValueOf(float64(65536.0))},
+		decodeTest{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), reflect.ValueOf(float64(255.0))},
+		decodeTest{[]byte("\x00\x00\x27\x0F\xFF\xF9\x72\x47"), reflect.ValueOf(float64(9999.9999))},
+		decodeTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), reflect.ValueOf(float64(4294967295.0))},
 	}
+
 	for _, test := range tests {
-		got := decUF32(test.Input).Interface()
+		got := decUF64(test.Input).Interface()
 		want := test.Want.Interface()
 		if got != want {
-			t.Errorf("decUF32(%q) = %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+			t.Errorf("decUF64(%q) = %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
 		}
 	}
 }

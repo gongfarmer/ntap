@@ -5,14 +5,12 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
-	"math/big"
 	"reflect"
 )
 
 // ADE Data types
 // Defined in 112-0002_r4.0B_StorageGRID_Data_Types
 // The ADE code C-type mappings are in OSL_Types.h
-
 const (
 	UI01 ADEType = "UI01" // unsigned int / bool
 	UI08 ADEType = "UI08" // unsigned int
@@ -52,18 +50,20 @@ const (
 
 /**********************************************************/
 
-// decOp is the signature of a decoding operator for a given type.
-// Returns a reflect.Value containing the data within a go type suitable for
-// the data.
-type decOp func(buf []byte) reflect.Value
+type (
+	// decOp is the signature of a decoding operator for a given type.
+	// Returns a reflect.Value containing the data within a go type suitable for
+	// the data.
+	decOp func(buf []byte) reflect.Value
 
-// decOp is the signature of a function that prints value as a string.
-type strOp func(buf []byte) string
+	// decOp is the signature of a function that prints value as a string.
+	strOp func(buf []byte) string
 
-type Operators struct {
-	Decode decOp
-	String strOp
-}
+	Operators struct {
+		Decode decOp
+		String strOp
+	}
+)
 
 var opTable = map[ADEType]Operators{
 	UI01: Operators{decUI01, strUI01},
@@ -78,7 +78,7 @@ var opTable = map[ADEType]Operators{
 	FP32: Operators{decFP32, strFP32},
 	FP64: Operators{decFP64, strFP64},
 	UF32: Operators{decUF32, strUF32},
-	UF64: Operators{decUI64, strUF64},
+	UF64: Operators{decUF64, strUF64},
 	SF32: Operators{decSF32, strSF32},
 	SF64: Operators{decSF64, strSF64},
 	UR32: Operators{decUR32, strUR32},
@@ -164,30 +164,47 @@ func decFP32(buf []byte) reflect.Value {
 	return reflect.ValueOf(v)
 }
 func decFP64(buf []byte) reflect.Value {
-	//var v float64
-	//checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &v))
 	var ui64 = decUI64(buf).Uint()
 	var v float64 = math.Float64frombits(ui64)
 	return reflect.ValueOf(v)
 }
+
+// Fixed-point values are stored as integer types. OSL_Types.h:
+/*
+#define                     UFIX32Type      'UF32'
+typedef UINT32              UFIX32;
+typedef UINT32Ptr           UFIX32Ptr;
+
+#define                     SFIX32Type      'SF32'
+typedef SINT32              SFIX32;
+typedef SINT32Ptr           SFIX32Ptr;
+
+#define                     UFIX64Type      'UF64'
+typedef UINT64              UFIX64;
+typedef UINT64Ptr           UFIX64Ptr;
+
+#define                     SFIX64Type      'SF64'
+typedef SINT64              SFIX64;
+typedef SINT64Ptr           SFIX64Ptr;
+*/
+// Returns a 64 bit float despite being stored in 32 bits.
+// This is intentional, this type can store some values that are outside the
+// range of SF32.
 func decUF32(buf []byte) reflect.Value {
-	ui32 := uint32(decUI32(buf).Uint())
-	v := float64(ui32) / float64(MaxUint16Plus1)
+	var v = float64(decUI32(buf).Uint()) / 65536.0
 	return reflect.ValueOf(v)
 }
 func decUF64(buf []byte) reflect.Value {
-	p := new(big.Int)
-	p.SetBytes(buf)
-	q := new(big.Int)
-	mod := new(big.Int)
-	q.DivMod(p, big.NewInt(MaxUint32Plus1), mod)
-	fmt.Println("Got modulus ", mod)
-	i := *p
-	// ui64 := decUI64(buf).Uint()
-	// //pv := new(big.Float)
-	// //pv.SetFloat64
-	// r := big.NewRat(ui64, uint64(MaxUint32Plus1))
-	return reflect.ValueOf(i)
+	// Use math.big.Float for division to be sure we drop no precision
+	//	var val, max32 = big.NewFloat(float64(decUI64(buf).Uint())), big.NewFloat(MaxUint32Plus1)
+	//	v, _ := new(big.Float).Quo(val, max32).Float64() // returned math.Accuracy is EXACT, BTW
+	//	return reflect.ValueOf(v)
+
+	// This is probably the same result, without using math.big
+	//	var v = float64(decUI64(buf).Uint()) / float64(MaxUint32Plus1)
+	//	return reflect.ValueOf(v)
+	var v = float64(decUI64(buf).Uint()) / 4294967296.0
+	return reflect.ValueOf(v)
 }
 func decUR32(buf []byte) reflect.Value {
 	var arr [2]uint16
@@ -235,7 +252,7 @@ func decUSTR(buf []byte) reflect.Value {
 func decDATA(buf []byte) reflect.Value {
 	return reflect.ValueOf(buf)
 }
-func decNULL(buf []byte) reflect.Value {
+func decNULL(_ []byte) reflect.Value {
 	return reflect.ValueOf(nil)
 }
 
@@ -281,16 +298,19 @@ func strFP64(buf []byte) string {
 func strUF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decUF32(buf).Float())
 }
+
+// FIXME This disagrees with ccat. I have tried so many ways that I think this
+// is right and ccat is wrong.
 func strUF64(buf []byte) string {
-	i := decUF64(buf).Interface().(big.Int)
-	return i.Text(10)
-	//return fmt.Sprintf("%0.8f", decUF64(buf))
+	v := decUF64(buf).Float()
+	fmt.Printf("decUF64 % x\n", math.Float64bits(v))
+	return fmt.Sprintf("%0.8f", v)
 }
 func strSF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decSF32(buf).Float())
 }
 func strSF64(buf []byte) string {
-	return fmt.Sprintf("%0.9f", decSF64(buf).Float())
+	return fmt.Sprintf("%.9f", decSF64(buf).Float())
 }
 func strUR32(buf []byte) string {
 	arr := decUR32(buf).Interface().([2]uint16)
