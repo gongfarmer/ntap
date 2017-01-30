@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"math"
 	"reflect"
+	"unicode"
 )
 
 // ADE Data types
@@ -246,8 +248,15 @@ func decCSTR(buf []byte) reflect.Value {
 	return reflect.ValueOf(s)
 }
 func decUSTR(buf []byte) reflect.Value {
-	s := string(buf)
-	return reflect.ValueOf(s)
+	var runes = make([]rune, len(buf)/4)
+	var err error
+	reader := bytes.NewReader(buf)
+	for err != io.EOF {
+		var r rune
+		err = binary.Read(reader, binary.BigEndian, &r)
+		runes = append(runes, rune(r))
+	}
+	return reflect.ValueOf(string(runes))
 }
 func decDATA(buf []byte) reflect.Value {
 	return reflect.ValueOf(buf)
@@ -343,7 +352,7 @@ func strCSTR(buf []byte) string {
 	return fmt.Sprintf("%q", string(trimmed))
 }
 func strUSTR(buf []byte) string {
-	return fmt.Sprintf("\"%s\"", string(buf))
+	return adeCstrEscape(decUSTR(buf).String())
 }
 func strDATA(buf []byte) string {
 	return fmt.Sprintf("0x%X", buf)
@@ -483,4 +492,29 @@ func (a Atom) SetValue(adeType ADEType, value interface{}) (err error) {
 		err = fmt.Errorf("unknown ADE type %d", adeType)
 	}
 	return
+}
+
+// libs/osl/OSL_Types.cc CStr_Escape()
+func adeCstrEscape(s string) string {
+	output := make([]byte, len(s))
+	for size, r := range s {
+		if size > 1 { // multibyte
+			if !unicode.IsPrint(r) {
+				output = append(output, fmt.Sprintf("%q", r))
+			} else {
+				output = append(output, r)
+			}
+			continue
+		}
+		// ascii
+		switch r {
+		case '\n', '\r', '\\', '"', '\x7f':
+			output = append(output, '\\')
+		}
+		if r <= rune(0x1f) {
+			output = append(output, '\\')
+		}
+		output = append(output, []byte(r)...)
+	}
+	return string(output)
 }
