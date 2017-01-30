@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"math"
 	"reflect"
+	"strings"
 	"unicode"
 )
 
@@ -249,13 +249,7 @@ func decCSTR(buf []byte) reflect.Value {
 }
 func decUSTR(buf []byte) reflect.Value {
 	var runes = make([]rune, len(buf)/4)
-	var err error
-	reader := bytes.NewReader(buf)
-	for err != io.EOF {
-		var r rune
-		err = binary.Read(reader, binary.BigEndian, &r)
-		runes = append(runes, rune(r))
-	}
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &runes))
 	return reflect.ValueOf(string(runes))
 }
 func decDATA(buf []byte) reflect.Value {
@@ -352,7 +346,7 @@ func strCSTR(buf []byte) string {
 	return fmt.Sprintf("%q", string(trimmed))
 }
 func strUSTR(buf []byte) string {
-	return adeCstrEscape(decUSTR(buf).String())
+	return fmt.Sprintf("\"%s\"", adeCstrEscape(decUSTR(buf).String()))
 }
 func strDATA(buf []byte) string {
 	return fmt.Sprintf("0x%X", buf)
@@ -494,27 +488,31 @@ func (a Atom) SetValue(adeType ADEType, value interface{}) (err error) {
 	return
 }
 
-// libs/osl/OSL_Types.cc CStr_Escape()
+// ade: libs/osl/OSL_Types.cc CStr_Escape()
 func adeCstrEscape(s string) string {
-	output := make([]byte, len(s))
-	for size, r := range s {
-		if size > 1 { // multibyte
-			if !unicode.IsPrint(r) {
-				output = append(output, fmt.Sprintf("%q", r))
-			} else {
-				output = append(output, r)
-			}
+	output := make([]rune, 0, len(s))
+	for _, r := range s {
+		charsToEscape := "\\\"\x7f"
+		if r == '\n' {
+			output = append(output, '\\', 'n')
+			continue
+		} else if r == '\r' {
+			output = append(output, '\\', 'r')
+			continue
+		} else if r == '\\' {
+			output = append(output, '\\', '\\')
+			continue
+		} else if r == '"' {
+			output = append(output, '\\', '"')
+			continue
+		} else if strings.ContainsRune(charsToEscape, r) || r <= rune(0x1f) {
+			output = append(output, []rune(fmt.Sprintf("\\x%02X", r))...)
+			continue
+		} else if !unicode.IsPrint(r) {
+			output = append(output, []rune(fmt.Sprintf("%q", r))...)
 			continue
 		}
-		// ascii
-		switch r {
-		case '\n', '\r', '\\', '"', '\x7f':
-			output = append(output, '\\')
-		}
-		if r <= rune(0x1f) {
-			output = append(output, '\\')
-		}
-		output = append(output, []byte(r)...)
+		output = append(output, r)
 	}
 	return string(output)
 }

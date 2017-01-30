@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
-	<container name="STRD">
-		<container name="SENT">
-			<atom name="ZHCN" type="CSTR" value="l\x09/he"/>
-			<atom name="ZHCN" type="USTR" value="blah escape \n blah"/>
-		</container>
-	</container>
-</containerxml>
