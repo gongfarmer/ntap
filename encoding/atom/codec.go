@@ -205,7 +205,14 @@ func decUF64(buf []byte) reflect.Value {
 	// This is probably the same result, without using math.big
 	//	var v = float64(decUI64(buf).Uint()) / float64(MaxUint32Plus1)
 	//	return reflect.ValueOf(v)
-	var v = float64(decUI64(buf).Uint()) / 4294967296.0
+
+	var arr [2]int32
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr))
+	var integer, fractional float64
+	integer = float64(arr[0])
+	fractional = float64(arr[1]) / 0xffffffff
+	var v = integer + RoundPlaces(fractional, 9)
+
 	//fmt.Printf("decUF64: in:%8x out:%f\n", buf, v)
 	return reflect.ValueOf(v)
 }
@@ -307,7 +314,7 @@ func strUF32(buf []byte) string {
 // is right and ccat is wrong.
 func strUF64(buf []byte) string {
 	v := decUF64(buf).Float()
-	return fmt.Sprintf("%0.8f", v)
+	return fmt.Sprint("%0.9f", v)
 }
 func strSF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decSF32(buf).Float())
@@ -515,4 +522,12 @@ func adeCstrEscape(s string) string {
 		output = append(output, r)
 	}
 	return string(output)
+}
+
+func Round(f float64) float64 {
+	return math.Floor(f + .5)
+}
+func RoundPlaces(f float64, places int) float64 {
+	shift := math.Pow(10, float64(places))
+	return Round(f*shift) / shift
 }

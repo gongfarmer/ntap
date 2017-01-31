@@ -337,7 +337,7 @@ func TestDecUF64(t *testing.T) {
 		got := decUF64(test.Input).Interface()
 		want := test.Want.Interface()
 		if got != want {
-			t.Errorf("decUF64(%q) = %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+			t.Errorf("decUF64(% x)  got %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
 		}
 	}
 }
