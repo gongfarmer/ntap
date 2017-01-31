@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -196,24 +197,13 @@ func decUF32(buf []byte) reflect.Value {
 	var v = float64(decUI32(buf).Uint()) / 65536.0
 	return reflect.ValueOf(v)
 }
+
+// Precision is higher than ADE ccat here.
+// It needs rounding to match ccat exactly.
 func decUF64(buf []byte) reflect.Value {
-	// Use math.big.Float for division to be sure we drop no precision
-	//	var val, max32 = big.NewFloat(float64(decUI64(buf).Uint())), big.NewFloat(MaxUint32Plus1)
-	//	v, _ := new(big.Float).Quo(val, max32).Float64() // returned math.Accuracy is EXACT, BTW
-	//	return reflect.ValueOf(v)
-
-	// This is probably the same result, without using math.big
-	//	var v = float64(decUI64(buf).Uint()) / float64(MaxUint32Plus1)
-	//	return reflect.ValueOf(v)
-
-	var arr [2]int32
-	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr))
-	var integer, fractional float64
-	integer = float64(arr[0])
-	fractional = float64(arr[1]) / 0xffffffff
-	var v = integer + RoundPlaces(fractional, 9)
-
-	//fmt.Printf("decUF64: in:%8x out:%f\n", buf, v)
+	var i uint64
+	checkError(binary.Read(bytes.NewReader(buf), binary.BigEndian, &i))
+	var v = float64(i) / 4294967296.0
 	return reflect.ValueOf(v)
 }
 func decUR32(buf []byte) reflect.Value {
@@ -314,7 +304,7 @@ func strUF32(buf []byte) string {
 // is right and ccat is wrong.
 func strUF64(buf []byte) string {
 	v := decUF64(buf).Float()
-	return fmt.Sprint("%0.9f", v)
+	return strconv.FormatFloat(v, 'f', 9, 64)
 }
 func strSF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decSF32(buf).Float())

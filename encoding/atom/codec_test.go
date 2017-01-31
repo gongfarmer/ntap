@@ -9,6 +9,11 @@ import (
 	"testing"
 )
 
+type stringTest struct {
+	Input []byte
+	Want  string
+}
+
 type decodeTest struct {
 	Input []byte
 	Want  reflect.Value
@@ -514,7 +519,33 @@ func TestStrSI64(t *testing.T) {
 func TestStrFP32(t *testing.T) {
 func TestStrFP64(t *testing.T) {
 func TestStrUF32(t *testing.T) {
+*/
 func TestStrUF64(t *testing.T) {
+	tests := []stringTest{
+		stringTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0.000000000"},
+		stringTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), "1.000000000"},
+		stringTest{[]byte("\x00\x01\x00\x3c\x00\x00\x96\xfe"), "65596.000009000"},
+		stringTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), "4294967295.000000000"},
+		stringTest{[]byte("\xff\xff\xff\xfe\x00\x00\x00\x00"), "4294967294.000000000"},
+		stringTest{[]byte("\xff\xff\xff\xff\x19\x99\x99\x99"), "4294967295.100000000"},
+		stringTest{[]byte("\xff\xff\xff\xff\x02\x8f\x5c\x28"), "4294967295.010000000"},
+		stringTest{[]byte("\xff\xff\xff\xff\x00\x41\x89\x37"), "4294967295.001000000"},
+		stringTest{[]byte("\xff\xff\xff\xff\x00\x06\x8d\xb8"), "4294967295.000100000"},
+		stringTest{[]byte("\xff\xff\xff\xff\x00\x00\xa7\xc5"), "4294967295.000010000"},
+		stringTest{[]byte("\xff\xff\xff\xff\x00\x00\x10\xc6"), "4294967295.000001000"},
+		stringTest{[]byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), "4294967295.999999999"},
+	}
+
+	for _, test := range tests {
+		got := strUF64(test.Input)
+		want := test.Want
+		if got != want {
+			t.Errorf("strUF64(% x)  got '%v', want '%v'", test.Input, got, want)
+		}
+	}
+}
+
+/*
 func TestStrSF32(t *testing.T) {
 func TestStrSF64(t *testing.T) {
 func TestStrUR32(t *testing.T) {
