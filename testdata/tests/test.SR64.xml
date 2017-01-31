@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="SR64">
+		<atom name="valu" type="SR64" value="1/1"/>
+		<atom name="valu" type="SR64" value="1/-1"/>
+		<atom name="valu" type="SR64" value="-1/1"/>
+		<atom name="valu" type="SR64" value="1/1"/>
+		<atom name="valu" type="SR64" value="1/2"/>
+		<atom name="valu" type="SR64" value="1/-2"/>
+		<atom name="valu" type="SR64" value="-1/2"/>
+		<atom name="valu" type="SR64" value="1/2"/>
+		<atom name="valu" type="SR64" value="1/1"/>
+		<atom name="valu" type="SR64" value="-2147483648/2147483647"/>
+		<atom name="valu" type="SR64" value="2147483647/-2147483648"/>
+		<atom name="valu" type="SR64" value="1/1"/>
+		<atom name="valu" type="SR64" value="1/2147483647"/>
+		<atom name="valu" type="SR64" value="-1/2147483647"/>
+		<atom name="valu" type="SR64" value="1/-2147483648"/>
+		<atom name="valu" type="SR64" value="1/-2147483648"/>
+	</container>
+</containerxml>

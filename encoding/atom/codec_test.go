@@ -418,8 +418,37 @@ func TestDecSR32(t *testing.T) {
 	}
 }
 
-/*
 func TestDecSR64(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), reflect.ValueOf([2]int32{1, 1})},
+		decodeTest{[]byte("\x00\x00\x00\x01\xff\xff\xff\xff"), reflect.ValueOf([2]int32{1, -1})},
+		decodeTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x01"), reflect.ValueOf([2]int32{-1, 1})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), reflect.ValueOf([2]int32{1, 1})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), reflect.ValueOf([2]int32{1, 2})},
+		decodeTest{[]byte("\x00\x00\x00\x01\xff\xff\xff\xfe"), reflect.ValueOf([2]int32{1, -2})},
+		decodeTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x02"), reflect.ValueOf([2]int32{-1, 2})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), reflect.ValueOf([2]int32{1, 2})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), reflect.ValueOf([2]int32{1, 1})},
+		decodeTest{[]byte("\x80\x00\x00\x00\x7f\xff\xff\xff"), reflect.ValueOf([2]int32{-2147483648, 2147483647})},
+		decodeTest{[]byte("\x7f\xff\xff\xff\x80\x00\x00\x00"), reflect.ValueOf([2]int32{2147483647, -2147483648})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), reflect.ValueOf([2]int32{1, 1})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), reflect.ValueOf([2]int32{1, 2147483647})},
+		decodeTest{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), reflect.ValueOf([2]int32{-1, 2147483647})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), reflect.ValueOf([2]int32{1, -2147483648})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), reflect.ValueOf([2]int32{1, -2147483648})},
+	}
+
+	for _, test := range tests {
+		got := decSR64(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decSR64(% x)  got %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
+/*
+
 func TestDecFC32(t *testing.T) {
 func TestDecIP32(t *testing.T) {
 func TestDecIPAD(t *testing.T) {

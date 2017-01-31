@@ -323,11 +323,11 @@ func strUR64(buf []byte) string {
 }
 func strSR32(buf []byte) string {
 	arr := decSR32(buf).Interface().([2]int16)
-	fmt.Printf("% 8x  %d/%d\n", buf, arr[0], arr[1])
 	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strSR64(buf []byte) string {
 	arr := decSR64(buf).Interface().([2]int32)
+	fmt.Printf("% 8x  %d/%d\n", buf, arr[0], arr[1])
 	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strFC32(buf []byte) string {
