@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math"
 	"reflect"
-	"strconv"
 	"strings"
 	"unicode"
 )
@@ -300,11 +299,14 @@ func strUF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decUF32(buf).Float())
 }
 
-// FIXME This disagrees with ccat. I have tried so many ways that I think this
-// is right and ccat is wrong.
+// ade: CXD_String.cc CXD_String_from_UFIX64(...)
+// isolate whole and fractional parts, then combine within the string
 func strUF64(buf []byte) string {
-	v := decUF64(buf).Float()
-	return strconv.FormatFloat(v, 'f', 9, 64)
+	iValue := decUI64(buf).Uint()
+	var iWhole uint64 = iValue >> 32
+	var iFract uint64 = iValue << 32 >> 32
+	fFract := float64(iFract) / 4294967296.0 * math.Pow(10, 9)
+	return fmt.Sprintf("%d.%09.0f", iWhole, fFract)
 }
 func strSF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decSF32(buf).Float())
