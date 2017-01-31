@@ -347,10 +347,78 @@ func TestDecUF64(t *testing.T) {
 	}
 }
 
-/*
 func TestDecUR32(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte("\x00\x01\x00\x01"), reflect.ValueOf([2]uint16{1, 1})},
+		decodeTest{[]byte("\x00\x01\x00\x02"), reflect.ValueOf([2]uint16{1, 2})},
+		decodeTest{[]byte("\x01\x00\x01\x00"), reflect.ValueOf([2]uint16{256, 256})},
+		decodeTest{[]byte("\x00\x00\x00\x00"), reflect.ValueOf([2]uint16{0, 0})},
+		decodeTest{[]byte("\x19\x99\x99\x99"), reflect.ValueOf([2]uint16{6553, 39321})},
+		decodeTest{[]byte("\x02\x8f\x5c\x28"), reflect.ValueOf([2]uint16{655, 23592})},
+		decodeTest{[]byte("\xff\xff\x00\x05"), reflect.ValueOf([2]uint16{65535, 5})},
+		decodeTest{[]byte("\xff\xff\x00\x02"), reflect.ValueOf([2]uint16{65535, 2})},
+		decodeTest{[]byte("\xff\xff\xff\xff"), reflect.ValueOf([2]uint16{65535, 65535})},
+	}
+
+	for _, test := range tests {
+		got := decUR32(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decUR32(% x)  got %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
 func TestDecUR64(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), reflect.ValueOf([2]uint32{1, 1})},
+		decodeTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), reflect.ValueOf([2]uint32{1, 2})},
+		decodeTest{[]byte("\x01\x02\x03\x04\x05\x06\x07\x08"), reflect.ValueOf([2]uint32{16909060, 84281096})},
+		decodeTest{[]byte("\x10\x20\x30\x40\x50\x60\x70\x80"), reflect.ValueOf([2]uint32{270544960, 1348497536})},
+		decodeTest{[]byte("\x19\x99\x99\x99\x19\x99\x99\x99"), reflect.ValueOf([2]uint32{429496729, 429496729})},
+		decodeTest{[]byte("\xff\xff\x00\x02\xff\xff\xcc\xee"), reflect.ValueOf([2]uint32{4294901762, 4294954222})},
+		decodeTest{[]byte("\xff\xff\xff\xff\xff\xff\xff\xff"), reflect.ValueOf([2]uint32{4294967295, 4294967295})},
+	}
+
+	for _, test := range tests {
+		got := decUR64(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decUR64(% x)  got %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
 func TestDecSR32(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte("\x00\x01\x00\x01"), reflect.ValueOf([2]int16{1, 1})},
+		decodeTest{[]byte("\x00\x01\xff\xff"), reflect.ValueOf([2]int16{1, -1})},
+		decodeTest{[]byte("\xff\xff\x00\x01"), reflect.ValueOf([2]int16{-1, 1})},
+		decodeTest{[]byte("\x00\x01\x00\x01"), reflect.ValueOf([2]int16{1, 1})},
+		decodeTest{[]byte("\x00\x01\x00\x02"), reflect.ValueOf([2]int16{1, 2})},
+		decodeTest{[]byte("\x00\x01\xff\xfe"), reflect.ValueOf([2]int16{1, -2})},
+		decodeTest{[]byte("\xff\xff\x00\x02"), reflect.ValueOf([2]int16{-1, 2})},
+		decodeTest{[]byte("\x00\x01\x00\x02"), reflect.ValueOf([2]int16{1, 2})},
+		decodeTest{[]byte("\x00\x01\x00\x01"), reflect.ValueOf([2]int16{1, 1})},
+		decodeTest{[]byte("\x80\x00\x7f\xff"), reflect.ValueOf([2]int16{-32768, 32767})},
+		decodeTest{[]byte("\x7f\xff\x80\x00"), reflect.ValueOf([2]int16{32767, -32768})},
+		decodeTest{[]byte("\x00\x01\x00\x01"), reflect.ValueOf([2]int16{1, 1})},
+		decodeTest{[]byte("\x00\x01\x7f\xff"), reflect.ValueOf([2]int16{1, 32767})},
+		decodeTest{[]byte("\xff\xff\x7f\xff"), reflect.ValueOf([2]int16{-1, 32767})},
+		decodeTest{[]byte("\x00\x01\x80\x00"), reflect.ValueOf([2]int16{1, -32768})},
+		decodeTest{[]byte("\x00\x01\x80\x00"), reflect.ValueOf([2]int16{1, -32768})},
+	}
+
+	for _, test := range tests {
+		got := decSR32(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decSR32(% x)  got %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
+/*
 func TestDecSR64(t *testing.T) {
 func TestDecFC32(t *testing.T) {
 func TestDecIP32(t *testing.T) {

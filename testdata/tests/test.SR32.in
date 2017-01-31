@@ -1,0 +1,18 @@
+SR32:CONT:
+	valu:SR32:1/1
+	valu:SR32:1/-1
+	valu:SR32:-1/1
+	valu:SR32:-1/-1
+	valu:SR32:1/2
+	valu:SR32:1/-2
+	valu:SR32:-1/2
+	valu:SR32:-1/-2
+	valu:SR32:32767/32767
+	valu:SR32:-32768/32767
+	valu:SR32:32767/-32768
+	valu:SR32:-32768/-32768
+	valu:SR32:1/32767
+	valu:SR32:-1/32767
+	valu:SR32:1/-32768
+	valu:SR32:-1/-32768
+END

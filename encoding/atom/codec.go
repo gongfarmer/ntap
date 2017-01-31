@@ -303,10 +303,9 @@ func strUF32(buf []byte) string {
 // isolate whole and fractional parts, then combine within the string
 func strUF64(buf []byte) string {
 	iValue := decUI64(buf).Uint()
-	var iWhole uint64 = iValue >> 32
 	var iFract uint64 = iValue << 32 >> 32
 	fFract := float64(iFract) / 4294967296.0 * math.Pow(10, 9)
-	return fmt.Sprintf("%d.%09.0f", iWhole, fFract)
+	return fmt.Sprintf("%d.%09.0f", iValue>>32, fFract)
 }
 func strSF32(buf []byte) string {
 	return fmt.Sprintf("%0.4f", decSF32(buf).Float())
@@ -324,6 +323,7 @@ func strUR64(buf []byte) string {
 }
 func strSR32(buf []byte) string {
 	arr := decSR32(buf).Interface().([2]int16)
+	fmt.Printf("% 8x  %d/%d\n", buf, arr[0], arr[1])
 	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strSR64(buf []byte) string {
