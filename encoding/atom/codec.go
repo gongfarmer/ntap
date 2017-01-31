@@ -228,8 +228,7 @@ func decSR64(buf []byte) reflect.Value {
 	return reflect.ValueOf(arr)
 }
 func decFC32(buf []byte) reflect.Value {
-	var s = string(buf[:])
-	return reflect.ValueOf(s)
+	return decUI32(buf)
 }
 
 // Store as [4]byte, same way IPv4 is represented in Go's net/ library
@@ -327,13 +326,14 @@ func strSR32(buf []byte) string {
 }
 func strSR64(buf []byte) string {
 	arr := decSR64(buf).Interface().([2]int32)
-	fmt.Printf("% 8x  %d/%d\n", buf, arr[0], arr[1])
 	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
 func strFC32(buf []byte) string {
 	if isPrintableBytes(buf) {
+		fmt.Printf("%08x  <<<%s>>>\n", buf, string(buf))
 		return fmt.Sprintf("'%s'", string(buf))
 	} else {
+		fmt.Printf("%08x  <<<0x%08X>>>\n", buf, buf)
 		return fmt.Sprintf("0x%08X", buf)
 	}
 }

@@ -406,7 +406,6 @@ func TestDecSR32(t *testing.T) {
 		decodeTest{[]byte("\x00\x01\x7f\xff"), reflect.ValueOf([2]int16{1, 32767})},
 		decodeTest{[]byte("\xff\xff\x7f\xff"), reflect.ValueOf([2]int16{-1, 32767})},
 		decodeTest{[]byte("\x00\x01\x80\x00"), reflect.ValueOf([2]int16{1, -32768})},
-		decodeTest{[]byte("\x00\x01\x80\x00"), reflect.ValueOf([2]int16{1, -32768})},
 	}
 
 	for _, test := range tests {
@@ -435,7 +434,6 @@ func TestDecSR64(t *testing.T) {
 		decodeTest{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), reflect.ValueOf([2]int32{1, 2147483647})},
 		decodeTest{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), reflect.ValueOf([2]int32{-1, 2147483647})},
 		decodeTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), reflect.ValueOf([2]int32{1, -2147483648})},
-		decodeTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), reflect.ValueOf([2]int32{1, -2147483648})},
 	}
 
 	for _, test := range tests {
@@ -447,9 +445,85 @@ func TestDecSR64(t *testing.T) {
 	}
 }
 
-/*
-
 func TestDecFC32(t *testing.T) {
+	tests := []decodeTest{
+		// test printable chars
+		decodeTest{[]byte("\x20\x7e\x7d\x7c"), reflect.ValueOf(uint32(0x207e7d7c))},
+		decodeTest{[]byte("\x21\x20\x7e\x7d"), reflect.ValueOf(uint32(0x21207e7d))},
+		decodeTest{[]byte("\x5c\x21\x20\x7e"), reflect.ValueOf(uint32(0x5c21207e))},
+		decodeTest{[]byte("\x23\x5c\x21\x20"), reflect.ValueOf(uint32(0x235c2120))},
+		decodeTest{[]byte("\x24\x23\x5c\x21"), reflect.ValueOf(uint32(0x24235c21))},
+		decodeTest{[]byte("\x25\x24\x23\x5c"), reflect.ValueOf(uint32(0x2524235c))},
+		decodeTest{[]byte("\x26\x25\x24\x23"), reflect.ValueOf(uint32(0x26252423))},
+		decodeTest{[]byte("\x27\x26\x25\x24"), reflect.ValueOf(uint32(0x27262524))},
+		decodeTest{[]byte("\x28\x27\x26\x25"), reflect.ValueOf(uint32(0x28272625))},
+		decodeTest{[]byte("\x29\x28\x27\x26"), reflect.ValueOf(uint32(0x29282726))},
+		decodeTest{[]byte("\x2a\x29\x28\x27"), reflect.ValueOf(uint32(0x2a292827))},
+		decodeTest{[]byte("\x2b\x2a\x29\x28"), reflect.ValueOf(uint32(0x2b2a2928))},
+		decodeTest{[]byte("\x2c\x2b\x2a\x29"), reflect.ValueOf(uint32(0x2c2b2a29))},
+		decodeTest{[]byte("\x2d\x2c\x2b\x2a"), reflect.ValueOf(uint32(0x2d2c2b2a))},
+		decodeTest{[]byte("\x2e\x2d\x2c\x2b"), reflect.ValueOf(uint32(0x2e2d2c2b))},
+		decodeTest{[]byte("\x2f\x2e\x2d\x2c"), reflect.ValueOf(uint32(0x2f2e2d2c))},
+		decodeTest{[]byte("\x30\x2f\x2e\x2d"), reflect.ValueOf(uint32(0x302f2e2d))},
+		decodeTest{[]byte("\x31\x30\x2f\x2e"), reflect.ValueOf(uint32(0x31302f2e))},
+		decodeTest{[]byte("\x32\x31\x30\x2f"), reflect.ValueOf(uint32(0x3231302f))},
+		decodeTest{[]byte("\x5b\x5a\x59\x58"), reflect.ValueOf(uint32(0x5b5a5958))},
+		decodeTest{[]byte("\x5c\x5b\x5a\x59"), reflect.ValueOf(uint32(0x5c5b5a59))},
+		decodeTest{[]byte("\x5d\x5c\x5b\x5a"), reflect.ValueOf(uint32(0x5d5c5b5a))},
+		decodeTest{[]byte("\x5e\x5d\x5c\x5b"), reflect.ValueOf(uint32(0x5e5d5c5b))},
+		decodeTest{[]byte("\x5f\x5e\x5d\x5c"), reflect.ValueOf(uint32(0x5f5e5d5c))},
+		decodeTest{[]byte("\x60\x5f\x5e\x5d"), reflect.ValueOf(uint32(0x605f5e5d))},
+		decodeTest{[]byte("\x61\x60\x5f\x5e"), reflect.ValueOf(uint32(0x61605f5e))},
+		decodeTest{[]byte("\x62\x61\x60\x5f"), reflect.ValueOf(uint32(0x6261605f))},
+		decodeTest{[]byte("\x63\x62\x61\x60"), reflect.ValueOf(uint32(0x63626160))},
+		decodeTest{[]byte("\x7b\x7a\x79\x78"), reflect.ValueOf(uint32(0x7b7a7978))},
+		decodeTest{[]byte("\x7c\x7b\x7a\x79"), reflect.ValueOf(uint32(0x7c7b7a79))},
+		decodeTest{[]byte("\x7d\x7c\x7b\x7a"), reflect.ValueOf(uint32(0x7d7c7b7a))},
+		decodeTest{[]byte("\x7e\x7d\x7c\x7b"), reflect.ValueOf(uint32(0x7e7d7c7b))},
+		decodeTest{[]byte("\x20\x20\x20\x20"), reflect.ValueOf(uint32(0x20202020))},
+		// test a few nonprintable chars
+		decodeTest{[]byte("\x00\x00\x00\x00"), reflect.ValueOf(uint32(0x00000000))},
+		decodeTest{[]byte("\x00\x00\x00\x01"), reflect.ValueOf(uint32(0x00000001))},
+		decodeTest{[]byte("\x00\x00\x00\x02"), reflect.ValueOf(uint32(0x00000002))},
+		decodeTest{[]byte("\x00\x00\x00\x03"), reflect.ValueOf(uint32(0x00000003))},
+		decodeTest{[]byte("\x00\x00\x00\x04"), reflect.ValueOf(uint32(0x00000004))},
+		decodeTest{[]byte("\x00\x00\x00\x05"), reflect.ValueOf(uint32(0x00000005))},
+		decodeTest{[]byte("\x00\x00\x00\x06"), reflect.ValueOf(uint32(0x00000006))},
+		decodeTest{[]byte("\x00\x00\x00\x07"), reflect.ValueOf(uint32(0x00000007))},
+		decodeTest{[]byte("\x00\x00\x00\x08"), reflect.ValueOf(uint32(0x00000008))},
+		decodeTest{[]byte("\x00\x00\x00\x09"), reflect.ValueOf(uint32(0x00000009))},
+		decodeTest{[]byte("\x00\x00\x00\x0a"), reflect.ValueOf(uint32(0x0000000A))},
+		decodeTest{[]byte("\x00\x00\x00\x0b"), reflect.ValueOf(uint32(0x0000000B))},
+		decodeTest{[]byte("\x00\x00\x00\x0c"), reflect.ValueOf(uint32(0x0000000C))},
+		decodeTest{[]byte("\x00\x00\x00\x0d"), reflect.ValueOf(uint32(0x0000000D))},
+		decodeTest{[]byte("\x00\x00\x00\x0e"), reflect.ValueOf(uint32(0x0000000E))},
+		decodeTest{[]byte("\x00\x00\x00\x0f"), reflect.ValueOf(uint32(0x0000000F))},
+		decodeTest{[]byte("\x01\x00\x00\x00"), reflect.ValueOf(uint32(0x01000000))},
+		decodeTest{[]byte("\x02\x00\x00\x00"), reflect.ValueOf(uint32(0x02000000))},
+		decodeTest{[]byte("\x03\x00\x00\x00"), reflect.ValueOf(uint32(0x03000000))},
+		decodeTest{[]byte("\x04\x00\x00\x00"), reflect.ValueOf(uint32(0x04000000))},
+		decodeTest{[]byte("\x05\x00\x00\x00"), reflect.ValueOf(uint32(0x05000000))},
+		decodeTest{[]byte("\x06\x00\x00\x00"), reflect.ValueOf(uint32(0x06000000))},
+		decodeTest{[]byte("\x07\x00\x00\x00"), reflect.ValueOf(uint32(0x07000000))},
+		decodeTest{[]byte("\x08\x00\x00\x00"), reflect.ValueOf(uint32(0x08000000))},
+		decodeTest{[]byte("\x09\x00\x00\x00"), reflect.ValueOf(uint32(0x09000000))},
+		decodeTest{[]byte("\x0a\x00\x00\x00"), reflect.ValueOf(uint32(0x0A000000))},
+		decodeTest{[]byte("\x0b\x00\x00\x00"), reflect.ValueOf(uint32(0x0B000000))},
+		decodeTest{[]byte("\x0c\x00\x00\x00"), reflect.ValueOf(uint32(0x0C000000))},
+		decodeTest{[]byte("\x0d\x00\x00\x00"), reflect.ValueOf(uint32(0x0D000000))},
+		decodeTest{[]byte("\x0e\x00\x00\x00"), reflect.ValueOf(uint32(0x0E000000))},
+		decodeTest{[]byte("\x0f\x00\x00\x00"), reflect.ValueOf(uint32(0x0F000000))},
+	}
+	for _, test := range tests {
+		got := decFC32(test.Input).Interface()
+		want := test.Want.Interface()
+		if got != want {
+			t.Errorf("decFC32(% x)  got %T(%[2]v), want %T(%[3]v)", test.Input, got, want)
+		}
+	}
+}
+
+/*
 func TestDecIP32(t *testing.T) {
 func TestDecIPAD(t *testing.T) {
 func TestDecCSTR(t *testing.T) {
