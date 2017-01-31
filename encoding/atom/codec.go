@@ -206,6 +206,7 @@ func decUF64(buf []byte) reflect.Value {
 	//	var v = float64(decUI64(buf).Uint()) / float64(MaxUint32Plus1)
 	//	return reflect.ValueOf(v)
 	var v = float64(decUI64(buf).Uint()) / 4294967296.0
+	//fmt.Printf("decUF64: in:%8x out:%f\n", buf, v)
 	return reflect.ValueOf(v)
 }
 func decUR32(buf []byte) reflect.Value {
@@ -306,7 +307,6 @@ func strUF32(buf []byte) string {
 // is right and ccat is wrong.
 func strUF64(buf []byte) string {
 	v := decUF64(buf).Float()
-	fmt.Printf("decUF64 % x\n", math.Float64bits(v))
 	return fmt.Sprintf("%0.8f", v)
 }
 func strSF32(buf []byte) string {
