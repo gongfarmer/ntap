@@ -523,9 +523,65 @@ func TestDecFC32(t *testing.T) {
 	}
 }
 
-/*
 func TestDecIP32(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte("\x00\x00\x00\x00"), reflect.ValueOf([]byte{0, 0, 0, 0})},
+		decodeTest{[]byte("\x11\x22\x33\x44"), reflect.ValueOf([]byte{17, 34, 51, 68})},
+		decodeTest{[]byte("\xC0\xA8\x01\x80"), reflect.ValueOf([]byte{192, 168, 1, 128})},
+		decodeTest{[]byte("\xF1\xAB\xCD\xEF"), reflect.ValueOf([]byte{241, 171, 205, 239})},
+		decodeTest{[]byte("\xff\xff\xff\xff"), reflect.ValueOf([]byte{255, 255, 255, 255})},
+	}
+	for _, test := range tests {
+		got := decIP32(test.Input).Interface().([]byte)
+		want := test.Want.Interface().([]byte)
+		if got[0] != want[0] || got[1] != want[1] || got[2] != want[2] || got[3] != want[3] {
+			t.Errorf(
+				"decIP32(%q)  got (%d.%d.%d.%d), want (%d.%d.%d.%d)",
+				test.Input,
+				got[0], got[1], got[2], got[3],
+				want[0], want[1], want[2], want[3])
+		}
+	}
+}
+
 func TestDecIPAD(t *testing.T) {
+	tests := []decodeTest{
+		decodeTest{[]byte("\x30\x2e\x30\x2e\x30\x2e\x30\x00"), reflect.ValueOf(string("0.0.0.0"))},
+		decodeTest{[]byte("\x31\x2e\x31\x2e\x31\x2e\x31\x00"), reflect.ValueOf(string("1.1.1.1"))},
+		decodeTest{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x30\x2e\x31\x00"), reflect.ValueOf(string("192.168.0.1"))},
+		decodeTest{[]byte("\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x00"), reflect.ValueOf(string("255.255.255.255"))},
+		decodeTest{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x31\x2e\x30\x00"), reflect.ValueOf(string("192.168.1.0"))},
+		decodeTest{[]byte("\x31\x30\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x34\x00"), reflect.ValueOf(string("10.255.255.254"))},
+		decodeTest{[]byte("\x31\x37\x32\x2e\x31\x38\x2e\x35\x2e\x34\x00"), reflect.ValueOf(string("172.18.5.4"))},
+		decodeTest{[]byte("\x38\x2e\x38\x2e\x34\x2e\x34\x00"), reflect.ValueOf(string("8.8.4.4"))},
+		decodeTest{[]byte("\x31\x32\x37\x2e\x30\x2e\x30\x2e\x31\x00"), reflect.ValueOf(string("127.0.0.1"))},
+		decodeTest{[]byte("\x31\x2e\x32\x35\x35\x2e\x33\x2e\x34\x00"), reflect.ValueOf(string("1.255.3.4"))},
+		decodeTest{[]byte("\x32\x35\x35\x2e\x30\x2e\x30\x2e\x31\x00"), reflect.ValueOf(string("255.0.0.1"))},
+		decodeTest{[]byte("\x3a\x3a\x00"), reflect.ValueOf(string("::"))},
+		decodeTest{[]byte("\x3a\x3a\x66\x66\x66\x66\x3a\x35\x2e\x36\x2e\x37\x2e\x38\x00"), reflect.ValueOf(string("::ffff:5.6.7.8"))},
+		decodeTest{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), reflect.ValueOf(string("fdf8:f53b:82e4::53"))},
+		decodeTest{[]byte("\x66\x65\x38\x30\x3a\x3a\x32\x30\x30\x3a\x35\x61\x65\x65\x3a\x66\x65\x61\x61\x3a\x32\x30\x61\x32\x00"), reflect.ValueOf(string("fe80::200:5aee:feaa:20a2"))},
+		decodeTest{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), reflect.ValueOf(string("2001::1"))},
+		decodeTest{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), reflect.ValueOf(string("2001:0000:4136:e378:8000:63bf:3fff:fdd2"))},
+		decodeTest{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x32\x3a\x36\x63\x3a\x3a\x34\x33\x30\x00"), reflect.ValueOf(string("2001:0002:6c::430"))},
+		decodeTest{[]byte("\x32\x30\x30\x31\x3a\x31\x30\x3a\x32\x34\x30\x3a\x61\x62\x3a\x3a\x61\x00"), reflect.ValueOf(string("2001:10:240:ab::a"))},
+		decodeTest{[]byte("\x32\x30\x30\x32\x3a\x63\x62\x30\x61\x3a\x33\x63\x64\x64\x3a\x31\x3a\x3a\x31\x00"), reflect.ValueOf(string("2002:cb0a:3cdd:1::1"))},
+		decodeTest{[]byte("\x32\x30\x30\x31\x3a\x64\x62\x38\x3a\x38\x3a\x34\x3a\x3a\x32\x00"), reflect.ValueOf(string("2001:db8:8:4::2"))},
+		decodeTest{[]byte("\x66\x66\x30\x31\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x32\x00"), reflect.ValueOf(string("ff01:0:0:0:0:0:0:2"))},
+		decodeTest{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), reflect.ValueOf(string("fdf8:f53b:82e4::53"))},
+		decodeTest{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), reflect.ValueOf(string("2001::1"))},
+		decodeTest{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), reflect.ValueOf(string("2001:0000:4136:e378:8000:63bf:3fff:fdd2"))},
+	}
+	for _, test := range tests {
+		got := decIPAD(test.Input).String()
+		want := test.Want.String()
+		if got != want {
+			t.Errorf("decIPAD(%q)  got '%s', want '%s'", test.Input, got, want)
+		}
+	}
+}
+
+/*
 func TestDecCSTR(t *testing.T) {
 */
 

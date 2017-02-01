@@ -89,7 +89,7 @@ var opTable = map[ADEType]Operators{
 	SR64: Operators{decSR64, strSR64},
 	FC32: Operators{decFC32, strFC32},
 	IP32: Operators{decIP32, strIP32},
-	IPAD: Operators{decUSTR, strCSTR},
+	IPAD: Operators{decIPAD, strIPAD},
 	CSTR: Operators{decCSTR, strCSTR},
 	USTR: Operators{decUSTR, strUSTR},
 	DATA: Operators{decDATA, strDATA},
@@ -236,7 +236,8 @@ func decIP32(buf []byte) reflect.Value {
 	return reflect.ValueOf(buf)
 }
 func decIPAD(buf []byte) reflect.Value {
-	s := string(buf)
+	trimmed := buf[0 : len(buf)-1]
+	s := string(trimmed)
 	return reflect.ValueOf(s)
 }
 func decCSTR(buf []byte) reflect.Value {
@@ -328,17 +329,22 @@ func strSR64(buf []byte) string {
 	arr := decSR64(buf).Interface().([2]int32)
 	return fmt.Sprintf("%d/%d", arr[0], arr[1])
 }
+
+// Mantis #27726: ccat/ctac can't parse container names starting with "#" or " ".
+// If string is printable but starts with "# \"'", print it as hex.
 func strFC32(buf []byte) string {
-	if isPrintableBytes(buf) {
-		fmt.Printf("%08x  <<<%s>>>\n", buf, string(buf))
+	var badStartChars = "# \"'"
+	if isPrintableBytes(buf) && !strings.ContainsRune(badStartChars, rune(buf[0])) {
 		return fmt.Sprintf("'%s'", string(buf))
 	} else {
-		fmt.Printf("%08x  <<<0x%08X>>>\n", buf, buf)
 		return fmt.Sprintf("0x%08X", buf)
 	}
 }
 func strIP32(buf []byte) string {
 	return fmt.Sprintf("%d.%d.%d.%d", buf[0], buf[1], buf[2], buf[3])
+}
+func strIPAD(buf []byte) string {
+	return fmt.Sprintf("\"%s\"", decIPAD(buf).String())
 }
 func strCSTR(buf []byte) string {
 	trimmed := buf[0 : len(buf)-1]

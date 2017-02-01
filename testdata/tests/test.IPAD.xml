@@ -1,9 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
 	<container name="TEST">
-		<container name="SENT">
-			<atom name="addr" type="IP32" value="192.168.110.225"/>
+		<container name="IP32">
+			<atom name="addr" type="IP32" value="0.0.0.0"/>
+			<atom name="addr" type="IP32" value="1.1.1.1"/>
+			<atom name="addr" type="IP32" value="192.168.0.1"/>
+			<atom name="addr" type="IP32" value="255.255.255.255"/>
 			<atom name="ipad" type="IP32" value="0x7F0000017F000001"/>
+		</container>
+		<container name="IPAD">
+			<container name="IPV4">
+				<atom name="addr" type="IPAD" value="0.0.0.0"/>
+				<atom name="addr" type="IPAD" value="1.1.1.1"/>
+				<atom name="addr" type="IPAD" value="192.168.0.1"/>
+				<atom name="addr" type="IPAD" value="255.255.255.255"/>
+				<atom name="addr" type="IPAD" value="192.168.1.0"/>
+				<atom name="addr" type="IPAD" value="10.255.255.254"/>
+				<atom name="addr" type="IPAD" value="172.18.5.4"/>
+				<atom name="addr" type="IPAD" value="8.8.4.4"/>
+				<atom name="addr" type="IPAD" value="127.0.0.1"/>
+				<atom name="addr" type="IPAD" value="1.255.3.4"/>
+				<atom name="addr" type="IPAD" value="255.0.0.1"/>
+			</container>
+			<container name="IPV6">
+				<atom name="addr" type="IPAD" value="::"/>
+				<atom name="addr" type="IPAD" value="::ffff:5.6.7.8"/>
+				<atom name="addr" type="IPAD" value="fdf8:f53b:82e4::53"/>
+				<atom name="addr" type="IPAD" value="fe80::200:5aee:feaa:20a2"/>
+				<atom name="addr" type="IPAD" value="2001::1"/>
+				<atom name="addr" type="IPAD" value="2001:0000:4136:e378:8000:63bf:3fff:fdd2"/>
+				<atom name="addr" type="IPAD" value="2001:0002:6c::430"/>
+				<atom name="addr" type="IPAD" value="2001:10:240:ab::a"/>
+				<atom name="addr" type="IPAD" value="2002:cb0a:3cdd:1::1"/>
+				<atom name="addr" type="IPAD" value="2001:db8:8:4::2"/>
+				<atom name="addr" type="IPAD" value="ff01:0:0:0:0:0:0:2"/>
+				<atom name="addr" type="IPAD" value="fdf8:f53b:82e4::53"/>
+				<atom name="addr" type="IPAD" value="2001::1"/>
+				<atom name="addr" type="IPAD" value="2001:0000:4136:e378:8000:63bf:3fff:fdd2"/>
+			</container>
 		</container>
 	</container>
 </containerxml>
