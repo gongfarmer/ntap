@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="TEST">
+		<atom name="atom" type="CSTR" value="    "/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value="&#9;&#10;"/>
+		<atom name="atom" type="CSTR" value="&#13;"/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=" !&quot;#"/>
+		<atom name="atom" type="CSTR" value="$%&amp;'"/>
+		<atom name="atom" type="CSTR" value="()*+"/>
+		<atom name="atom" type="CSTR" value=",-./"/>
+		<atom name="atom" type="CSTR" value="0123"/>
+		<atom name="atom" type="CSTR" value="4567"/>
+		<atom name="atom" type="CSTR" value="89:;"/>
+		<atom name="atom" type="CSTR" value="&lt;=&gt;?"/>
+		<atom name="atom" type="CSTR" value="@ABC"/>
+		<atom name="atom" type="CSTR" value="DEFG"/>
+		<atom name="atom" type="CSTR" value="HIJK"/>
+		<atom name="atom" type="CSTR" value="LMNO"/>
+		<atom name="atom" type="CSTR" value="PQRS"/>
+		<atom name="atom" type="CSTR" value="TUVW"/>
+		<atom name="atom" type="CSTR" value="XYZ["/>
+		<atom name="atom" type="CSTR" value="\]^_"/>
+		<atom name="atom" type="CSTR" value="`abc"/>
+		<atom name="atom" type="CSTR" value="defg"/>
+		<atom name="atom" type="CSTR" value="hijk"/>
+		<atom name="atom" type="CSTR" value="lmno"/>
+		<atom name="atom" type="CSTR" value="pqrs"/>
+		<atom name="atom" type="CSTR" value="tuvw"/>
+		<atom name="atom" type="CSTR" value="xyz{"/>
+		<atom name="atom" type="CSTR" value="|}~"/>
+	</container>
+</containerxml>

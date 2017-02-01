@@ -231,10 +231,12 @@ func decFC32(buf []byte) reflect.Value {
 	return decUI32(buf)
 }
 
-// Store as [4]byte, same way IPv4 is represented in Go's net/ library
+// Decode to [4]byte, same way IPv4 is represented in Go's net/ library
 func decIP32(buf []byte) reflect.Value {
 	return reflect.ValueOf(buf)
 }
+
+// Decode to string, because this could be IPv4 or IPv6.
 func decIPAD(buf []byte) reflect.Value {
 	trimmed := buf[0 : len(buf)-1]
 	s := string(trimmed)
