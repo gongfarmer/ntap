@@ -139,10 +139,13 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 				return atoms, ErrInvalidInput
 			}
 		}
+		adeType := ADEType(h.Type[:])
 		var a = Atom{
 			Name: asPrintableString(h.Name[:]),
-			Type: ADEType(h.Type[:]),
-			Data: data}
+			Type: adeType,
+			data: data,
+		}
+		a.Value = NewCodec(&a)
 
 		// add atom to parent.Children, or to atoms list if no parent
 		if parent, ok := containers.Peek(); ok {

@@ -38,7 +38,11 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	var output bytes.Buffer
 	// print atom name,type,data
 	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", a.Name, a.Type)
-	fmt.Fprintln(&output, a.ValueString())
+	s, err := a.Value.String()
+	if err != nil {
+		panic(fmt.Errorf("conversion of atom to text failed: %s", err))
+	}
+	fmt.Fprintln(&output, s)
 
 	// print children
 	if a.Type == CONT {

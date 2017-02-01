@@ -13,7 +13,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"reflect"
 	"unicode"
 )
 
@@ -27,7 +26,8 @@ var _ encoding.TextMarshaler = &(Atom{})
 type Atom struct {
 	Name     string
 	Type     ADEType
-	Data     []byte
+	Value    *codec
+	data     []byte
 	Children []*Atom
 }
 type ADEType string
@@ -57,42 +57,6 @@ func (a Atom) String() string {
 		panic(fmt.Errorf("Failed to write Atom '%s:%s' to text: %s", a.Name, a.Type, err))
 	}
 	return string(buf)
-}
-
-// This returns the value as a string following the ADE quoting rules
-func (a Atom) ValueString() string {
-	if _, ok := opTable[a.Type]; !ok {
-		panic(fmt.Errorf("Unknown ADE type: %s", a.Type))
-	}
-	return opTable[a.Type].String(a.Data)
-}
-
-// Return a go type suitable for holding a value of the given ADE Atom type
-func (a Atom) goType() reflect.Type {
-	var p reflect.Value
-	switch a.Type {
-	case UI01:
-		p = reflect.ValueOf(new(bool))
-	case UI08, UI16, UI32, UI64:
-		p = reflect.ValueOf(new(uint64))
-	case SI08, SI16, SI32, SI64:
-		p = reflect.ValueOf(new(int64))
-	case FP32, FP64, UF32, UF64, SF32, SF64:
-		p = reflect.ValueOf(new(float64)) // FIXME signed float64 has smaller max value than UF64
-	case UR32, UR64:
-		p = reflect.ValueOf(new([2]uint64))
-	case SR32, SR64:
-		p = reflect.ValueOf(new([2]int64))
-	case FC32, IP32, IPAD, CSTR, USTR, UUID:
-		p = reflect.ValueOf(new(string)) // FIXME signed float64 has smaller max value than UF64
-	case DATA, CNCT:
-		p = reflect.ValueOf(a.Data) // FIXME signed float64 has smaller max value than UF64
-	case ENUM:
-		p = reflect.ValueOf(new(int32))
-	default:
-		panic(fmt.Errorf("Don't know how to handle type %s", a.Type))
-	}
-	return p.Type()
 }
 
 func (c *Atom) addChild(a *Atom) {
