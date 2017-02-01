@@ -771,6 +771,9 @@ func TestDecNULL(t *testing.T) {
 	}
 }
 
+/**********************************************************/
+// test methods for conversion to escaped string
+/**********************************************************/
 /*
 func TestStrUI01(t *testing.T) {
 func TestStrUI08(t *testing.T) {

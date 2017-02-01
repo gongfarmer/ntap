@@ -31,6 +31,7 @@ type Atom struct {
 	Children []*Atom
 }
 type ADEType string
+type GoType string
 
 // Return true if string is printable, false otherwise
 func isPrintableString(s string) bool {
@@ -56,22 +57,6 @@ func (a Atom) String() string {
 		panic(fmt.Errorf("Failed to write Atom '%s:%s' to text: %s", a.Name, a.Type, err))
 	}
 	return string(buf)
-}
-
-// Return as a reflect.Value which can be printed
-// String values are returned without ADE quoting
-func (a Atom) Value() reflect.Value {
-	defer func() {
-		if r := recover(); r != nil {
-			err := fmt.Errorf("while handling atom %s:%s, %s", a.Name, a.Type, r)
-			panic(err)
-		}
-	}()
-
-	if _, ok := opTable[a.Type]; !ok {
-		panic(fmt.Errorf("Unknown ADE type: %s", a.Type))
-	}
-	return opTable[a.Type].Decode(a.Data)
 }
 
 // This returns the value as a string following the ADE quoting rules

@@ -46,6 +46,13 @@ const (
 	Cnct ADEType = "cnct" // alias for CNCT
 	CONT ADEType = "CONT" // Atom Container
 
+	goString GoType = "String"
+	goUint   GoType = "Uint"
+	goInt    GoType = "Int"
+	goBool   GoType = "Bool"
+	goBytes  GoType = "Bytes"
+	goFloat  GoType = "Float"
+
 	MaxUint16Plus1 = math.MaxUint16 + 1
 	MaxUint32Plus1 = math.MaxUint32 + 1
 )
@@ -100,6 +107,67 @@ var opTable = map[ADEType]Operators{
 	NULL: Operators{decNULL, strNULL},
 	CONT: Operators{decNULL, strNULL},
 }
+
+// "Type not handled" message template
+const strNH = "No conversion from ADE type '%s' to Go type '%s' is defined."
+
+type decoder struct {
+	String        func([]byte) string
+	StringEscaped func([]byte) string
+	Uint          func([]byte) uint64
+	Int           func([]byte) int64
+	Bool          func([]byte) bool
+	Float         func([]byte) float64
+	SliceOfByte   func([]byte) []byte
+	SliceOfInt    func([]byte) []int64
+	SliceOfUint   func([]byte) []uint64
+}
+
+// Zero value of ADE type decoder panics on every type conversion.
+func NewDecoder(from ADEType) decoder {
+	return decoder{
+		String:        func([]byte) string { panic(fmt.Errorf(strNH, from, "string")) },
+		StringEscaped: func([]byte) string { panic(fmt.Errorf(strNH, from, "string")) },
+		Uint:          func([]byte) uint64 { panic(fmt.Errorf(strNH, from, "uint")) },
+		Int:           func([]byte) int64 { panic(fmt.Errorf(strNH, from, "int")) },
+		Bool:          func([]byte) bool { panic(fmt.Errorf(strNH, from, "bool")) },
+		Float:         func([]byte) float64 { panic(fmt.Errorf(strNH, from, "float")) },
+		SliceOfByte:   func([]byte) []byte { panic(fmt.Errorf(strNH, from, "sliceOfByte")) },
+		SliceOfInt:    func([]byte) []int64 { panic(fmt.Errorf(strNH, from, "sliceOfInt")) },
+		SliceOfUint:   func([]byte) []uint64 { panic(fmt.Errorf(strNH, from, "sliceOfUint")) },
+	}
+}
+
+var decoderTable map[ADEType]decoder
+
+// FIXME can't do this`
+func init() {
+	decoderTable[UI01] = NewDecoder(UI01)(
+		String: UI01ToString,
+		Bool:   UI01ToBool,
+		Uint:   UI01ToUint,
+	)
+}
+
+//{
+//	UI01: Operators{
+//		String:        UI01ToString,
+//		StringEscaped: UI01ToString,
+//		Uint:          UI01ToUint,
+//		Int:           UI01ToInt,
+//		Bool:          UI01ToBool,
+//		Bytes:         UI01ToBytes,
+//		Float:         UI01ToFloat,
+//		SliceOfByte:   UI01ToFloat,
+//		SliceOfInt:    UI01ToFloat,
+//		SliceOfUint:   UI01ToFloat,
+//	},
+//	UI08: Operators{
+//		String: UI01ToString,
+//		Uint:   UI01ToUint,
+//		Sint:   UI01ToSint,
+//	},
+//}
 
 /**********************************************************
    decoder methods.
