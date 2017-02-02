@@ -37,6 +37,7 @@ func (a *Atom) MarshalText() (text []byte, err error) {
 func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	var output bytes.Buffer
 	// print atom name,type,data
+	fmt.Printf("% *s%s:%s\n", depth*4, "", a.Name, a.Type)
 	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", a.Name, a.Type)
 	s, err := a.Value.String()
 	if err != nil {

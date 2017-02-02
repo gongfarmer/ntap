@@ -163,8 +163,6 @@ func NewCodec(a *Atom) *codec {
 
 // Decoder methods: pass atom data to the decoder for type conversion to go type
 func (c codec) String() (string, error) {
-	fmt.Printf("String(): codec is %v\n", c)
-	fmt.Printf("String(): atom is %s:%s\n", c.Atom.Name, c.Atom.Type)
 	return c.Decoder.String(c.Atom.data)
 }
 func (c codec) StringRaw() (string, error)     { return c.Decoder.StringRaw(c.Atom.data) }
@@ -289,6 +287,12 @@ func init() {
 	d.String = FC32ToString
 	decoderByType[FC32] = d
 
+	// ADE ENUM type
+	d = NewDecoder(ENUM)
+	d.String = SI32ToString
+	d.Int = SI32ToInt64
+	decoderByType[ENUM] = d
+
 	// IP Address types
 	d = NewDecoder(IP32)
 	d.String = IP32ToString
@@ -300,11 +304,13 @@ func init() {
 
 	// ADE String types
 	d = NewDecoder(CSTR)
-	d.String = CSTRToString
+	d.StringRaw = CSTRToString
+	d.String = CSTRToStringEscaped
 	decoderByType[CSTR] = d
 
 	d = NewDecoder(USTR)
-	d.String = USTRToString
+	d.StringRaw = USTRToString
+	d.String = USTRToStringEscaped
 	decoderByType[USTR] = d
 
 	// DATA type, and aliases
@@ -542,7 +548,8 @@ func SF64ToString(buf []byte) (v string, e error) {
 	var f float64
 	f, e = SF64ToFloat64(buf)
 	if e == nil {
-		v = fmt.Sprintf("%0.9f", f)
+		f -= 0.0000000005
+		v = fmt.Sprintf("%.9f", f)
 	}
 	return
 }
@@ -646,14 +653,31 @@ func IPADToString(buf []byte) (v string, e error) {
 // String types
 
 func CSTRToString(buf []byte) (v string, e error) {
-	return string(buf), nil
+	v = string(buf[0 : len(buf)-1]) // trim null terminator
+	return v, nil
+}
+
+func CSTRToStringEscaped(buf []byte) (v string, e error) {
+	v, e = CSTRToString(buf)
+	if e == nil {
+		v = fmt.Sprintf("\"%s\"", adeCstrEscape(v))
+	}
+	return
 }
 
 func USTRToString(buf []byte) (v string, e error) {
 	var runes = make([]rune, len(buf)/4)
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &runes)
-	if e != nil {
+	if e == nil {
 		v = string(runes)
+	}
+	return
+}
+
+func USTRToStringEscaped(buf []byte) (v string, e error) {
+	v, e = USTRToString(buf)
+	if e == nil {
+		v = fmt.Sprintf("\"%s\"", adeCstrEscape(v))
 	}
 	return
 }
