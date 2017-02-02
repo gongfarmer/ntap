@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"reflect"
 )
 
 // AtomContainer object, paired with its end byte position in the stream
@@ -83,11 +82,11 @@ type atomHeader struct {
 	Type [4]byte
 }
 
+const headerSize = 12
+
 func (h atomHeader) isContainer() bool {
 	return ADEType(h.Type[:]) == CONT
 }
-
-var headerBytes uint32 = uint32(reflect.TypeOf(atomHeader{}).Size())
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
 // It can be used to rehydrate an Atom starting from the zero value of Atom.
@@ -134,7 +133,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		// construct Atom object, read data
 		var data []byte
 		if !h.isContainer() {
-			data, err = readAtomData(r, h.Size-headerBytes, &bytesRead)
+			data, err = readAtomData(r, h.Size-headerSize, &bytesRead)
 			if err != nil {
 				return atoms, ErrInvalidInput
 			}
@@ -156,7 +155,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 
 		// push container onto stack
 		if a.Type == CONT {
-			endPos := bytesRead + h.Size - headerBytes
+			endPos := bytesRead + h.Size - headerSize
 			containers.Push(cont{&a, endPos})
 		}
 
@@ -169,7 +168,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 func readAtomHeader(r io.Reader, bytesRead *uint32) (h atomHeader, err error) {
 	h = atomHeader{}
 	err = binary.Read(r, binary.BigEndian, &h)
-	*bytesRead += headerBytes
+	*bytesRead += headerSize
 	return
 }
 
