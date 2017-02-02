@@ -293,6 +293,11 @@ func init() {
 	d.Int = SI32ToInt64
 	decoderByType[ENUM] = d
 
+	// ADE UUID type
+	d = NewDecoder(UUID)
+	d.String = UUIDToString
+	decoderByType[UUID] = d
+
 	// IP Address types
 	d = NewDecoder(IP32)
 	d.String = IP32ToString
@@ -548,7 +553,6 @@ func SF64ToString(buf []byte) (v string, e error) {
 	var f float64
 	f, e = SF64ToFloat64(buf)
 	if e == nil {
-		f -= 0.0000000005
 		v = fmt.Sprintf("%.9f", f)
 	}
 	return
@@ -633,6 +637,29 @@ func FC32ToString(buf []byte) (v string, e error) {
 		v = fmt.Sprintf("'%s'", string(buf))
 	} else {
 		v = fmt.Sprintf("0x%08X", buf)
+	}
+	return
+}
+
+func UUIDToString(buf []byte) (v string, e error) {
+	var uuid struct {
+		TimeLow          uint32
+		TimeMid          uint16
+		TimeHiAndVersion uint16
+		ClkSeqHiRes      uint8
+		ClkSeqLow        uint8
+		Node             [6]byte
+	}
+	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &uuid)
+	if e == nil {
+		v = fmt.Sprintf(
+			"%08X-%04X-%04X-%02X%02X-%012X",
+			uuid.TimeLow,
+			uuid.TimeMid,
+			uuid.TimeHiAndVersion,
+			uuid.ClkSeqHiRes,
+			uuid.ClkSeqLow,
+			uuid.Node)
 	}
 	return
 }
