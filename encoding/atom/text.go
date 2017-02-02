@@ -1,6 +1,7 @@
 package atom
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 )
@@ -55,4 +56,18 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	}
 
 	return output
+}
+
+// UnmarshalText gets called on a zero-value Atom reciever, and populates it
+// based on the contents of the argument string, which contains an ADE
+// ContainerText reprentation with a single top-level CONT atom.
+// "#" comments are not allowed within this text string.
+func (a *Atom) UnMarshalText(input []byte) error {
+	var err error
+	scanner := bufio.NewScanner(input)
+	for scanner.Scan() {
+		line = scanner.Text()
+	}
+	err := Scanner.Err()
+	return err
 }
