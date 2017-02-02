@@ -37,8 +37,8 @@ func (a *Atom) MarshalText() (text []byte, err error) {
 
 func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	var output bytes.Buffer
-	// print atom name,type,data
-	fmt.Printf("% *s%s:%s\n", depth*4, "", a.Name, a.Type)
+
+	// write atom name,type,data
 	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", a.Name, a.Type)
 	s, err := a.Value.String()
 	if err != nil {
@@ -46,7 +46,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	}
 	fmt.Fprintln(&output, s)
 
-	// print children
+	// write children
 	if a.Type == CONT {
 		for _, childPtr := range a.Children {
 			buf := atomToTextBuffer(childPtr, depth+1)
@@ -64,10 +64,10 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 // "#" comments are not allowed within this text string.
 func (a *Atom) UnMarshalText(input []byte) error {
 	var err error
-	scanner := bufio.NewScanner(input)
+	scanner := bufio.NewScanner(bytes.NewReader(input))
 	for scanner.Scan() {
-		line = scanner.Text()
+		_ = scanner.Text()
 	}
-	err := Scanner.Err()
+	err = scanner.Err()
 	return err
 }

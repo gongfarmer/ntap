@@ -58,25 +58,40 @@ const (
 
 /**********************************************************/
 
-func noDecoder(from ADEType, to GoType) error {
-	return fmt.Errorf("no decoder exists to convert ADE type %s to go type %s.", from, to)
+type (
+	decoder struct {
+		String      func(buf []byte) (string, error)
+		StringRaw   func(buf []byte) (string, error)
+		Bool        func(buf []byte) (bool, error)
+		Uint        func(buf []byte) (uint64, error)
+		Int         func(buf []byte) (int64, error)
+		Float       func(buf []byte) (float64, error)
+		SliceOfUint func(buf []byte) ([]uint64, error)
+		SliceOfInt  func(buf []byte) ([]int64, error)
+		SliceOfByte func(buf []byte) ([]byte, error)
+	}
+	encoder struct {
+	}
+	codec struct {
+		Atom    *Atom
+		Decoder decoder
+		Encoder encoder
+	}
+)
+
+// NewCodec returns a codec that performs type conversion for atom data.
+// It provides methods to convert data from an atom's ADE type into suitable Go
+// types, and vice versa.
+func NewCodec(a *Atom) *codec {
+	c := codec{
+		Atom:    a,
+		Decoder: decoderByType[a.Type],
+		Encoder: encoderByType[a.Type],
+	}
+	return &c
 }
 
-type decoder struct {
-	String      func(buf []byte) (string, error)
-	StringRaw   func(buf []byte) (string, error)
-	Bool        func(buf []byte) (bool, error)
-	Uint        func(buf []byte) (uint64, error)
-	Int         func(buf []byte) (int64, error)
-	Float       func(buf []byte) (float64, error)
-	SliceOfUint func(buf []byte) ([]uint64, error)
-	SliceOfInt  func(buf []byte) ([]int64, error)
-	SliceOfByte func(buf []byte) ([]byte, error)
-}
-type encoder struct {
-}
-
-// Zero value of ADE type decoder panics on every type conversion.
+// NewDecoder returns a decoder which has every type conversion set to panic.
 func NewDecoder(from ADEType) decoder {
 	return decoder{
 		String:      func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
@@ -87,28 +102,14 @@ func NewDecoder(from ADEType) decoder {
 		Float:       func([]byte) (v float64, e error) { return v, noDecoder(from, "float64") },
 		SliceOfUint: func([]byte) (v []uint64, e error) { return v, noDecoder(from, "[]uint64") },
 		SliceOfInt:  func([]byte) (v []int64, e error) { return v, noDecoder(from, "[]int64") },
-		SliceOfByte: func([]byte) (v []byte, e error) { return v, noDecoder(from, "[]byte") },
 	}
 }
 
 var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
 
-type codec struct {
-	Atom    *Atom
-	Decoder decoder
-	Encoder encoder
-}
-
-// Given an atom, return a codec that provides type conversion for the atom
-// data from the atom's ADE type into Go types, and vice versa.
-func NewCodec(a *Atom) *codec {
-	c := codec{
-		Atom:    a,
-		Decoder: decoderByType[a.Type],
-		Encoder: encoderByType[a.Type],
-	}
-	return &c
+func noDecoder(from ADEType, to GoType) error {
+	return fmt.Errorf("no decoder exists to convert ADE type %s to go type %s.", from, to)
 }
 
 // Decoder methods: pass atom data to the decoder for type conversion to go type
