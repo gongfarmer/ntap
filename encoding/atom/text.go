@@ -82,7 +82,6 @@ func (a *Atom) UnmarshalText(input []byte) error {
 			fmt.Println(x)
 		}
 	}
-	fmt.Println("Finished unmarshaling")
 	return err
 }
 
@@ -105,17 +104,15 @@ const (
 	_                   itemEnum = iota
 	itemAtomName                 // atom name field
 	itemAtomType                 // atom type field
-	itemAtomData                 // atom data field
-	itemSep                      // separator ":"
 	itemFractionDivider          // separator ":"
 	itemNumber                   // number within data field
 	itemUUID                     // uuid value
-	itemIP32                     // uuid value
+	itemNULL                     // uuid value
+	itemIP32                     // IP32 value (1 byte per octet IPv4)
 	itemString                   // string value
 	itemContainerStart           // AtomContainer start
 	itemContainerEnd             // AtomContainer end
 	itemFourCharCode             // FCHR32 value
-	itemText                     // plain text  FIXME why do we have this??
 	itemError                    // error occured, value is text of error
 	itemEOF                      // end of input
 )
@@ -153,7 +150,7 @@ type (
 
 	// item represents a token returned from the scanenr
 	item struct {
-		typ  itemEnum // type of item, such as itemName/itemType/itemData
+		typ  itemEnum // type of item, such as itemAtomName/itemAtomType
 		val  string   // Value, such as "23.2"
 		line uint32   // line number at the start of this line
 	}
@@ -176,8 +173,8 @@ func (i item) String() string {
 		return "EOF"
 	case i.typ == itemError:
 		return i.val
-	case len(i.val) > 10:
-		return fmt.Sprintf("%.10q...", i.val)
+	case len(i.val) > 40:
+		return fmt.Sprintf("%.40q...", i.val)
 	}
 	return fmt.Sprintf("%q", i.val)
 }
@@ -241,6 +238,11 @@ func (l *lexer) accept(valid string) bool {
 	return false
 }
 
+func (l *lexer) readToEndOfLine() {
+	for c := l.next(); c != '\n'; c = l.next() {
+	}
+}
+
 // acceptRun consumes a run of runes from the valid set.
 // Returns a count of runes consumed.
 func (l *lexer) acceptRun(valid string) int {
@@ -276,14 +278,37 @@ func (l *lexer) first() rune {
 	return rune(l.input[0])
 }
 
+// error returns an error token and terminates the scan by passing back a nil
+// pointer that will be the next state, terminating l.run.
+func (l *lexer) errorf(format string, args ...interface{}) stateFn {
+	l.items <- item{
+		itemError,
+		strings.Join([]string{
+			fmt.Sprintf("error while lexing line %d: ", l.line),
+			fmt.Sprintf(format, args...),
+		}, ""),
+		l.line,
+	}
+	return nil
+}
+
 func lexLine(l *lexer) stateFn {
-	for {
+	ok := true
+	for ok {
+		if l.chars() != 0 {
+			s := fmt.Sprintf("Expecting empy buffer at start of line, got <<<%s>>>", l.buffer())
+			panic(s)
+		}
 		r := l.next()
 		switch {
 		case isSpace(r):
 			l.ignore()
 		case r == eof:
-			break
+			l.emit(itemEOF)
+			ok = false
+		case r == '#':
+			l.readToEndOfLine()
+			l.ignore()
 		case isPrintableRune(r):
 			l.backup()
 			return lexAtomName
@@ -292,16 +317,11 @@ func lexLine(l *lexer) stateFn {
 		}
 	}
 	// Correctly reached EOF.
-	if l.pos > l.start {
-		l.emit(itemText)
-	}
-	l.emit(itemEOF)
 	return nil // Stop the run loop
 }
 
 func lexAtomName(l *lexer) stateFn {
 
-	fmt.Printf("pre So far, got  <<<%s>>>\n", l.buffer())
 	// If Atom name starts with 0x, check for 8 byte hex string
 	if l.accept("0") && l.accept("xX") {
 		l.acceptRun(hexDigits)
@@ -321,7 +341,6 @@ func lexAtomName(l *lexer) stateFn {
 			return l.errorf("badly formed atom name: %q", l.buffer())
 		}
 	}
-	fmt.Printf("So far, got  <<<%s>>>\n", l.buffer())
 
 	// Try to get 4 printable chars. May already have one.
 	for i := l.chars(); i < 4; i++ {
@@ -358,7 +377,13 @@ func lexAtomType(l *lexer) stateFn {
 		l.ignore() // discard trailing colon
 
 		switch atyp {
-		case "CONT", "NULL":
+		case "CONT":
+			l.emit(itemContainerStart)
+			l.accept(":")
+			return lexEndOfLine
+		case "NULL":
+			l.emit(itemNULL)
+			l.accept(":")
 			return lexEndOfLine
 		case "UUID":
 			return lexUUID
@@ -399,7 +424,18 @@ func lexUUID(l *lexer) stateFn {
 	}
 	return l.errorf("badly formed UUID value: `%q'", l.buffer())
 }
+
+// may be in hex
 func lexIP32(l *lexer) stateFn {
+	if l.accept("0") && l.accept("xX") { // Is it hex?
+		l.acceptRun(hexDigits)
+		if l.chars() < 3 {
+			return l.errorf("badly formed IPv4 value: `%q'", l.buffer())
+		}
+		l.emit(itemIP32)
+		return lexEndOfLine
+	}
+	l.acceptRun(digits)
 	l.acceptRun(digits)
 	l.accept(".")
 	l.acceptRun(digits)
@@ -430,6 +466,7 @@ func lexIPAD(l *lexer) stateFn {
 	ipadChars := strings.Join([]string{hexDigits, ".:"}, "")
 	l.acceptRun(ipadChars)
 	l.accept("\"")
+	l.emit(itemString)
 	return lexEndOfLine
 }
 
@@ -500,6 +537,7 @@ func lexFourCharCode(l *lexer) stateFn {
 func lexEndOfLine(l *lexer) stateFn {
 	l.acceptRun(whitespaceChars)
 	if l.accept("\n") {
+		l.ignore()
 		return lexLine
 	}
 
@@ -508,38 +546,36 @@ func lexEndOfLine(l *lexer) stateFn {
 }
 
 func lexString(l *lexer) stateFn {
-	// Read in double quote
+	// Read double quote
 	if l.next() != '"' {
 		fmt := "expected double quote to start string value, got `%q'"
 		return l.errorf(fmt, l.first())
 	}
 
 	// Read in chars
-	for {
-		r := l.next()
+	var r rune
+	var done bool = false
+	for !done {
+		r = l.next()
 		switch r {
 		case '\\':
-			l.accept("\"")
+			r = l.next()
+			if !strings.ContainsRune("\\\"nrx", r) {
+				return l.errorf("string has invalid escape: %s", l.buffer())
+			}
 		case '"':
-			break
+			done = true
 		case '\n':
-			return l.errorf("unterminated string data, got %q", l.buffer(), l.buffer())
+			return l.errorf("unterminated string, got %q", l.buffer())
 		}
+	}
+
+	if r != '"' {
+		return l.errorf("unterminated string data, got %q", l.buffer())
 	}
 
 	l.emit(itemString)
 	return lexEndOfLine
-}
-
-// error returns an error token and terminates the scan by passing back a nil
-// pointer that will be the next state, terminating l.run.
-func (l *lexer) errorf(format string, args ...interface{}) stateFn {
-	l.items <- item{
-		itemError,
-		fmt.Sprintf(format, args...),
-		l.line,
-	}
-	return nil
 }
 
 func isSpace(r rune) bool {

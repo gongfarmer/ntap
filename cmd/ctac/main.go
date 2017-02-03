@@ -42,5 +42,6 @@ func main() {
 		fmt.Println("Unable to convert text to atoms, got error ", err)
 		os.Exit(1)
 	}
+	fmt.Println("ctac: finished unmarshaling")
 
 }

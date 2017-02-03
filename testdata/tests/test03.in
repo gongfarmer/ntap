@@ -152,6 +152,7 @@ ROOT:CONT:
             ENUM:ENUM:+255
             ENUM:ENUM:39023
 	
+			CSTR:CSTR:"abc"
 			CSTR:CSTR:"A very exciting test\nstring!"
 			CSTR:CSTR:"""""A very exciting test\nstring!"""
 			USTR:USTR:""\\イロハニホヘト ホヘト ホヘ\n\r""""
