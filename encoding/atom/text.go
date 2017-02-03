@@ -72,12 +72,17 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 func (a *Atom) UnmarshalText(input []byte) error {
 	var err error
 	var l *lexer = lex("UnmarshalText", string(input))
-	for {
+	for ok := true; ok; {
+		var x item
 		select {
-		case x := <-l.items:
+		case x, ok = <-l.items:
+			if !ok {
+				break
+			}
 			fmt.Println(x)
 		}
 	}
+	fmt.Println("Finished unmarshaling")
 	return err
 }
 
@@ -107,7 +112,8 @@ const (
 	itemUUID                     // uuid value
 	itemIP32                     // uuid value
 	itemString                   // string value
-	itemCont                     // AtomContainer
+	itemContainerStart           // AtomContainer start
+	itemContainerEnd             // AtomContainer end
 	itemFourCharCode             // FCHR32 value
 	itemText                     // plain text  FIXME why do we have this??
 	itemError                    // error occured, value is text of error
@@ -278,11 +284,11 @@ func lexLine(l *lexer) stateFn {
 			l.ignore()
 		case r == eof:
 			break
-		case isAtomNameChar(r):
+		case isPrintableRune(r):
 			l.backup()
 			return lexAtomName
 		default:
-			return l.errorf("bad line start char: %q", l.buffer)
+			return l.errorf("bad line start char: %q", l.buffer())
 		}
 	}
 	// Correctly reached EOF.
@@ -294,6 +300,8 @@ func lexLine(l *lexer) stateFn {
 }
 
 func lexAtomName(l *lexer) stateFn {
+
+	fmt.Printf("pre So far, got  <<<%s>>>\n", l.buffer())
 	// If Atom name starts with 0x, check for 8 byte hex string
 	if l.accept("0") && l.accept("xX") {
 		l.acceptRun(hexDigits)
@@ -310,13 +318,18 @@ func lexAtomName(l *lexer) stateFn {
 		case 2, 3: // < 2 is not possible in here
 			// incomplete short atom name starts with 0x.  Weird, but OK.
 		default:
-			return l.errorf("badly formed atom name: %q", l.buffer)
+			return l.errorf("badly formed atom name: %q", l.buffer())
 		}
 	}
+	fmt.Printf("So far, got  <<<%s>>>\n", l.buffer())
 
-	// Try to get 4 printable chars. May already have one from if condition.
+	// Try to get 4 printable chars. May already have one.
 	for i := l.chars(); i < 4; i++ {
 		l.accept(printableChars)
+	}
+	if l.buffer() == "END" {
+		l.emit(itemContainerEnd)
+		return lexEndOfLine
 	}
 	if l.chars() == 4 && l.peek() == ':' {
 		l.emit(itemAtomName)
@@ -325,13 +338,14 @@ func lexAtomName(l *lexer) stateFn {
 
 	// Next char is not printable.
 	l.next()
-	return l.errorf("badly formed atom name: %q", l.buffer)
+	return l.errorf("badly formed atom name: %q", l.buffer())
 }
 
 func lexAtomType(l *lexer) stateFn {
 	if l.next() != ':' {
-		return l.errorf("expected `:' after atom name, got `%q'", l.buffer)
+		return l.errorf("expected `:' after atom name, got `%q'", l.buffer())
 	}
+	l.ignore()
 
 	// Try to get 4 printable chars.
 	for i := 0; i < 4; i++ {
@@ -339,8 +353,9 @@ func lexAtomType(l *lexer) stateFn {
 	}
 	if l.chars() == 4 && l.peek() == ':' {
 		atyp := l.buffer()
-		l.next()
 		l.emit(itemAtomType)
+		l.next()
+		l.ignore() // discard trailing colon
 
 		switch atyp {
 		case "CONT", "NULL":
@@ -364,8 +379,7 @@ func lexAtomType(l *lexer) stateFn {
 		}
 	}
 
-	l.next()
-	return l.errorf("badly formed atom type: `%q'", l.buffer)
+	return l.errorf("badly formed atom type: '%q'", l.buffer())
 }
 
 // example: uuid:UUID:64881431-B6DC-478E-B7EE-ED306619C797
@@ -383,7 +397,7 @@ func lexUUID(l *lexer) stateFn {
 		l.emit(itemUUID)
 		return lexEndOfLine
 	}
-	return l.errorf("badly formed UUID value: `%q'", l.buffer)
+	return l.errorf("badly formed UUID value: `%q'", l.buffer())
 }
 func lexIP32(l *lexer) stateFn {
 	l.acceptRun(digits)
@@ -394,7 +408,7 @@ func lexIP32(l *lexer) stateFn {
 	l.accept(".")
 	l.acceptRun(digits)
 	if l.chars() > 15 || l.chars() < 7 { // min/max IPv4 string length
-		return l.errorf("badly formed IPv4 value: `%q'", l.buffer)
+		return l.errorf("badly formed IPv4 value: `%q'", l.buffer())
 	}
 	l.emit(itemIP32)
 	return lexEndOfLine
@@ -403,7 +417,7 @@ func lexIP32(l *lexer) stateFn {
 func lexFraction(l *lexer) stateFn {
 	lexNumber(l)
 	if !l.accept("/") {
-		return l.errorf("fractional type lacks divider: ", l.buffer)
+		return l.errorf("fractional type lacks divider: ", l.buffer())
 	}
 	l.emit(itemFractionDivider)
 	return lexNumber(l)
@@ -447,7 +461,7 @@ func lexNumber(l *lexer) stateFn {
 
 	// Next thing mustn't be alphanumeric.
 	if l.accept(alphaNumericChars) {
-		return l.errorf("bad number syntax: %q", l.buffer)
+		return l.errorf("bad number syntax: %q", l.buffer())
 	}
 	l.emit(itemNumber)
 	return lexEndOfLine
@@ -529,7 +543,7 @@ func (l *lexer) errorf(format string, args ...interface{}) stateFn {
 }
 
 func isSpace(r rune) bool {
-	whitespaceChars := "\x09\x20" // tab or space
+	whitespaceChars := " \v\t\r\n" // tab or space
 	return strings.ContainsRune(whitespaceChars, r)
 }
 
@@ -555,4 +569,8 @@ func isAlphaNumeric(buf []byte) bool {
 		}
 	}
 	return true
+}
+
+func isPrintableRune(r rune) bool {
+	return strings.ContainsRune(printableChars, r)
 }
