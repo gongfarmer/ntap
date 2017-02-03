@@ -1,0 +1,54 @@
+EMPT:CONT:
+	empt:DATA:
+	fc32:FC32:'data'
+	fc32:FC32:0xFFFFFFFF
+	null:NULL:
+	null:NULL:
+	cstr:CSTR:""
+	cstr:CSTR:""
+	cstr:CSTR:""
+	cstr:CSTR:"\"unmatched quote"
+	cstr:CSTR:"'unmatched quote"
+	cstr:CSTR:"dog"
+	snum:CSTR:"1"
+	shex:CSTR:"0xFFCC0011"
+	ustr:USTR:""
+	ustr:USTR:""
+	ustr:USTR:""
+	ustr:USTR:"\"unmatched quote"
+	ustr:USTR:"'unmatched quote"
+	ustr:USTR:"dog"
+	snum:USTR:"1"
+	shex:USTR:"0xFFCC0011"
+	ipad:USTR:""
+	ipad:USTR:""
+	ipad:IPAD:"::"
+	ipad:IPAD:"::"
+	empt:DATA:
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+	END
+	cont:CONT:
+		empt:DATA:
+		empt:DATA:
+		empt:DATA:
+		empt:DATA:
+	END
+END

@@ -1,0 +1,58 @@
+# Test of all the types that can have empty values.
+# An empty DATA is properly encoded by ctac, but this does not work for CNCT/cnct.
+# Also testing giving data to types that should not have data (eg. CONT)
+# Also unmatched parens in string types
+EMPT:CONT:
+    empt:DATA:
+    fc32:FC32:data
+    fc32:FC32:0xFFFFFFFF
+    null:NULL:
+    null:NULL:                                    
+		cstr:CSTR:
+		cstr:CSTR:""
+		cstr:CSTR:"
+		cstr:CSTR:"unmatched quote
+		cstr:CSTR:'unmatched quote
+		cstr:CSTR:"dog"
+		snum:CSTR:1
+		shex:CSTR:0xFFCC0011
+		ustr:USTR:
+		ustr:USTR:""
+		ustr:USTR:"
+		ustr:USTR:"unmatched quote
+		ustr:USTR:'unmatched quote
+		ustr:USTR:"dog"
+		snum:USTR:1
+		shex:USTR:0xFFCC0011
+		ipad:USTR:
+		ipad:USTR:""
+		ipad:IPAD:
+		ipad:IPAD:""
+		empt:DATA:
+	  cont:CONT:'four char code'
+		END
+	  cont:CONT:             'spaces before data'
+		END
+	  cont:CONT: 'unmatched quote
+		END
+	  cont:CONT: "unmatched quote
+		END
+	  cont:CONT:"the quick brown fox"
+		END
+	  cont:CONT:0xFFCC0011
+		END
+	  cont:CONT:0x
+		END
+	  cont:CONT:hello
+		END
+	  cont:CONT:""
+		END
+	  cont:CONT:
+		END
+	  cont:CONT:""
+		    empt:DATA:
+		    empt:DATA:
+		    empt:DATA:
+		    empt:DATA:
+    END
+END

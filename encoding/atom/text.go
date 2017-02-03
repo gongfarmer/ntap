@@ -1,9 +1,10 @@
 package atom
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
+	"strings"
+	"unicode/utf8"
 )
 
 // Enable reading and writing of text format ADE AtomContainers by fulfilling
@@ -29,6 +30,9 @@ import (
 //     	   UnmarshalText(text []byte) error
 //     }
 
+/**********************************************************/
+// Marshaling from Atom to text
+/**********************************************************/
 // Write Atom object to a byte slice in ADE ContainerText format.
 func (a *Atom) MarshalText() (text []byte, err error) {
 	buf := atomToTextBuffer(a, 0)
@@ -54,20 +58,446 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 		}
 		fmt.Fprintf(&output, "% *sEND\n", depth*4, "")
 	}
-
 	return output
 }
 
-// UnmarshalText gets called on a zero-value Atom reciever, and populates it
+/**********************************************************/
+// Unmarshaling from text to Atom
+/**********************************************************/
+
+// UnmarshalText gets called on a zero-value Atom receiver, and populates it
 // based on the contents of the argument string, which contains an ADE
 // ContainerText reprentation with a single top-level CONT atom.
 // "#" comments are not allowed within this text string.
-func (a *Atom) UnMarshalText(input []byte) error {
+func (a *Atom) UnmarshalText(input []byte) error {
 	var err error
-	scanner := bufio.NewScanner(bytes.NewReader(input))
-	for scanner.Scan() {
-		_ = scanner.Text()
-	}
-	err = scanner.Err()
+	var l lexer = *lex("UnmarshalText", string(input))
 	return err
+}
+
+// Lexer / parser design is based on a talk from Rob Pike.
+//   https://talks.golang.org/2011/lex.slide
+// That describes an early version of go standard lib text/template/parse/lex.go
+
+// The lexer is a state machine with each state implemented as a function
+// (stateFn) which takes the lexer state as an argument, and returns the next
+// state function which should run.
+// The lexer and parser run concurrently in separate goroutines. This is done
+// for lexer/parser code separation, not for performance.
+// The lexer sends tokens to the parser over a channel.
+
+const (
+	digits                    = "0123456789"
+	hexDigits                 = "0123456789abcdefABCDEF"
+	whitespaceChars           = "\t\r "
+	eof                       = -1
+	_                itemEnum = iota
+	itemAtomName              // atom name field
+	itemAtomType              // atom type field
+	itemAtomData              // atom data field
+	itemSep                   // separator ":"
+	itemNumber                // number within data field
+	itemString                // string value
+	itemCont                  // AtomContainer
+	itemFourCharCode          // FCHR32 value
+	itemText                  // plain text  FIXME why do we have this??
+	itemError                 // error occured, value is text of error
+	itemEOF                   // end of input
+)
+
+var printableChars = strPrintableChars()
+var alphaNumericChars = strAlphaNumeric()
+
+// returns string of all printable chars < ascii 127, excludes whitespace
+func strPrintableChars() string {
+	var b []byte = make([]byte, 0, 0x7f-0x21) // ascii char values
+	for c := byte(0x21); c < 0x7f; c++ {
+		b = append(b, c)
+	}
+	return string(b)
+}
+
+// returns string of all alphanumeric chars < ascii 127
+func strAlphaNumeric() string {
+	var b []byte = make([]byte, 62)
+	for c := '0'; c < '9'; c++ {
+		b = append(b, byte(c))
+	}
+	for c := 'a'; c < 'z'; c++ {
+		b = append(b, byte(c))
+	}
+	for c := 'A'; c < 'Z'; c++ {
+		b = append(b, byte(c))
+	}
+	return string(b)
+}
+
+type (
+	itemEnum int
+	stateFn  func(*lexer) stateFn
+
+	// item represents a token returned from the scanenr
+	item struct {
+		typ  itemEnum // type of item, such as itemName/itemType/itemData
+		val  string   // Value, such as "23.2"
+		line uint32   // line number at the start of this line
+	}
+
+	// lexer holds the state of the scanner
+	lexer struct {
+		name  string    // used only for error reports
+		input string    // the string being scanned
+		start uint32    // start position of this item
+		width int       // width of last rune read from input
+		items chan item // channel of scanned items
+		pos   uint32    // current string offset
+		line  uint32    // 1+number of newlines seen
+	}
+)
+
+func (i item) String() string {
+	switch {
+	case i.typ == itemEOF:
+		return "EOF"
+	case i.typ == itemError:
+		return i.val
+	case len(i.val) > 10:
+		return fmt.Sprintf("%.10q...", i.val)
+	}
+	return fmt.Sprintf("%q", i.val)
+}
+
+func lex(name, input string) *lexer {
+	l := &lexer{
+		name:  name,
+		input: input,
+		items: make(chan item),
+	}
+	go l.run() // Concurrently run state machine
+	return l
+}
+
+// run lexes the input by executing state functions until the state is nil.
+func (l *lexer) run() {
+	for state := lexLine; state != nil; {
+		state = state(l)
+	}
+	close(l.items) // No more tokens will be delivered
+}
+
+// next returns the next rune in the input.
+func (l *lexer) next() (r rune) {
+	if int(l.pos) >= len(l.input) {
+		l.width = 0
+		return eof
+	}
+	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
+	l.pos += uint32(l.width)
+	if r == '\n' {
+		l.line++
+	}
+	return
+}
+
+// ignore skips over the pending input before this point.
+func (l *lexer) ignore() {
+	l.start = l.pos
+}
+
+// backup steps back one rune.
+// Can only be called once per call of next.
+func (l *lexer) backup() {
+	l.pos -= uint32(l.width)
+}
+
+// peek returns but does not consume the next rune in the input.
+func (l *lexer) peek() rune {
+	r := l.next()
+	l.backup()
+	return r
+}
+
+// accept consumes the next rune if it's from the valid set.
+func (l *lexer) accept(valid string) bool {
+	if strings.IndexRune(valid, l.next()) >= 0 {
+		return true
+	}
+	l.backup()
+	return false
+}
+
+// acceptRun consumes a run of runes from the valid set.
+// Returns a count of runes consumed.
+func (l *lexer) acceptRun(valid string) int {
+	i := 0
+	for strings.IndexRune(valid, l.next()) >= 0 {
+		i++
+	}
+	l.backup()
+	return i
+}
+
+// token emitter
+func (l *lexer) emit(t itemEnum) {
+	l.items <- item{t, l.input[l.start:l.pos], l.line}
+	l.start = l.pos
+}
+
+// chars returns a count of the chars seen in the current value
+func (l *lexer) chars() int {
+	return int(l.pos - l.start)
+}
+
+// Return the characters seen so far in the current value
+func (l *lexer) buffer() string {
+	return l.input[l.start:l.pos]
+}
+
+// first returns the first rune in the value
+func (l *lexer) first() rune {
+	if l.chars() == 0 {
+		panic("Can't return first char from empty buffer")
+	}
+	return rune(l.input[0])
+}
+
+func lexLine(l *lexer) stateFn {
+	for {
+		r := l.next()
+		switch {
+		case isSpace(r):
+			l.ignore()
+		case r == eof:
+			break
+		case isAtomNameChar(r):
+			l.backup()
+			return lexAtomName
+		default:
+			return l.errorf("bad line start char: %q", l.buffer)
+		}
+	}
+	// Correctly reached EOF.
+	if l.pos > l.start {
+		l.emit(itemText)
+	}
+	l.emit(itemEOF)
+	return nil // Stop the run loop
+}
+
+func lexAtomName(l *lexer) stateFn {
+	var chars uint32
+
+	// If Atom name starts with 0x, check for 8 byte hex string
+	if l.accept("0") && l.accept("xX") {
+		l.acceptRun(hexDigits)
+
+		switch l.chars() {
+		case 10: // got a complete hex atom name
+			l.emit(itemAtomName)
+			return lexAtomType
+		case 4: // complete short atom name starts with 0x.  Weird, but OK.
+			if l.peek() == ':' {
+				l.emit(itemAtomName)
+				return lexAtomType
+			}
+		case 2, 3: // < 2 is not possible in here
+			// incomplete short atom name starts with 0x.  Weird, but OK.
+		default:
+			return l.errorf("badly formed atom name: %q", l.buffer)
+		}
+	}
+
+	// Try to get 4 printable chars. May already have one from if condition.
+	for i := l.chars(); i < 4; i++ {
+		l.accept(printableChars)
+	}
+	if l.chars() == 4 && l.peek() == ':' {
+		l.emit(itemAtomName)
+		return lexAtomType
+	}
+
+	// Next char is not printable.
+	l.next()
+	return l.errorf("badly formed atom name: %q", l.buffer)
+}
+
+func lexAtomType(l *lexer) stateFn {
+	if l.next() != ':' {
+		return l.errorf("expected `:' after atom name, got `%q'", l.buffer)
+	}
+
+	// Try to get 4 printable chars.
+	for i := 0; i < 4; i++ {
+		l.next()
+	}
+	if l.chars() == 4 && l.peek() == ':' {
+		l.emit(itemAtomType)
+		l.next()
+
+		switch l.buffer() {
+		case "CONT", "NULL":
+			return lexEndOfLine
+		case "UUID":
+			return lexUUID
+		case "UR32", "UR64", "SR32", "SR64":
+			return lexFraction
+		case "DATA", "CNCT", "Cnct":
+			return lexHexData
+		case "IPAD":
+			return lexIPAD
+		case "IP32":
+			return lexIP32
+		default:
+			return lexAtomData // handles strings or numbers
+		}
+	}
+
+	l.next()
+	return l.errorf("badly formed atom type: `%q'", l.buffer)
+}
+
+func lexUUID(l *lexer) stateFn {
+}
+
+func lexAtomData(l *lexer) stateFn {
+	nextRune := l.peek()
+	switch nextRune {
+	case '\'':
+		return lexFourCharCode
+	case '"':
+		return lexString
+	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-':
+		return lexNumber
+	}
+
+	l.next()
+	return l.errorf("badly formed atom data, starts with: `%q'", l.buffer)
+}
+
+func lexNumber(l *lexer) stateFn {
+	l.accept("+-") // Optional leading sign.
+
+	digits := "0123456789"
+	if l.accept("0") && l.accept("xX") { // Is it hex?
+		digits = hexDigits
+	}
+	l.acceptRun(digits)
+	if l.accept(".") {
+		l.acceptRun(digits)
+	}
+	if l.accept("eE") {
+		l.accept("+-")
+		l.acceptRun("0123456789")
+	}
+
+	// Next thing mustn't be alphanumeric.
+	if l.accept(alphaNumericChars) {
+		return l.errorf("bad number syntax: %q", l.buffer)
+	}
+	l.emit(itemNumber)
+	return lexInsideAction
+}
+
+func lexFourCharCode(l *lexer) stateFn {
+	// Read in single quote
+	if l.next() != '\'' {
+		fmt := "expected single quote to start four-char code value, got `%q'"
+		return l.errorf(fmt, l.first())
+	}
+
+	// Read in chars
+	for i := 0; i < 4; i++ {
+		l.next()
+	}
+	if l.chars() < 4 {
+		fmt := "insufficient chars for four-char code value, got `%q'"
+		return l.errorf(fmt, l.buffer())
+	}
+	if !isPrintableString(l.buffer()) {
+		fmt := "invalid chars for four-char code value, got these (shown in hex:) %X"
+		return l.errorf(fmt, l.input[l.start+1:l.pos]) // skips leading single quote
+	}
+
+	// Read in single quote
+	if l.next() != '\'' {
+		fmt := "expected single quote to end four-char code value, got: %q"
+		return l.errorf(fmt, l.buffer())
+	}
+
+	l.emit(itemFourCharCode)
+	return lexEndOfLine
+}
+
+func lexEndOfLine(l *lexer) stateFn {
+	l.acceptRun(whitespaceChars)
+	if l.accept("\n") {
+		return lexLine
+	}
+
+	fmt := "trailing characters at end of line: %q"
+	return l.errorf(fmt, l.buffer())
+}
+
+func lexString(l *lexer) stateFn {
+	// Read in double quote
+	if l.next() != '"' {
+		fmt := "expected double quote to start string value, got `%q'"
+		return l.errorf(fmt, l.first())
+	}
+
+	// Read in chars
+	for {
+		r := l.next()
+		switch r {
+		case '\\':
+			l.accept("\"")
+		case '"':
+			break
+		case '\n':
+			return l.errorf("unterminated string data, got %q", l.buffer(), l.buffer())
+		}
+	}
+
+	l.emit(itemString)
+	return lexEndOfLine
+}
+
+// error returns an error token and terminates the scan by passing back a nil
+// pointer that will be the next state, terminating l.run.
+func (l *lexer) errorf(format string, args ...interface{}) stateFn {
+	l.items <- item{
+		itemError,
+		fmt.Sprintf(format, args...),
+		l.line,
+	}
+	return nil
+}
+
+func isSpace(r rune) bool {
+	whitespaceChars := "\x09\x20" // tab or space
+	return strings.ContainsRune(whitespaceChars, r)
+}
+
+func isAtomNameChar(r rune) bool {
+	// multibyte UTF8 is allowed within strings, but not within an FC32
+	if utf8.RuneLen(r) > 1 {
+		return false
+	}
+
+	// check for byte value within ascii printable range
+	b := byte(r)
+	if b < 0x21 || b > 0x7f {
+		return false
+	}
+
+	return true
+}
+
+func isAlphaNumeric(buf []byte) bool {
+	for _, c := range buf {
+		if !strings.ContainsRune(alphaNumericChars, rune(c)) {
+			return false
+		}
+	}
+	return true
 }
