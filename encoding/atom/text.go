@@ -72,7 +72,12 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 func (a *Atom) UnmarshalText(input []byte) error {
 	var err error
 	var l *lexer = lex("UnmarshalText", string(input))
-	fmt.Println(l.items)
+	for {
+		select {
+		case x := <-l.items:
+			fmt.Println(x)
+		}
+	}
 	return err
 }
 

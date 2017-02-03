@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
@@ -13,13 +15,13 @@ a binary file containing the same data in the ADE binary container format.
 `
 
 func main() {
-	if len(os.args) < 2 {
+	if len(os.Args) < 2 {
 		fmt.Println("Please provide input filename of a text file.\n")
 		os.Exit(1)
 	}
-	inFile = os.args[1]
+	inFile := os.Args[1]
 
-	//if len(os.args) < 3 {
+	//if len(os.argv) < 3 {
 	//	fmt.Println("Please provide output filename for a binary file.\n")
 	//	os.Exit(1)
 	//}
@@ -27,16 +29,17 @@ func main() {
 
 	var a atom.Atom
 	var buf []byte
+	var err error
 
-	if buf, e := ioutil.Readfile(inFile); e != nil {
-		fmt.Println("Unable to read input file, got error ", e)
+	if buf, err = ioutil.ReadFile(inFile); err != nil {
+		fmt.Println("Unable to read input file, got error ", err)
 		os.Exit(1)
 	}
 
 	// FIXME strip out comments
 
-	if e = a.UnmarshalText(buf); e != nil {
-		fmt.Println("Unable to convert text to atoms, got error ", e)
+	if err = a.UnmarshalText(buf); err != nil {
+		fmt.Println("Unable to convert text to atoms, got error ", err)
 		os.Exit(1)
 	}
 
