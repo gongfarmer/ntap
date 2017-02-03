@@ -71,7 +71,8 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 // "#" comments are not allowed within this text string.
 func (a *Atom) UnmarshalText(input []byte) error {
 	var err error
-	var l lexer = *lex("UnmarshalText", string(input))
+	var l *lexer = lex("UnmarshalText", string(input))
+	fmt.Println(l.items)
 	return err
 }
 
@@ -87,22 +88,25 @@ func (a *Atom) UnmarshalText(input []byte) error {
 // The lexer sends tokens to the parser over a channel.
 
 const (
-	digits                    = "0123456789"
-	hexDigits                 = "0123456789abcdefABCDEF"
-	whitespaceChars           = "\t\r "
-	eof                       = -1
-	_                itemEnum = iota
-	itemAtomName              // atom name field
-	itemAtomType              // atom type field
-	itemAtomData              // atom data field
-	itemSep                   // separator ":"
-	itemNumber                // number within data field
-	itemString                // string value
-	itemCont                  // AtomContainer
-	itemFourCharCode          // FCHR32 value
-	itemText                  // plain text  FIXME why do we have this??
-	itemError                 // error occured, value is text of error
-	itemEOF                   // end of input
+	digits                       = "0123456789"
+	hexDigits                    = "0123456789abcdefABCDEF"
+	whitespaceChars              = "\t\r "
+	eof                          = -1
+	_                   itemEnum = iota
+	itemAtomName                 // atom name field
+	itemAtomType                 // atom type field
+	itemAtomData                 // atom data field
+	itemSep                      // separator ":"
+	itemFractionDivider          // separator ":"
+	itemNumber                   // number within data field
+	itemUUID                     // uuid value
+	itemIP32                     // uuid value
+	itemString                   // string value
+	itemCont                     // AtomContainer
+	itemFourCharCode             // FCHR32 value
+	itemText                     // plain text  FIXME why do we have this??
+	itemError                    // error occured, value is text of error
+	itemEOF                      // end of input
 )
 
 var printableChars = strPrintableChars()
@@ -285,8 +289,6 @@ func lexLine(l *lexer) stateFn {
 }
 
 func lexAtomName(l *lexer) stateFn {
-	var chars uint32
-
 	// If Atom name starts with 0x, check for 8 byte hex string
 	if l.accept("0") && l.accept("xX") {
 		l.acceptRun(hexDigits)
@@ -331,10 +333,11 @@ func lexAtomType(l *lexer) stateFn {
 		l.next()
 	}
 	if l.chars() == 4 && l.peek() == ':' {
-		l.emit(itemAtomType)
+		atyp := l.buffer()
 		l.next()
+		l.emit(itemAtomType)
 
-		switch l.buffer() {
+		switch atyp {
 		case "CONT", "NULL":
 			return lexEndOfLine
 		case "UUID":
@@ -347,8 +350,12 @@ func lexAtomType(l *lexer) stateFn {
 			return lexIPAD
 		case "IP32":
 			return lexIP32
+		case "USTR", "CSTR":
+			return lexString
+		case "FC32":
+			return lexFourCharCode
 		default:
-			return lexAtomData // handles strings or numbers
+			return lexNumber
 		}
 	}
 
@@ -356,22 +363,65 @@ func lexAtomType(l *lexer) stateFn {
 	return l.errorf("badly formed atom type: `%q'", l.buffer)
 }
 
+// example: uuid:UUID:64881431-B6DC-478E-B7EE-ED306619C797
 func lexUUID(l *lexer) stateFn {
+	l.acceptRun(hexDigits)
+	l.accept("-")
+	l.acceptRun(hexDigits)
+	l.accept("-")
+	l.acceptRun(hexDigits)
+	l.accept("-")
+	l.acceptRun(hexDigits)
+	l.accept("-")
+	l.acceptRun(hexDigits)
+	if l.chars() == 36 { // size of well-formed UUID
+		l.emit(itemUUID)
+		return lexEndOfLine
+	}
+	return l.errorf("badly formed UUID value: `%q'", l.buffer)
+}
+func lexIP32(l *lexer) stateFn {
+	l.acceptRun(digits)
+	l.accept(".")
+	l.acceptRun(digits)
+	l.accept(".")
+	l.acceptRun(digits)
+	l.accept(".")
+	l.acceptRun(digits)
+	if l.chars() > 15 || l.chars() < 7 { // min/max IPv4 string length
+		return l.errorf("badly formed IPv4 value: `%q'", l.buffer)
+	}
+	l.emit(itemIP32)
+	return lexEndOfLine
 }
 
-func lexAtomData(l *lexer) stateFn {
-	nextRune := l.peek()
-	switch nextRune {
-	case '\'':
-		return lexFourCharCode
-	case '"':
-		return lexString
-	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-':
-		return lexNumber
+func lexFraction(l *lexer) stateFn {
+	lexNumber(l)
+	if !l.accept("/") {
+		return l.errorf("fractional type lacks divider: ", l.buffer)
 	}
+	l.emit(itemFractionDivider)
+	return lexNumber(l)
+}
 
+func lexIPAD(l *lexer) stateFn {
+	if !l.accept("\"") {
+		return l.errorf("IPAD type should start with double quote")
+	}
+	ipadChars := strings.Join([]string{hexDigits, ".:"}, "")
+	l.acceptRun(ipadChars)
+	l.accept("\"")
+	return lexEndOfLine
+}
+
+func lexHexData(l *lexer) stateFn {
 	l.next()
-	return l.errorf("badly formed atom data, starts with: `%q'", l.buffer)
+	l.next()
+	if l.buffer() != "0x" {
+		return l.errorf("hex data type should start with 0x")
+	}
+	l.acceptRun(hexDigits)
+	return lexEndOfLine
 }
 
 func lexNumber(l *lexer) stateFn {
@@ -395,7 +445,7 @@ func lexNumber(l *lexer) stateFn {
 		return l.errorf("bad number syntax: %q", l.buffer)
 	}
 	l.emit(itemNumber)
-	return lexInsideAction
+	return lexEndOfLine
 }
 
 func lexFourCharCode(l *lexer) stateFn {
