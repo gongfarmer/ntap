@@ -3,6 +3,7 @@ package atom
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -61,28 +62,34 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	return output
 }
 
-/**********************************************************/
-// Unmarshaling from text to Atom
-/**********************************************************/
+/**********************************************************
+ Unmarshaling from text to Atom - Lexer
+ Identifies token strings (and structure problems) in input text
+**********************************************************/
 
 // UnmarshalText gets called on a zero-value Atom receiver, and populates it
 // based on the contents of the argument string, which contains an ADE
 // ContainerText reprentation with a single top-level CONT atom.
 // "#" comments are not allowed within this text string.
-func (a *Atom) UnmarshalText(input []byte) error {
-	var err error
+func (a *Atom) UnmarshalText(input []byte) (err error) {
+	// Convert text into Atom values
+	var atoms []Atom
 	var l *lexer = lex("UnmarshalText", string(input))
-	for ok := true; ok; {
-		var x item
-		select {
-		case x, ok = <-l.items:
-			if !ok {
-				break
-			}
-			fmt.Println(x)
-		}
+	atoms, err = parse(l.items)
+	if err != nil {
+		return
 	}
-	return err
+
+	// Set receiver to the (unique) top-level AtomContainer
+	switch len(atoms) {
+	case 0:
+		err = fmt.Errorf("no atoms found in text")
+	case 1:
+		*a = atoms[0]
+	default:
+		err = fmt.Errorf("multiple atoms found in text")
+	}
+	return
 }
 
 // Lexer / parser design is based on a talk from Rob Pike.
@@ -102,12 +109,12 @@ const (
 	whitespaceChars              = "\t\r "
 	eof                          = -1
 	_                   itemEnum = iota
-	itemAtomName                 // atom name field
-	itemAtomType                 // atom type field
+	itemAtomName                 // atom name
+	itemAtomType                 // atom type
 	itemFractionDivider          // separator ":"
-	itemNumber                   // number within data field
+	itemNumber                   // number value
 	itemUUID                     // uuid value
-	itemNULL                     // uuid value
+	itemNULL                     // null value
 	itemIP32                     // IP32 value (1 byte per octet IPv4)
 	itemString                   // string value
 	itemContainerStart           // AtomContainer start
@@ -609,4 +616,91 @@ func isAlphaNumeric(buf []byte) bool {
 
 func isPrintableRune(r rune) bool {
 	return strings.ContainsRune(printableChars, r)
+}
+
+/**********************************************************
+ Unmarshaling from text to Atom - Parser
+ Converts token strings into Atom instances, detects invalid values
+**********************************************************/
+
+type parserState struct {
+	atoms []Atom
+	items <-chan item
+}
+
+type parseFunc func(name string, p *parserState) error
+
+var parseType = make(map[string]parseFunc, 32)
+
+func init() {
+	parseType["UI01"] = parseUI01
+	//	parseType["UI08"] = parseUI08
+	//	parseType["UI16"] = parseUI16
+	//	parseType["UI32"] = parseUI32
+	//	parseType["UI64"] = parseUI64
+	//	parseType["SI08"] = parseSI08
+	//	parseType["SI16"] = parseSI16
+	//	parseType["SI32"] = parseSI32
+	//	parseType["SI64"] = parseSI64
+	//	parseType["FP32"] = parseFP32
+	//	parseType["FP64"] = parseFP64
+	//	parseType["UF32"] = parseUF32
+	//	parseType["UF64"] = parseUF64
+	//	parseType["SF32"] = parseSF32
+	//	parseType["SF64"] = parseSF64
+	//	parseType["UR32"] = parseUR32
+	//	parseType["UR64"] = parseUR64
+	//	parseType["SR32"] = parseSR32
+	//	parseType["SR64"] = parseSR64
+	//	parseType["FC32"] = parseFC32
+	//	parseType["IP32"] = parseIP32
+	//	parseType["IPAD"] = parseIPAD
+	//	parseType["CSTR"] = parseCSTR
+	//	parseType["USTR"] = parseUSTR
+	//	parseType["DATA"] = parseDATA
+	//	parseType["ENUM"] = parseENUM
+	//	parseType["UUID"] = parseUUID
+	//	parseType["NULL"] = parseNULL
+	//	parseType["CNCT"] = parseDATA
+	//	parseType["cnct"] = parseDATA
+	//	parseType["CONT"] = parseCONT
+}
+
+func parseUI01(name string, p *parserState) (err error) {
+	// Validate token string
+	var i item
+	i, err = <-p.items
+	if err != nil {
+		return
+	}
+
+	// Convert token strings to atom
+	var a Atom
+	var value uint64
+	if item.typ == itemNumber {
+		a, err := strconv.ParseUint(strValue)
+	}
+	return
+}
+
+func parse(items <-chan item) (atoms []Atom, err error) {
+	var state = parserState{atoms, items}
+	var i item
+	for ok := true; ok; {
+		select {
+		case i, ok = <-items:
+			if !ok {
+				break
+			}
+			err = parseItem(i, state)
+			if err != nil {
+				ok = false
+			}
+		}
+	}
+	return
+}
+
+func parseItem(i item, p parserState) (err error) {
+	return
 }
