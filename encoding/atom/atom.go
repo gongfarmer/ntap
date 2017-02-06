@@ -16,19 +16,19 @@ import (
 	"unicode"
 )
 
-// Verify that atom meets encoding interfaces at compile time
+// Verify that type atom meets encoding interfaces at compile time
 var _ encoding.BinaryUnmarshaler = &(Atom{})
 
 // var _ encoding.BinaryMarshaler = Atom{}
-// var _ encoding.TextUnmarshaler = Atom{}
+var _ encoding.TextUnmarshaler = &(Atom{})
 var _ encoding.TextMarshaler = &(Atom{})
 
 type Atom struct {
 	Name     string
-	Type     ADEType
 	Value    *codec
-	data     []byte
 	Children []*Atom
+	typ      ADEType
+	data     []byte
 }
 type ADEType string
 type GoType string
@@ -51,6 +51,43 @@ func isPrintableBytes(buf []byte) bool {
 	return true
 }
 
+// Read-only access to ADE data type
+func (a *Atom) Type() ADEType {
+	return a.typ
+}
+
+// Set atom type.
+// Get a codec that can write/read this ADE type.
+// Allocate proper amount of backing memory for non-String types.
+func (a *Atom) SetType(newType ADEType) {
+	a.typ = newType
+	a.Value = NewCodec(a)
+	a.ZeroData()
+}
+
+// Set atom data to zero value of its ADE type.
+// Allocate the correct amount of backing memory.
+func (a *Atom) ZeroData() {
+	switch a.typ {
+	case UI08, SI08:
+		a.data = make([]byte, 1)
+	case UI16, SI16:
+		a.data = make([]byte, 2)
+	case UI01, UI32, SI32, FP32, UF32, SF32, SR32, UR32, FC32, IP32:
+		a.data = make([]byte, 4)
+	case UI64, SI64, FP64, UF64, SF64, UR64, SR64:
+		a.data = make([]byte, 8)
+	case UUID:
+		a.data = make([]byte, 36)
+	case IPAD, CSTR, USTR, DATA, ENUM, CNCT, Cnct:
+		a.data = make([]byte, 0)
+	case CONT, NULL:
+		a.data = make([]byte, 0)
+	default:
+		panic(fmt.Sprintf("Unknown ADE type: %s", string(a.typ)))
+	}
+}
+
 func (a Atom) String() string {
 	buf, err := a.MarshalText()
 	if err != nil {
@@ -60,7 +97,7 @@ func (a Atom) String() string {
 }
 
 func (c *Atom) addChild(a *Atom) {
-	if c.Type == "CONT" {
+	if c.Type() == CONT {
 		c.Children = append(c.Children, a)
 	} else {
 		panic(fmt.Errorf("Cannot add child to non-CONT atom %s:%s", c.Name, c.Type))

@@ -61,6 +61,7 @@ const (
 /**********************************************************/
 
 type (
+	// FIXME: switch these to interfaces?
 	decoder struct {
 		String      func(buf []byte) (string, error)
 		StringRaw   func(buf []byte) (string, error)
@@ -96,8 +97,8 @@ type (
 func NewCodec(a *Atom) *codec {
 	c := codec{
 		Atom:    a,
-		Decoder: decoderByType[a.Type],
-		Encoder: encoderByType[a.Type],
+		Decoder: decoderByType[a.Type()],
+		Encoder: encoderByType[a.Type()],
 		Writer:  bytes.NewBuffer(a.data), // allows writing directly to a.data, not a copy
 	}
 	return &c

@@ -43,7 +43,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	var output bytes.Buffer
 
 	// write atom name,type,data
-	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", a.Name, a.Type)
+	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", a.Name, a.Type())
 	s, err := a.Value.String()
 	if err != nil {
 		panic(fmt.Errorf("conversion of atom to text failed: %s", err))
@@ -51,7 +51,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	fmt.Fprintln(&output, s)
 
 	// write children
-	if a.Type == CONT {
+	if a.Type() == CONT {
 		for _, childPtr := range a.Children {
 			buf := atomToTextBuffer(childPtr, depth+1)
 			output.Write(buf.Bytes())
@@ -72,7 +72,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 // "#" comments are not allowed within this text string.
 func (a *Atom) UnmarshalText(input []byte) (err error) {
 	// Convert text into Atom values
-	var atoms []Atom
+	var atoms []*Atom
 	var l *lexer = lex(string(input))
 	atoms, err = parse(l.items)
 	if err != nil {
@@ -84,9 +84,9 @@ func (a *Atom) UnmarshalText(input []byte) (err error) {
 	case 0:
 		err = fmt.Errorf("no atoms found in text")
 	case 1:
-		*a = atoms[0]
+		*a = *atoms[0]
 	default:
-		err = fmt.Errorf("multiple atoms found in text")
+		err = fmt.Errorf("multiple atoms (%d) found in text", len(atoms))
 	}
 	return
 }
@@ -103,39 +103,37 @@ func (a *Atom) UnmarshalText(input []byte) (err error) {
 // The lexer sends tokens to the parser over a channel.
 
 const (
-	digits                       = "0123456789"
-	hexDigits                    = "0123456789abcdefABCDEF"
-	whitespaceChars              = "\t\r "
-	eof                          = -1
-	numOfADETypes                = 32
-	_                   itemEnum = iota
-	itemAtomName                 // atom name
-	itemAtomType                 // atom type
-	itemFractionDivider          // separator ":"
-	itemNumber                   // number value
-	itemUUID                     // uuid value
-	itemNULL                     // null value
-	itemIP32                     // IP32 value (1 byte per octet IPv4)
-	itemString                   // string value
-	itemContainerStart           // AtomContainer start
-	itemContainerEnd             // AtomContainer end
-	itemFourCharCode             // FCHR32 value
-	itemError                    // error occured, value is text of error
-	itemEOF                      // end of input
+	digits              = "0123456789"
+	hexDigits           = "0123456789abcdefABCDEF"
+	whitespaceChars     = "\t\r "
+	eof                 = -1
+	numOfADETypes       = 32
+	itemAtomName        = "iName"   // atom name
+	itemAtomType        = "iType"   // atom type
+	itemFractionDivider = "iFrac"   // separator ":"
+	itemNumber          = "iNumb"   // number value
+	itemUUID            = "iUUID"   // uuid value
+	itemNULL            = "iNULL"   // null value
+	itemIP32            = "iIP32"   // IP32 value (1 byte per octet IPv4)
+	itemString          = "iString" // string value
+	itemContainerEnd    = "iEND"    // AtomContainer end
+	itemFourCharCode    = "iFC32"   // FCHR32 value
+	itemError           = "iErr"    // error occured, value is text of error
+	itemEOF             = "iEOF"    // end of input
 )
 
 var printableChars = strPrintableChars()
 var alphaNumericChars = strAlphaNumeric()
 
 type (
-	itemEnum int
+	itemEnum string
 	stateFn  func(*lexer) stateFn
 
 	// item represents a token returned from the scanenr
 	item struct {
-		typ  itemEnum // type of item, such as itemAtomName/itemAtomType
-		val  string   // Value, such as "23.2"
-		line uint32   // line number at the start of this line
+		typ   itemEnum // type of item, such as itemAtomName/itemAtomType
+		value string   // Value, such as "23.2"
+		line  uint32   // line number at the start of this line
 	}
 
 	// lexer holds the state of the scanner
@@ -154,11 +152,11 @@ func (i item) String() string {
 	case i.typ == itemEOF:
 		return "EOF"
 	case i.typ == itemError:
-		return i.val
-	case len(i.val) > 40:
-		return fmt.Sprintf("%.40q...", i.val)
+		return i.value
+	case len(i.value) > 40:
+		return fmt.Sprintf("%.40q...", i.value)
 	}
-	return fmt.Sprintf("%q", i.val)
+	return fmt.Sprintf("%q", i.value)
 }
 
 func lex(input string) *lexer {
@@ -359,8 +357,8 @@ func lexAtomType(l *lexer) stateFn {
 
 		switch atyp {
 		case "CONT":
-			l.emit(itemContainerStart)
 			l.accept(":")
+			// NOTE: ade ccat accepts arbitrary chars until end of line.
 			return lexEndOfLine
 		case "NULL":
 			l.emit(itemNULL)
@@ -624,30 +622,30 @@ func strAlphaNumeric() string {
 type (
 	parseFunc func(p *parser) parseFunc
 	parser    struct {
-		theAtom  *Atom
-		atoms    []Atom
-		openCont atomStack
-		line     uint32 // 1+number of newlines seen
-		items    <-chan item
-		err      error
+		theAtom    *Atom       // atom currently being built
+		containers atomStack   // containers kept in a stack to track hierarchy
+		atoms      []*Atom     // array of output atoms
+		line       uint32      // 1+number of newlines seen
+		items      <-chan item // source of item text strings
+		err        error       // indicates parsing succeeded or describes what failed
 	}
 	atomStack []*Atom
 )
 
-var parseType = make(map[string]parseFunc, numOfADETypes)
+var parseType = make(map[ADEType]parseFunc, numOfADETypes)
 
 func init() {
-	parseType["UI01"] = parseUI01
-	//	parseType["UI08"] = parseUI08
-	//	parseType["UI16"] = parseUI16
-	//	parseType["UI32"] = parseUI32
-	//	parseType["UI64"] = parseUI64
-	//	parseType["SI08"] = parseSI08
-	//	parseType["SI16"] = parseSI16
-	//	parseType["SI32"] = parseSI32
-	//	parseType["SI64"] = parseSI64
-	//	parseType["FP32"] = parseFP32
-	//	parseType["FP64"] = parseFP64
+	parseType[UI01] = parseNumber
+	parseType[UI08] = parseNumber
+	parseType[UI16] = parseNumber
+	parseType[UI32] = parseNumber
+	parseType[UI64] = parseNumber
+	parseType[SI08] = parseNumber
+	parseType[SI16] = parseNumber
+	parseType[SI32] = parseNumber
+	parseType[SI64] = parseNumber
+	parseType[FP32] = parseNumber
+	parseType[FP64] = parseNumber
 	//	parseType["UF32"] = parseUF32
 	//	parseType["UF64"] = parseUF64
 	//	parseType["SF32"] = parseSF32
@@ -664,36 +662,55 @@ func init() {
 	//	parseType["DATA"] = parseDATA
 	//	parseType["ENUM"] = parseENUM
 	//	parseType["UUID"] = parseUUID
-	//	parseType["NULL"] = parseNULL
+	parseType["NULL"] = parseNULL
 	//	parseType["CNCT"] = parseDATA
 	//	parseType["cnct"] = parseDATA
-	//	parseType["CONT"] = parseCONT
+	parseType["CONT"] = parseNULL
 }
 
-func parse(ch <-chan item) ([]Atom, error) {
+func parse(ch <-chan item) (atoms []*Atom, err error) {
 	var state = parser{items: ch}
 	state.runParser()
+
+	fmt.Printf("===========================================\n")
+	fmt.Printf("Finished parsing, err was %v\n", state.err)
+	if state.err != nil {
+		err = state.err
+		return
+	}
+	a := *(state.atoms[0])
+	for _, c := range a.Children {
+		fmt.Printf("subcont %s has %d children  ", c.Name, len(c.Children))
+		for _, child := range c.Children {
+			fmt.Printf("%p ", child)
+		}
+		fmt.Println()
+	}
+
 	return state.atoms, state.err
 }
+
 func (p *parser) runParser() {
 	for state := parseAtomName; state != nil; {
 		state = state(p)
 	}
 }
-func readItem(p *parser) (i item) {
+
+func readItem(p *parser) (it item) {
+	var ok bool
 	select {
-	case i, ok := <-p.items:
+	case it, ok = <-p.items:
 		if !ok {
 			return item{
-				typ: itemEOF,
-				val: "EOF",
+				typ:   itemEOF,
+				value: "EOF",
 			}
 		}
 	}
-	p.line = i.line
+	//	fmt.Println("readItem", it.typ, it.value)
+	p.line = it.line
 	return
 }
-
 func (p *parser) errorf(format string, args ...interface{}) error {
 	err := fmt.Errorf(
 		strings.Join([]string{
@@ -701,6 +718,32 @@ func (p *parser) errorf(format string, args ...interface{}) error {
 			fmt.Sprintf(format, args...),
 		}, ""))
 	return err
+}
+func (ptr *atomStack) push(a Atom) {
+	*ptr = append(*ptr, &a)
+}
+func (ptr *atomStack) pop() *Atom {
+	var s atomStack = *ptr
+	size := len(s)
+	if size == 0 {
+		panic("attempt to pop from empty stack")
+	}
+	lastAtom := s[size-1]
+	*ptr = s[:size-1]
+	return lastAtom
+}
+func (ptr *atomStack) empty() bool {
+	return len(*ptr) == 0
+}
+func (ptr *atomStack) size() int {
+	return len(*ptr)
+}
+func (ptr *atomStack) top() *Atom {
+	size := len(*ptr)
+	if size == 0 {
+		return nil
+	}
+	return (*ptr)[size-1]
 }
 
 func parseAtomName(p *parser) parseFunc {
@@ -712,22 +755,38 @@ func parseAtomName(p *parser) parseFunc {
 		return nil
 	}
 
-	// check item type
+	fmt.Printf("parseAtomName >>>>>>>>>>>>>>>>>\n")
+	//  a := *(p.atoms[0])
+	//	if a != nil {
+	//		for _, c := range a.Children {
+	//			fmt.Printf("subcont %s has %d children  ", c.Name, len(c.Children))
+	//			for _, child := range c.Children {
+	//				fmt.Printf("%p ", child)
+	//			}
+	//			fmt.Println()
+	//		}
+	//	}
+	fmt.Printf("parseAtomName <<<<<<<<<<<<<<<<<\n")
+
 	if it.typ == itemContainerEnd {
-		if p.openCont.empty() {
-			p.err = fmt.Errorf("parse error: found END but there are no open containers, line %d", it.line)
+		if p.containers.empty() {
+			p.err = fmt.Errorf("line %d: got END but there are no open containers", it.line+1)
 			return nil
 		}
-		p.openCont.pop()
+		cont := p.containers.pop()
+		if p.containers.empty() {
+			// on close, push parentless containers into output array
+			p.atoms = append(p.atoms, cont)
+		}
 		return parseAtomName
 	}
 	if it.typ != itemAtomName {
-		p.err = fmt.Errorf("expecting token type itemAtomName, got %s", it.typ)
+		p.err = fmt.Errorf("line %d: expecting atom name, got %s", it.line+1, it.typ)
 		return nil
 	}
 
 	// parse atom name
-	p.theAtom.Name = it.val // may be hex.. either way, store as string for now
+	p.theAtom.Name = it.value // may be hex.. either way, store as string for now
 
 	// return next state
 	return parseAtomType
@@ -737,63 +796,67 @@ func parseAtomType(p *parser) parseFunc {
 	// get next item
 	it := readItem(p)
 	if it.typ == itemEOF {
+		p.err = fmt.Errorf("end of input while parsing atom %s", p.theAtom.Name)
 		return nil
 	}
 
 	// verify item type
 	if it.typ != itemAtomType {
-		p.err = fmt.Errorf("expecting token type itemAtomName, got %s", it.typ)
+		p.err = fmt.Errorf("expecting token type itemAtomType, got %s", it.typ)
 		return nil
 	}
+	p.theAtom.SetType(ADEType(it.value))
 
-	// FIXME check for valid adeType enum value
-	p.theAtom.Type = ADEType(it.val)
+	// Add atom to children of parent, if any
+	if p.containers.empty() { // No open containers = no parent. Add atom to output.
+		if it.value != "CONT" { // Containers are added to output when they close
+			p.atoms = append(p.atoms, p.theAtom)
+		}
+	} else {
+		// Add atom to children of currently open container
+		p.containers.top().Children = append(p.containers.top().Children, p.theAtom)
+		a := p.theAtom
+		c := p.containers.top()
+		fmt.Printf("Added atom %s:%s to container %s.\n", a.Name, a.Type(), c.Name)
+		fmt.Printf("container %s has %d children.\n", c.Name, len(c.Children))
+	}
+
+	// If container, make it the currently open container
+	if p.theAtom.Type() == CONT {
+		p.containers.push(*p.theAtom)
+	}
+
 	return parseAtomData
 }
 
 func parseAtomData(p *parser) parseFunc {
-
-	switch p.theAtom.Type {
-	case CONT:
-		return parseAtomName
-	case UI01:
-		return parseUI01
-	case UI08:
-		return parseUI08
-	case UI16:
-		return parseUI16
-	default:
-		p.error = fmt.Errorf("unknown ADE type: %s", p.theAtom.Type)
+	parseFunc := parseType[p.theAtom.Type()]
+	if parseFunc == nil {
+		panic(fmt.Sprintf("no data parse function defined for type %s", p.theAtom.Type()))
+	}
+	retval := parseFunc(p)
+	if retval == nil { // nil function returned means error
 		return nil
 	}
-
-	// return next state
-	return parseError
+	return parseAtomName // return next state
 }
 
-func parseUI01(p *parser) parseFunc {
-
+func parseNumber(p *parser) parseFunc {
 	it := readItem(p)
-	if it == nil {
-		return nil
-	}
 
 	if it.typ != itemNumber {
-		p.errorf("expected atom data for UI01, got token type %s", p.typ)
+		p.errorf("expected atom data with type Number, got type %s", it.typ)
 	}
 
-	p.theAtom.Value.SetString(value)
-	return
-}
-func (s *atomStack) push(a Atom) {
-	*s = *s.append(&a)
-}
-func (s *atomStack) pop() *Atom {
-	if len(s) == 0 {
-		panic("attempt to pop empty atomStack")
+	err := p.theAtom.Value.SetString(it.value)
+	if err != nil {
+		p.err = p.errorf(err.Error())
+		return nil
 	}
-	*s = *s[:len(s)-1]
+	return parseAtomName
 }
-func (s *atomStack) empty() bool {
-	return len(s) == 0
+
+// Read empty data section.  Absorb no tokens.
+func parseNULL(p *parser) parseFunc {
+	return parseAtomName
 }

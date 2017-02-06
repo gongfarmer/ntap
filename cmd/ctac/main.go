@@ -32,16 +32,16 @@ func main() {
 	var err error
 
 	if buf, err = ioutil.ReadFile(inFile); err != nil {
-		fmt.Println("Unable to read input file, got error ", err)
+		fmt.Println("ctac: Unable to read input file: ", err)
 		os.Exit(1)
 	}
 
 	// FIXME strip out comments
 
 	if err = a.UnmarshalText(buf); err != nil {
-		fmt.Println("Unable to convert text to atoms, got error ", err)
+		fmt.Println("ctac: Unable to convert text to atoms: ", err)
 		os.Exit(1)
 	}
-	fmt.Println("ctac: finished unmarshaling")
+	fmt.Println("ctac: Finished unmarshaling")
 
 }

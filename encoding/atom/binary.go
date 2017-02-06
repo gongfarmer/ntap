@@ -141,7 +141,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		adeType := ADEType(h.Type[:])
 		var a = Atom{
 			Name: asPrintableString(h.Name[:]),
-			Type: adeType,
+			typ:  adeType,
 			data: data,
 		}
 		a.Value = NewCodec(&a)
@@ -154,7 +154,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		}
 
 		// push container onto stack
-		if a.Type == CONT {
+		if a.Type() == CONT {
 			endPos := bytesRead + h.Size - headerSize
 			containers.Push(cont{&a, endPos})
 		}
