@@ -3,7 +3,6 @@ package atom
 import (
 	"bytes"
 	"fmt"
-	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -74,7 +73,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 func (a *Atom) UnmarshalText(input []byte) (err error) {
 	// Convert text into Atom values
 	var atoms []Atom
-	var l *lexer = lex("UnmarshalText", string(input))
+	var l *lexer = lex(string(input))
 	atoms, err = parse(l.items)
 	if err != nil {
 		return
@@ -108,6 +107,7 @@ const (
 	hexDigits                    = "0123456789abcdefABCDEF"
 	whitespaceChars              = "\t\r "
 	eof                          = -1
+	numOfADETypes                = 32
 	_                   itemEnum = iota
 	itemAtomName                 // atom name
 	itemAtomType                 // atom type
@@ -127,30 +127,6 @@ const (
 var printableChars = strPrintableChars()
 var alphaNumericChars = strAlphaNumeric()
 
-// returns string of all printable chars < ascii 127, excludes whitespace
-func strPrintableChars() string {
-	var b []byte = make([]byte, 0, 0x7f-0x21) // ascii char values
-	for c := byte(0x21); c < 0x7f; c++ {
-		b = append(b, c)
-	}
-	return string(b)
-}
-
-// returns string of all alphanumeric chars < ascii 127
-func strAlphaNumeric() string {
-	var b []byte = make([]byte, 62)
-	for c := '0'; c < '9'; c++ {
-		b = append(b, byte(c))
-	}
-	for c := 'a'; c < 'z'; c++ {
-		b = append(b, byte(c))
-	}
-	for c := 'A'; c < 'Z'; c++ {
-		b = append(b, byte(c))
-	}
-	return string(b)
-}
-
 type (
 	itemEnum int
 	stateFn  func(*lexer) stateFn
@@ -164,7 +140,6 @@ type (
 
 	// lexer holds the state of the scanner
 	lexer struct {
-		name  string    // used only for error reports
 		input string    // the string being scanned
 		start uint32    // start position of this item
 		width int       // width of last rune read from input
@@ -186,9 +161,8 @@ func (i item) String() string {
 	return fmt.Sprintf("%q", i.val)
 }
 
-func lex(name, input string) *lexer {
+func lex(input string) *lexer {
 	l := &lexer{
-		name:  name,
 		input: input,
 		items: make(chan item),
 	}
@@ -618,19 +592,49 @@ func isPrintableRune(r rune) bool {
 	return strings.ContainsRune(printableChars, r)
 }
 
+// returns string of all printable chars < ascii 127, excludes whitespace
+func strPrintableChars() string {
+	var b []byte = make([]byte, 0, 0x7f-0x21) // ascii char values
+	for c := byte(0x21); c < 0x7f; c++ {
+		b = append(b, c)
+	}
+	return string(b)
+}
+
+// returns string of all alphanumeric chars < ascii 127
+func strAlphaNumeric() string {
+	var b []byte = make([]byte, 62)
+	for c := '0'; c < '9'; c++ {
+		b = append(b, byte(c))
+	}
+	for c := 'a'; c < 'z'; c++ {
+		b = append(b, byte(c))
+	}
+	for c := 'A'; c < 'Z'; c++ {
+		b = append(b, byte(c))
+	}
+	return string(b)
+}
+
 /**********************************************************
  Unmarshaling from text to Atom - Parser
  Converts token strings into Atom instances, detects invalid values
 **********************************************************/
 
-type parserState struct {
-	atoms []Atom
-	items <-chan item
-}
+type (
+	parseFunc func(p *parser) parseFunc
+	parser    struct {
+		theAtom  *Atom
+		atoms    []Atom
+		openCont atomStack
+		line     uint32 // 1+number of newlines seen
+		items    <-chan item
+		err      error
+	}
+	atomStack []*Atom
+)
 
-type parseFunc func(name string, p *parserState) error
-
-var parseType = make(map[string]parseFunc, 32)
+var parseType = make(map[string]parseFunc, numOfADETypes)
 
 func init() {
 	parseType["UI01"] = parseUI01
@@ -666,41 +670,130 @@ func init() {
 	//	parseType["CONT"] = parseCONT
 }
 
-func parseUI01(name string, p *parserState) (err error) {
-	// Validate token string
-	var i item
-	i, err = <-p.items
-	if err != nil {
-		return
-	}
-
-	// Convert token strings to atom
-	var a Atom
-	var value uint64
-	if item.typ == itemNumber {
-		a, err := strconv.ParseUint(strValue)
-	}
-	return
+func parse(ch <-chan item) ([]Atom, error) {
+	var state = parser{items: ch}
+	state.runParser()
+	return state.atoms, state.err
 }
-
-func parse(items <-chan item) (atoms []Atom, err error) {
-	var state = parserState{atoms, items}
-	var i item
-	for ok := true; ok; {
-		select {
-		case i, ok = <-items:
-			if !ok {
-				break
-			}
-			err = parseItem(i, state)
-			if err != nil {
-				ok = false
+func (p *parser) runParser() {
+	for state := parseAtomName; state != nil; {
+		state = state(p)
+	}
+}
+func readItem(p *parser) (i item) {
+	select {
+	case i, ok := <-p.items:
+		if !ok {
+			return item{
+				typ: itemEOF,
+				val: "EOF",
 			}
 		}
 	}
+	p.line = i.line
 	return
 }
 
-func parseItem(i item, p parserState) (err error) {
+func (p *parser) errorf(format string, args ...interface{}) error {
+	err := fmt.Errorf(
+		strings.Join([]string{
+			fmt.Sprintf("parse error on line %d: ", p.line),
+			fmt.Sprintf(format, args...),
+		}, ""))
+	return err
+}
+
+func parseAtomName(p *parser) parseFunc {
+	p.theAtom = new(Atom)
+
+	// get next item
+	it := readItem(p)
+	if it.typ == itemEOF {
+		return nil
+	}
+
+	// check item type
+	if it.typ == itemContainerEnd {
+		if p.openCont.empty() {
+			p.err = fmt.Errorf("parse error: found END but there are no open containers, line %d", it.line)
+			return nil
+		}
+		p.openCont.pop()
+		return parseAtomName
+	}
+	if it.typ != itemAtomName {
+		p.err = fmt.Errorf("expecting token type itemAtomName, got %s", it.typ)
+		return nil
+	}
+
+	// parse atom name
+	p.theAtom.Name = it.val // may be hex.. either way, store as string for now
+
+	// return next state
+	return parseAtomType
+}
+
+func parseAtomType(p *parser) parseFunc {
+	// get next item
+	it := readItem(p)
+	if it.typ == itemEOF {
+		return nil
+	}
+
+	// verify item type
+	if it.typ != itemAtomType {
+		p.err = fmt.Errorf("expecting token type itemAtomName, got %s", it.typ)
+		return nil
+	}
+
+	// FIXME check for valid adeType enum value
+	p.theAtom.Type = ADEType(it.val)
+	return parseAtomData
+}
+
+func parseAtomData(p *parser) parseFunc {
+
+	switch p.theAtom.Type {
+	case CONT:
+		return parseAtomName
+	case UI01:
+		return parseUI01
+	case UI08:
+		return parseUI08
+	case UI16:
+		return parseUI16
+	default:
+		p.error = fmt.Errorf("unknown ADE type: %s", p.theAtom.Type)
+		return nil
+	}
+
+	// return next state
+	return parseError
+}
+
+func parseUI01(p *parser) parseFunc {
+
+	it := readItem(p)
+	if it == nil {
+		return nil
+	}
+
+	if it.typ != itemNumber {
+		p.errorf("expected atom data for UI01, got token type %s", p.typ)
+	}
+
+	p.theAtom.Value.SetString(value)
 	return
+}
+func (s *atomStack) push(a Atom) {
+	*s = *s.append(&a)
+}
+func (s *atomStack) pop() *Atom {
+	if len(s) == 0 {
+		panic("attempt to pop empty atomStack")
+	}
+	*s = *s[:len(s)-1]
+}
+func (s *atomStack) empty() bool {
+	return len(s) == 0
 }
