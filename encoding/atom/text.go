@@ -672,19 +672,9 @@ func parse(ch <-chan item) (atoms []*Atom, err error) {
 	var state = parser{items: ch}
 	state.runParser()
 
-	fmt.Printf("===========================================\n")
-	fmt.Printf("Finished parsing, err was %v\n", state.err)
 	if state.err != nil {
 		err = state.err
 		return
-	}
-	a := *(state.atoms[0])
-	for _, c := range a.Children {
-		fmt.Printf("subcont %s has %d children  ", c.Name, len(c.Children))
-		for _, child := range c.Children {
-			fmt.Printf("%p ", child)
-		}
-		fmt.Println()
 	}
 
 	return state.atoms, state.err
@@ -707,7 +697,6 @@ func readItem(p *parser) (it item) {
 			}
 		}
 	}
-	//	fmt.Println("readItem", it.typ, it.value)
 	p.line = it.line
 	return
 }
@@ -719,8 +708,8 @@ func (p *parser) errorf(format string, args ...interface{}) error {
 		}, ""))
 	return err
 }
-func (ptr *atomStack) push(a Atom) {
-	*ptr = append(*ptr, &a)
+func (ptr *atomStack) push(a *Atom) {
+	*ptr = append(*ptr, a)
 }
 func (ptr *atomStack) pop() *Atom {
 	var s atomStack = *ptr
@@ -755,33 +744,8 @@ func parseAtomName(p *parser) parseFunc {
 		return nil
 	}
 
-	fmt.Printf("parseAtomName >>>>>>>>>>>>>>>>>\n")
-	if len(p.containers) > 0 {
-		fmt.Println(p.containers[0])
-	}
-	//	a := *(p.container[0])
-	//	if a != nil {
-	//		for _, c := range a.Children {
-	//			fmt.Printf("subcont %s has %d children  ", c.Name, len(c.Children))
-	//			for _, child := range c.Children {
-	//				fmt.Printf("%p ", child)
-	//			}
-	//			fmt.Println()
-	//		}
-	//	}
-	fmt.Printf("parseAtomName <<<<<<<<<<<<<<<<<\n")
-
 	if it.typ == itemContainerEnd {
-		if p.containers.empty() {
-			p.err = fmt.Errorf("line %d: got END but there are no open containers", it.line+1)
-			return nil
-		}
-		cont := p.containers.pop()
-		if p.containers.empty() {
-			// on close, push parentless containers into output array
-			p.atoms = append(p.atoms, cont)
-		}
-		return parseAtomName
+		return parseContainerEnd(p)
 	}
 	if it.typ != itemAtomName {
 		p.err = fmt.Errorf("line %d: expecting atom name, got %s", it.line+1, it.typ)
@@ -793,6 +757,19 @@ func parseAtomName(p *parser) parseFunc {
 
 	// return next state
 	return parseAtomType
+}
+
+func parseContainerEnd(p *parser) parseFunc {
+	if p.containers.empty() {
+		p.err = fmt.Errorf("got END but there are no open containers")
+		return nil
+	}
+	cont := p.containers.pop()
+	if p.containers.empty() {
+		// on close, push parentless containers into output array
+		p.atoms = append(p.atoms, cont)
+	}
+	return parseAtomName
 }
 
 func parseAtomType(p *parser) parseFunc {
@@ -818,15 +795,11 @@ func parseAtomType(p *parser) parseFunc {
 	} else {
 		// Add atom to children of currently open container
 		p.containers.top().addChild(p.theAtom)
-		a := p.theAtom
-		c := p.containers.top()
-		fmt.Printf("Added atom %s:%s to container %s.\n", a.Name, a.Type(), c.Name)
-		fmt.Printf("container %s has %d children.\n", c.Name, len(c.Children))
 	}
 
 	// If container, make it the currently open container
 	if p.theAtom.Type() == CONT {
-		p.containers.push(*p.theAtom)
+		p.containers.push(p.theAtom)
 	}
 
 	return parseAtomData

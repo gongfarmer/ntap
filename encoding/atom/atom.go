@@ -104,6 +104,10 @@ func (c *Atom) addChild(a *Atom) {
 	}
 }
 
+func (c *Atom) NumChildren() int {
+	return len(c.Children)
+}
+
 func FromFile(path string) (a Atom, err error) {
 	fstat, err := os.Stat(path)
 	if err != nil {
