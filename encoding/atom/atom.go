@@ -91,7 +91,7 @@ func (a *Atom) ZeroData() {
 func (a Atom) String() string {
 	buf, err := a.MarshalText()
 	if err != nil {
-		panic(fmt.Errorf("Failed to write Atom '%s:%s' to text: %s", a.Name, a.Type, err))
+		panic(fmt.Errorf("Failed to write Atom '%s:%s' to text: %s", a.Name, a.Type(), err))
 	}
 	return string(buf)
 }
@@ -100,7 +100,7 @@ func (c *Atom) addChild(a *Atom) {
 	if c.Type() == CONT {
 		c.Children = append(c.Children, a)
 	} else {
-		panic(fmt.Errorf("Cannot add child to non-CONT atom %s:%s", c.Name, c.Type))
+		panic(fmt.Errorf("Cannot add child to non-CONT atom %s:%s", c.Name, c.Type()))
 	}
 }
 

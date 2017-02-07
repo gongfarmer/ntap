@@ -157,7 +157,7 @@ var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
 
 func noEncoder(a *Atom, goType interface{}) error {
-	return fmt.Errorf("no encoder exists to convert go type %s to ADE type %s.", a.Type, goType)
+	return fmt.Errorf("no encoder exists to convert go type %s to ADE type %s.", goType, a.typ)
 }
 func noDecoder(from ADEType, to GoType) error {
 	return fmt.Errorf("no decoder exists to convert ADE type %s to go type %s.", from, to)
@@ -357,7 +357,7 @@ func UI16ToUint64(buf []byte) (v uint64, e error) {
 func UI32ToBool(buf []byte) (v bool, e error) {
 	ui32 := binary.BigEndian.Uint32(buf)
 	if ui32 != 0 && ui32 != 1 {
-		e = fmt.Errorf("range error: value %d overflows type bool", v)
+		e = fmt.Errorf("range error: value %d overflows type bool", ui32)
 		return
 	}
 	return ui32 == 1, e

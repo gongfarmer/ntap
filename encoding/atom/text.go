@@ -432,7 +432,7 @@ func lexIP32(l *lexer) stateFn {
 func lexFraction(l *lexer) stateFn {
 	lexNumber(l)
 	if !l.accept("/") {
-		return l.errorf("fractional type lacks divider: ", l.buffer())
+		return l.errorf("fractional type missing / divider: %s", l.buffer())
 	}
 	l.emit(itemFractionDivider)
 	return lexNumber(l)
