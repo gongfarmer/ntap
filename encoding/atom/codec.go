@@ -373,7 +373,7 @@ func UI64ToUint64(buf []byte) (v uint64, e error) {
 	return binary.BigEndian.Uint64(buf), e
 }
 func UI08ToString(buf []byte) (v string, e error) {
-	return string(buf[0]), e
+	return fmt.Sprintf("%d", (buf[0])), e
 }
 func UI16ToString(buf []byte) (v string, e error) {
 	return fmt.Sprintf("%d", binary.BigEndian.Uint16(buf)), e
@@ -968,23 +968,20 @@ func SetUI01FromUint64(a *Atom, v uint64) (e error) {
 func SetUI08FromString(a *Atom, v string) (e error) {
 	var i uint64
 	i, e = strconv.ParseUint(v, 0, 8)
-	s := uint8(i)
-	//	fmt.Printf("will assign %s/%d/%d\n", v, i, s)
-	//	if e == nil {
-	//		binary.Write(a.Value.Writer, binary.BigEndian, s)
-	//	}
-	a.data[0] = s
-	val, err := a.Value.Uint()
-	fmt.Printf("set value. from string(%s) to value(%v)%v\n", v, val, err)
-	return
+	if e != nil {
+		return
+	}
+	return SetUI08FromUint64(a, i)
 }
 
 func SetUI08FromUint64(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint8 {
-		e = fmt.Errorf("value overflows type UINT08: %d", v)
-		return
+		return fmt.Errorf("value overflows type UI08: %d", v)
 	}
-	binary.Write(a.Value.Writer, binary.BigEndian, uint8(v))
+	if len(a.data) != 1 {
+		return fmt.Errorf("UI08 atom data buffer size should be 1, not %d", len(a.data))
+	}
+	a.data[0] = uint8(v)
 	return
 }
 
