@@ -157,10 +157,10 @@ var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
 
 func noEncoder(a *Atom, goType interface{}) error {
-	return fmt.Errorf("no encoder exists to convert go type %s to ADE type %s.", goType, a.typ)
+	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'.", goType, a.typ)
 }
 func noDecoder(from ADEType, to GoType) error {
-	return fmt.Errorf("no decoder exists to convert ADE type %s to go type %s.", from, to)
+	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'.", from, to)
 }
 
 // Decoder methods: pass atom data to the decoder for type conversion to go type
@@ -784,38 +784,39 @@ func init() {
 	enc.SetString = SetUI16FromString
 	enc.SetUint = SetUI16FromUint64
 	encoderByType[UI16] = enc
-	// --
 
 	enc = NewEncoder(UI32)
-	//	enc.SetString = StringToUI32
-	//	enc.SetUint = Uint64ToUI32
+	enc.SetString = SetUI32FromString
+	enc.SetUint = SetUI32FromUint64
 	encoderByType[UI32] = enc
 
 	enc = NewEncoder(UI64)
-	//	enc.SetString = StringToUI64
-	//	enc.SetUint = Uint64ToUI64
+	enc.SetString = SetUI64FromString
+	enc.SetUint = SetUI64FromUint64
 	encoderByType[UI64] = enc
 
 	// ADE signed int types
 	enc = NewEncoder(SI08)
-	//	enc.SetString = StringToSI08
-	//	enc.SetInt = Int64ToSI08
+	enc.SetString = SetSI08FromString
+	enc.SetInt = SetSI08FromInt64
 	encoderByType[SI08] = enc
 
 	enc = NewEncoder(SI16)
-	//	enc.SetString = StringToSI16
-	//	enc.SetInt = Int64ToSI16
+	enc.SetString = SetSI16FromString
+	enc.SetInt = SetSI16FromInt64
 	encoderByType[SI16] = enc
 
 	enc = NewEncoder(SI32)
-	//	enc.SetString = StringToSI32
-	//	enc.SetInt = Int64ToSI32
+	enc.SetString = SetSI32FromString
+	enc.SetInt = SetSI32FromInt64
 	encoderByType[SI32] = enc
 
 	enc = NewEncoder(SI64)
-	//	enc.SetString = StringToSI64
-	//	enc.SetInt = Int64ToSI64
+	enc.SetString = SetSI64FromString
+	enc.SetInt = SetSI64FromInt64
 	encoderByType[SI64] = enc
+
+	// --
 
 	// ADE floating point types
 	enc = NewEncoder(FP32)
@@ -852,13 +853,13 @@ func init() {
 	// ADE fractional types
 
 	enc = NewEncoder(UR32)
-	//	enc.SetString = StringToUR32
-	//	enc.SetSliceOfUint = SliceOfUintToUR32
+	enc.SetString = SetUR32FromString
+	enc.SetSliceOfUint = SetUR32FromSliceOfUint
 	encoderByType[UR32] = enc
 
 	enc = NewEncoder(UR64)
-	//	enc.SetString = StringToUR64
-	//	enc.SetSliceOfUint = SliceOfUintToUR64
+	enc.SetString = SetUR64FromString
+	enc.SetSliceOfUint = SetUR64FromSliceOfUint
 	encoderByType[UR64] = enc
 
 	enc = NewEncoder(SR32)
@@ -999,5 +1000,152 @@ func SetUI16FromUint64(a *Atom, v uint64) (e error) {
 		return
 	}
 	binary.BigEndian.PutUint16(a.data, uint16(v))
+	return
+}
+
+func SetUI32FromString(a *Atom, v string) (e error) {
+	var i uint64
+	i, e = strconv.ParseUint(v, 0, 32)
+	if e == nil {
+		binary.BigEndian.PutUint32(a.data, uint32(i))
+	}
+	return
+}
+
+func SetUI32FromUint64(a *Atom, v uint64) (e error) {
+	if v > math.MaxUint32 {
+		e = fmt.Errorf("value overflows type UINT32: %d", v)
+		return
+	}
+	binary.BigEndian.PutUint32(a.data, uint32(v))
+	return
+}
+
+func SetUI64FromString(a *Atom, v string) (e error) {
+	var i uint64
+	i, e = strconv.ParseUint(v, 0, 64)
+	if e == nil {
+		binary.BigEndian.PutUint64(a.data, uint64(i))
+	}
+	return
+}
+
+func SetUI64FromUint64(a *Atom, v uint64) (e error) {
+	binary.BigEndian.PutUint64(a.data, uint64(v))
+	return
+}
+
+// ADE signed integer types
+
+func SetSI08FromString(a *Atom, v string) (e error) {
+	var i int64
+	i, e = strconv.ParseInt(v, 0, 8)
+	if e != nil {
+		return
+	}
+	return SetSI08FromInt64(a, i)
+}
+
+func SetSI08FromInt64(a *Atom, v int64) (e error) {
+	if v > math.MaxInt8 {
+		return fmt.Errorf("value overflows type SI08: %d", v)
+	}
+	a.data[0] = byte(v)
+	return
+}
+
+func SetSI16FromString(a *Atom, v string) (e error) {
+	var i int64
+	i, e = strconv.ParseInt(v, 0, 16)
+	if e == nil {
+		binary.BigEndian.PutUint16(a.data, uint16(i))
+	}
+	return
+}
+
+func SetSI16FromInt64(a *Atom, v int64) (e error) {
+	if v > math.MaxInt16 {
+		e = fmt.Errorf("value overflows type int16: %d", v)
+		return
+	}
+	binary.BigEndian.PutUint16(a.data, uint16(v))
+	return
+}
+
+func SetSI32FromString(a *Atom, v string) (e error) {
+	var i int64
+	i, e = strconv.ParseInt(v, 0, 32)
+	if e == nil {
+		binary.BigEndian.PutUint32(a.data, uint32(i))
+	}
+	return
+}
+
+func SetSI32FromInt64(a *Atom, v int64) (e error) {
+	if v > math.MaxInt32 {
+		e = fmt.Errorf("value overflows type Int32: %d", v)
+		return
+	}
+	binary.BigEndian.PutUint32(a.data, uint32(v))
+	return
+}
+
+func SetSI64FromString(a *Atom, v string) (e error) {
+	var i int64
+	i, e = strconv.ParseInt(v, 0, 64)
+	if e == nil {
+		binary.BigEndian.PutUint64(a.data, uint64(i))
+	}
+	return
+}
+
+func SetSI64FromInt64(a *Atom, v int64) (e error) {
+	binary.BigEndian.PutUint64(a.data, uint64(v))
+	return
+}
+
+func SetUR32FromString(a *Atom, v string) (e error) {
+	var num, den uint64
+	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
+	if err != nil {
+		return err
+	}
+	return SetUR32FromSliceOfUint(a, []uint64{num, den})
+}
+
+func SetUR32FromSliceOfUint(a *Atom, v []uint64) (e error) {
+	var num, den uint64
+	num = v[0]
+	den = v[1]
+	if num > math.MaxUint16 || den > math.MaxUint16 {
+		e = fmt.Errorf("cannot set UR32, fractional part overflows type uint16: %d", v)
+		return e
+	}
+
+	value := (uint32(num) << 16) + uint32(den)
+	binary.BigEndian.PutUint32(a.data, value)
+	return
+}
+
+func SetUR64FromString(a *Atom, v string) (e error) {
+	var num, den uint64
+	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
+	if err != nil {
+		return err
+	}
+	return SetUR64FromSliceOfUint(a, []uint64{num, den})
+}
+
+func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
+	var num, den uint64
+	num = v[0]
+	den = v[1]
+	if num > math.MaxUint32 || den > math.MaxUint32 {
+		e = fmt.Errorf("cannot set UR64, fractional part overflows type uint32: %d", v)
+		return e
+	}
+
+	value := (num << 32) + den
+	binary.BigEndian.PutUint64(a.data, value)
 	return
 }

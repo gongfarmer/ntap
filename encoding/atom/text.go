@@ -103,23 +103,23 @@ func (a *Atom) UnmarshalText(input []byte) (err error) {
 // The lexer sends tokens to the parser over a channel.
 
 const (
-	digits              = "0123456789"
-	hexDigits           = "0123456789abcdefABCDEF"
-	whitespaceChars     = "\t\r "
-	eof                 = -1
-	numOfADETypes       = 32
-	itemAtomName        = "iName"   // atom name
-	itemAtomType        = "iType"   // atom type
-	itemFractionDivider = "iFrac"   // separator ":"
-	itemNumber          = "iNumb"   // number value
-	itemUUID            = "iUUID"   // uuid value
-	itemNULL            = "iNULL"   // null value
-	itemIP32            = "iIP32"   // IP32 value (1 byte per octet IPv4)
-	itemString          = "iString" // string value
-	itemContainerEnd    = "iEND"    // AtomContainer end
-	itemFourCharCode    = "iFC32"   // FCHR32 value
-	itemError           = "iErr"    // error occured, value is text of error
-	itemEOF             = "iEOF"    // end of input
+	digits           = "0123456789"
+	hexDigits        = "0123456789abcdefABCDEF"
+	whitespaceChars  = "\t\r "
+	eof              = -1
+	numOfADETypes    = 32
+	itemAtomName     = "iName"   // atom name
+	itemAtomType     = "iType"   // atom type
+	itemVinculum     = "iVinc"   // fraction divider
+	itemNumber       = "iNumber" // number value
+	itemUUID         = "iUUID"   // uuid value
+	itemNULL         = "iNULL"   // null value
+	itemIP32         = "iIP32"   // IPv4 address as 1 byte per octet
+	itemString       = "iString" // string value
+	itemContainerEnd = "iEND"    // AtomContainer end
+	itemFourCharCode = "iFC32"   // FCHR32 value
+	itemError        = "iErr"    // error occurred, value is text of error
+	itemEOF          = "iEOF"    // end of input
 )
 
 var printableChars = strPrintableChars()
@@ -434,7 +434,7 @@ func lexFraction(l *lexer) stateFn {
 	if !l.accept("/") {
 		return l.errorf("fractional type missing / divider: %s", l.buffer())
 	}
-	l.emit(itemFractionDivider)
+	l.emit(itemVinculum)
 	return lexNumber(l)
 }
 
@@ -646,26 +646,26 @@ func init() {
 	parseType[SI64] = parseNumber
 	parseType[FP32] = parseNumber
 	parseType[FP64] = parseNumber
-	//	parseType["UF32"] = parseUF32
-	//	parseType["UF64"] = parseUF64
-	//	parseType["SF32"] = parseSF32
-	//	parseType["SF64"] = parseSF64
-	//	parseType["UR32"] = parseUR32
-	//	parseType["UR64"] = parseUR64
-	//	parseType["SR32"] = parseSR32
-	//	parseType["SR64"] = parseSR64
-	//	parseType["FC32"] = parseFC32
-	//	parseType["IP32"] = parseIP32
-	//	parseType["IPAD"] = parseIPAD
-	//	parseType["CSTR"] = parseCSTR
-	//	parseType["USTR"] = parseUSTR
-	//	parseType["DATA"] = parseDATA
-	//	parseType["ENUM"] = parseENUM
-	//	parseType["UUID"] = parseUUID
-	parseType["NULL"] = parseNULL
-	//	parseType["CNCT"] = parseDATA
-	//	parseType["cnct"] = parseDATA
-	parseType["CONT"] = parseNULL
+	//parseType[UF32] =
+	//parseType[UF64] =
+	//parseType[SF32] =
+	//parseType[SF64] =
+	parseType[UR32] = parseFraction
+	parseType[UR64] = parseFraction
+	parseType[SR32] = parseFraction
+	parseType[SR64] = parseFraction
+	//	parseType[FC32] = parseFC32
+	//	parseType[IP32] = parseIP32
+	//	parseType[IPAD] = parseIPAD
+	//	parseType[CSTR] = parseCSTR
+	//	parseType[USTR] = parseUSTR
+	//	parseType[DATA] = parseDATA
+	//	parseType[ENUM] = parseENUM
+	//	parseType[UUID] = parseUUID
+	parseType[NULL] = parseNULL
+	//	parseType[CNCT] = parseDATA
+	//	parseType[cnct] = parseDATA
+	parseType[CONT] = parseNULL
 }
 
 func parse(ch <-chan item) (atoms []*Atom, err error) {
@@ -700,13 +700,12 @@ func readItem(p *parser) (it item) {
 	p.line = it.line
 	return
 }
-func (p *parser) errorf(format string, args ...interface{}) error {
-	err := fmt.Errorf(
+func (p *parser) errorf(format string, args ...interface{}) {
+	p.err = fmt.Errorf(
 		strings.Join([]string{
 			fmt.Sprintf("parse error on line %d: ", p.line),
 			fmt.Sprintf(format, args...),
 		}, ""))
-	return err
 }
 func (ptr *atomStack) push(a *Atom) {
 	*ptr = append(*ptr, a)
@@ -826,7 +825,7 @@ func parseNumber(p *parser) parseFunc {
 
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
-		p.err = p.errorf(err.Error())
+		p.errorf(err.Error())
 		return nil
 	}
 	return parseAtomName
@@ -834,5 +833,29 @@ func parseNumber(p *parser) parseFunc {
 
 // Read empty data section.  Absorb no tokens.
 func parseNULL(p *parser) parseFunc {
+	return parseAtomName
+}
+
+func parseFraction(p *parser) parseFunc {
+	// Take the next 3 tokens
+	var items = make([]item, 0, 3)
+	items = append(items, readItem(p)) // fraction numerator
+	items = append(items, readItem(p)) // fraction separator
+	items = append(items, readItem(p)) // fraction denominator
+	var values = []string{items[0].value, items[1].value, items[2].value}
+
+	// Verify token types are correct for fractional type data
+	if !(items[0].typ == itemNumber && items[1].typ == itemVinculum && items[2].typ == itemNumber) {
+		p.errorf("malformed fraction: %s %s %s", values[0], values[1], values[2])
+		return nil
+	}
+
+	// Send tokens for type conversion
+	err := p.theAtom.Value.SetString(strings.Join(values, " "))
+	if err != nil {
+		p.errorf(err.Error())
+		return nil
+	}
+
 	return parseAtomName
 }
