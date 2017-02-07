@@ -968,9 +968,14 @@ func SetUI01FromUint64(a *Atom, v uint64) (e error) {
 func SetUI08FromString(a *Atom, v string) (e error) {
 	var i uint64
 	i, e = strconv.ParseUint(v, 0, 8)
-	if e != nil {
-		binary.Write(a.Value.Writer, binary.BigEndian, uint8(i))
-	}
+	s := uint8(i)
+	//	fmt.Printf("will assign %s/%d/%d\n", v, i, s)
+	//	if e == nil {
+	//		binary.Write(a.Value.Writer, binary.BigEndian, s)
+	//	}
+	a.data[0] = s
+	val, err := a.Value.Uint()
+	fmt.Printf("set value. from string(%s) to value(%v)%v\n", v, val, err)
 	return
 }
 

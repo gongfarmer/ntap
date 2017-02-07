@@ -43,5 +43,6 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("ctac: Finished unmarshaling")
+	fmt.Println(a)
 
 }

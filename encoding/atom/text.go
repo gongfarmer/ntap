@@ -756,7 +756,10 @@ func parseAtomName(p *parser) parseFunc {
 	}
 
 	fmt.Printf("parseAtomName >>>>>>>>>>>>>>>>>\n")
-	//  a := *(p.atoms[0])
+	if len(p.containers) > 0 {
+		fmt.Println(p.containers[0])
+	}
+	//	a := *(p.container[0])
 	//	if a != nil {
 	//		for _, c := range a.Children {
 	//			fmt.Printf("subcont %s has %d children  ", c.Name, len(c.Children))
