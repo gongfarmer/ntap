@@ -481,7 +481,6 @@ func FP32ToString(buf []byte) (v string, e error) {
 }
 func FP64ToString(buf []byte) (v string, e error) {
 	var f float64
-	fmt.Printf("FP64ToString  buffer: % X\n", buf)
 	f, e = FP64ToFloat64(buf)
 	if e == nil {
 		v = fmt.Sprintf("%0.17E", f)

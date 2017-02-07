@@ -817,7 +817,7 @@ func parseAtomType(p *parser) parseFunc {
 		}
 	} else {
 		// Add atom to children of currently open container
-		p.containers.top().Children = append(p.containers.top().Children, p.theAtom)
+		p.containers.top().addChild(p.theAtom)
 		a := p.theAtom
 		c := p.containers.top()
 		fmt.Printf("Added atom %s:%s to container %s.\n", a.Name, a.Type(), c.Name)
