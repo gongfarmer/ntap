@@ -475,7 +475,7 @@ func FP32ToString(buf []byte) (v string, e error) {
 	var f float64
 	f, e = FP32ToFloat64(buf)
 	if e == nil {
-		v = fmt.Sprintf("%0.8E", f)
+		v = fmt.Sprintf("%0.8G", f)
 	}
 	return
 }
@@ -816,18 +816,18 @@ func init() {
 	enc.SetInt = SetSI64FromInt64
 	encoderByType[SI64] = enc
 
-	// --
-
 	// ADE floating point types
 	enc = NewEncoder(FP32)
-	//	enc.SetString = StringToFP32
-	//	enc.SetFloat = Float64ToFP32
+	enc.SetString = SetFP32FromString
+	enc.SetFloat = SetFP32FromFloat64
 	encoderByType[FP32] = enc
 
 	enc = NewEncoder(FP64)
-	//	enc.SetString = StringToFP64
-	//	enc.SetFloat = Float64ToFP64
+	enc.SetString = SetFP64FromString
+	enc.SetFloat = SetFP64FromFloat64
 	encoderByType[FP64] = enc
+
+	// --
 
 	// ADE fixed point types
 	enc = NewEncoder(UF32)
@@ -863,13 +863,13 @@ func init() {
 	encoderByType[UR64] = enc
 
 	enc = NewEncoder(SR32)
-	//	enc.SetString = StringToSR32
-	//	enc.SetSliceOfInt = SliceOfIntToSR32
+	enc.SetString = SetSR32FromString
+	enc.SetSliceOfInt = SetSR32FromSliceOfInt
 	encoderByType[SR32] = enc
 
 	enc = NewEncoder(SR64)
-	//	enc.SetString = StringToSR64
-	//	enc.SetSliceOfInt = SliceOfIntToSR64
+	enc.SetString = SetSR64FromString
+	enc.SetSliceOfInt = SetSR64FromSliceOfInt
 	encoderByType[SR64] = enc
 
 	// ADE Four char code
@@ -1064,7 +1064,7 @@ func SetSI16FromString(a *Atom, v string) (e error) {
 }
 
 func SetSI16FromInt64(a *Atom, v int64) (e error) {
-	if v > math.MaxInt16 {
+	if v < math.MinInt16 || v > math.MaxInt16 {
 		e = fmt.Errorf("value overflows type int16: %d", v)
 		return
 	}
@@ -1082,7 +1082,7 @@ func SetSI32FromString(a *Atom, v string) (e error) {
 }
 
 func SetSI32FromInt64(a *Atom, v int64) (e error) {
-	if v > math.MaxInt32 {
+	if v < math.MinInt32 || v > math.MaxInt32 {
 		e = fmt.Errorf("value overflows type Int32: %d", v)
 		return
 	}
@@ -1103,6 +1103,8 @@ func SetSI64FromInt64(a *Atom, v int64) (e error) {
 	binary.BigEndian.PutUint64(a.data, uint64(v))
 	return
 }
+
+// encode of unsigned fractional types
 
 func SetUR32FromString(a *Atom, v string) (e error) {
 	var num, den uint64
@@ -1147,5 +1149,85 @@ func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
 
 	value := (num << 32) + den
 	binary.BigEndian.PutUint64(a.data, value)
+	return
+}
+
+// encode of signed fractional types
+
+func SetSR32FromString(a *Atom, v string) (e error) {
+	var num, den int64
+	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
+	if err != nil {
+		return err
+	}
+	return SetSR32FromSliceOfInt(a, []int64{num, den})
+}
+
+func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
+	var num, den int64
+	num = v[0]
+	den = v[1]
+	if num > math.MaxInt16 || den > math.MaxInt16 {
+		e = fmt.Errorf("cannot set SR32, fractional part overflows type int16: %d", v)
+		return e
+	}
+
+	value := (int32(num) << 16) + int32(den)
+	binary.BigEndian.PutUint32(a.data, uint32(value))
+	return
+}
+
+func SetSR64FromString(a *Atom, v string) (e error) {
+	var num, den int64
+	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
+	if err != nil {
+		return err
+	}
+	return SetSR64FromSliceOfInt(a, []int64{num, den})
+}
+
+func SetSR64FromSliceOfInt(a *Atom, v []int64) (e error) {
+	var num, den int64
+	num = v[0]
+	den = v[1]
+	if num > math.MaxInt32 || den > math.MaxInt32 || num < math.MinInt32 || den < math.MinInt32 {
+		e = fmt.Errorf("cannot set SR64, fractional part overflows type int32: %d", v)
+		return e
+	}
+
+	value := (num << 32) + den
+	binary.BigEndian.PutUint64(a.data, uint64(value))
+	return
+}
+
+// encode of floating point types
+
+func SetFP32FromString(a *Atom, v string) (e error) {
+	var f float64
+	f, e = strconv.ParseFloat(v, 32)
+	return SetFP32FromFloat64(a, f)
+}
+
+func SetFP32FromFloat64(a *Atom, v float64) (e error) {
+	if v > math.MaxFloat32 {
+		e = fmt.Errorf("value overflows type Float32: %f", v)
+		return
+	}
+
+	var bits uint32 = math.Float32bits(float32(v))
+	binary.BigEndian.PutUint32(a.data, bits)
+	return
+}
+
+func SetFP64FromString(a *Atom, v string) (e error) {
+	var f float64
+	f, e = strconv.ParseFloat(v, 64)
+	return SetFP64FromFloat64(a, f)
+}
+
+func SetFP64FromFloat64(a *Atom, v float64) (e error) {
+	binary.BigEndian.PutUint64(a.data, uint64(v))
+	var bits uint64 = math.Float64bits(v)
+	binary.BigEndian.PutUint64(a.data, bits)
 	return
 }
