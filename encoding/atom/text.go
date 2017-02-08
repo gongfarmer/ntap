@@ -646,10 +646,10 @@ func init() {
 	parseType[SI64] = parseNumber
 	parseType[FP32] = parseNumber
 	parseType[FP64] = parseNumber
-	//parseType[UF32] =
-	//parseType[UF64] =
-	//parseType[SF32] =
-	//parseType[SF64] =
+	parseType[UF32] = parseNumber
+	parseType[UF64] = parseNumber
+	parseType[SF32] = parseNumber
+	parseType[SF64] = parseNumber
 	parseType[UR32] = parseFraction
 	parseType[UR64] = parseFraction
 	parseType[SR32] = parseFraction

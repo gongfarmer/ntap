@@ -131,33 +131,11 @@ func NewDecoder(from ADEType) decoder {
 	}
 }
 
-/*
-// FIXME Understand this code from stackoverflow, may shorten up the encoder...
-func setId(id string, v interface{}) {
-    // error checking is left as an exercise
-    val := reflect.ValueOf(v).Elem() // this will panic if v isn't a pointer
-    switch val.Kind() {
-    case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-        idn, _ := strconv.ParseInt(id, 10, 64)
-        if val.OverflowInt(idn) {
-            // handle large values
-        }
-        val.SetInt(idn)
-    case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-        idn, _ := strconv.ParseUint(id, 10, 64)
-        if val.OverflowUint(idn) {
-            // handle large values
-        }
-        val.SetUint(idn)
-    }
-}
-*/
-
 var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
 
 func noEncoder(a *Atom, goType interface{}) error {
-	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'.", goType, a.typ)
+	panic(fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'.", goType, a.typ))
 }
 func noDecoder(from ADEType, to GoType) error {
 	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'.", from, to)
@@ -827,18 +805,18 @@ func init() {
 	enc.SetFloat = SetFP64FromFloat64
 	encoderByType[FP64] = enc
 
-	// --
-
 	// ADE fixed point types
 	enc = NewEncoder(UF32)
-	//	enc.SetString = StringToUF32
-	//	enc.SetFloat = Float64ToUF32
+	enc.SetString = SetUF32FromString
+	enc.SetFloat = SetUF32FromFloat64
 	encoderByType[UF32] = enc
 
 	enc = NewEncoder(UF64)
-	//	enc.SetString = StringToUF64
-	//	enc.SetFloat = Float64ToUF64
+	enc.SetString = SetUF64FromString
+	enc.SetFloat = SetUF64FromFloat64
 	encoderByType[UF64] = enc
+
+	// --
 
 	enc = NewEncoder(SF32)
 	//	enc.SetString = StringToSF32
@@ -926,7 +904,9 @@ func init() {
 	encoderByType[CONT] = enc
 }
 
-/************************************************************/
+/************************************************************
+Encoding functions - set Atom.data bytes from go type
+************************************************************/
 
 func SetUI01FromString(a *Atom, v string) (e error) {
 	switch v {
@@ -965,6 +945,7 @@ func SetUI01FromUint64(a *Atom, v uint64) (e error) {
 	return
 }
 
+// encode of unsigned integer types
 func SetUI08FromString(a *Atom, v string) (e error) {
 	var i uint64
 	i, e = strconv.ParseUint(v, 0, 8)
@@ -1035,7 +1016,7 @@ func SetUI64FromUint64(a *Atom, v uint64) (e error) {
 	return
 }
 
-// ADE signed integer types
+// encode of signed integer types
 
 func SetSI08FromString(a *Atom, v string) (e error) {
 	var i int64
@@ -1229,5 +1210,67 @@ func SetFP64FromFloat64(a *Atom, v float64) (e error) {
 	binary.BigEndian.PutUint64(a.data, uint64(v))
 	var bits uint64 = math.Float64bits(v)
 	binary.BigEndian.PutUint64(a.data, bits)
+	return
+}
+
+// encode of fixed point types
+
+func SetUF32FromString(a *Atom, v string) (e error) {
+	var f float64
+	f, e = strconv.ParseFloat(v, 64)
+	return SetUF32FromFloat64(a, f)
+}
+
+func SetUF32FromFloat64(a *Atom, v float64) (e error) {
+	binary.BigEndian.PutUint32(a.data, uint32(v*65536.0))
+	return
+}
+
+// split string into whole and fractional parts
+func SetUF64FromString(a *Atom, v string) (e error) {
+	pieces := strings.Split(v, ".")
+	if len(pieces) > 2 {
+		return fmt.Errorf("invalid fixed point data:%s", v)
+	}
+
+	// get whole part
+	var whole uint64
+	whole, e = strconv.ParseUint(pieces[0], 10, 64)
+	if e != nil {
+		return
+	}
+
+	// get fractional part
+	var fract float64
+	fract, e = strconv.ParseFloat(pieces[1], 64)
+	if e != nil {
+		return
+	}
+
+	strFract := []byte(fmt.Sprintf("%04.0f", fract))[0:4]
+
+	str := fmt.Sprintf("%d.%s", whole, strFract)
+	//	fmt.Printf("Got template (%d.%s)\n", whole, strFract)
+	value, e := strconv.ParseFloat(str, 64)
+
+	return SetUF64FromFloat64(a, value)
+}
+
+func SetUF64FromFloat64(a *Atom, v float64) (e error) {
+	var i = uint64(v * 4294967296.0)
+	binary.BigEndian.PutUint64(a.data, i)
+	return
+}
+
+// ade: CXD_String.cc CXD_String_from_UFIX64(...)
+// isolate whole and fractional parts, then combine within the string
+func ___UF64ToString(buf []byte) (v string, e error) {
+	var i uint64
+	i, e = UI64ToUint64(buf)
+	if e == nil {
+		iFract := i << 32 >> 32
+		fFract := float64(iFract) / 4294967296.0 * math.Pow(10, 9)
+		v = fmt.Sprintf("%d.%09.0f", i>>32, fFract)
+	}
 	return
 }
