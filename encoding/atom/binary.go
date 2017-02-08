@@ -148,7 +148,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 
 		// add atom to parent.Children, or to atoms list if no parent
 		if parent, ok := containers.Peek(); ok {
-			parent.atomPtr.addChild(&a)
+			parent.atomPtr.AddChild(&a)
 		} else {
 			atoms = append(atoms, &a)
 		}

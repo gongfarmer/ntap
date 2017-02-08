@@ -793,7 +793,7 @@ func parseAtomType(p *parser) parseFunc {
 		}
 	} else {
 		// Add atom to children of currently open container
-		p.containers.top().addChild(p.theAtom)
+		p.containers.top().AddChild(p.theAtom)
 	}
 
 	// If container, make it the currently open container

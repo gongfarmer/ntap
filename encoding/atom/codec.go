@@ -501,7 +501,7 @@ func UF64ToString(buf []byte) (v string, e error) {
 	var i uint64
 	i, e = UI64ToUint64(buf)
 	if e == nil {
-		iFract := i << 32 >> 32
+		iFract := i << 32 >> 32 // FIXME iFract := i & 0x0000FFFF
 		fFract := float64(iFract) / 4294967296.0 * math.Pow(10, 9)
 		v = fmt.Sprintf("%d.%09.0f", i>>32, fFract)
 	}
@@ -1246,14 +1246,20 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 	if e != nil {
 		return
 	}
+	iFract := uint64(fract * (math.Pow(10, 9) / 4294967296.0))
+	fmt.Printf("Before: %08x\n", iFract)
+	iFract = iFract & 0x0000FFFF
+	fmt.Printf("After : %08x\n", iFract)
 
-	strFract := []byte(fmt.Sprintf("%04.0f", fract))[0:4]
+	//strFract := []byte(fmt.Sprintf("%04.0f", fract))[0:4]
+	//str := fmt.Sprintf("%d.%s", whole, strFract)
+	//value, e := strconv.ParseFloat(str, 64)
 
-	str := fmt.Sprintf("%d.%s", whole, strFract)
-	//	fmt.Printf("Got template (%d.%s)\n", whole, strFract)
-	value, e := strconv.ParseFloat(str, 64)
+	fmt.Printf("Got template (%d)(%d)\n", whole, iFract)
 
-	return SetUF64FromFloat64(a, value)
+	var valueUi64 = (whole << 32) + iFract
+	binary.BigEndian.PutUint64(a.data, valueUi64)
+	return
 }
 
 func SetUF64FromFloat64(a *Atom, v float64) (e error) {

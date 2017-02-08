@@ -96,7 +96,7 @@ func (a Atom) String() string {
 	return string(buf)
 }
 
-func (c *Atom) addChild(a *Atom) {
+func (c *Atom) AddChild(a *Atom) {
 	if c.Type() == CONT {
 		c.Children = append(c.Children, a)
 	} else {
