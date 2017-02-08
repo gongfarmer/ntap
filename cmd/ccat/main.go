@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
@@ -14,7 +16,38 @@ import (
 // FIXME Support parsing of files containing hex, since hex+binary are
 // supported on STDIN they should both be allowed within files.
 
+var FlagDebug = flag.Bool("d", true, "print atoms in detailed debug format")
+
 func printAtom(a atom.Atom) {
+	if *FlagDebug {
+		printDebug(a)
+	} else {
+		printString(a)
+	}
+}
+
+func printDebug(a atom.Atom) {
+	atoms := a.AtomList()
+	for _, a := range atoms {
+		fmt.Printf("name: \"%s\"\n", a.Name)
+		fmt.Printf("type: \"%s\"\n", a.Type())
+		strData, err := a.Value.String()
+		if err != nil {
+			fmt.Printf(err.Error())
+			os.Exit(1)
+		}
+		bytesData, err := a.Value.SliceOfByte()
+		if err != nil {
+			fmt.Printf(err.Error())
+			os.Exit(1)
+		}
+		fmt.Printf("data: \"%s\"\n", strData) // value as string
+		fmt.Printf("      % x\n", bytesData)  // value as bytes
+		fmt.Println("--")
+	}
+}
+
+func printString(a atom.Atom) {
 	buf, err := a.MarshalText()
 	if err != nil {
 		fmt.Printf("failed to print AtomContainer: %s\n", err)
@@ -45,11 +78,16 @@ func readAtomsFromHexStream(r io.Reader) (atoms []*atom.Atom, err error) {
 }
 
 func main() {
+	flag.Parse()
+
 	rc := 0
 
 	// Read from files
 	var files = os.Args[1:]
 	for _, path := range files {
+		if strings.HasPrefix(path, "-") {
+			continue
+		}
 		a, err := readContainerFromFile(path)
 		if err != nil {
 			fmt.Printf("failed to read from %s: %s\n", path, err)

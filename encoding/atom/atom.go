@@ -108,6 +108,18 @@ func (c *Atom) NumChildren() int {
 	return len(c.Children)
 }
 
+// List of pointers to every atom in hierarchical order
+func (c *Atom) AtomList() []*Atom {
+	return c.getAtomList(new([]*Atom))
+}
+func (c *Atom) getAtomList(list *([]*Atom)) []*Atom {
+	*list = append(*list, c)
+	for _, a := range c.Children {
+		a.getAtomList(list)
+	}
+	return *list
+}
+
 func FromFile(path string) (a Atom, err error) {
 	fstat, err := os.Stat(path)
 	if err != nil {

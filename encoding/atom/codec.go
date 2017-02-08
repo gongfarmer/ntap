@@ -816,16 +816,14 @@ func init() {
 	enc.SetFloat = SetUF64FromFloat64
 	encoderByType[UF64] = enc
 
-	// --
-
 	enc = NewEncoder(SF32)
-	//	enc.SetString = StringToSF32
-	//	enc.SetFloat = Float64ToSF32
+	enc.SetString = SetSF32FromString
+	enc.SetFloat = SetSF32FromFloat64
 	encoderByType[SF32] = enc
 
 	enc = NewEncoder(SF64)
-	//	enc.SetString = StringToSF64
-	//	enc.SetFloat = Float64ToSF64
+	enc.SetString = SetSF64FromString
+	enc.SetFloat = SetSF64FromFloat64
 	encoderByType[SF64] = enc
 
 	// ADE fractional types
@@ -849,6 +847,8 @@ func init() {
 	enc.SetString = SetSR64FromString
 	enc.SetSliceOfInt = SetSR64FromSliceOfInt
 	encoderByType[SR64] = enc
+
+	// =====
 
 	// ADE Four char code
 	enc = NewEncoder(FC32)
@@ -1226,8 +1226,8 @@ func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 	return
 }
 
-// split string into whole and fractional parts
 func SetUF64FromString(a *Atom, v string) (e error) {
+	// split string into whole and fractional parts
 	pieces := strings.Split(v, ".")
 	if len(pieces) > 2 {
 		return fmt.Errorf("invalid fixed point data:%s", v)
@@ -1251,7 +1251,6 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 		fract *= (4294967296.0 / math.Pow(10, 9))
 	}
 
-	// combine bits into final value
 	binary.BigEndian.PutUint64(a.data, whole+uint64(fract))
 	return
 }
@@ -1259,5 +1258,60 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 func SetUF64FromFloat64(a *Atom, v float64) (e error) {
 	var i = uint64(v * 4294967296.0)
 	binary.BigEndian.PutUint64(a.data, i)
+	return
+}
+
+func SetSF32FromString(a *Atom, v string) (e error) {
+	var f float64
+	f, e = strconv.ParseFloat(v, 64)
+	return SetSF32FromFloat64(a, f)
+}
+
+func SetSF32FromFloat64(a *Atom, v float64) (e error) {
+	if -32768.0 > v || v >= 32768.0 {
+		e = fmt.Errorf("range error: value %G overflows type SF32", v)
+		return
+	}
+	binary.BigEndian.PutUint32(a.data, uint32(v*65536.0))
+	return
+}
+
+func SetSF64FromString(a *Atom, v string) (e error) {
+	// split string into whole and fractional parts
+	pieces := strings.Split(v, ".")
+	if len(pieces) > 2 {
+		return fmt.Errorf("invalid fixed point data:%s", v)
+	}
+
+	// whole part to the first 32 bits of a uint64
+	var whole int64
+	whole, e = strconv.ParseInt(pieces[0], 10, 64)
+	if e != nil {
+		return
+	}
+	whole <<= 32
+
+	// fractional part
+	var fract float64
+	fract, e = strconv.ParseFloat(pieces[1], 64)
+	if e != nil {
+		return
+	}
+	if 0.0 <= fract && fract < 4294967296.0 {
+		fract *= (4294967296.0 / math.Pow(10, 9))
+	}
+
+	// invert the bits in the fractional value, if negative number
+	iFract := int64(fract)
+	if whole < 0 {
+		iFract = -1 * iFract
+	}
+
+	binary.BigEndian.PutUint64(a.data, uint64(whole+iFract))
+	return
+}
+
+func SetSF64FromFloat64(a *Atom, v float64) (e error) {
+	binary.BigEndian.PutUint64(a.data, uint64(v*4294967296.0))
 	return
 }
