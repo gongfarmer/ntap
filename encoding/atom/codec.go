@@ -501,7 +501,7 @@ func UF64ToString(buf []byte) (v string, e error) {
 	var i uint64
 	i, e = UI64ToUint64(buf)
 	if e == nil {
-		iFract := i << 32 >> 32 // FIXME iFract := i & 0x0000FFFF
+		iFract := i & 0x00000000FFFFFFFF
 		fFract := float64(iFract) / 4294967296.0 * math.Pow(10, 9)
 		v = fmt.Sprintf("%d.%09.0f", i>>32, fFract)
 	}
@@ -1233,50 +1233,31 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 		return fmt.Errorf("invalid fixed point data:%s", v)
 	}
 
-	// get whole part
+	// whole part to the first 32 bits of a uint64
 	var whole uint64
 	whole, e = strconv.ParseUint(pieces[0], 10, 64)
 	if e != nil {
 		return
 	}
+	whole <<= 32
 
-	// get fractional part
+	// fractional part
 	var fract float64
 	fract, e = strconv.ParseFloat(pieces[1], 64)
 	if e != nil {
 		return
 	}
-	iFract := uint64(fract * (math.Pow(10, 9) / 4294967296.0))
-	fmt.Printf("Before: %08x\n", iFract)
-	iFract = iFract & 0x0000FFFF
-	fmt.Printf("After : %08x\n", iFract)
+	if 0.0 <= fract && fract < 4294967296.0 {
+		fract *= (4294967296.0 / math.Pow(10, 9))
+	}
 
-	//strFract := []byte(fmt.Sprintf("%04.0f", fract))[0:4]
-	//str := fmt.Sprintf("%d.%s", whole, strFract)
-	//value, e := strconv.ParseFloat(str, 64)
-
-	fmt.Printf("Got template (%d)(%d)\n", whole, iFract)
-
-	var valueUi64 = (whole << 32) + iFract
-	binary.BigEndian.PutUint64(a.data, valueUi64)
+	// combine bits into final value
+	binary.BigEndian.PutUint64(a.data, whole+uint64(fract))
 	return
 }
 
 func SetUF64FromFloat64(a *Atom, v float64) (e error) {
 	var i = uint64(v * 4294967296.0)
 	binary.BigEndian.PutUint64(a.data, i)
-	return
-}
-
-// ade: CXD_String.cc CXD_String_from_UFIX64(...)
-// isolate whole and fractional parts, then combine within the string
-func ___UF64ToString(buf []byte) (v string, e error) {
-	var i uint64
-	i, e = UI64ToUint64(buf)
-	if e == nil {
-		iFract := i << 32 >> 32
-		fFract := float64(iFract) / 4294967296.0 * math.Pow(10, 9)
-		v = fmt.Sprintf("%d.%09.0f", i>>32, fFract)
-	}
 	return
 }
