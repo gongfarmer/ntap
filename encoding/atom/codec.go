@@ -848,12 +848,13 @@ func init() {
 	enc.SetSliceOfInt = SetSR64FromSliceOfInt
 	encoderByType[SR64] = enc
 
-	// =====
-
 	// ADE Four char code
 	enc = NewEncoder(FC32)
-	//	enc.SetString = StringToFC32
+	enc.SetString = SetFC32FromString
+	enc.SetUint = SetFC32FromUint
 	encoderByType[FC32] = enc
+
+	// =====
 
 	// ADE ENUM type
 	enc = NewEncoder(ENUM)
@@ -1313,5 +1314,41 @@ func SetSF64FromString(a *Atom, v string) (e error) {
 
 func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 	binary.BigEndian.PutUint64(a.data, uint64(v*4294967296.0))
+	return
+}
+
+func SetFC32FromString(a *Atom, v string) (e error) {
+	var buf = make([]byte, 0, 4)
+
+	if len(v) == 6 {
+		// string should be printable when defined as 4 chars
+		if !isPrintableString(v) {
+			return fmt.Errorf("four-char code is not printable: 0x%x", v)
+		}
+		_, e = fmt.Sscanf(v, "'%s'", &buf)
+	}
+
+	// nonprintable chars are allowed if the name is hex-encoded
+	// this is because hex-encoded FCHR32 values may be generated
+	if len(v) == 10 && strings.HasPrefix(v, "0x") {
+		_, e = fmt.Sscanf(v, "0x%x", &buf)
+	}
+
+	if len(v) == 8 {
+		_, e = fmt.Sscanf(v, "%x", &buf)
+	}
+
+	if len(buf) == 4 {
+		copy(a.data, buf)
+	}
+
+	return fmt.Errorf("invalid four-char code: '%s'", v)
+}
+
+func SetFC32FromUint(a *Atom, v uint64) (e error) {
+	if v > math.MaxUint32 {
+		return fmt.Errorf("invalid four-char code: %x", v)
+	}
+	binary.BigEndian.PutUint32(a.data, uint32(v))
 	return
 }

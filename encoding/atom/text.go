@@ -486,8 +486,8 @@ func lexNumber(l *lexer) stateFn {
 func lexFourCharCode(l *lexer) stateFn {
 	// Read in single quote
 	if l.next() != '\'' {
-		fmt := "expected single quote to start four-char code value, got `%q'"
-		return l.errorf(fmt, l.first())
+		fmt := "expected single quote to start four-char code value, got `%s'"
+		return l.errorf(fmt, l.buffer())
 	}
 
 	// Read in chars
@@ -654,7 +654,7 @@ func init() {
 	parseType[UR64] = parseFraction
 	parseType[SR32] = parseFraction
 	parseType[SR64] = parseFraction
-	//	parseType[FC32] = parseFC32
+	parseType[FC32] = parseString
 	//	parseType[IP32] = parseIP32
 	//	parseType[IPAD] = parseIPAD
 	//	parseType[CSTR] = parseCSTR
@@ -857,5 +857,13 @@ func parseFraction(p *parser) parseFunc {
 		return nil
 	}
 
+	return parseAtomName
+}
+
+func parseString(p *parser) parseFunc {
+	it := readItem(p)
+
+	fmt.Printf("Set string value(%s) for atom %s:%s\n", it.value, p.theAtom.Name, p.theAtom.Type())
+	p.theAtom.Value.SetString(it.value)
 	return parseAtomName
 }
