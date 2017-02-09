@@ -874,7 +874,7 @@ func init() {
 	encoderByType[IP32] = enc
 
 	enc = NewEncoder(IPAD)
-	//	enc.SetString = StringToIPAD
+	enc.SetString = SetIPADFromString
 	encoderByType[IPAD] = enc
 
 	// ADE String types
@@ -1362,10 +1362,9 @@ func SetFC32FromUint(a *Atom, v uint64) (e error) {
 	return
 }
 
-// FIXME accept hex string?
 func SetIP32FromString(a *Atom, v string) (e error) {
 	if strings.HasPrefix(v, "0x") {
-		i, err := strconv.ParseUint(v, 16, 64)
+		i, err := strconv.ParseUint(strings.TrimPrefix(v, "0x"), 16, 64)
 		if err != nil {
 			e = fmt.Errorf("invalid hex IP32 value \"%s\": %s", v, err.Error())
 			return
@@ -1392,4 +1391,38 @@ func SetIP32FromUint(a *Atom, v uint64) (e error) {
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v))
 	return
+}
+
+func SetIPADFromString(a *Atom, v string) (e error) {
+	size := len(v)
+	buf := make([]byte, size)
+	copy(buf[:], v)
+
+	// verify delimiters
+	if buf[0] != '"' || buf[size-1] != '"' {
+		return fmt.Errorf("IPAD value lacks delimiters: (%s)", v)
+	}
+
+	// verify valid chars for IPv6
+	chars := "0123456789abcdefABCDEF:."
+	for _, r := range buf[1 : size-1] {
+		if !strings.ContainsRune(chars, rune(r)) {
+			return fmt.Errorf("invalid char in IPAD value: '%c'", r)
+		}
+	}
+
+	buf[size-1] = '\x00' // replace end delimiter with null byte terminator
+	a.data = buf[1:]     // from 1, to skip start delimiter
+	return
+}
+
+// Strip exactly one of the delimiter rune from the front and one from the end
+// of the string. Return a copy of the string without these delimiters.
+// If both end delimiters exist and are removed, return true.
+func stripDelimiter(s string, delim string) (string, bool) {
+	if !strings.HasPrefix(s, delim) || !strings.HasSuffix(s, delim) {
+		return "", false
+	}
+	buf := []byte(s)
+	return string(buf[1 : len(buf)-1]), true
 }

@@ -696,7 +696,7 @@ func init() {
 	parseType[SR64] = parseFraction
 	parseType[FC32] = parseFC32Value
 	parseType[IP32] = parseIP32
-	//	parseType[IPAD] = parseIPAD
+	parseType[IPAD] = parseString
 	//	parseType[CSTR] = parseCSTR
 	//	parseType[USTR] = parseUSTR
 	//	parseType[DATA] = parseDATA
@@ -925,6 +925,17 @@ func parseIP32(p *parser) parseFunc {
 		p.errorf("expected atom data with type IP32, got type %s", it.typ)
 		return nil
 	}
+
+	err := p.theAtom.Value.SetString(it.value)
+	if err != nil {
+		p.errorf(err.Error())
+		return nil
+	}
+	return parseAtomName
+}
+
+func parseString(p *parser) parseFunc {
+	it := readItem(p)
 
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
