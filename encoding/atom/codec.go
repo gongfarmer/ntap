@@ -1325,7 +1325,7 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 	switch len(v) {
 	case 10: // 8 hex digits plus leading 0x
 		if !strings.HasPrefix(v, "0x") {
-			return fmt.Errorf("Invalid FC32 value: %s", v)
+			return fmt.Errorf("FC32 value is too long: (%s)", v)
 		}
 		_, e = fmt.Sscanf(v, "0x%x", &buf)
 	case 8: // 8 hex digits
@@ -1335,19 +1335,18 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 			return fmt.Errorf("FC32 value is not printable: 0x%x", v)
 		}
 		if v[0] != '\'' || v[5] != '\'' {
-			return fmt.Errorf("FC32 value lacks single quote delimiters: %s", v)
+			return fmt.Errorf("FC32 value lacks single quote delimiters: (%s)", v)
 		}
-		_, e = fmt.Sscanf(v, "'%s", &buf) // FIXME: ignores start quot, collects rear quote in string
+		buf = []byte(v)[1:5]
 	default:
-		return fmt.Errorf("FC32 value is incorrect size: '%s'", v)
+		return fmt.Errorf("FC32 value is incorrect size: (%s)", v)
 	}
 
-	buf = strings.TrimSuffix(buf, "'")
 	if len(buf) != 4 {
 		return fmt.Errorf("Invalid FC32 value: (%s)", buf)
 	}
 
-	copied := copy(a.data, buf[1:4])
+	copied := copy(a.data, buf)
 	if copied != 4 {
 		return fmt.Errorf("Expected 4 chars copied for FC32 value(%s), got %d: e", v, copied)
 	}

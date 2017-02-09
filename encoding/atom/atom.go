@@ -6,13 +6,13 @@
 package atom
 
 import (
-	"bytes"
 	"encoding"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 	"unicode"
 )
 
@@ -42,9 +42,12 @@ func isPrintableString(s string) bool {
 	}
 	return true
 }
+
+// unicode.IsPrint does not work for this, it returns true for large swathes of
+// ascii 127-255.
 func isPrintableBytes(buf []byte) bool {
-	for _, r := range bytes.Runes(buf) {
-		if !unicode.IsPrint(r) {
+	for _, b := range buf {
+		if !strings.ContainsRune(printableChars, rune(b)) {
 			return false
 		}
 	}
