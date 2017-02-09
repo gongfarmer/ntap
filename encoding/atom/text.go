@@ -108,18 +108,19 @@ const (
 	whitespaceChars  = "\t\r "
 	eof              = -1
 	numOfADETypes    = 32
-	itemAtomName     = "iName"   // atom name
-	itemAtomType     = "iType"   // atom type
-	itemVinculum     = "iVinc"   // fraction divider
-	itemNumber       = "iNumber" // number value
-	itemUUID         = "iUUID"   // uuid value
-	itemNULL         = "iNULL"   // null value
-	itemIP32         = "iIP32"   // IPv4 address as 1 byte per octet
-	itemString       = "iString" // string value
-	itemContainerEnd = "iEND"    // AtomContainer end
-	itemFourCharCode = "iFC32"   // FCHR32 value
-	itemError        = "iErr"    // error occurred, value is text of error
-	itemEOF          = "iEOF"    // end of input
+	itemAtomName     = "iName"     // atom name
+	itemAtomType     = "iType"     // atom type
+	itemVinculum     = "iVinc"     // fraction divider
+	itemNumber       = "iNumber"   // number value
+	itemUUID         = "iUUID"     // uuid value
+	itemNULL         = "iNULL"     // null value
+	itemIP32         = "iIP32"     // IPv4 address as 1 byte per octet
+	itemString       = "iString"   // string value
+	itemContainerEnd = "iEND"      // AtomContainer end
+	itemFC32Hex      = "iFC32hex"  // FCHR32 value as 8 hexadecimal digits
+	itemFC32Quoted   = "iFC32quot" // FCHR32 value as single quoted 4 chars
+	itemError        = "iErr"      // error occurred, value is text of error
+	itemEOF          = "iEOF"      // end of input
 )
 
 var printableChars = strPrintableChars()
@@ -484,10 +485,52 @@ func lexNumber(l *lexer) stateFn {
 }
 
 func lexFourCharCode(l *lexer) stateFn {
-	// Read in single quote
+	var err error
+	var itemType itemEnum
+	switch l.peek() {
+	case '\'':
+		itemType = itemFC32Quoted
+		err = acceptFCHR32AsSingleQuotedString(l)
+	case '0':
+		itemType = itemFC32Hex
+		err = acceptFCHR32AsHex(l)
+	default:
+		return l.errorf("invalid data value for FC32: `%s'", l.buffer())
+	}
+
+	if err != nil {
+		return l.errorf(err.Error())
+	}
+
+	l.emit(itemType)
+	return lexEndOfLine
+}
+
+// Make the lexer read characters.
+// If 0x followed by 8 hex digits is found, leave it in the lexer's buffer and return nil.
+// Otherwise, return error. Don't emit anything -- that's up to the caller.
+func acceptFCHR32AsHex(l *lexer) error {
+	// Read in initial 0x
+	l.next()
+	l.next()
+	if l.buffer() != "0x" {
+		return fmt.Errorf("expected 0x to start hexadecimal four-char code value, got `%s'", l.buffer())
+	}
+
+	l.acceptRun("0123456789ABCDEFabcdef")
+	if l.chars() != 10 { // 0x and 8 hex digits
+		return fmt.Errorf("Invalid hex data value for FC32: %s", l.buffer())
+	}
+	return nil
+}
+
+// Make the lexer read characters.
+// If a single-quoted 4-char string is found, leave it in the lexer's buffer and return nil.
+// Otherwise, return error. Don't emit anything -- that's up to the caller.
+func acceptFCHR32AsSingleQuotedString(l *lexer) error {
+	// Read initial single quote
 	if l.next() != '\'' {
-		fmt := "expected single quote to start four-char code value, got `%s'"
-		return l.errorf(fmt, l.buffer())
+		return fmt.Errorf("expected single quote to start four-char code value, got `%s'", l.buffer())
 	}
 
 	// Read in chars
@@ -495,22 +538,19 @@ func lexFourCharCode(l *lexer) stateFn {
 		l.next()
 	}
 	if l.chars() < 4 {
-		fmt := "insufficient chars for four-char code value, got `%q'"
-		return l.errorf(fmt, l.buffer())
+		return fmt.Errorf("insufficient chars for four-char code value, got %q", l.buffer())
 	}
 	if !isPrintableString(l.buffer()) {
-		fmt := "invalid chars for four-char code value, got these (shown in hex:) %X"
-		return l.errorf(fmt, l.input[l.start+1:l.pos]) // skips leading single quote
+		msg := "invalid chars for four-char code value, got these (shown in hex:) %X"
+		return fmt.Errorf(msg, l.buffer())
 	}
 
-	// Read in single quote
+	// Check for single quote
 	if l.next() != '\'' {
-		fmt := "expected single quote to end four-char code value, got: %q"
-		return l.errorf(fmt, l.buffer())
+		return fmt.Errorf("expected single quote to end four-char code value, got: %s", l.buffer())
 	}
 
-	l.emit(itemFourCharCode)
-	return lexEndOfLine
+	return nil
 }
 
 func lexEndOfLine(l *lexer) stateFn {
@@ -654,7 +694,7 @@ func init() {
 	parseType[UR64] = parseFraction
 	parseType[SR32] = parseFraction
 	parseType[SR64] = parseFraction
-	parseType[FC32] = parseString
+	parseType[FC32] = parseFC32Value
 	//	parseType[IP32] = parseIP32
 	//	parseType[IPAD] = parseIPAD
 	//	parseType[CSTR] = parseCSTR
@@ -860,10 +900,20 @@ func parseFraction(p *parser) parseFunc {
 	return parseAtomName
 }
 
-func parseString(p *parser) parseFunc {
+func parseFC32Value(p *parser) parseFunc {
 	it := readItem(p)
+	switch it.typ {
+	case itemFC32Hex, itemFC32Quoted:
+		p.theAtom.Value.SetString(it.value)
+	default:
+		p.errorf("Parse error: expected to parse FC32 value, got %s", string(it.typ))
+		return nil
+	}
 
 	fmt.Printf("Set string value(%s) for atom %s:%s\n", it.value, p.theAtom.Name, p.theAtom.Type())
-	p.theAtom.Value.SetString(it.value)
+	err := p.theAtom.Value.SetString(it.value)
+	if err != nil {
+		fmt.Printf("Failed to set FC32 value: %s\n", err.Error())
+	}
 	return parseAtomName
 }

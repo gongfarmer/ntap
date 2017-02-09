@@ -1320,29 +1320,38 @@ func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 func SetFC32FromString(a *Atom, v string) (e error) {
 	var buf = make([]byte, 0, 4)
 
-	if len(v) == 6 {
-		// string should be printable when defined as 4 chars
-		if !isPrintableString(v) {
-			return fmt.Errorf("four-char code is not printable: 0x%x", v)
-		}
-		_, e = fmt.Sscanf(v, "'%s'", &buf)
-	}
-
 	// nonprintable chars are allowed if the name is hex-encoded
 	// this is because hex-encoded FCHR32 values may be generated
-	if len(v) == 10 && strings.HasPrefix(v, "0x") {
+	switch len(v) {
+	case 10: // 8 hex digits plus leading 0x
+		if !strings.HasPrefix(v, "0x") {
+			return fmt.Errorf("Invalid FC32 value: %s", v)
+		}
 		_, e = fmt.Sscanf(v, "0x%x", &buf)
-	}
-
-	if len(v) == 8 {
+	case 8: // 8 hex digits
 		_, e = fmt.Sscanf(v, "%x", &buf)
+	case 6: // 4 printable chars, single quote delimited
+		if !isPrintableString(v) {
+			return fmt.Errorf("FC32 value is not printable: 0x%x", v)
+		}
+		if v[0] != '\'' || v[5] != '\'' {
+			return fmt.Errorf("FC32 value lacks single quote delimiters: %s", v)
+		}
+		_, e = fmt.Sscanf(v, "'%s", &buf) // FIXME: ignores start quot, collects rear quote in string
+	default:
+		return fmt.Errorf("FC32 value is incorrect size: '%s'", v)
 	}
 
-	if len(buf) == 4 {
-		copy(a.data, buf)
+	buf = strings.TrimSuffix(buf, "'")
+	if len(buf) != 4 {
+		return fmt.Errorf("Invalid FC32 value: (%s)", buf)
 	}
 
-	return fmt.Errorf("invalid four-char code: '%s'", v)
+	copied := copy(a.data, buf[1:4])
+	if copied != 4 {
+		return fmt.Errorf("Expected 4 chars copied for FC32 value(%s), got %d: e", v, copied)
+	}
+	return nil
 }
 
 func SetFC32FromUint(a *Atom, v uint64) (e error) {
