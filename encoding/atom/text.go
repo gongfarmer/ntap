@@ -695,7 +695,7 @@ func init() {
 	parseType[SR32] = parseFraction
 	parseType[SR64] = parseFraction
 	parseType[FC32] = parseFC32Value
-	//	parseType[IP32] = parseIP32
+	parseType[IP32] = parseIP32
 	//	parseType[IPAD] = parseIPAD
 	//	parseType[CSTR] = parseCSTR
 	//	parseType[USTR] = parseUSTR
@@ -906,14 +906,30 @@ func parseFC32Value(p *parser) parseFunc {
 	case itemFC32Hex, itemFC32Quoted:
 		p.theAtom.Value.SetString(it.value)
 	default:
-		p.errorf("Parse error: expected to parse FC32 value, got %s", string(it.typ))
+		p.errorf("expected atom data with type FC32, got type %s", it.typ)
 		return nil
 	}
 
-	fmt.Printf("Set string value(%s) for atom %s:%s\n", it.value, p.theAtom.Name, p.theAtom.Type())
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
-		fmt.Printf("Failed to set FC32 value: %s\n", err.Error())
+		p.errorf("failed to set FC32 atom data (%s): %s", it.value, err.Error())
+		return nil
+	}
+	return parseAtomName
+}
+
+func parseIP32(p *parser) parseFunc {
+	it := readItem(p)
+
+	if it.typ != itemIP32 {
+		p.errorf("expected atom data with type IP32, got type %s", it.typ)
+		return nil
+	}
+
+	err := p.theAtom.Value.SetString(it.value)
+	if err != nil {
+		p.errorf(err.Error())
+		return nil
 	}
 	return parseAtomName
 }

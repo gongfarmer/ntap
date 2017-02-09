@@ -869,7 +869,8 @@ func init() {
 
 	// IP Address types
 	enc = NewEncoder(IP32)
-	//	enc.SetString = StringToIP32
+	enc.SetString = SetIP32FromString
+	enc.SetUint = SetIP32FromUint
 	encoderByType[IP32] = enc
 
 	enc = NewEncoder(IPAD)
@@ -1343,12 +1344,12 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 	}
 
 	if len(buf) != 4 {
-		return fmt.Errorf("Invalid FC32 value: (%s)", buf)
+		return fmt.Errorf("invalid FC32 value: (%s)", buf)
 	}
 
 	copied := copy(a.data, buf)
 	if copied != 4 {
-		return fmt.Errorf("Expected 4 chars copied for FC32 value(%s), got %d: e", v, copied)
+		return fmt.Errorf("expected 4 chars copied for FC32 value(%s), got %d: e", v, copied)
 	}
 	return nil
 }
@@ -1356,6 +1357,38 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 func SetFC32FromUint(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint32 {
 		return fmt.Errorf("invalid four-char code: %x", v)
+	}
+	binary.BigEndian.PutUint32(a.data, uint32(v))
+	return
+}
+
+// FIXME accept hex string?
+func SetIP32FromString(a *Atom, v string) (e error) {
+	if strings.HasPrefix(v, "0x") {
+		i, err := strconv.ParseUint(v, 16, 64)
+		if err != nil {
+			e = fmt.Errorf("invalid hex IP32 value \"%s\": %s", v, err.Error())
+			return
+		}
+		return a.Value.SetUint(i)
+	}
+
+	var oct1, oct2, oct3, oct4 uint8
+	_, e = fmt.Sscanf(v, "%d.%d.%d.%d", &oct1, &oct2, &oct3, &oct4)
+	if e != nil {
+		e = fmt.Errorf("invalid IP32 value \"%s\": %s", v, e.Error())
+		return
+	}
+	copied := copy(a.data, []byte{oct1, oct2, oct3, oct4})
+	if copied != 4 {
+		e = fmt.Errorf("expected 4 bytes copied for IP32 value(%s), got %d: e", v, copied)
+	}
+	return
+}
+
+func SetIP32FromUint(a *Atom, v uint64) (e error) {
+	if v > math.MaxUint32 {
+		return fmt.Errorf("invalid IP32 data: %x", v)
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v))
 	return
