@@ -891,27 +891,25 @@ func init() {
 
 	// DATA type, and aliases
 	enc = NewEncoder(DATA)
-	enc.SetString = SetDataFromHexString
+	enc.SetString = SetDATAFromHexString
 	encoderByType[DATA] = enc
 	encoderByType[CNCT] = enc
 	encoderByType[Cnct] = enc
 
-	// =====
-
 	// ADE ENUM type
 	enc = NewEncoder(ENUM)
-	//	enc.SetString = StringToSI32
-	//	enc.SetInt = Int64ToSI32
+	enc.SetString = SetSI32FromString
+	enc.SetInt = SetSI32FromInt64
 	encoderByType[ENUM] = enc
 
 	// NULL type
 	enc = NewEncoder(NULL)
-	//	enc.SetString = func([]byte) (s string, e error) { return }
+	enc.SetString = func(_ *Atom, _ string) (e error) { return }
 	encoderByType[NULL] = enc
 
 	// ADE container
 	enc = NewEncoder(CONT)
-	//	enc.SetString = func(
+	enc.SetString = func(_ *Atom, _ string) (e error) { return }
 	encoderByType[CONT] = enc
 }
 
@@ -1067,6 +1065,7 @@ func SetSI16FromInt64(a *Atom, v int64) (e error) {
 func SetSI32FromString(a *Atom, v string) (e error) {
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 32)
+	fmt.Println(a.String(), v, i, len(a.data))
 	if e == nil {
 		binary.BigEndian.PutUint32(a.data, uint32(i))
 	}
@@ -1504,7 +1503,7 @@ func SetUSTRFromEscapedString(a *Atom, v string) (e error) {
 	return
 }
 
-func SetDataFromHexString(a *Atom, v string) (e error) {
+func SetDATAFromHexString(a *Atom, v string) (e error) {
 	if !strings.HasPrefix(v, "0x") {
 		return fmt.Errorf("hexadecimal string should start with 0x, got \"%s\"", v)
 	}

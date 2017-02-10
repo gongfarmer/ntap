@@ -705,7 +705,7 @@ func init() {
 	parseType[UUID] = parseString
 	parseType[CNCT] = parseString
 	parseType[Cnct] = parseString
-	//	parseType[ENUM] = parseString
+	parseType[ENUM] = parseNumber
 	parseType[NULL] = parseNULL
 	parseType[CONT] = parseNULL
 }
@@ -873,7 +873,7 @@ func parseNumber(p *parser) parseFunc {
 	return parseAtomName
 }
 
-// Read empty data section.  Absorb no tokens.
+// Read empty data section.  Consume no tokens.
 func parseNULL(p *parser) parseFunc {
 	return parseAtomName
 }
