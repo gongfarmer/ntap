@@ -68,8 +68,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 
 // UnmarshalText gets called on a zero-value Atom receiver, and populates it
 // based on the contents of the argument string, which contains an ADE
-// ContainerText reprentation with a single top-level CONT atom.
-// "#" comments are not allowed within this text string.
+// ContainerText representation with a single top-level CONT atom.
 func (a *Atom) UnmarshalText(input []byte) (err error) {
 	// Convert text into Atom values
 	var atoms []*Atom
@@ -79,14 +78,15 @@ func (a *Atom) UnmarshalText(input []byte) (err error) {
 		return
 	}
 
-	// Set receiver to the (unique) top-level AtomContainer
+	// Set receiver to the sole top-level AtomContainer
 	switch len(atoms) {
 	case 0:
 		err = fmt.Errorf("no atoms found in text")
 	case 1:
+		a.Zero()
 		*a = *atoms[0]
 	default:
-		err = fmt.Errorf("multiple atoms (%d) found in text", len(atoms))
+		err = fmt.Errorf("multiple top-level atoms (%d) found in text", len(atoms))
 	}
 	return
 }
@@ -798,7 +798,6 @@ func parseAtomName(p *parser) parseFunc {
 	if it.typ != itemAtomName {
 		p.err = fmt.Errorf("line %d: expecting atom name, got %s", it.line+1, it.typ)
 		panic(p.err)
-		return nil
 	}
 
 	p.theAtom.Name = it.value // may be hex.. either way, store as string for now

@@ -1,5 +1,5 @@
   Review error handling
-    -eliminate all panics from all library code
+    -eliminate panics from all library code?
     -consider what errors are returned and export a couple of package-level errors for them
   Review package path
     -atom.Atom is not a great name
@@ -10,7 +10,7 @@
     -write good help text for ccat/ctac
   
   
-  Implement encoding
+X Implement encoding
   Implement xml handling?
   Implement path handling, XPATH like but specified on the command line for any old atomContainer:
     ccat --path 

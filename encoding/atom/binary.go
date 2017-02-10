@@ -32,8 +32,8 @@ var ErrInvalidInput = errors.New("Input is invalid for conversion to Atom")
 // LIFO stack of Atoms of type container.
 type containerStack []cont
 
-// Return a pointer to the last (top) element of the stack, without removing
-// the element. Second return value is false if stack is empty.
+// Peek returns a pointer to the last (top) element of the stack, without
+// removing the element. Second return value is false if stack is empty.
 func (s *containerStack) Peek() (value *cont, ok bool) {
 	if len(*s) == 0 {
 		value, ok = &(cont{}), false
@@ -42,9 +42,13 @@ func (s *containerStack) Peek() (value *cont, ok bool) {
 	}
 	return
 }
+
+// Empty returns true if the stack is empty.
 func (s *containerStack) Empty() bool {
 	return len(*s) == 0
 }
+
+// Push puts an element on top of the stack.
 func (s *containerStack) Push(c cont) {
 	(*s) = append((*s), c)
 }
@@ -74,8 +78,9 @@ func (s *containerStack) PopCompleted(pos uint32) []*Atom {
 	return closedConts
 }
 
-// atomHeader models the binary encoding values that start every ADE
-// AtomContainer. Must have fixed size for initialization by encoding/binary.
+// An atomHeader models the binary encoding values that start every ADE
+// AtomContainer. All struct elements must have fixed size so that
+// encoding/binary can use this type to read/write bytes.
 type atomHeader struct {
 	Size uint32
 	Name [4]byte
@@ -84,6 +89,7 @@ type atomHeader struct {
 
 const headerSize = 12
 
+// isContainer returns true if this atomHeader's type is CONT.
 func (h atomHeader) isContainer() bool {
 	return ADEType(h.Type[:]) == CONT
 }
@@ -94,19 +100,25 @@ func (h atomHeader) isContainer() bool {
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
 // It can be used to rehydrate an Atom starting from the zero value of Atom.
-// FIXME: rewrite to handle a stream with multiple top-level atoms
 func (a *Atom) UnmarshalBinary(data []byte) error {
 	return a.UnmarshalFromReader(bytes.NewReader(data))
 }
 
+// UnmarshalFromReader reads bytes from a reader. If the byte stream describes
+// a valid ADE Binary Container, the container is reconstructed with the Atom
+// receiver as the root container.
+// Returns an error if the byte stream is not a valid binary AtomContainer, or
+// there is more than one container in the stream.
 func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	atoms, err := ReadAtomsFromBinary(r)
 	if err != nil {
 		panic(fmt.Errorf("Failed to parse binary stream: %s", err))
 	}
 
+	// Set receiver to the sole top-level AtomContainer
 	switch len(atoms) {
 	case 1:
+		a.Zero()
 		*a = *atoms[0]
 	case 0:
 		panic(fmt.Errorf("Binary stream contained no atoms"))
@@ -116,6 +128,11 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	return err
 }
 
+// ReadAtomsFromBinary reads bytes from a reader. It expectst he byte stream to
+// describe 0 or more ADE binary AtomContainers.
+// It reconstructs all the AtomContainers found and returns them in an array of Atom objects.
+// Returns an error if the byte stream is not a valid binary AtomContainer, or
+// there is more than one container in the stream.
 func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 	defer func() {
 		if p := recover(); p != nil {
@@ -272,10 +289,6 @@ func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 }
 
 // Return length of this atom when encoded as binary bytes.
-//	+4 bytes (size field)
-//	+4 bytes (atom name field)
-//	+4 bytes (atom type field)
-// == 12 bytes minimum
 func (a *Atom) Len() (length uint32) {
 	length = uint32(headerSize + len(a.data))
 	for _, child := range a.Children {

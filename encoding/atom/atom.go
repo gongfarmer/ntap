@@ -16,11 +16,11 @@ import (
 	"unicode"
 )
 
-// Verify that type atom meets encoding interfaces at compile time
-var _ encoding.BinaryUnmarshaler = &(Atom{})
-var _ encoding.BinaryMarshaler = &(Atom{})
-var _ encoding.TextUnmarshaler = &(Atom{})
-var _ encoding.TextMarshaler = &(Atom{})
+// Verify that type Atom meets encoding interfaces at compile time
+var _ encoding.BinaryUnmarshaler = &Atom{}
+var _ encoding.BinaryMarshaler = &Atom{}
+var _ encoding.TextUnmarshaler = &Atom{}
+var _ encoding.TextMarshaler = &Atom{}
 
 type Atom struct {
 	Name     string
@@ -90,6 +90,7 @@ func (a *Atom) ZeroData() {
 	}
 }
 
+// String returns the atom's text description in ADE ContainerText format.
 func (a Atom) String() string {
 	buf, err := a.MarshalText()
 	if err != nil {
@@ -98,6 +99,8 @@ func (a Atom) String() string {
 	return string(buf)
 }
 
+// AddChild makes the Atom pointed to by the argument a child of this Atom.
+// Panics when called on non-container AToms.
 func (c *Atom) AddChild(a *Atom) {
 	if c.Type() == CONT {
 		c.Children = append(c.Children, a)
@@ -106,11 +109,13 @@ func (c *Atom) AddChild(a *Atom) {
 	}
 }
 
+// NumChildren returns a count of the number of children of this Atom.
+// Returns 0 for non-container Atoms.
 func (c *Atom) NumChildren() int {
 	return len(c.Children)
 }
 
-// List of pointers to every atom in hierarchical order
+// AtomList returns a list of pointers to every Atom in hierarchical order.
 func (c *Atom) AtomList() []*Atom {
 	return c.getAtomList(new([]*Atom))
 }
@@ -122,6 +127,9 @@ func (c *Atom) getAtomList(list *([]*Atom)) []*Atom {
 	return *list
 }
 
+// FromFile reads the filepath given as an argument, and attempts to read it in
+// as a binary AtomContainer.
+// On success, returns an Atom object. Returns an error otherwise.
 func FromFile(path string) (a Atom, err error) {
 	fstat, err := os.Stat(path)
 	if err != nil {
@@ -151,4 +159,14 @@ func checkError(err error) error {
 		return err
 	}
 	panic(err)
+}
+
+// Sets this atom object to the zero value of an Atom.
+// Updates the atom data ptr to point to zero-length slice, releasing any
+// previous memory allocated for data.
+// Updates the list of children to an empty slice.
+func (a *Atom) Zero() {
+	a.Name = ""
+	a.SetType(NULL)
+	a.Children = new([]Atom)
 }
