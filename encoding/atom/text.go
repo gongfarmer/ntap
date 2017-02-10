@@ -746,7 +746,6 @@ func readItem(p *parser) (it item) {
 			}
 		}
 	}
-	fmt.Println(it)
 	p.line = it.line
 	return
 }
@@ -802,10 +801,8 @@ func parseAtomName(p *parser) parseFunc {
 		return nil
 	}
 
-	// parse atom name
 	p.theAtom.Name = it.value // may be hex.. either way, store as string for now
 
-	// return next state
 	return parseAtomType
 }
 
@@ -823,7 +820,6 @@ func parseContainerEnd(p *parser) parseFunc {
 }
 
 func parseAtomType(p *parser) parseFunc {
-	// get next item
 	it := readItem(p)
 	if it.typ == itemEOF {
 		p.err = fmt.Errorf("end of input while parsing atom %s", p.theAtom.Name)

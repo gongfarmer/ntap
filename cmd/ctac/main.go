@@ -16,16 +16,17 @@ a binary file containing the same data in the ADE binary container format.
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Please provide input filename of a text file.\n")
+		fmt.Println("Please provide input filename.\n")
+		fmt.Println("The input should be a text file in ADE ContainerText format.\n")
 		os.Exit(1)
 	}
 	inFile := os.Args[1]
 
-	//if len(os.argv) < 3 {
-	//	fmt.Println("Please provide output filename for a binary file.\n")
-	//	os.Exit(1)
-	//}
-	//outFile = os.args[2]
+	if len(os.Args) < 3 {
+		fmt.Println("Please provide output filename.\n")
+		os.Exit(1)
+	}
+	outFile := os.Args[2]
 
 	var a atom.Atom
 	var buf []byte
@@ -38,9 +39,23 @@ func main() {
 
 	// FIXME strip out comments
 
+	// Read input file
 	if err = a.UnmarshalText(buf); err != nil {
-		fmt.Println("ctac: Unable to convert text to atoms: ", err)
+		fmt.Println("ctac: Invalid input container: ", err)
 		os.Exit(1)
 	}
-	fmt.Println(a)
+
+	// Convert to binary
+	buf, err = a.MarshalBinary()
+	if err != nil {
+		fmt.Println("ctac: Unable to convert container to binary: ", err)
+		os.Exit(1)
+	}
+
+	// Write binary to file
+	err = ioutil.WriteFile(outFile, buf, 0777)
+	if err != nil {
+		fmt.Println("ctac: Unable to write to file: ", err)
+		os.Exit(1)
+	}
 }

@@ -88,6 +88,10 @@ func (h atomHeader) isContainer() bool {
 	return ADEType(h.Type[:]) == CONT
 }
 
+/**********************************************************/
+// Unmarshal from binary
+/**********************************************************/
+
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
 // It can be used to rehydrate an Atom starting from the zero value of Atom.
 // FIXME: rewrite to handle a stream with multiple top-level atoms
@@ -223,4 +227,59 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 	}
 
 	return ReadAtomsFromBinary(bytes.NewReader(buffer))
+}
+
+/**********************************************************/
+// Marshal to binary
+/**********************************************************/
+
+// MarshalBinary implements encoding.BinaryMarshaler.
+// It can be used to rehydrate an Atom starting from the zero value of Atom.
+func (a *Atom) MarshalBinary() (data []byte, err error) {
+	buf := new(bytes.Buffer)
+	err = a.BinaryWrite(buf)
+	return buf.Bytes(), err
+}
+
+// Encode this atom and its children to binary bytes.
+// Write bytes to the given io.Writer.
+func (a *Atom) BinaryWrite(w io.Writer) (err error) {
+	// write atom header
+	var name [4]byte
+	var typ [4]byte
+	copy(name[:], a.Name)
+	copy(typ[:], a.Type())
+	err = binary.Write(w, binary.BigEndian, atomHeader{a.Len(), name, typ})
+	if err != nil {
+		return
+	}
+
+	// write atom data
+	_, err = w.Write(a.data)
+	if err != nil {
+		return
+	}
+
+	// write children
+	for _, child := range a.Children {
+		err = child.BinaryWrite(w)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+// Return length of this atom when encoded as binary bytes.
+//	+4 bytes (size field)
+//	+4 bytes (atom name field)
+//	+4 bytes (atom type field)
+// == 12 bytes minimum
+func (a *Atom) Len() (length uint32) {
+	length = uint32(headerSize + len(a.data))
+	for _, child := range a.Children {
+		length += child.Len()
+	}
+	return
 }

@@ -18,8 +18,7 @@ import (
 
 // Verify that type atom meets encoding interfaces at compile time
 var _ encoding.BinaryUnmarshaler = &(Atom{})
-
-// var _ encoding.BinaryMarshaler = Atom{}
+var _ encoding.BinaryMarshaler = &(Atom{})
 var _ encoding.TextUnmarshaler = &(Atom{})
 var _ encoding.TextMarshaler = &(Atom{})
 
