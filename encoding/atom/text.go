@@ -445,7 +445,9 @@ func lexIPAD(l *lexer) stateFn {
 	}
 	ipadChars := strings.Join([]string{hexDigits, ".:"}, "")
 	l.acceptRun(ipadChars)
-	l.accept("\"")
+	if !l.accept("\"") {
+		return l.errorf("invalid data for IPAD type: %s", l.buffer())
+	}
 	l.emit(itemString)
 	return lexEndOfLine
 }
@@ -454,7 +456,7 @@ func lexHexData(l *lexer) stateFn {
 	l.next()
 	l.next()
 	if l.buffer() != "0x" {
-		return l.errorf("hex data type should start with 0x")
+		return l.errorf("hex data type should start with 0x, got %s", l.buffer())
 	}
 	l.acceptRun(hexDigits)
 	return lexEndOfLine
@@ -697,14 +699,14 @@ func init() {
 	parseType[FC32] = parseFC32Value
 	parseType[IP32] = parseIP32
 	parseType[IPAD] = parseString
-	//	parseType[CSTR] = parseCSTR
-	//	parseType[USTR] = parseUSTR
-	//	parseType[DATA] = parseDATA
-	//	parseType[ENUM] = parseENUM
-	//	parseType[UUID] = parseUUID
+	parseType[CSTR] = parseString
+	parseType[USTR] = parseString
+	parseType[DATA] = parseString
+	parseType[UUID] = parseString
+	parseType[CNCT] = parseString
+	parseType[Cnct] = parseString
+	//	parseType[ENUM] = parseString
 	parseType[NULL] = parseNULL
-	//	parseType[CNCT] = parseDATA
-	//	parseType[cnct] = parseDATA
 	parseType[CONT] = parseNULL
 }
 

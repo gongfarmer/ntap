@@ -3,6 +3,7 @@ package atom
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"math"
@@ -690,9 +691,15 @@ func USTRToString(buf []byte) (v string, e error) {
 
 func USTRToStringEscaped(buf []byte) (v string, e error) {
 	v, e = USTRToString(buf)
-	if e == nil {
-		v = fmt.Sprintf("\"%s\"", adeCstrEscape(v))
+	if e != nil {
+		return
 	}
+
+	// ADE escaping
+	v = fmt.Sprintf("\"%s\"", adeCstrEscape(v))
+
+	// Go/unicode escaping
+	//v = strconv.Quote(v)
 	return
 }
 
@@ -854,19 +861,6 @@ func init() {
 	enc.SetUint = SetFC32FromUint
 	encoderByType[FC32] = enc
 
-	// =====
-
-	// ADE ENUM type
-	enc = NewEncoder(ENUM)
-	//	enc.SetString = StringToSI32
-	//	enc.SetInt = Int64ToSI32
-	encoderByType[ENUM] = enc
-
-	// ADE UUID type
-	enc = NewEncoder(UUID)
-	//	enc.SetString = StringToUUID
-	encoderByType[UUID] = enc
-
 	// IP Address types
 	enc = NewEncoder(IP32)
 	enc.SetString = SetIP32FromString
@@ -877,23 +871,36 @@ func init() {
 	enc.SetString = SetIPADFromString
 	encoderByType[IPAD] = enc
 
+	// ADE UUID type
+	enc = NewEncoder(UUID)
+	enc.SetString = SetUUIDFromString
+	encoderByType[UUID] = enc
+
 	// ADE String types
 	enc = NewEncoder(CSTR)
 	//	enc.SetStringRaw = StringToCSTR
-	//	enc.SetString = StringEscapedToCSTR
+	enc.SetString = SetCSTRFromEscapedString
 	encoderByType[CSTR] = enc
 
 	enc = NewEncoder(USTR)
 	//	enc.SetStringRaw = StringToUSTR
-	//	enc.SetString = StringEscapedToUSTR
+	enc.SetString = SetUSTRFromEscapedString
 	encoderByType[USTR] = enc
 
 	// DATA type, and aliases
 	enc = NewEncoder(DATA)
-	//	enc.SetString = HexStringToBytes
+	enc.SetString = SetDataFromHexString
 	encoderByType[DATA] = enc
 	encoderByType[CNCT] = enc
 	encoderByType[Cnct] = enc
+
+	// =====
+
+	// ADE ENUM type
+	enc = NewEncoder(ENUM)
+	//	enc.SetString = StringToSI32
+	//	enc.SetInt = Int64ToSI32
+	encoderByType[ENUM] = enc
 
 	// NULL type
 	enc = NewEncoder(NULL)
@@ -902,7 +909,7 @@ func init() {
 
 	// ADE container
 	enc = NewEncoder(CONT)
-	enc.SetString = func(a *Atom, v string) error { return nil }
+	//	enc.SetString = func(
 	encoderByType[CONT] = enc
 }
 
@@ -1412,17 +1419,99 @@ func SetIPADFromString(a *Atom, v string) (e error) {
 	}
 
 	buf[size-1] = '\x00' // replace end delimiter with null byte terminator
-	a.data = buf[1:]     // from 1, to skip start delimiter
+	a.data = buf[1:]     // from 1, skips start delimiter
 	return
 }
 
-// Strip exactly one of the delimiter rune from the front and one from the end
-// of the string. Return a copy of the string without these delimiters.
-// If both end delimiters exist and are removed, return true.
-func stripDelimiter(s string, delim string) (string, bool) {
-	if !strings.HasPrefix(s, delim) || !strings.HasSuffix(s, delim) {
-		return "", false
+// No NULL terminator is used for this type
+func SetUUIDFromString(a *Atom, v string) (e error) {
+	size := len(v)
+	buf := make([]byte, size)
+	copy(buf[:], v)
+
+	// verify delimiters
+	if buf[0] != '"' || buf[size-1] != '"' {
+		return fmt.Errorf("UUID lacks delimiters: (%s)", v)
 	}
-	buf := []byte(s)
-	return string(buf[1 : len(buf)-1]), true
+
+	// verify valid chars for UUID
+	chars := "0123456789abcdefABCDEF-"
+	for _, r := range buf[1 : size-1] {
+		if !strings.ContainsRune(chars, rune(r)) {
+			return fmt.Errorf("invalid char in UUID: '%c'", r)
+		}
+	}
+
+	// Verify format (example 64881431-B6DC-478E-B7EE-ED306619C797 )
+	groups := strings.Split(v, "-")
+	if len(groups) != 5 || len(groups[0]) != 8 ||
+		len(groups[1]) != 4 || len(groups[2]) != 4 ||
+		len(groups[3]) != 4 || len(groups[4]) != 12 {
+		return fmt.Errorf("invalid format for UUID: %s", v)
+	}
+
+	a.data = buf[1 : size-1] // slice range skips delimiters
+	return
+}
+
+// Uses NULL terminator
+func SetCSTRFromEscapedString(a *Atom, v string) (e error) {
+	size := len(v)
+	buf := make([]byte, size)
+	copy(buf[:], v)
+
+	// verify delimiters
+	if buf[0] != '"' || buf[size-1] != '"' {
+		return fmt.Errorf("CSTR value must be double-quoted: (%s)", v)
+	}
+
+	buf[size-1] = '\x00' // replace end delimiter with null byte terminator
+	a.data = buf[1:]     // from 1, skips start delimiter
+	return
+}
+
+// Every character in an ADE USTR is encoded as 4 bytes.
+// There's no variable-length encoding.
+// No NULL terminator is used for this type, unlike CSTR.
+func SetUSTRFromEscapedString(a *Atom, v string) (e error) {
+
+	// verify delimiters (required for strconv.Unquote() )
+	if v[0] != '"' || v[len(v)-1] != '"' {
+		return fmt.Errorf("USTR value must be double-quoted: (%s)", v)
+	}
+
+	// unescape the string
+	var s string
+	s, e = strconv.Unquote(v)
+	if e != nil {
+		return
+	}
+
+	// write each rune as 4 bytes:
+	//	 1. Padding (0-3 bytes, as 4 - <bytes in rune UTF8 encoding>)
+	//   2. rune (1-4 bytes, UTF-8 variable-length encoding)
+	buf := new(bytes.Buffer)
+	for _, r := range s { // iterate by rune
+		e := binary.Write(buf, binary.BigEndian, uint32(r))
+		if e != nil {
+			return e
+		}
+	}
+	a.data = buf.Bytes()
+
+	return
+}
+
+func SetDataFromHexString(a *Atom, v string) (e error) {
+	if !strings.HasPrefix(v, "0x") {
+		return fmt.Errorf("hexadecimal string should start with 0x, got \"%s\"", v)
+	}
+	//	bufPtr := make([]byte, len(v)/2)
+
+	buffer, e := hex.DecodeString(v[2:])
+	if e != nil {
+		return
+	}
+	a.data = buffer
+	return
 }
