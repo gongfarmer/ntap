@@ -1065,7 +1065,6 @@ func SetSI16FromInt64(a *Atom, v int64) (e error) {
 func SetSI32FromString(a *Atom, v string) (e error) {
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 32)
-	fmt.Println(a.String(), v, i, len(a.data))
 	if e == nil {
 		binary.BigEndian.PutUint32(a.data, uint32(i))
 	}

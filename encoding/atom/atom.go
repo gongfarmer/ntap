@@ -76,13 +76,13 @@ func (a *Atom) ZeroData() {
 		a.data = make([]byte, 1)
 	case UI16, SI16:
 		a.data = make([]byte, 2)
-	case UI01, UI32, SI32, FP32, UF32, SF32, SR32, UR32, FC32, IP32:
+	case UI01, UI32, SI32, FP32, UF32, SF32, SR32, UR32, FC32, IP32, ENUM:
 		a.data = make([]byte, 4)
 	case UI64, SI64, FP64, UF64, SF64, UR64, SR64:
 		a.data = make([]byte, 8)
 	case UUID:
 		a.data = make([]byte, 36)
-	case IPAD, CSTR, USTR, DATA, ENUM, CNCT, Cnct:
+	case IPAD, CSTR, USTR, DATA, CNCT, Cnct:
 		a.data = make([]byte, 0)
 	case CONT, NULL:
 		a.data = make([]byte, 0)

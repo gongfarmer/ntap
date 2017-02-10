@@ -200,6 +200,9 @@ func (l *lexer) ignore() {
 // Can only be called once per call of next.
 func (l *lexer) backup() {
 	l.pos -= uint32(l.width)
+	if l.input[l.pos] == '\n' {
+		l.line--
+	}
 }
 
 // peek returns but does not consume the next rune in the input.
@@ -276,7 +279,7 @@ func lexLine(l *lexer) stateFn {
 	ok := true
 	for ok {
 		if l.chars() != 0 {
-			s := fmt.Sprintf("Expecting empy buffer at start of line, got <<<%s>>>", l.buffer())
+			s := fmt.Sprintf("expecting empy buffer at start of line, got <<<%s>>>", l.buffer())
 			panic(s)
 		}
 		r := l.next()
@@ -358,13 +361,10 @@ func lexAtomType(l *lexer) stateFn {
 
 		switch atyp {
 		case "CONT":
-			l.accept(":")
 			// NOTE: ade ccat accepts arbitrary chars until end of line.
-			return lexEndOfLine
+			return lexNullValue
 		case "NULL":
-			l.emit(itemNULL)
-			l.accept(":")
-			return lexEndOfLine
+			return lexNullValue
 		case "UUID":
 			return lexUUID
 		case "UR32", "UR64", "SR32", "SR64":
@@ -459,6 +459,7 @@ func lexHexData(l *lexer) stateFn {
 		return l.errorf("hex data type should start with 0x, got %s", l.buffer())
 	}
 	l.acceptRun(hexDigits)
+	l.emit(itemString)
 	return lexEndOfLine
 }
 
@@ -596,6 +597,12 @@ func lexString(l *lexer) stateFn {
 	}
 
 	l.emit(itemString)
+	return lexEndOfLine
+}
+
+func lexNullValue(l *lexer) stateFn {
+	l.emit(itemNULL)
+	l.accept(":")
 	return lexEndOfLine
 }
 
@@ -739,6 +746,7 @@ func readItem(p *parser) (it item) {
 			}
 		}
 	}
+	fmt.Println(it)
 	p.line = it.line
 	return
 }
@@ -790,6 +798,7 @@ func parseAtomName(p *parser) parseFunc {
 	}
 	if it.typ != itemAtomName {
 		p.err = fmt.Errorf("line %d: expecting atom name, got %s", it.line+1, it.typ)
+		panic(p.err)
 		return nil
 	}
 
@@ -873,8 +882,9 @@ func parseNumber(p *parser) parseFunc {
 	return parseAtomName
 }
 
-// Read empty data section.  Consume no tokens.
+// Read empty data section.  Consume one token, which is ignored.
 func parseNULL(p *parser) parseFunc {
+	readItem(p)
 	return parseAtomName
 }
 
