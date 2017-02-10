@@ -698,6 +698,8 @@ func USTRToStringEscaped(buf []byte) (v string, e error) {
 	// ADE escaping
 	v = fmt.Sprintf("\"%s\"", adeCstrEscape(v))
 
+	// FIXME: need escaping on decode / encode to be exact inverse operations
+
 	// Go/unicode escaping
 	//v = strconv.Quote(v)
 	return

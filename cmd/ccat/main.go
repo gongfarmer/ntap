@@ -13,13 +13,10 @@ import (
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
 
-// FIXME Support parsing of files containing hex, since hex+binary are
-// supported on STDIN they should both be allowed within files.
-
-var FlagDebug = flag.Bool("d", true, "print atoms in detailed debug format")
+var FlagDebug = flag.Bool("d", false, "print atoms in detailed debug format")
 
 func printAtom(a atom.Atom) {
-	if *FlagDebug {
+	if true == *FlagDebug {
 		printDebug(a)
 	} else {
 		printString(a)
