@@ -129,6 +129,7 @@ func NewDecoder(from ADEType) decoder {
 		Float:       func([]byte) (v float64, e error) { return v, noDecoder(from, "float64") },
 		SliceOfUint: func([]byte) (v []uint64, e error) { return v, noDecoder(from, "[]uint64") },
 		SliceOfInt:  func([]byte) (v []int64, e error) { return v, noDecoder(from, "[]int64") },
+		SliceOfByte: func(data []byte) (v []byte, e error) { return data, nil },
 	}
 }
 
@@ -328,6 +329,10 @@ func init() {
 // ADE unsigned int types
 
 func UI08ToUint64(buf []byte) (v uint64, e error) {
+	if len(buf) != 1 {
+		e = fmt.Errorf("invalid byte count for ADE type UI08: expected 1, got %d", len(buf))
+		return
+	}
 	return uint64(buf[0]), e
 }
 func UI16ToUint64(buf []byte) (v uint64, e error) {
