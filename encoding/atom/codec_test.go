@@ -14,6 +14,7 @@ type testBytesToUint struct {
 	WantValue uint64
 	WantError error
 }
+
 type fromBytesFunc func([]byte) (uint64, error)
 
 // Given a function as an argument, return the function's name
@@ -28,12 +29,18 @@ func runTestsUint(t *testing.T, tests []testBytesToUint, f fromBytesFunc) {
 		got_value, got_err := f(test.Input)
 
 		funcName := GetFunctionName(f)
+		fmt.Printf("got %v, want %v\n", got_err, test.WantError)
 		switch {
-		case got_err == nil && test.WantError == nil {
-		}
-		if got_err != test.WantError {
+		case got_err == nil && test.WantError == nil:
+		case got_err != nil && test.WantError == nil:
+			fallthrough
+		case got_err == nil && test.WantError != nil:
+			fallthrough
+		case got_err.Error() != test.WantError.Error():
 			t.Errorf("%v(%q): got err %s, want err %s", funcName, test.Input, got_err, test.WantError)
+			return
 		}
+
 		if got_value != test.WantValue {
 			t.Errorf("%v(%q): got value %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, got_value, test.WantValue)
 		}
@@ -42,6 +49,7 @@ func runTestsUint(t *testing.T, tests []testBytesToUint, f fromBytesFunc) {
 
 //func TestUI08ToUint64(buf []byte) (v uint64, e error) {
 func TestUI08ToUint64(t *testing.T) {
+	err_fmt := "invalid byte count for ADE type UI08: want %d, got %d"
 	tests := []testBytesToUint{
 		testBytesToUint{[]byte("\x00"), 0, nil},
 		testBytesToUint{[]byte("\x01"), 1, nil},
@@ -49,19 +57,27 @@ func TestUI08ToUint64(t *testing.T) {
 		testBytesToUint{[]byte("\x0F"), 15, nil},
 		testBytesToUint{[]byte("\xF0"), 240, nil},
 		testBytesToUint{[]byte("\xFF"), 255, nil},
-		testBytesToUint{[]byte("\x00\x00"), 0, fmt.Errorf("invalid byte count for ADE type UI08: expected 1, got 2")},
+		testBytesToUint{[]byte("\x00\x00"), 0, fmt.Errorf(err_fmt, 1, 2)},
+		testBytesToUint{[]byte("\xFF\xFF"), 0, fmt.Errorf(err_fmt, 1, 2)},
+		testBytesToUint{[]byte(""), 0, fmt.Errorf(err_fmt, 1, 0)},
 	}
 	runTestsUint(t, tests, UI08ToUint64)
 }
 
-// func UI16ToUint64(buf []byte) (v uint64, e error) {
-// 	tests := []testBytesToUint{
-// 		testBytesToUint{[]byte("\x00"), 0, nil},
-// 		testBytesToUint{[]byte("\x01"), 1, nil},
-// 	}
-//
-// 	runTestsUint(t, tests, UI08ToUint64)
-// }
+func TestUI16ToUint64(t *testing.T) {
+	err_fmt := "invalid byte count for ADE type UI16: want %d, got %d"
+	tests := []testBytesToUint{
+		testBytesToUint{[]byte("\x00\x00"), 0, nil},
+		testBytesToUint{[]byte("\x00\xFF"), 255, nil},
+		testBytesToUint{[]byte("\xFF\x00"), 65280, nil},
+		testBytesToUint{[]byte("\xFF\xFF"), 65535, nil},
+		testBytesToUint{[]byte("\x00\x00\x01"), 0, fmt.Errorf(err_fmt, 2, 3)},
+		testBytesToUint{[]byte("\xFF"), 0, fmt.Errorf(err_fmt, 2, 1)},
+		testBytesToUint{[]byte("\x00"), 0, fmt.Errorf(err_fmt, 2, 1)},
+		testBytesToUint{[]byte{}, 0, fmt.Errorf(err_fmt, 2, 0)},
+	}
+	runTestsUint(t, tests, UI16ToUint64)
+}
 
 //func UI32ToBool(buf []byte) (v bool, e error) {
 //func UI32ToUint32(buf []byte) (v uint32, e error) {

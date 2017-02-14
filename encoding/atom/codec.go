@@ -330,12 +330,16 @@ func init() {
 
 func UI08ToUint64(buf []byte) (v uint64, e error) {
 	if len(buf) != 1 {
-		e = fmt.Errorf("invalid byte count for ADE type UI08: expected 1, got %d", len(buf))
+		e = fmt.Errorf("invalid byte count for ADE type UI08: want 1, got %d", len(buf))
 		return
 	}
 	return uint64(buf[0]), e
 }
 func UI16ToUint64(buf []byte) (v uint64, e error) {
+	if len(buf) != 2 {
+		e = fmt.Errorf("invalid byte count for ADE type UI16: want 2, got %d", len(buf))
+		return
+	}
 	return uint64(binary.BigEndian.Uint16(buf)), e
 }
 func UI32ToBool(buf []byte) (v bool, e error) {
