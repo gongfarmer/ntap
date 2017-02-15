@@ -29,7 +29,6 @@ func runTestsUint(t *testing.T, tests []testBytesToUint, f fromBytesFunc) {
 		got_value, got_err := f(test.Input)
 
 		funcName := GetFunctionName(f)
-		fmt.Printf("got %v, want %v\n", got_err, test.WantError)
 		switch {
 		case got_err == nil && test.WantError == nil:
 		case got_err != nil && test.WantError == nil:
@@ -49,7 +48,7 @@ func runTestsUint(t *testing.T, tests []testBytesToUint, f fromBytesFunc) {
 
 //func TestUI08ToUint64(buf []byte) (v uint64, e error) {
 func TestUI08ToUint64(t *testing.T) {
-	err_fmt := "invalid byte count for ADE type UI08: want %d, got %d"
+	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI08", 1)
 	tests := []testBytesToUint{
 		testBytesToUint{[]byte("\x00"), 0, nil},
 		testBytesToUint{[]byte("\x01"), 1, nil},
@@ -57,29 +56,68 @@ func TestUI08ToUint64(t *testing.T) {
 		testBytesToUint{[]byte("\x0F"), 15, nil},
 		testBytesToUint{[]byte("\xF0"), 240, nil},
 		testBytesToUint{[]byte("\xFF"), 255, nil},
-		testBytesToUint{[]byte("\x00\x00"), 0, fmt.Errorf(err_fmt, 1, 2)},
-		testBytesToUint{[]byte("\xFF\xFF"), 0, fmt.Errorf(err_fmt, 1, 2)},
-		testBytesToUint{[]byte(""), 0, fmt.Errorf(err_fmt, 1, 0)},
+		testBytesToUint{[]byte("\x00\x00"), 0, fmt.Errorf(fmtByteCount, 2)},
+		testBytesToUint{[]byte("\xFF\xFF"), 0, fmt.Errorf(fmtByteCount, 2)},
+		testBytesToUint{[]byte(""), 0, fmt.Errorf(fmtByteCount, 0)},
 	}
 	runTestsUint(t, tests, UI08ToUint64)
 }
 
 func TestUI16ToUint64(t *testing.T) {
-	err_fmt := "invalid byte count for ADE type UI16: want %d, got %d"
+	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI16", 2)
 	tests := []testBytesToUint{
 		testBytesToUint{[]byte("\x00\x00"), 0, nil},
 		testBytesToUint{[]byte("\x00\xFF"), 255, nil},
 		testBytesToUint{[]byte("\xFF\x00"), 65280, nil},
 		testBytesToUint{[]byte("\xFF\xFF"), 65535, nil},
-		testBytesToUint{[]byte("\x00\x00\x01"), 0, fmt.Errorf(err_fmt, 2, 3)},
-		testBytesToUint{[]byte("\xFF"), 0, fmt.Errorf(err_fmt, 2, 1)},
-		testBytesToUint{[]byte("\x00"), 0, fmt.Errorf(err_fmt, 2, 1)},
-		testBytesToUint{[]byte{}, 0, fmt.Errorf(err_fmt, 2, 0)},
+		testBytesToUint{[]byte("\x00\x00\x01"), 0, fmt.Errorf(fmtByteCount, 3)},
+		testBytesToUint{[]byte("\xFF"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint{[]byte("\x00"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint{[]byte{}, 0, fmt.Errorf(fmtByteCount, 0)},
 	}
 	runTestsUint(t, tests, UI16ToUint64)
 }
 
-//func UI32ToBool(buf []byte) (v bool, e error) {
+func TestUI32ToBool(t *testing.T) {
+	type testBytesToBool struct {
+		Input     []byte
+		WantValue bool
+		WantError error
+	}
+	fmtTooBig := "value %d overflows type bool"
+	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI01", 4)
+	tests := []testBytesToBool{
+		testBytesToBool{[]byte("\x00\x00\x00\x00"), false, nil},
+		testBytesToBool{[]byte("\x00\x00\x00\x01"), true, nil},
+		testBytesToBool{[]byte("\x00\x00\x00\x02"), false, fmt.Errorf(fmtTooBig, 2)},
+		testBytesToBool{[]byte("\x00\x00\x00\xFF"), false, fmt.Errorf(fmtTooBig, 255)},
+		testBytesToBool{[]byte(""), false, fmt.Errorf(fmtByteCount, 0)},
+		testBytesToBool{[]byte("\x01"), false, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToBool{[]byte("\x00\x01"), false, fmt.Errorf(fmtByteCount, 2)},
+		testBytesToBool{[]byte("\x00\x00\x01"), false, fmt.Errorf(fmtByteCount, 3)},
+		testBytesToBool{[]byte("\x00\x00\x00\x00\x01"), false, fmt.Errorf(fmtByteCount, 5)},
+		testBytesToBool{[]byte("\x00\x00\x00\x00\x00\x01"), false, fmt.Errorf(fmtByteCount, 6)},
+	}
+	funcName := "UI32ToBool"
+	for _, test := range tests {
+		got_value, got_err := UI32ToBool(test.Input)
+		switch {
+		case got_err == nil && test.WantError == nil:
+		case got_err != nil && test.WantError == nil:
+			fallthrough
+		case got_err == nil && test.WantError != nil:
+			fallthrough
+		case got_err.Error() != test.WantError.Error():
+			t.Errorf("%v(%q): got err <<%s>>, want err <<%s>>", funcName, test.Input, got_err, test.WantError)
+			return
+		}
+
+		if got_value != test.WantValue {
+			t.Errorf("%v(%q): got value %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, got_value, test.WantValue)
+		}
+	}
+}
+
 //func UI32ToUint32(buf []byte) (v uint32, e error) {
 //func UI32ToUint64(buf []byte) (v uint64, e error) {
 //func UI64ToUint64(buf []byte) (v uint64, e error) {

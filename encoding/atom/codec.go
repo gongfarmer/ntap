@@ -329,23 +329,24 @@ func init() {
 // ADE unsigned int types
 
 func UI08ToUint64(buf []byte) (v uint64, e error) {
-	if len(buf) != 1 {
-		e = fmt.Errorf("invalid byte count for ADE type UI08: want 1, got %d", len(buf))
+	if e = checkByteCount(buf, 1, "UI08"); e != nil {
 		return
 	}
 	return uint64(buf[0]), e
 }
 func UI16ToUint64(buf []byte) (v uint64, e error) {
-	if len(buf) != 2 {
-		e = fmt.Errorf("invalid byte count for ADE type UI16: want 2, got %d", len(buf))
+	if e = checkByteCount(buf, 2, "UI16"); e != nil {
 		return
 	}
 	return uint64(binary.BigEndian.Uint16(buf)), e
 }
 func UI32ToBool(buf []byte) (v bool, e error) {
+	if e = checkByteCount(buf, 4, "UI01"); e != nil {
+		return
+	}
 	ui32 := binary.BigEndian.Uint32(buf)
 	if ui32 != 0 && ui32 != 1 {
-		e = fmt.Errorf("range error: value %d overflows type bool", ui32)
+		e = fmt.Errorf("value %d overflows type bool", ui32)
 		return
 	}
 	return ui32 == 1, e
@@ -1522,5 +1523,12 @@ func SetDATAFromHexString(a *Atom, v string) (e error) {
 		return
 	}
 	a.data = buffer
+	return
+}
+
+func checkByteCount(buf []byte, bytesExpected int, strType string) (e error) {
+	if len(buf) != bytesExpected {
+		e = fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", strType, bytesExpected, len(buf))
+	}
 	return
 }
