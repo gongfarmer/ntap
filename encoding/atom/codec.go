@@ -365,18 +365,33 @@ func UI32ToUint64(buf []byte) (v uint64, e error) {
 	return uint64(ui32), e
 }
 func UI64ToUint64(buf []byte) (v uint64, e error) {
+	if e = checkByteCount(buf, 8, "UI64"); e != nil {
+		return
+	}
 	return binary.BigEndian.Uint64(buf), e
 }
 func UI08ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 1, "UI08"); e != nil {
+		return
+	}
 	return fmt.Sprintf("%d", (buf[0])), e
 }
 func UI16ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 2, "UI16"); e != nil {
+		return
+	}
 	return fmt.Sprintf("%d", binary.BigEndian.Uint16(buf)), e
 }
 func UI32ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 4, "UI32"); e != nil {
+		return
+	}
 	return fmt.Sprintf("%d", binary.BigEndian.Uint32(buf)), e
 }
 func UI64ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 8, "UI64"); e != nil {
+		return
+	}
 	return fmt.Sprintf("%d", binary.BigEndian.Uint64(buf)), e
 }
 

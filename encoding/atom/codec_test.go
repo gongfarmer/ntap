@@ -70,12 +70,60 @@ func TestUI16ToUint64(t *testing.T) {
 		testBytesToUint{[]byte("\x00\xFF"), 255, nil},
 		testBytesToUint{[]byte("\xFF\x00"), 65280, nil},
 		testBytesToUint{[]byte("\xFF\xFF"), 65535, nil},
-		testBytesToUint{[]byte("\x00\x00\x01"), 0, fmt.Errorf(fmtByteCount, 3)},
-		testBytesToUint{[]byte("\xFF"), 0, fmt.Errorf(fmtByteCount, 1)},
-		testBytesToUint{[]byte("\x00"), 0, fmt.Errorf(fmtByteCount, 1)},
 		testBytesToUint{[]byte{}, 0, fmt.Errorf(fmtByteCount, 0)},
+		testBytesToUint{[]byte("\x00"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint{[]byte("\xFF"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint{[]byte("\x00\x00\x01"), 0, fmt.Errorf(fmtByteCount, 3)},
 	}
 	runTestsUint(t, tests, UI16ToUint64)
+}
+
+func TestUI32ToUint64(t *testing.T) {
+	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI32", 4)
+	tests := []testBytesToUint{
+		testBytesToUint{[]byte("\x00\x00\x00\x00"), 0, nil},
+		testBytesToUint{[]byte("\x00\x00\x00\xFF"), 0xFF, nil},
+		testBytesToUint{[]byte("\x00\x00\xFF\x00"), 0xFF00, nil},
+		testBytesToUint{[]byte("\x00\xFF\x00\x00"), 0xFF0000, nil},
+		testBytesToUint{[]byte("\xFF\x00\x00\x00"), 0xFF000000, nil},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF"), 0xFFFFFFFF, nil},
+
+		testBytesToUint{[]byte{}, 0, fmt.Errorf(fmtByteCount, 0)},
+		testBytesToUint{[]byte("\x01"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint{[]byte("\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 2)},
+		testBytesToUint{[]byte("\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 3)},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\x01"), 0xFFFFFF01, nil},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 5)},
+	}
+	runTestsUint(t, tests, UI32ToUint64)
+}
+
+func TestUI64ToUint64(t *testing.T) {
+	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI64", 8)
+	tests := []testBytesToUint{
+		testBytesToUint{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), 0, nil},
+		testBytesToUint{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), 0xFF, nil},
+		testBytesToUint{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), 0xFF00, nil},
+		testBytesToUint{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), 0xFF0000, nil},
+		testBytesToUint{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), 0xFF000000, nil},
+		testBytesToUint{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), 0xFF00000000, nil},
+		testBytesToUint{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), 0xFF0000000000, nil},
+		testBytesToUint{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), 0xFF000000000000, nil},
+		testBytesToUint{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), 0xFF00000000000000, nil},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), 0xFFFFFFFFFFFFFFFF, nil},
+
+		testBytesToUint{[]byte{}, 0, fmt.Errorf(fmtByteCount, 0)},
+		testBytesToUint{[]byte("\x01"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint{[]byte("\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 2)},
+		testBytesToUint{[]byte("\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 3)},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 4)},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 5)},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 6)},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 7)},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), 0xFFFFFFFFFFFFFF01, nil},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), 0, fmt.Errorf(fmtByteCount, 9)},
+	}
+	runTestsUint(t, tests, UI64ToUint64)
 }
 
 func TestUI01ToBool(t *testing.T) {
@@ -153,8 +201,6 @@ func funcUI32ToUint32(t *testing.T) {
 	}
 }
 
-//func UI32ToUint64(buf []byte) (v uint64, e error) {
-//func UI64ToUint64(buf []byte) (v uint64, e error) {
 //func UI08ToString(buf []byte) (v string, e error) {
 //func UI16ToString(buf []byte) (v string, e error) {
 //func UI32ToString(buf []byte) (v string, e error) {
