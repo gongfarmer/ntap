@@ -47,7 +47,6 @@ func runTestsUint(t *testing.T, tests []testBytesToUint, f fromBytesFunc) {
 	}
 }
 
-//func TestUI08ToUint64(buf []byte) (v uint64, e error) {
 func TestUI08ToUint64(t *testing.T) {
 	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI08", 1)
 	tests := []testBytesToUint{
@@ -79,7 +78,7 @@ func TestUI16ToUint64(t *testing.T) {
 	runTestsUint(t, tests, UI16ToUint64)
 }
 
-func TestUI32ToBool(t *testing.T) {
+func TestUI01ToBool(t *testing.T) {
 	type testBytesToBool struct {
 		Input     []byte
 		WantValue bool
@@ -99,9 +98,9 @@ func TestUI32ToBool(t *testing.T) {
 		testBytesToBool{[]byte("\x00\x00\x00\x00\x01"), false, fmt.Errorf(fmtByteCount, 5)},
 		testBytesToBool{[]byte("\x00\x00\x00\x00\x00\x01"), false, fmt.Errorf(fmtByteCount, 6)},
 	}
-	funcName := "UI32ToBool"
+	funcName := "UI01ToBool"
 	for _, test := range tests {
-		got_value, got_err := UI32ToBool(test.Input)
+		got_value, got_err := UI01ToBool(test.Input)
 		switch {
 		case got_err == nil && test.WantError == nil:
 		case got_err != nil && test.WantError == nil:
@@ -120,18 +119,38 @@ func TestUI32ToBool(t *testing.T) {
 }
 
 func funcUI32ToUint32(t *testing.T) {
-
-	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI32", 4)
-	tests := []testBytesToUint{
-		testBytesToUint{[]byte{}, 0, fmt.Errorf(fmtByteCount, 0)},
-		testBytesToUint{[]byte("\x00"), 0, fmt.Errorf(fmtByteCount, 1)},
-		testBytesToUint{[]byte("\x00\xFF"), 0, fmt.Errorf(fmtByteCount, 2)},
-		testBytesToUint{[]byte("\xFF\x00\xFF"), 0, fmt.Errorf(fmtByteCount, 3)},
-		testBytesToUint{[]byte("\x00\x00\x00\x00"), 0, nil},
-		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF"), math.MaxUint32, nil},
-		testBytesToUint{[]byte("\x01\xFF\xFF\xFF\xFF"), 0, nil},
+	type testBytesToUint32 struct {
+		Input     []byte
+		WantValue uint32
+		WantError error
 	}
-	runTestsUint(t, tests, UI32ToUint32)
+	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI32", 4)
+	tests := []testBytesToUint32{
+		testBytesToUint32{[]byte{}, 0, fmt.Errorf(fmtByteCount, 0)},
+		testBytesToUint32{[]byte("\x00"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint32{[]byte("\x00\xFF"), 0, fmt.Errorf(fmtByteCount, 2)},
+		testBytesToUint32{[]byte("\xFF\x00\xFF"), 0, fmt.Errorf(fmtByteCount, 3)},
+		testBytesToUint32{[]byte("\x00\x00\x00\x00"), 0, nil},
+		testBytesToUint32{[]byte("\xFF\xFF\xFF\xFF"), math.MaxUint32, nil},
+		testBytesToUint32{[]byte("\x01\xFF\xFF\xFF\xFF"), 0, nil},
+	}
+	funcName := "UI32ToUint32"
+	for _, test := range tests {
+		got_value, got_err := UI32ToUint32(test.Input)
+		switch {
+		case got_err == nil && test.WantError == nil:
+		case got_err != nil && test.WantError == nil:
+			fallthrough
+		case got_err == nil && test.WantError != nil:
+			fallthrough
+		case got_err.Error() != test.WantError.Error():
+			t.Errorf("%v(%q): got err <<%s>>, want err <<%s>>", funcName, test.Input, got_err, test.WantError)
+			return
+		}
+		if got_value != test.WantValue {
+			t.Errorf("%v(%q): got value %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, got_value, test.WantValue)
+		}
+	}
 }
 
 //func UI32ToUint64(buf []byte) (v uint64, e error) {

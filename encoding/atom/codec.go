@@ -173,7 +173,7 @@ func init() {
 	// ADE unsigned int types
 	dec := NewDecoder(UI01)
 	dec.String = UI32ToString
-	dec.Bool = UI32ToBool
+	dec.Bool = UI01ToBool
 	dec.Uint = UI32ToUint64
 	decoderByType[UI01] = dec
 
@@ -340,8 +340,8 @@ func UI16ToUint64(buf []byte) (v uint64, e error) {
 	}
 	return uint64(binary.BigEndian.Uint16(buf)), e
 }
-func UI32ToBool(buf []byte) (v bool, e error) {
-	if e = checkByteCount(buf, 4, "UI32"); e != nil {
+func UI01ToBool(buf []byte) (v bool, e error) {
+	if e = checkByteCount(buf, 4, "UI01"); e != nil {
 		return
 	}
 	ui32 := binary.BigEndian.Uint32(buf)

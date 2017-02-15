@@ -168,5 +168,5 @@ func checkError(err error) error {
 func (a *Atom) Zero() {
 	a.Name = ""
 	a.SetType(NULL)
-	a.Children = new([]Atom)
+	a.Children = []*Atom{}
 }
