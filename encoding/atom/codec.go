@@ -341,20 +341,26 @@ func UI16ToUint64(buf []byte) (v uint64, e error) {
 	return uint64(binary.BigEndian.Uint16(buf)), e
 }
 func UI32ToBool(buf []byte) (v bool, e error) {
-	if e = checkByteCount(buf, 4, "UI01"); e != nil {
+	if e = checkByteCount(buf, 4, "UI32"); e != nil {
 		return
 	}
 	ui32 := binary.BigEndian.Uint32(buf)
-	if ui32 != 0 && ui32 != 1 {
+	if ui32 > 1 {
 		e = fmt.Errorf("value %d overflows type bool", ui32)
 		return
 	}
 	return ui32 == 1, e
 }
 func UI32ToUint32(buf []byte) (v uint32, e error) {
+	if e = checkByteCount(buf, 4, "UI32"); e != nil {
+		return
+	}
 	return binary.BigEndian.Uint32(buf), e
 }
 func UI32ToUint64(buf []byte) (v uint64, e error) {
+	if e = checkByteCount(buf, 4, "UI32"); e != nil {
+		return
+	}
 	var ui32 uint32 = binary.BigEndian.Uint32(buf)
 	return uint64(ui32), e
 }
@@ -1516,7 +1522,6 @@ func SetDATAFromHexString(a *Atom, v string) (e error) {
 	if !strings.HasPrefix(v, "0x") {
 		return fmt.Errorf("hexadecimal string should start with 0x, got \"%s\"", v)
 	}
-	//	bufPtr := make([]byte, len(v)/2)
 
 	buffer, e := hex.DecodeString(v[2:])
 	if e != nil {

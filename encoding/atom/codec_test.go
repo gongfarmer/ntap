@@ -2,6 +2,7 @@ package atom
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 	"runtime"
 	"strings"
@@ -118,7 +119,21 @@ func TestUI32ToBool(t *testing.T) {
 	}
 }
 
-//func UI32ToUint32(buf []byte) (v uint32, e error) {
+func funcUI32ToUint32(t *testing.T) {
+
+	fmtByteCount := fmt.Sprintf("invalid byte count for ADE type %s: want %d, got %%d", "UI32", 4)
+	tests := []testBytesToUint{
+		testBytesToUint{[]byte{}, 0, fmt.Errorf(fmtByteCount, 0)},
+		testBytesToUint{[]byte("\x00"), 0, fmt.Errorf(fmtByteCount, 1)},
+		testBytesToUint{[]byte("\x00\xFF"), 0, fmt.Errorf(fmtByteCount, 2)},
+		testBytesToUint{[]byte("\xFF\x00\xFF"), 0, fmt.Errorf(fmtByteCount, 3)},
+		testBytesToUint{[]byte("\x00\x00\x00\x00"), 0, nil},
+		testBytesToUint{[]byte("\xFF\xFF\xFF\xFF"), math.MaxUint32, nil},
+		testBytesToUint{[]byte("\x01\xFF\xFF\xFF\xFF"), 0, nil},
+	}
+	runTestsUint(t, tests, UI32ToUint32)
+}
+
 //func UI32ToUint64(buf []byte) (v uint64, e error) {
 //func UI64ToUint64(buf []byte) (v uint64, e error) {
 //func UI08ToString(buf []byte) (v string, e error) {
