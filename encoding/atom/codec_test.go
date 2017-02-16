@@ -263,9 +263,62 @@ func TestUI64ToString(t *testing.T) {
 	})
 }
 
-//func SI08ToInt64(buf []byte) (v int64, e error) {
-//func SI16ToInt64(buf []byte) (v int64, e error) {
-//func SI32ToInt32(buf []byte) (v int32, e error) {
+func TestSI08ToInt64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI08", 1)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00"), int64(0), nil},
+		tFromBytes{[]byte("\x01"), int64(1), nil},
+		tFromBytes{[]byte("\x0F"), int64(15), nil},
+		tFromBytes{[]byte("\x1F"), int64(31), nil},
+		tFromBytes{[]byte("\xFF"), int64(-1), nil},
+		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI08ToInt64(input)
+	})
+}
+
+func TestSI16ToInt64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI16", 2)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00"), int64(0), nil},
+		tFromBytes{[]byte("\x00\x01"), int64(1), nil},
+		tFromBytes{[]byte("\x80\x00"), int64(math.MinInt16), nil},
+		tFromBytes{[]byte("\x7F\xFF"), int64(math.MaxInt16), nil},
+		tFromBytes{[]byte("\xFF\xFF"), int64(-1), nil},
+		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), int64(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI16ToInt64(input)
+	})
+}
+
+func TestSI32ToInt32(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01"), int64(1), nil},
+		tFromBytes{[]byte("\x00\x00\x00\xFF"), int64(255), nil},
+		tFromBytes{[]byte("\x00\x00\xFF\x01"), int64(65281), nil},
+		tFromBytes{[]byte("\x00\xFF\x00\x01"), int64(16711681), nil},
+		tFromBytes{[]byte("\xFF\x00\x00\x01"), int64(-16777215), nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), int64(-1), nil},
+		tFromBytes{[]byte("\x80\x00\x00\x00"), int64(math.MinInt32), nil},
+		tFromBytes{[]byte("\x7F\xFF\xFF\xFF"), int64(math.MaxInt32), nil},
+		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), int64(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI32ToInt64(input)
+	})
+}
+
 //func SI32ToInt64(buf []byte) (v int64, e error) {
 //func SI64ToInt64(buf []byte) (v int64, e error) {
 //func SI08ToString(buf []byte) (v string, e error) {

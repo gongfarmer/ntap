@@ -405,16 +405,25 @@ func UI64ToString(buf []byte) (v string, e error) {
 // ADE signed int types
 
 func SI08ToInt64(buf []byte) (v int64, e error) {
+	if e = checkByteCount(buf, 1, "SI08"); e != nil {
+		return
+	}
 	var i int8
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &i)
 	return int64(i), e
 }
 func SI16ToInt64(buf []byte) (v int64, e error) {
+	if e = checkByteCount(buf, 2, "SI16"); e != nil {
+		return
+	}
 	var i int16
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &i)
 	return int64(i), e
 }
 func SI32ToInt32(buf []byte) (v int32, e error) {
+	if e = checkByteCount(buf, 4, "SI32"); e != nil {
+		return
+	}
 	var i int32
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &i)
 	return i, e
