@@ -183,7 +183,6 @@ func funcUI32ToUint32(t *testing.T) {
 	})
 }
 
-//func UI08ToString(buf []byte) (v string, e error) {
 func TestUI08ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI08", 1)
 	tests := []tFromBytes{
@@ -202,9 +201,68 @@ func TestUI08ToString(t *testing.T) {
 	})
 }
 
-//func UI16ToString(buf []byte) (v string, e error) {
-//func UI32ToString(buf []byte) (v string, e error) {
-//func UI64ToString(buf []byte) (v string, e error) {
+func TestUI16ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UI16", 2)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00"), "0", nil},
+		tFromBytes{[]byte("\x00\x01"), "1", nil},
+		tFromBytes{[]byte("\x00\xFF"), "255", nil},
+		tFromBytes{[]byte("\xFF\x00"), "65280", nil},
+		tFromBytes{[]byte("\xFF\xFF"), "65535", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00\x00"), "", byteCountErr(3)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UI16ToString(input)
+	})
+}
+
+func TestUI32ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UI32", 4)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "0", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01"), "1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\xFF"), "255", nil},
+		tFromBytes{[]byte("\x00\x00\xFF\x00"), "65280", nil},
+		tFromBytes{[]byte("\x00\xFF\x00\x00"), "16711680", nil},
+		tFromBytes{[]byte("\xFF\x00\x00\x00"), "4278190080", nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), "4294967295", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00\x00"), "", byteCountErr(3)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00"), "", byteCountErr(5)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UI32ToString(input)
+	})
+}
+
+func TestUI64ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UI64", 8)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), "1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), "255", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), "65280", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), "16711680", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), "4278190080", nil},
+		tFromBytes{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), "1095216660480", nil},
+		tFromBytes{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), "280375465082880", nil},
+		tFromBytes{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), "71776119061217280", nil},
+		tFromBytes{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), "18374686479671623680", nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "18446744073709551615", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00"), "", byteCountErr(5)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(10)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UI64ToString(input)
+	})
+}
+
 //func SI08ToInt64(buf []byte) (v int64, e error) {
 //func SI16ToInt64(buf []byte) (v int64, e error) {
 //func SI32ToInt32(buf []byte) (v int32, e error) {
