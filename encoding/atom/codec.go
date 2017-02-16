@@ -92,6 +92,13 @@ type (
 	}
 )
 
+// error constructors
+type errFunc (func(string, int, int) error)
+
+func errByteCount(adeType string, bytesWant int, bytesGot int) (e error) {
+	return fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", adeType, bytesWant, bytesGot)
+}
+
 // NewCodec returns a codec that performs type conversion for atom data.
 // It provides methods to convert data from an atom's ADE type into suitable Go
 // types, and vice versa.
@@ -346,7 +353,7 @@ func UI01ToBool(buf []byte) (v bool, e error) {
 	}
 	ui32 := binary.BigEndian.Uint32(buf)
 	if ui32 > 1 {
-		e = fmt.Errorf("value %d overflows type bool", ui32)
+		e = fmt.Errorf("value %d overflows type %s", ui32, "bool")
 		return
 	}
 	return ui32 == 1, e
@@ -980,7 +987,7 @@ func SetUI01FromUint64(a *Atom, v uint64) (e error) {
 	} else if v == 0 {
 		binary.BigEndian.PutUint32(a.data, uint32(0))
 	} else {
-		e = fmt.Errorf("value overflows type UINT01: %d", v)
+		e = fmt.Errorf("value %d overflows type %s", v, "UI01")
 	}
 	return
 }
@@ -997,10 +1004,11 @@ func SetUI08FromString(a *Atom, v string) (e error) {
 
 func SetUI08FromUint64(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint8 {
-		return fmt.Errorf("value overflows type UI08: %d", v)
+		e = fmt.Errorf("value %d overflows type %s", v, "UI08")
+		return
 	}
 	if len(a.data) != 1 {
-		return fmt.Errorf("UI08 atom data buffer size should be 1, not %d", len(a.data))
+		return errByteCount("UI08", 1, len(a.data))
 	}
 	a.data[0] = uint8(v)
 	return
@@ -1017,7 +1025,7 @@ func SetUI16FromString(a *Atom, v string) (e error) {
 
 func SetUI16FromUint64(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint16 {
-		e = fmt.Errorf("value overflows type UINT16: %d", v)
+		e = fmt.Errorf("value %d overflows type %s", v, "UI16")
 		return
 	}
 	binary.BigEndian.PutUint16(a.data, uint16(v))
@@ -1035,7 +1043,7 @@ func SetUI32FromString(a *Atom, v string) (e error) {
 
 func SetUI32FromUint64(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint32 {
-		e = fmt.Errorf("value overflows type UINT32: %d", v)
+		e = fmt.Errorf("value %d overflows type %s", v, "UI32")
 		return
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v))
@@ -1548,7 +1556,7 @@ func SetDATAFromHexString(a *Atom, v string) (e error) {
 
 func checkByteCount(buf []byte, bytesExpected int, strType string) (e error) {
 	if len(buf) != bytesExpected {
-		e = fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", strType, bytesExpected, len(buf))
+		e = errByteCount(strType, bytesExpected, len(buf))
 	}
 	return
 }
