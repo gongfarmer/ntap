@@ -437,6 +437,9 @@ func SI32ToInt64(buf []byte) (v int64, e error) {
 	return v, e
 }
 func SI64ToInt64(buf []byte) (v int64, e error) {
+	if e = checkByteCount(buf, 8, "SI64"); e != nil {
+		return
+	}
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	return v, e
 }
@@ -476,12 +479,18 @@ func SI64ToString(buf []byte) (v string, e error) {
 // ADE floating point types
 
 func FP32ToFloat32(buf []byte) (v float32, e error) {
+	if e = checkByteCount(buf, 4, "FP32"); e != nil {
+		return
+	}
 	var i uint32
 	i, e = UI32ToUint32(buf)
 	v = math.Float32frombits(i)
 	return
 }
 func FP32ToFloat64(buf []byte) (v float64, e error) {
+	if e = checkByteCount(buf, 4, "FP32"); e != nil {
+		return
+	}
 	var i uint32
 	i, e = UI32ToUint32(buf)
 	if e == nil {
@@ -490,6 +499,9 @@ func FP32ToFloat64(buf []byte) (v float64, e error) {
 	return
 }
 func FP64ToFloat64(buf []byte) (v float64, e error) {
+	if e = checkByteCount(buf, 8, "FP64"); e != nil {
+		return
+	}
 	var i uint64
 	i, e = UI64ToUint64(buf)
 	if e == nil {

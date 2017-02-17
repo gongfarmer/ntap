@@ -45,7 +45,7 @@ func runTests(t *testing.T, tests []tFromBytes, f fromBytesFunc) {
 		}
 
 		if got_value != test.WantValue {
-			t.Errorf("%v(%q): got value %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, got_value, test.WantValue)
+			t.Errorf("%v(%x): got value %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, got_value, test.WantValue)
 		}
 	}
 }
@@ -300,6 +300,28 @@ func TestSI16ToInt64(t *testing.T) {
 func TestSI32ToInt32(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
 	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00"), int32(0), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01"), int32(1), nil},
+		tFromBytes{[]byte("\x00\x00\x00\xFF"), int32(255), nil},
+		tFromBytes{[]byte("\x00\x00\xFF\x01"), int32(65281), nil},
+		tFromBytes{[]byte("\x00\xFF\x00\x01"), int32(16711681), nil},
+		tFromBytes{[]byte("\xFF\x00\x00\x01"), int32(-16777215), nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), int32(-1), nil},
+		tFromBytes{[]byte("\x80\x00\x00\x00"), int32(math.MinInt32), nil},
+		tFromBytes{[]byte("\x7F\xFF\xFF\xFF"), int32(math.MaxInt32), nil},
+		tFromBytes{[]byte(""), int32(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), int32(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), int32(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int32(0), byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI32ToInt32(input)
+	})
+}
+
+func TestSI32ToInt64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
+	tests := []tFromBytes{
 		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), nil},
 		tFromBytes{[]byte("\x00\x00\x00\x01"), int64(1), nil},
 		tFromBytes{[]byte("\x00\x00\x00\xFF"), int64(255), nil},
@@ -319,13 +341,202 @@ func TestSI32ToInt32(t *testing.T) {
 	})
 }
 
-//func SI32ToInt64(buf []byte) (v int64, e error) {
-//func SI64ToInt64(buf []byte) (v int64, e error) {
-//func SI08ToString(buf []byte) (v string, e error) {
-//func SI16ToString(buf []byte) (v string, e error) {
-//func SI32ToString(buf []byte) (v string, e error) {
-//func SI64ToString(buf []byte) (v string, e error) {
-//func FP32ToFloat32(buf []byte) (v float32, e error) {
+func TestSI64ToInt64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI64", 8)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), int64(1), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), int64(255), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), int64(65280), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), int64(16711680), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), int64(4278190080), nil},
+		tFromBytes{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), int64(1095216660480), nil},
+		tFromBytes{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), int64(280375465082880), nil},
+		tFromBytes{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), int64(71776119061217280), nil},
+		tFromBytes{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), int64(-72057594037927936), nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), int64(-1), nil},
+		tFromBytes{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), int64(math.MinInt64), nil},
+		tFromBytes{[]byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), int64(math.MaxInt64), nil},
+		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), int64(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI64ToInt64(input)
+	})
+}
+
+func TestSI08ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI08", 1)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00"), "0", nil},
+		tFromBytes{[]byte("\x01"), "1", nil},
+		tFromBytes{[]byte("\x0F"), "15", nil},
+		tFromBytes{[]byte("\x1F"), "31", nil},
+		tFromBytes{[]byte("\xFF"), "-1", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI08ToString(input)
+	})
+}
+
+func TestSI16ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI16", 2)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00"), "0", nil},
+		tFromBytes{[]byte("\x00\x01"), "1", nil},
+		tFromBytes{[]byte("\x80\x00"), "-32768", nil},
+		tFromBytes{[]byte("\x7F\xFF"), "32767", nil},
+		tFromBytes{[]byte("\xFF\xFF"), "-1", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI16ToString(input)
+	})
+}
+
+func TestSI32ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "0", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01"), "1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\xFF"), "255", nil},
+		tFromBytes{[]byte("\x00\x00\xFF\x01"), "65281", nil},
+		tFromBytes{[]byte("\x00\xFF\x00\x01"), "16711681", nil},
+		tFromBytes{[]byte("\xFF\x00\x00\x01"), "-16777215", nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), "-1", nil},
+		tFromBytes{[]byte("\x80\x00\x00\x00"), "-2147483648", nil},
+		tFromBytes{[]byte("\x7F\xFF\xFF\xFF"), "2147483647", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI32ToString(input)
+	})
+}
+
+func TestSI64ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SI64", 8)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), "1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), "255", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), "65280", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), "16711680", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), "4278190080", nil},
+		tFromBytes{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), "1095216660480", nil},
+		tFromBytes{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), "280375465082880", nil},
+		tFromBytes{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), "71776119061217280", nil},
+		tFromBytes{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), "-72057594037927936", nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "-1", nil},
+		tFromBytes{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), "-9223372036854775808", nil},
+		tFromBytes{[]byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "9223372036854775807", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI64ToString(input)
+	})
+}
+
+// FP32 has a range magnitude minimum of 1.1754E-38 and a range magnitude
+// maximum of 3.4028E+38 (either can be positive or negative).
+func TestFP32ToFloat32(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00"), float32(0.0), nil},
+		tFromBytes{[]byte("\x00\x7F\xFD\x5F"), float32(1.1754E-38), nil},
+		tFromBytes{[]byte("\x2d\x59\x2f\xfe"), float32(1.2345678E-11), nil},
+		tFromBytes{[]byte("\x42\x03\x11\x68"), float32(32.766998), nil},
+		tFromBytes{[]byte("\x42\x82\x00\x83"), float32(65.000999), nil},
+		tFromBytes{[]byte("\x43\xa3\xd5\xc3"), float32(327.67001), nil},
+		tFromBytes{[]byte("\x47\x00\x00\x00"), float32(32768), nil},
+		tFromBytes{[]byte("\x4c\x23\xd7\x0a"), float32(42949672), nil},
+		tFromBytes{[]byte("\x4d\x9c\x40\x00"), float32(3.2768E+08), nil},
+		tFromBytes{[]byte("\x7f\x7f\xff\x8b"), float32(3.4027999E+38), nil},
+		tFromBytes{[]byte("\x7F\x7F\xFF\x8B"), float32(3.4028E+38), nil},
+		tFromBytes{[]byte("\x80\x7f\xfd\x5f"), float32(-1.1754E-38), nil},
+		tFromBytes{[]byte("\xc0\x51\xb5\x74"), float32(-3.2767), nil},
+		tFromBytes{[]byte("\xc4\x9a\x52\x2b"), float32(-1234.5677), nil},
+		tFromBytes{[]byte("\xc5\xcb\x20\x00"), float32(-6500), nil},
+		tFromBytes{[]byte(""), float32(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), float32(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), float32(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float32(0), byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return FP32ToFloat32(input)
+	})
+}
+
+func TestFP32ToFloat64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
+	tests := []tFromBytes{
+		// must cast expected result to float32 first, otherwise the float64 has
+		// too much precision to match the real result
+		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(float32(0.0)), nil},
+		tFromBytes{[]byte("\x00\x7F\xFD\x5F"), float64(float32(1.1754E-38)), nil},
+		tFromBytes{[]byte("\x2d\x59\x2f\xfe"), float64(float32(1.2345678E-11)), nil},
+		tFromBytes{[]byte("\x42\x03\x11\x68"), float64(float32(32.766998)), nil},
+		tFromBytes{[]byte("\x42\x82\x00\x83"), float64(float32(65.000999)), nil},
+		tFromBytes{[]byte("\x43\xa3\xd5\xc3"), float64(float32(327.67001)), nil},
+		tFromBytes{[]byte("\x47\x00\x00\x00"), float64(float32(32768)), nil},
+		tFromBytes{[]byte("\x4c\x23\xd7\x0a"), float64(float32(42949672)), nil},
+		tFromBytes{[]byte("\x4d\x9c\x40\x00"), float64(float32(3.2768E+08)), nil},
+		tFromBytes{[]byte("\x7f\x7f\xff\x8b"), float64(float32(3.4027999E+38)), nil},
+		tFromBytes{[]byte("\x7F\x7F\xFF\x8B"), float64(float32(3.4028E+38)), nil},
+		tFromBytes{[]byte("\x80\x7f\xfd\x5f"), float64(float32(-1.1754E-38)), nil},
+		tFromBytes{[]byte("\xc0\x51\xb5\x74"), float64(float32(-3.2767)), nil},
+		tFromBytes{[]byte("\xc4\x9a\x52\x2b"), float64(float32(-1234.5677)), nil},
+		tFromBytes{[]byte("\xc5\xcb\x20\x00"), float64(float32(-6500)), nil},
+		tFromBytes{[]byte(""), float64(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), float64(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float64(0), byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return FP32ToFloat64(input)
+	})
+}
+
+func TestFP64ToFloat64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("FP64", 8)
+	tests := []tFromBytes{
+
+		tFromBytes{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), float64(-1.23456789012345672E+09), nil},
+		tFromBytes{[]byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), float64(3.27670000000000030E+01), nil},
+		tFromBytes{[]byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), float64(3.27670000000000016E+02), nil},
+		tFromBytes{[]byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), float64(6.50010000000000048E+01), nil},
+		tFromBytes{[]byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), float64(-3.26800000000000011E+02), nil},
+		tFromBytes{[]byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), float64(-3.27669999999999995E+00), nil},
+		tFromBytes{[]byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), float64(-6.50000000000000000E+03), nil},
+		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), float64(2.22499999999999987E-308), nil},
+		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), float64(2.22499999999999987E-308), nil},
+		tFromBytes{[]byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), float64(1.79760000000000007E+308), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float64(0.00000000000000000E+00), nil},
+		tFromBytes{[]byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), float64(3.27680000000000000E+04), nil},
+		tFromBytes{[]byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), float64(3.27680001000000000E+08), nil},
+		tFromBytes{[]byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), float64(4.29496720000000000E+07), nil},
+		tFromBytes{[]byte(""), float64(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), float64(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(0), byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return FP64ToFloat64(input)
+	})
+}
+
 //func FP32ToFloat64(buf []byte) (v float64, e error) {
 //func FP64ToFloat64(buf []byte) (v float64, e error) {
 //func FP32ToString(buf []byte) (v string, e error) {
