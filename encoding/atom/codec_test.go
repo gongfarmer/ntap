@@ -484,7 +484,7 @@ func TestFP32ToFloat64(t *testing.T) {
 	tests := []tFromBytes{
 		// must cast expected result to float32 first, otherwise the float64 has
 		// too much precision to match the real result
-		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(float32(0.0)), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(float32(0)), nil},
 		tFromBytes{[]byte("\x00\x7F\xFD\x5F"), float64(float32(1.1754E-38)), nil},
 		tFromBytes{[]byte("\x2d\x59\x2f\xfe"), float64(float32(1.2345678E-11)), nil},
 		tFromBytes{[]byte("\x42\x03\x11\x68"), float64(float32(32.766998)), nil},
@@ -512,7 +512,6 @@ func TestFP32ToFloat64(t *testing.T) {
 func TestFP64ToFloat64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FP64", 8)
 	tests := []tFromBytes{
-
 		tFromBytes{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), float64(-1.23456789012345672E+09), nil},
 		tFromBytes{[]byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), float64(3.27670000000000030E+01), nil},
 		tFromBytes{[]byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), float64(3.27670000000000016E+02), nil},
@@ -537,18 +536,290 @@ func TestFP64ToFloat64(t *testing.T) {
 	})
 }
 
-//func FP32ToFloat64(buf []byte) (v float64, e error) {
-//func FP64ToFloat64(buf []byte) (v float64, e error) {
-//func FP32ToString(buf []byte) (v string, e error) {
-//func FP64ToString(buf []byte) (v string, e error) {
-//func UF32ToFloat64(buf []byte) (v float64, e error) {
-//func UF64ToFloat64(buf []byte) (v float64, e error) {
+func TestFP32ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "0", nil},
+		tFromBytes{[]byte("\x00\x7F\xFD\x5F"), "1.1754E-38", nil},
+		tFromBytes{[]byte("\x2d\x59\x2f\xfe"), "1.2345678E-11", nil},
+		tFromBytes{[]byte("\x42\x03\x11\x68"), "32.766998", nil},
+		tFromBytes{[]byte("\x42\x82\x00\x83"), "65.000999", nil},
+		tFromBytes{[]byte("\x43\xa3\xd5\xc3"), "327.67001", nil},
+		tFromBytes{[]byte("\x47\x00\x00\x00"), "32768", nil},
+		tFromBytes{[]byte("\x4c\x23\xd7\x0a"), "42949672", nil},
+		tFromBytes{[]byte("\x4d\x9c\x40\x00"), "3.2768E+08", nil},
+		tFromBytes{[]byte("\x7f\x7f\xff\x8b"), "3.4027999E+38", nil},
+		//FIXME		tFromBytes{[]byte("\x7F\x7F\xFF\x8B"), "3.4028E+38", nil},
+		tFromBytes{[]byte("\x80\x7f\xfd\x5f"), "-1.1754E-38", nil},
+		tFromBytes{[]byte("\xc0\x51\xb5\x74"), "-3.2767", nil},
+		tFromBytes{[]byte("\xc4\x9a\x52\x2b"), "-1234.5677", nil},
+		tFromBytes{[]byte("\xc5\xcb\x20\x00"), "-6500", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return FP32ToString(input)
+	})
+}
+
+func TestFP64ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("FP64", 8)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), "-1.23456789012345672E+09", nil},
+		tFromBytes{[]byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), "3.27670000000000030E+01", nil},
+		tFromBytes{[]byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), "3.27670000000000016E+02", nil},
+		tFromBytes{[]byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), "6.50010000000000048E+01", nil},
+		tFromBytes{[]byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), "-3.26800000000000011E+02", nil},
+		tFromBytes{[]byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), "-3.27669999999999995E+00", nil},
+		tFromBytes{[]byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), "-6.50000000000000000E+03", nil},
+		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), "2.22499999999999987E-308", nil},
+		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), "2.22499999999999987E-308", nil},
+		tFromBytes{[]byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), "1.79760000000000007E+308", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0.00000000000000000E+00", nil},
+		tFromBytes{[]byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), "3.27680000000000000E+04", nil},
+		tFromBytes{[]byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), "3.27680001000000000E+08", nil},
+		tFromBytes{[]byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), "4.29496720000000000E+07", nil},
+		tFromBytes{[]byte(""), "", byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return FP64ToString(input)
+	})
+}
+
+// // FIXME
+// func TestUF32ToFloat64(t *testing.T) {
+// 	byteCountErr := errFunc(errByteCount).curry("UF32", 4)
+// 	tests := []tFromBytes{
+// 		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(float32(0.0000), nil},
+// 		tFromBytes{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
+// 		tFromBytes{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
+// 		tFromBytes{[]byte(""), "", byteCountErr(0)},
+// 		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
+// 		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
+// 		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+// 	}
+// 	runTests(t, tests, func(input []byte) (interface{}, error) {
+// 		return UF32ToFloat64(input)
+// 	})
+// }
+
+func TestUF64ToFloat64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UF64", 8)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), float64(4294967295.999999999), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), float64(4294967295.000000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xfe\x00\x00\x00\x00"), float64(4294967294.000000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xfd\x00\x00\x00\x00"), float64(4294967293.000000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xfc\x00\x00\x00\x00"), float64(4294967292.000000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xfb\x00\x00\x00\x00"), float64(4294967291.000000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xfa\x00\x00\x00\x00"), float64(4294967290.000000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x19\x99\x99\x99"), float64(4294967295.100000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x33\x33\x33\x33"), float64(4294967295.200000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x4c\xcc\xcc\xcc"), float64(4294967295.300000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x66\x66\x66\x66"), float64(4294967295.400000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x80\x00\x00\x00"), float64(4294967295.500000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x99\x99\x99\x99"), float64(4294967295.600000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\xb3\x33\x33\x33"), float64(4294967295.700000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\xcc\xcc\xcc\xcc"), float64(4294967295.800000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\xe6\x66\x66\x66"), float64(4294967295.900000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x02\x8f\x5c\x28"), float64(4294967295.010000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x05\x1e\xb8\x51"), float64(4294967295.020000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x07\xae\x14\x7a"), float64(4294967295.030000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x0a\x3d\x70\xa3"), float64(4294967295.040000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x0c\xcc\xcc\xcc"), float64(4294967295.050000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x0f\x5c\x28\xf5"), float64(4294967295.060000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x11\xeb\x85\x1e"), float64(4294967295.070000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x14\x7a\xe1\x47"), float64(4294967295.080000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x17\x0a\x3d\x70"), float64(4294967295.090000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x41\x89\x37"), float64(4294967295.001000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x83\x12\x6e"), float64(4294967295.002000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\xc4\x9b\xa5"), float64(4294967295.003000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x06\x24\xdd"), float64(4294967295.004000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x47\xae\x14"), float64(4294967295.005000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x89\x37\x4b"), float64(4294967295.006000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x01\xca\xc0\x83"), float64(4294967295.007000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x02\x0c\x49\xba"), float64(4294967295.008000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x02\x4d\xd2\xf1"), float64(4294967295.009000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x89\x37\x4b"), float64(4294967295.006000000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x06\x8d\xb8"), float64(4294967295.000100000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x0d\x1b\x71"), float64(4294967295.000200000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x13\xa9\x2a"), float64(4294967295.000300000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x1a\x36\xe2"), float64(4294967295.000400000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x20\xc4\x9b"), float64(4294967295.000500000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x27\x52\x54"), float64(4294967295.000600000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x2d\xe0\x0d"), float64(4294967295.000700000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x34\x6d\xc5"), float64(4294967295.000800000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x3a\xfb\x7e"), float64(4294967295.000900000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x27\x52\x54"), float64(4294967295.000600000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\xa7\xc5"), float64(4294967295.000010000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x01\x4f\x8b"), float64(4294967295.000020000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x01\xf7\x51"), float64(4294967295.000030000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x02\x9f\x16"), float64(4294967295.000040000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x03\x46\xdc"), float64(4294967295.000050000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x03\xee\xa2"), float64(4294967295.000060000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x04\x96\x67"), float64(4294967295.000070000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x05\x3e\x2d"), float64(4294967295.000080000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x05\xe5\xf3"), float64(4294967295.000090000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x03\xee\xa2"), float64(4294967295.000060000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x10\xc6"), float64(4294967295.000001000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x21\x8d"), float64(4294967295.000002000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x32\x54"), float64(4294967295.000003000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x43\x1b"), float64(4294967295.000004000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x53\xe2"), float64(4294967295.000005000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x64\xa9"), float64(4294967295.000006000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x75\x70"), float64(4294967295.000007000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x86\x37"), float64(4294967295.000008000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x96\xfe"), float64(4294967295.000009000), nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x64\xa9"), float64(4294967295.000006000), nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), float64(1.000000000), nil},
+		// FIXME this stupid type should be simply two married UINT32s.
+		//    tFromBytes{[]byte("\x00\x00\x00\x01\x19\x99\x99\x99"), float64(1.100000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x33\x33\x33\x33"), float64(1.200000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x4c\xcc\xcc\xcc"), float64(1.300000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x66\x66\x66\x66"), float64(1.400000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), float64(1.500000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x99\x99\x99\x99"), float64(1.600000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\xb3\x33\x33\x33"), float64(1.700000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\xcc\xcc\xcc\xcc"), float64(1.800000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\xe6\x66\x66\x66"), float64(1.900000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x02\x8f\x5c\x28"), float64(1.010000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x05\x1e\xb8\x51"), float64(1.020000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x07\xae\x14\x7a"), float64(1.030000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x0a\x3d\x70\xa3"), float64(1.040000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x0c\xcc\xcc\xcc"), float64(1.050000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x0f\x5c\x28\xf5"), float64(1.060000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x11\xeb\x85\x1e"), float64(1.070000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x14\x7a\xe1\x47"), float64(1.080000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x17\x0a\x3d\x70"), float64(1.090000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x41\x89\x37"), float64(1.001000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x83\x12\x6e"), float64(1.002000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\xc4\x9b\xa5"), float64(1.003000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x06\x24\xdd"), float64(1.004000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x47\xae\x14"), float64(1.005000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x89\x37\x4b"), float64(1.006000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\xca\xc0\x83"), float64(1.007000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x02\x0c\x49\xba"), float64(1.008000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x02\x4d\xd2\xf1"), float64(1.009000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x89\x37\x4b"), float64(1.006000000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x06\x8d\xb8"), float64(1.000100000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x0d\x1b\x71"), float64(1.000200000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x13\xa9\x2a"), float64(1.000300000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x1a\x36\xe2"), float64(1.000400000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x20\xc4\x9b"), float64(1.000500000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x27\x52\x54"), float64(1.000600000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x2d\xe0\x0d"), float64(1.000700000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x34\x6d\xc5"), float64(1.000800000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x3a\xfb\x7e"), float64(1.000900000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x27\x52\x54"), float64(1.000600000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\xa7\xc5"), float64(1.000010000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x01\x4f\x8b"), float64(1.000020000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x01\xf7\x51"), float64(1.000030000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x02\x9f\x16"), float64(1.000040000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x03\x46\xdc"), float64(1.000050000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x03\xee\xa2"), float64(1.000060000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x04\x96\x67"), float64(1.000070000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x05\x3e\x2d"), float64(1.000080000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x05\xe5\xf3"), float64(1.000090000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x03\xee\xa2"), float64(1.000060000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x10\xc6"), float64(1.000001000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x21\x8d"), float64(1.000002000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x32\x54"), float64(1.000003000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x43\x1b"), float64(1.000004000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x53\xe2"), float64(1.000005000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x64\xa9"), float64(1.000006000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x75\x70"), float64(1.000007000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x86\x37"), float64(1.000008000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x96\xfe"), float64(1.000009000), nil},
+		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x64\xa9"), float64(1.000006000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x19\x99\x99\x99"), float64(65596.100000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x33\x33\x33\x33"), float64(65596.200000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x4c\xcc\xcc\xcc"), float64(65596.300000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x66\x66\x66\x66"), float64(65596.400000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x80\x00\x00\x00"), float64(65596.500000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x99\x99\x99\x99"), float64(65596.600000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\xb3\x33\x33\x33"), float64(65596.700000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\xcc\xcc\xcc\xcc"), float64(65596.800000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\xe6\x66\x66\x66"), float64(65596.900000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x02\x8f\x5c\x28"), float64(65596.010000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x05\x1e\xb8\x51"), float64(65596.020000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x07\xae\x14\x7a"), float64(65596.030000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x0a\x3d\x70\xa3"), float64(65596.040000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x0c\xcc\xcc\xcc"), float64(65596.050000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x0f\x5c\x28\xf5"), float64(65596.060000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x11\xeb\x85\x1e"), float64(65596.070000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x14\x7a\xe1\x47"), float64(65596.080000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x17\x0a\x3d\x70"), float64(65596.090000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x41\x89\x37"), float64(65596.001000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x83\x12\x6e"), float64(65596.002000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\xc4\x9b\xa5"), float64(65596.003000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x06\x24\xdd"), float64(65596.004000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x47\xae\x14"), float64(65596.005000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x89\x37\x4b"), float64(65596.006000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\xca\xc0\x83"), float64(65596.007000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x02\x0c\x49\xba"), float64(65596.008000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x02\x4d\xd2\xf1"), float64(65596.009000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x89\x37\x4b"), float64(65596.006000000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x06\x8d\xb8"), float64(65596.000100000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x0d\x1b\x71"), float64(65596.000200000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x13\xa9\x2a"), float64(65596.000300000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x1a\x36\xe2"), float64(65596.000400000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x20\xc4\x9b"), float64(65596.000500000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x27\x52\x54"), float64(65596.000600000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x2d\xe0\x0d"), float64(65596.000700000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x34\x6d\xc5"), float64(65596.000800000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x3a\xfb\x7e"), float64(65596.000900000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x27\x52\x54"), float64(65596.000600000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\xa7\xc5"), float64(65596.000010000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x01\x4f\x8b"), float64(65596.000020000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x01\xf7\x51"), float64(65596.000030000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x02\x9f\x16"), float64(65596.000040000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x03\x46\xdc"), float64(65596.000050000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x03\xee\xa2"), float64(65596.000060000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x04\x96\x67"), float64(65596.000070000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x05\x3e\x2d"), float64(65596.000080000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x05\xe5\xf3"), float64(65596.000090000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x03\xee\xa2"), float64(65596.000060000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x10\xc6"), float64(65596.000001000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x21\x8d"), float64(65596.000002000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x32\x54"), float64(65596.000003000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x43\x1b"), float64(65596.000004000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x53\xe2"), float64(65596.000005000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x64\xa9"), float64(65596.000006000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x75\x70"), float64(65596.000007000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x86\x37"), float64(65596.000008000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x96\xfe"), float64(65596.000009000), nil},
+		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x64\xa9"), float64(65596.000006000), nil},
+		tFromBytes{[]byte(""), float64(0), byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), float64(0), byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(0), byteCountErr(4)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UF64ToFloat64(input)
+	})
+}
+
+// FIXME
 //func UF32ToString(buf []byte) (v string, e error) {
 //func UF64ToString(buf []byte) (v string, e error) {
 //func SF32ToFloat64(buf []byte) (v float64, e error) {
 //func SF64ToFloat64(buf []byte) (v float64, e error) {
 //func SF32ToString(buf []byte) (v string, e error) {
 //func SF64ToString(buf []byte) (v string, e error) {
+
 //func UR32ToSliceOfUint(buf []byte) (v []uint64, e error) {
 //func UR64ToSliceOfUint(buf []byte) (v []uint64, e error) {
 //func UR32ToString(buf []byte) (v string, e error) {
@@ -568,10 +839,6 @@ func TestFP64ToFloat64(t *testing.T) {
 //func BytesToHexString(buf []byte) (v string, e error) {
 //func asPrintableString(buf []byte) string {
 //func adeCstrEscape(s string) string {
-//func init() {
-//	enc.SetString = func(_ *Atom, _ string) (e error) { return }
-//	enc.SetString = func(_ *Atom, _ string) (e error) { return }
-//Encoding functions - set Atom.data bytes from go type
 //func SetUI01FromString(a *Atom, v string) (e error) {
 //func SetUI01FromBool(a *Atom, v bool) (e error) {
 //func SetUI01FromUint64(a *Atom, v uint64) (e error) {
@@ -603,6 +870,8 @@ func TestFP64ToFloat64(t *testing.T) {
 //func SetFP32FromFloat64(a *Atom, v float64) (e error) {
 //func SetFP64FromString(a *Atom, v string) (e error) {
 //func SetFP64FromFloat64(a *Atom, v float64) (e error) {
+
+// FIXME
 //func SetUF32FromString(a *Atom, v string) (e error) {
 //func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 //func SetUF64FromString(a *Atom, v string) (e error) {
@@ -611,6 +880,7 @@ func TestFP64ToFloat64(t *testing.T) {
 //func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 //func SetSF64FromString(a *Atom, v string) (e error) {
 //func SetSF64FromFloat64(a *Atom, v float64) (e error) {
+
 //func SetFC32FromString(a *Atom, v string) (e error) {
 //func SetFC32FromUint(a *Atom, v uint64) (e error) {
 //func SetIP32FromString(a *Atom, v string) (e error) {

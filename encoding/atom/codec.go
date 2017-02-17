@@ -538,6 +538,9 @@ func UF32ToFloat64(buf []byte) (v float64, e error) {
 	return
 }
 func UF64ToFloat64(buf []byte) (v float64, e error) {
+	if e = checkByteCount(buf, 8, "UF64"); e != nil {
+		return
+	}
 	var i uint64
 	i, e = UI64ToUint64(buf)
 	if e != nil {
