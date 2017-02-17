@@ -820,7 +820,28 @@ func TestUF64ToFloat64(t *testing.T) {
 //func SF32ToString(buf []byte) (v string, e error) {
 //func SF64ToString(buf []byte) (v string, e error) {
 
-//func UR32ToSliceOfUint(buf []byte) (v []uint64, e error) {
+func TestUR32ToSliceOfUint(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UR32", 4)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x01\x00\x01"), []uint64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x01\x00\x02"), []uint64{1, 2}, nil},
+		tFromBytes{[]byte("\x01\x00\x01\x00"), []uint64{256, 256}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), []uint64{0, 0}, nil},
+		tFromBytes{[]byte("\x19\x99\x99\x99"), []uint64{6553, 39321}, nil},
+		tFromBytes{[]byte("\x02\x8f\x5c\x28"), []uint64{655, 23592}, nil},
+		tFromBytes{[]byte("\xff\xff\x00\x05"), []uint64{65535, 5}, nil},
+		tFromBytes{[]byte("\xff\xff\x00\x02"), []uint64{65535, 2}, nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff"), []uint64{65535, 65535}, nil},
+		tFromBytes{[]byte(""), nil, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), nil, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), nil, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil, byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UR32ToSliceOfUint(input)
+	})
+}
+
 //func UR64ToSliceOfUint(buf []byte) (v []uint64, e error) {
 //func UR32ToString(buf []byte) (v string, e error) {
 //func UR64ToString(buf []byte) (v string, e error) {
