@@ -1,0 +1,8 @@
+IP32:CONT:
+  addr:IP32:0.0.0.0
+  addr:IP32:1.1.1.1
+  addr:IP32:192.168.0.1
+  addr:IP32:255.255.255.255
+  # This next one is actually an array specifying the IP range 127.0.0.1 to 127.0.0.1.
+  ipad:IP32:0x7F0000017F000001
+END

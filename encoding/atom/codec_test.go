@@ -1183,12 +1183,120 @@ func TestFC32ToString(t *testing.T) {
 	})
 }
 
-//func UUIDToString(buf []byte) (v string, e error) {
-//func IP32ToString(buf []byte) (v string, e error) {
-//func IPADToString(buf []byte) (v string, e error) {
-//func CSTRToString(buf []byte) (v string, e error) {
-//func CSTRToStringEscaped(buf []byte) (v string, e error) {
+func TestUUIDToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UUID", 16)
+	zero := ""
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), "64881431-B6DC-478E-B7EE-ED306619C797", nil},
+		tFromBytes{[]byte("\xa3\xbf\xff\x54\xf4\x74\x42\xe9\xab\x53\x01\xd9\x13\xd1\x18\xb1"), "A3BFFF54-F474-42E9-AB53-01D913D118B1", nil},
+		tFromBytes{[]byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), "64881431-B6DC-478E-B7EE-ED306619C797", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), "00000000-0000-0000-0000-000000000000", nil},
+		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF", nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(20)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UUIDToString(input)
+	})
+}
+
+func TestIP32ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("IP32", 4)
+	zero := ""
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "0.0.0.0", nil},
+		tFromBytes{[]byte("\x11\x22\x33\x44"), "17.34.51.68", nil},
+		tFromBytes{[]byte("\xC0\xA8\x01\x80"), "192.168.1.128", nil},
+		tFromBytes{[]byte("\xF1\xAB\xCD\xEF"), "241.171.205.239", nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff"), "255.255.255.255", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00\xff\xff\xff\xff"), "0.0.0.0-255.255.255.255", nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return IP32ToString(input)
+	})
+}
+
+func TestIPADToString(t *testing.T) {
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x30\x2e\x30\x2e\x30\x2e\x30\x00"), "\"0.0.0.0\"", nil},
+		tFromBytes{[]byte("\x31\x2e\x31\x2e\x31\x2e\x31\x00"), "\"1.1.1.1\"", nil},
+		tFromBytes{[]byte("\x31\x2e\x32\x35\x35\x2e\x33\x2e\x34\x00"), "\"1.255.3.4\"", nil},
+		tFromBytes{[]byte("\x31\x30\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x34\x00"), "\"10.255.255.254\"", nil},
+		tFromBytes{[]byte("\x31\x32\x37\x2e\x30\x2e\x30\x2e\x31\x00"), "\"127.0.0.1\"", nil},
+		tFromBytes{[]byte("\x31\x37\x32\x2e\x31\x38\x2e\x35\x2e\x34\x00"), "\"172.18.5.4\"", nil},
+		tFromBytes{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x30\x2e\x31\x00"), "\"192.168.0.1\"", nil},
+		tFromBytes{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x31\x2e\x30\x00"), "\"192.168.1.0\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), "\"2001:0000:4136:e378:8000:63bf:3fff:fdd2\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), "\"2001:0000:4136:e378:8000:63bf:3fff:fdd2\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x32\x3a\x36\x63\x3a\x3a\x34\x33\x30\x00"), "\"2001:0002:6c::430\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x31\x30\x3a\x32\x34\x30\x3a\x61\x62\x3a\x3a\x61\x00"), "\"2001:10:240:ab::a\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), "\"2001::1\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), "\"2001::1\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x64\x62\x38\x3a\x38\x3a\x34\x3a\x3a\x32\x00"), "\"2001:db8:8:4::2\"", nil},
+		tFromBytes{[]byte("\x32\x30\x30\x32\x3a\x63\x62\x30\x61\x3a\x33\x63\x64\x64\x3a\x31\x3a\x3a\x31\x00"), "\"2002:cb0a:3cdd:1::1\"", nil},
+		tFromBytes{[]byte("\x32\x35\x35\x2e\x30\x2e\x30\x2e\x31\x00"), "\"255.0.0.1\"", nil},
+		tFromBytes{[]byte("\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x00"), "\"255.255.255.255\"", nil},
+		tFromBytes{[]byte("\x38\x2e\x38\x2e\x34\x2e\x34\x00"), "\"8.8.4.4\"", nil},
+		tFromBytes{[]byte("\x3a\x3a\x00"), "\"::\"", nil},
+		tFromBytes{[]byte("\x3a\x3a\x66\x66\x66\x66\x3a\x35\x2e\x36\x2e\x37\x2e\x38\x00"), "\"::ffff:5.6.7.8\"", nil},
+		tFromBytes{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), "\"fdf8:f53b:82e4::53\"", nil},
+		tFromBytes{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), "\"fdf8:f53b:82e4::53\"", nil},
+		tFromBytes{[]byte("\x66\x65\x38\x30\x3a\x3a\x32\x30\x30\x3a\x35\x61\x65\x65\x3a\x66\x65\x61\x61\x3a\x32\x30\x61\x32\x00"), "\"fe80::200:5aee:feaa:20a2\"", nil},
+		tFromBytes{[]byte("\x66\x66\x30\x31\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x32\x00"), "\"ff01:0:0:0:0:0:0:2\"", nil},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return IPADToString(input)
+	})
+}
+func TestCSTRToString(t *testing.T) {
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x20\x20\x20\x20\x01\x02\x03\x00"), "    \x01\x02\x03", nil},
+		tFromBytes{[]byte("\x04\x05\x06\x07\x00"), "\x04\x05\x06\x07", nil},
+		tFromBytes{[]byte("\x08\x09\x0a\x0b\x00"), "\x08\x09\n\x0B", nil},
+		tFromBytes{[]byte("\x0c\x0d\x0e\x0f\x00"), "\x0C\r\x0E\x0F", nil},
+		tFromBytes{[]byte("\x10\x11\x12\x13\x00"), "\x10\x11\x12\x13", nil},
+		tFromBytes{[]byte("\x14\x15\x16\x17\x00"), "\x14\x15\x16\x17", nil},
+		tFromBytes{[]byte("\x18\x19\x1a\x1b\x00"), "\x18\x19\x1A\x1B", nil},
+		tFromBytes{[]byte("\x1c\x1d\x1e\x1f\x00"), "\x1C\x1D\x1E\x1F", nil},
+		tFromBytes{[]byte("\x20\x21\x22\x23\x00"), ` !"#`, nil},
+		tFromBytes{[]byte("\x24\x25\x26\x27\x00"), "$%&'", nil},
+		tFromBytes{[]byte("\x28\x29\x2a\x2b\x00"), "()*+", nil},
+		tFromBytes{[]byte("\x2c\x2d\x2e\x2f\x00"), ",-./", nil},
+		tFromBytes{[]byte("\x30\x31\x32\x33\x00"), "0123", nil},
+		tFromBytes{[]byte("\x34\x35\x36\x37\x00"), "4567", nil},
+		tFromBytes{[]byte("\x38\x39\x3a\x3b\x00"), "89:;", nil},
+		tFromBytes{[]byte("\x3c\x3d\x3e\x3f\x00"), "<=>?", nil},
+		tFromBytes{[]byte("\x40\x41\x42\x43\x00"), "@ABC", nil},
+		tFromBytes{[]byte("\x44\x45\x46\x47\x00"), "DEFG", nil},
+		tFromBytes{[]byte("\x48\x49\x4a\x4b\x00"), "HIJK", nil},
+		tFromBytes{[]byte("\x4c\x4d\x4e\x4f\x00"), "LMNO", nil},
+		tFromBytes{[]byte("\x50\x51\x52\x53\x00"), "PQRS", nil},
+		tFromBytes{[]byte("\x54\x55\x56\x57\x00"), "TUVW", nil},
+		tFromBytes{[]byte("\x58\x59\x5a\x5b\x00"), "XYZ[", nil},
+		tFromBytes{[]byte("\x5c\x5d\x5e\x5f\x00"), `\]^_`, nil},
+		tFromBytes{[]byte("\x60\x61\x62\x63\x00"), "`abc", nil},
+		tFromBytes{[]byte("\x64\x65\x66\x67\x00"), "defg", nil},
+		tFromBytes{[]byte("\x68\x69\x6a\x6b\x00"), "hijk", nil},
+		tFromBytes{[]byte("\x6c\x6d\x6e\x6f\x00"), "lmno", nil},
+		tFromBytes{[]byte("\x70\x71\x72\x73\x00"), "pqrs", nil},
+		tFromBytes{[]byte("\x74\x75\x76\x77\x00"), "tuvw", nil},
+		tFromBytes{[]byte("\x78\x79\x7a\x7b\x00"), "xyz{", nil},
+		tFromBytes{[]byte("\x7c\x7d\x7e\x7f\x00"), "|}~\x7F", nil},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return CSTRToString(input)
+	})
+}
+
 //func USTRToString(buf []byte) (v string, e error) {
+//func CSTRToStringEscaped(buf []byte) (v string, e error) {
 //func USTRToStringEscaped(buf []byte) (v string, e error) {
 //func BytesToHexString(buf []byte) (v string, e error) {
 //func asPrintableString(buf []byte) string {

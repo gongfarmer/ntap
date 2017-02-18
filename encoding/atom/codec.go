@@ -707,6 +707,9 @@ func FC32ToString(buf []byte) (v string, e error) {
 }
 
 func UUIDToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 16, "UUID"); e != nil {
+		return
+	}
 	var uuid struct {
 		TimeLow          uint32
 		TimeMid          uint16
@@ -731,8 +734,18 @@ func UUIDToString(buf []byte) (v string, e error) {
 
 // IP Address types
 
+// IP32 may optionally include a second 4-byte value, in which case it
+// represents a range of IPv4 addresses.
 func IP32ToString(buf []byte) (v string, e error) {
-	v = fmt.Sprintf("%d.%d.%d.%d", buf[0], buf[1], buf[2], buf[3])
+	switch len(buf) {
+	case 4:
+		v = fmt.Sprintf("%d.%d.%d.%d", buf[0], buf[1], buf[2], buf[3])
+	case 8:
+		v = fmt.Sprintf("%d.%d.%d.%d-%d.%d.%d.%d",
+			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7])
+	default:
+		e = errByteCount("IP32", 4, len(buf))
+	}
 	return
 }
 
