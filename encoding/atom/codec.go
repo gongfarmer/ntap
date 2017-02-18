@@ -694,6 +694,9 @@ func SR64ToString(buf []byte) (v string, e error) {
 // Mantis #27726: ccat/ctac can't parse container names starting with "#" or " ".
 // If string is printable but starts with "# \"'", print it as hex.
 func FC32ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 4, "FC32"); e != nil {
+		return
+	}
 	var badStartChars = "# \"'"
 	if isPrintableBytes(buf) && !strings.ContainsRune(badStartChars, rune(buf[0])) {
 		v = fmt.Sprintf("'%s'", string(buf))
