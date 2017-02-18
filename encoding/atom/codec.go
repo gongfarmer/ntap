@@ -611,6 +611,9 @@ func SF64ToString(buf []byte) (v string, e error) {
 // ADE fractional types, unsigned
 
 func UR32ToSliceOfUint(buf []byte) (v []uint64, e error) {
+	if e = checkByteCount(buf, 4, "UR32"); e != nil {
+		return
+	}
 	var arr [2]uint16
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if e == nil {
@@ -619,6 +622,9 @@ func UR32ToSliceOfUint(buf []byte) (v []uint64, e error) {
 	return
 }
 func UR64ToSliceOfUint(buf []byte) (v []uint64, e error) {
+	if e = checkByteCount(buf, 8, "UR64"); e != nil {
+		return
+	}
 	var arr [2]uint32
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if e == nil {
@@ -646,6 +652,9 @@ func UR64ToString(buf []byte) (v string, e error) {
 // ADE fractional types, signed
 
 func SR32ToSliceOfInt(buf []byte) (v []int64, e error) {
+	if e = checkByteCount(buf, 4, "SR32"); e != nil {
+		return
+	}
 	var arr [2]int16
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if e == nil {
@@ -654,6 +663,9 @@ func SR32ToSliceOfInt(buf []byte) (v []int64, e error) {
 	return
 }
 func SR64ToSliceOfInt(buf []byte) (v []int64, e error) {
+	if e = checkByteCount(buf, 8, "SR64"); e != nil {
+		return
+	}
 	var arr [2]int32
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &arr)
 	if e == nil {

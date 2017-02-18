@@ -44,7 +44,8 @@ func runTests(t *testing.T, tests []tFromBytes, f fromBytesFunc) {
 			return
 		}
 
-		if got_value != test.WantValue {
+		// value compare with DeepEqual instead of == so we can compare slice types like UR32
+		if !reflect.DeepEqual(got_value, test.WantValue) {
 			t.Errorf("%v(%x): got value %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, got_value, test.WantValue)
 		}
 	}
@@ -610,6 +611,7 @@ func TestFP64ToString(t *testing.T) {
 
 func TestUF64ToFloat64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UF64", 8)
+	zero := float64(0)
 	tests := []tFromBytes{
 		tFromBytes{[]byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), float64(4294967295.999999999), nil},
 		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), float64(4294967295.000000000), nil},
@@ -802,10 +804,10 @@ func TestUF64ToFloat64(t *testing.T) {
 		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x86\x37"), float64(65596.000008000), nil},
 		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x96\xfe"), float64(65596.000009000), nil},
 		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x64\xa9"), float64(65596.000006000), nil},
-		tFromBytes{[]byte(""), float64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), float64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(0), byteCountErr(4)},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
 	}
 	runTests(t, tests, func(input []byte) (interface{}, error) {
 		return UF64ToFloat64(input)
@@ -822,6 +824,7 @@ func TestUF64ToFloat64(t *testing.T) {
 
 func TestUR32ToSliceOfUint(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UR32", 4)
+	zero := []uint64(nil)
 	tests := []tFromBytes{
 		tFromBytes{[]byte("\x00\x01\x00\x01"), []uint64{1, 1}, nil},
 		tFromBytes{[]byte("\x00\x01\x00\x02"), []uint64{1, 2}, nil},
@@ -832,21 +835,198 @@ func TestUR32ToSliceOfUint(t *testing.T) {
 		tFromBytes{[]byte("\xff\xff\x00\x05"), []uint64{65535, 5}, nil},
 		tFromBytes{[]byte("\xff\xff\x00\x02"), []uint64{65535, 2}, nil},
 		tFromBytes{[]byte("\xff\xff\xff\xff"), []uint64{65535, 65535}, nil},
-		tFromBytes{[]byte(""), nil, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), nil, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), nil, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil, byteCountErr(8)},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
 	runTests(t, tests, func(input []byte) (interface{}, error) {
 		return UR32ToSliceOfUint(input)
 	})
 }
 
-//func UR64ToSliceOfUint(buf []byte) (v []uint64, e error) {
-//func UR32ToString(buf []byte) (v string, e error) {
-//func UR64ToString(buf []byte) (v string, e error) {
-//func SR32ToSliceOfInt(buf []byte) (v []int64, e error) {
-//func SR64ToSliceOfInt(buf []byte) (v []int64, e error) {
+func TestUR64ToSliceOfUint(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UR64", 8)
+	zero := []uint64(nil)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []uint64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []uint64{1, 2}, nil},
+		tFromBytes{[]byte("\x01\x02\x03\x04\x05\x06\x07\x08"), []uint64{16909060, 84281096}, nil},
+		tFromBytes{[]byte("\x10\x20\x30\x40\x50\x60\x70\x80"), []uint64{270544960, 1348497536}, nil},
+		tFromBytes{[]byte("\x19\x99\x99\x99\x19\x99\x99\x99"), []uint64{429496729, 429496729}, nil},
+		tFromBytes{[]byte("\xff\xff\x00\x02\xff\xff\xcc\xee"), []uint64{4294901762, 4294954222}, nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\xff\xff\xff\xff"), []uint64{4294967295, 4294967295}, nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UR64ToSliceOfUint(input)
+	})
+}
+
+func TestUR32ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UR32", 4)
+	zero := ""
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x01\x00\x02"), "1/2", nil},
+		tFromBytes{[]byte("\x01\x00\x01\x00"), "256/256", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), "0/0", nil},
+		tFromBytes{[]byte("\x19\x99\x99\x99"), "6553/39321", nil},
+		tFromBytes{[]byte("\x02\x8f\x5c\x28"), "655/23592", nil},
+		tFromBytes{[]byte("\xff\xff\x00\x05"), "65535/5", nil},
+		tFromBytes{[]byte("\xff\xff\x00\x02"), "65535/2", nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff"), "65535/65535", nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UR32ToString(input)
+	})
+}
+
+func TestUR64ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("UR64", 8)
+	zero := ""
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
+		tFromBytes{[]byte("\x01\x02\x03\x04\x05\x06\x07\x08"), "16909060/84281096", nil},
+		tFromBytes{[]byte("\x10\x20\x30\x40\x50\x60\x70\x80"), "270544960/1348497536", nil},
+		tFromBytes{[]byte("\x19\x99\x99\x99\x19\x99\x99\x99"), "429496729/429496729", nil},
+		tFromBytes{[]byte("\xff\xff\x00\x02\xff\xff\xcc\xee"), "4294901762/4294954222", nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\xff\xff\xff\xff"), "4294967295/4294967295", nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return UR64ToString(input)
+	})
+}
+func TestSR32ToSliceOfInt(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SR32", 4)
+	zero := []int64(nil)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x01\xff\xff"), []int64{1, -1}, nil},
+		tFromBytes{[]byte("\xff\xff\x00\x01"), []int64{-1, 1}, nil},
+		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x01\x00\x02"), []int64{1, 2}, nil},
+		tFromBytes{[]byte("\x00\x01\xff\xfe"), []int64{1, -2}, nil},
+		tFromBytes{[]byte("\xff\xff\x00\x02"), []int64{-1, 2}, nil},
+		tFromBytes{[]byte("\x00\x01\x00\x02"), []int64{1, 2}, nil},
+		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x80\x00\x7f\xff"), []int64{-32768, 32767}, nil},
+		tFromBytes{[]byte("\x7f\xff\x80\x00"), []int64{32767, -32768}, nil},
+		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x01\x7f\xff"), []int64{1, 32767}, nil},
+		tFromBytes{[]byte("\xff\xff\x7f\xff"), []int64{-1, 32767}, nil},
+		tFromBytes{[]byte("\x00\x01\x80\x00"), []int64{1, -32768}, nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SR32ToSliceOfInt(input)
+	})
+}
+func TestSR64ToSliceOfInt(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SR64", 8)
+	zero := []int64(nil)
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xff"), []int64{1, -1}, nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x01"), []int64{-1, 1}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []int64{1, 2}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xfe"), []int64{1, -2}, nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x02"), []int64{-1, 2}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []int64{1, 2}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x80\x00\x00\x00\x7f\xff\xff\xff"), []int64{-2147483648, 2147483647}, nil},
+		tFromBytes{[]byte("\x7f\xff\xff\xff\x80\x00\x00\x00"), []int64{2147483647, -2147483648}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), []int64{1, 2147483647}, nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), []int64{-1, 2147483647}, nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), []int64{1, -2147483648}, nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SR64ToSliceOfInt(input)
+	})
+}
+
+func TestSR32ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SR32", 4)
+	zero := ""
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x01\xff\xff"), "1/-1", nil},
+		tFromBytes{[]byte("\xff\xff\x00\x01"), "-1/1", nil},
+		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x01\x00\x02"), "1/2", nil},
+		tFromBytes{[]byte("\x00\x01\xff\xfe"), "1/-2", nil},
+		tFromBytes{[]byte("\xff\xff\x00\x02"), "-1/2", nil},
+		tFromBytes{[]byte("\x00\x01\x00\x02"), "1/2", nil},
+		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x80\x00\x7f\xff"), "-32768/32767", nil},
+		tFromBytes{[]byte("\x7f\xff\x80\x00"), "32767/-32768", nil},
+		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x01\x7f\xff"), "1/32767", nil},
+		tFromBytes{[]byte("\xff\xff\x7f\xff"), "-1/32767", nil},
+		tFromBytes{[]byte("\x00\x01\x80\x00"), "1/-32768", nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SR32ToString(input)
+	})
+}
+func TestSR64ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("SR64", 8)
+	zero := ""
+	tests := []tFromBytes{
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xff"), "1/-1", nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x01"), "-1/1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xfe"), "1/-2", nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x02"), "-1/2", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x80\x00\x00\x00\x7f\xff\xff\xff"), "-2147483648/2147483647", nil},
+		tFromBytes{[]byte("\x7f\xff\xff\xff\x80\x00\x00\x00"), "2147483647/-2147483648", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), "1/2147483647", nil},
+		tFromBytes{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), "-1/2147483647", nil},
+		tFromBytes{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), "1/-2147483648", nil},
+		tFromBytes{[]byte(""), zero, byteCountErr(0)},
+		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
+		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	}
+	runTests(t, tests, func(input []byte) (interface{}, error) {
+		return SR64ToString(input)
+	})
+}
+
 //func SR32ToString(buf []byte) (v string, e error) {
 //func SR64ToString(buf []byte) (v string, e error) {
 //func FC32ToString(buf []byte) (v string, e error) {
