@@ -99,7 +99,7 @@ func (a *Atom) UnmarshalText(input []byte) (err error) {
 // (stateFn) which takes the lexer state as an argument, and returns the next
 // state function which should run.
 // The lexer and parser run concurrently in separate goroutines. This is done
-// for lexer/parser code separation, not for performance.
+// for code separation, not for performance.
 // The lexer sends tokens to the parser over a channel.
 
 const (
@@ -153,7 +153,7 @@ func (i item) String() string {
 	case i.typ == itemEOF:
 		return "EOF"
 	case i.typ == itemError:
-		return i.value
+		panic(fmt.Errorf(i.value))
 	case len(i.value) > 40:
 		return fmt.Sprintf("%.40q...", i.value)
 	}
@@ -164,6 +164,7 @@ func lex(input string) *lexer {
 	l := &lexer{
 		input: input,
 		items: make(chan item),
+		line:  1,
 	}
 	go l.run() // Concurrently run state machine
 	return l
@@ -244,7 +245,7 @@ func (l *lexer) emit(t itemEnum) {
 }
 
 // chars returns a count of the chars seen in the current value
-func (l *lexer) chars() int {
+func (l *lexer) bufferSize() int {
 	return int(l.pos - l.start)
 }
 
@@ -254,11 +255,12 @@ func (l *lexer) buffer() string {
 }
 
 // first returns the first rune in the value
-func (l *lexer) first() rune {
-	if l.chars() == 0 {
+func (l *lexer) first() (r rune) {
+	if l.bufferSize() == 0 {
 		panic("Can't return first char from empty buffer")
 	}
-	return rune(l.input[0])
+	r, _ = utf8.DecodeRuneInString(l.input[l.start:])
+	return r
 }
 
 // error returns an error token and terminates the scan by passing back a nil
@@ -278,7 +280,7 @@ func (l *lexer) errorf(format string, args ...interface{}) stateFn {
 func lexLine(l *lexer) stateFn {
 	ok := true
 	for ok {
-		if l.chars() != 0 {
+		if l.bufferSize() != 0 {
 			s := fmt.Sprintf("expecting empy buffer at start of line, got <<<%s>>>", l.buffer())
 			panic(s)
 		}
@@ -309,7 +311,7 @@ func lexAtomName(l *lexer) stateFn {
 	if l.accept("0") && l.accept("xX") {
 		l.acceptRun(hexDigits)
 
-		switch l.chars() {
+		switch l.bufferSize() {
 		case 10: // got a complete hex atom name
 			l.emit(itemAtomName)
 			return lexAtomType
@@ -326,14 +328,14 @@ func lexAtomName(l *lexer) stateFn {
 	}
 
 	// Try to get 4 printable chars. May already have one.
-	for i := l.chars(); i < 4; i++ {
+	for i := l.bufferSize(); i < 4; i++ {
 		l.accept(printableChars)
 	}
 	if l.buffer() == "END" {
 		l.emit(itemContainerEnd)
 		return lexEndOfLine
 	}
-	if l.chars() == 4 && l.peek() == ':' {
+	if l.bufferSize() == 4 && l.peek() == ':' {
 		l.emit(itemAtomName)
 		return lexAtomType
 	}
@@ -353,7 +355,7 @@ func lexAtomType(l *lexer) stateFn {
 	for i := 0; i < 4; i++ {
 		l.next()
 	}
-	if l.chars() == 4 && l.peek() == ':' {
+	if l.bufferSize() == 4 && l.peek() == ':' {
 		atyp := l.buffer()
 		l.emit(itemAtomType)
 		l.next()
@@ -398,7 +400,7 @@ func lexUUID(l *lexer) stateFn {
 	l.acceptRun(hexDigits)
 	l.accept("-")
 	l.acceptRun(hexDigits)
-	if l.chars() == 36 { // size of well-formed UUID
+	if l.bufferSize() == 36 { // size of well-formed UUID
 		l.emit(itemUUID)
 		return lexEndOfLine
 	}
@@ -409,7 +411,7 @@ func lexUUID(l *lexer) stateFn {
 func lexIP32(l *lexer) stateFn {
 	if l.accept("0") && l.accept("xX") { // Is it hex?
 		l.acceptRun(hexDigits)
-		if l.chars() < 3 {
+		if l.bufferSize() < 3 {
 			return l.errorf("badly formed IPv4 value: `%q'", l.buffer())
 		}
 		l.emit(itemIP32)
@@ -423,7 +425,7 @@ func lexIP32(l *lexer) stateFn {
 	l.acceptRun(digits)
 	l.accept(".")
 	l.acceptRun(digits)
-	if l.chars() > 15 || l.chars() < 7 { // min/max IPv4 string length
+	if l.bufferSize() > 15 || l.bufferSize() < 7 { // min/max IPv4 string length
 		return l.errorf("badly formed IPv4 value: `%q'", l.buffer())
 	}
 	l.emit(itemIP32)
@@ -521,7 +523,7 @@ func acceptFCHR32AsHex(l *lexer) error {
 	}
 
 	l.acceptRun("0123456789ABCDEFabcdef")
-	if l.chars() != 10 { // 0x and 8 hex digits
+	if l.bufferSize() != 10 { // 0x and 8 hex digits
 		return fmt.Errorf("Invalid hex data value for FC32: %s", l.buffer())
 	}
 	return nil
@@ -540,7 +542,7 @@ func acceptFCHR32AsSingleQuotedString(l *lexer) error {
 	for i := 0; i < 4; i++ {
 		l.next()
 	}
-	if l.chars() < 4 {
+	if l.bufferSize() < 4 {
 		return fmt.Errorf("insufficient chars for four-char code value, got %q", l.buffer())
 	}
 	if !isPrintableString(l.buffer()) {
@@ -570,7 +572,7 @@ func lexEndOfLine(l *lexer) stateFn {
 func lexString(l *lexer) stateFn {
 	// Read double quote
 	if l.next() != '"' {
-		fmt := "expected double quote to start string value, got `%q'"
+		fmt := "expected double quote to start string value, got `%c'"
 		return l.errorf(fmt, l.first())
 	}
 
@@ -720,12 +722,6 @@ func init() {
 func parse(ch <-chan item) (atoms []*Atom, err error) {
 	var state = parser{items: ch}
 	state.runParser()
-
-	if state.err != nil {
-		err = state.err
-		return
-	}
-
 	return state.atoms, state.err
 }
 
@@ -788,20 +784,17 @@ func parseAtomName(p *parser) parseFunc {
 
 	// get next item
 	it := readItem(p)
-	if it.typ == itemEOF {
+	switch it.typ {
+	case itemAtomName:
+		p.theAtom.Name = it.value // may be hex.. either way, store as string for now
+	case itemError, itemEOF:
 		return nil
-	}
-
-	if it.typ == itemContainerEnd {
+	case itemContainerEnd:
 		return parseContainerEnd(p)
-	}
-	if it.typ != itemAtomName {
-		p.err = fmt.Errorf("line %d: expecting atom name, got %s", it.line+1, it.typ)
+	default:
+		p.err = fmt.Errorf("line %d: expecting atom name, got %s", it.line, it.typ)
 		panic(p.err)
 	}
-
-	p.theAtom.Name = it.value // may be hex.. either way, store as string for now
-
 	return parseAtomType
 }
 
@@ -943,6 +936,10 @@ func parseIP32(p *parser) parseFunc {
 
 func parseString(p *parser) parseFunc {
 	it := readItem(p)
+	if it.typ == itemError {
+		p.errorf(it.value)
+		return nil
+	}
 
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
