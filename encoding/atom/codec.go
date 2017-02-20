@@ -1165,6 +1165,9 @@ func SetUI64FromUint64(a *Atom, v uint64) (e error) {
 // encode of signed integer types
 
 func SetSI08FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 1 {
+		a.data = make([]byte, 1)
+	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 8)
 	if e != nil {
@@ -1174,7 +1177,10 @@ func SetSI08FromString(a *Atom, v string) (e error) {
 }
 
 func SetSI08FromInt64(a *Atom, v int64) (e error) {
-	if v > math.MaxInt8 {
+	if len(a.data) != 1 {
+		a.data = make([]byte, 1)
+	}
+	if v < math.MinInt8 || v > math.MaxInt8 {
 		return errRange("SI08", v)
 	}
 	a.data[0] = byte(v)
@@ -1182,15 +1188,22 @@ func SetSI08FromInt64(a *Atom, v int64) (e error) {
 }
 
 func SetSI16FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 2 {
+		a.data = make([]byte, 2)
+	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 16)
-	if e == nil {
-		binary.BigEndian.PutUint16(a.data, uint16(i))
+	if e != nil {
+		return errStrInvalid("SI16", v)
 	}
+	binary.BigEndian.PutUint16(a.data, uint16(i))
 	return
 }
 
 func SetSI16FromInt64(a *Atom, v int64) (e error) {
+	if len(a.data) != 2 {
+		a.data = make([]byte, 2)
+	}
 	if v < math.MinInt16 || v > math.MaxInt16 {
 		return errRange("SI16", v)
 	}
@@ -1199,15 +1212,22 @@ func SetSI16FromInt64(a *Atom, v int64) (e error) {
 }
 
 func SetSI32FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 32)
-	if e == nil {
-		binary.BigEndian.PutUint32(a.data, uint32(i))
+	if e != nil {
+		return errStrInvalid("SI32", v)
 	}
+	binary.BigEndian.PutUint32(a.data, uint32(i))
 	return
 }
 
 func SetSI32FromInt64(a *Atom, v int64) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	if v < math.MinInt32 || v > math.MaxInt32 {
 		return errRange("SI32", v)
 	}
@@ -1216,15 +1236,22 @@ func SetSI32FromInt64(a *Atom, v int64) (e error) {
 }
 
 func SetSI64FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 64)
-	if e == nil {
-		binary.BigEndian.PutUint64(a.data, uint64(i))
+	if e != nil {
+		return errStrInvalid("SI64", v)
 	}
+	binary.BigEndian.PutUint64(a.data, uint64(i))
 	return
 }
 
 func SetSI64FromInt64(a *Atom, v int64) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	binary.BigEndian.PutUint64(a.data, uint64(v))
 	return
 }
