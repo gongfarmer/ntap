@@ -1220,8 +1220,8 @@ func TestFC32ToString(t *testing.T) {
 		decoderTest{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
 		decoderTest{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
 		decoderTest{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
-		decoderTest{[]byte("\x24\x23\x5c\x21"), "$#\\!", nil},
-		decoderTest{[]byte("\x25\x24\x23\x5c"), "%$#\\", nil},
+		decoderTest{[]byte("\x24\x23\x5c\x21"), `$#\!`, nil},
+		decoderTest{[]byte("\x25\x24\x23\x5c"), `%$#\`, nil},
 		decoderTest{[]byte("\x26\x25\x24\x23"), "&%$#", nil},
 		decoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
 		decoderTest{[]byte("\x28\x27\x26\x25"), "('&%", nil},
@@ -1236,10 +1236,10 @@ func TestFC32ToString(t *testing.T) {
 		decoderTest{[]byte("\x31\x30\x2f\x2e"), "10/.", nil},
 		decoderTest{[]byte("\x32\x31\x30\x2f"), "210/", nil},
 		decoderTest{[]byte("\x5b\x5a\x59\x58"), "[ZYX", nil},
-		decoderTest{[]byte("\x5c\x5b\x5a\x59"), "\\[ZY", nil},
-		decoderTest{[]byte("\x5d\x5c\x5b\x5a"), "]\\[Z", nil},
-		decoderTest{[]byte("\x5e\x5d\x5c\x5b"), "^]\\[", nil},
-		decoderTest{[]byte("\x5f\x5e\x5d\x5c"), "_^]\\", nil},
+		decoderTest{[]byte("\x5c\x5b\x5a\x59"), `\[ZY`, nil},
+		decoderTest{[]byte("\x5d\x5c\x5b\x5a"), `]\[Z`, nil},
+		decoderTest{[]byte("\x5e\x5d\x5c\x5b"), `^]\[`, nil},
+		decoderTest{[]byte("\x5f\x5e\x5d\x5c"), `_^]\`, nil},
 		decoderTest{[]byte("\x60\x5f\x5e\x5d"), "`_^]", nil},
 		decoderTest{[]byte("\x61\x60\x5f\x5e"), "a`_^", nil},
 		decoderTest{[]byte("\x62\x61\x60\x5f"), "ba`_", nil},
@@ -1542,11 +1542,11 @@ func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 		switch {
 		case gotErr == nil && test.WantError == nil:
 		case gotErr != nil && test.WantError == nil:
-			t.Errorf("%v(%b): got err %s, want err <nil>", funcName, test.Input, gotErr)
+			t.Errorf("%v(%b): got err {%s}, want err <nil>", funcName, test.Input, gotErr)
 		case gotErr == nil && test.WantError != nil:
-			t.Errorf("%v(%b): got err <nil>, want err %s", funcName, test.Input, test.WantError)
+			t.Errorf("%v(%b): got err <nil>, want err {%s}", funcName, test.Input, test.WantError)
 		case gotErr.Error() != test.WantError.Error():
-			t.Errorf("%v(%b): got err %s, want err %s", funcName, test.Input, gotErr, test.WantError)
+			t.Errorf("%v(%v): got err {%s}, want err {%s}", funcName, test.Input, gotErr, test.WantError)
 			return
 		}
 
@@ -1560,8 +1560,8 @@ func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 // *** unit tests
 
 func TestSetUI01FromString(t *testing.T) {
-	zero := []byte("\x00\x00\x00\x00")
 	typ := "UI01"
+	zero := make([]byte, 4)
 	tests := []encoderTest{
 		encoderTest{"false", []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{"true", []byte("\x00\x00\x00\x01"), nil},
@@ -1575,15 +1575,24 @@ func TestSetUI01FromString(t *testing.T) {
 		encoderTest{"01", zero, errStrInvalid(typ, "01")},
 		encoderTest{"10", zero, errStrInvalid(typ, "10")},
 		encoderTest{"0x01", zero, errStrInvalid(typ, "0x01")},
+		encoderTest{"dog", zero, errStrInvalid(typ, "dog")},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetUI01FromString(atom, input.(string))
 	})
 }
-
+func TestSetUI01FromBool(t *testing.T) {
+	tests := []encoderTest{
+		encoderTest{false, []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{true, []byte("\x00\x00\x00\x01"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI01FromBool(atom, input.(bool))
+	})
+}
 func TestSetUI01FromUint64(t *testing.T) {
-	zero := []byte("\x00\x00\x00\x00")
 	typ := "UI01"
+	zero := make([]byte, 4)
 	tests := []encoderTest{
 		encoderTest{uint64(0), []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{uint64(1), []byte("\x00\x00\x00\x01"), nil},
@@ -1594,5 +1603,154 @@ func TestSetUI01FromUint64(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetUI01FromUint64(atom, input.(uint64))
+	})
+}
+func TestSetUI08FromString(t *testing.T) {
+	typ := "UI08"
+	zero := make([]byte, 1)
+	tests := []encoderTest{
+		encoderTest{"0", []byte("\x00"), nil},
+		encoderTest{"15", []byte("\x0F"), nil},
+		encoderTest{"240", []byte("\xF0"), nil},
+		encoderTest{"255", []byte("\xFF"), nil},
+		encoderTest{"3000", zero, errStrInvalid(typ, "3000")},
+		encoderTest{"-1", zero, errStrInvalid(typ, "-1")},
+		encoderTest{"dog", zero, errStrInvalid(typ, "dog")},
+		encoderTest{"", zero, errStrInvalid(typ, "")},
+		encoderTest{" ", zero, errStrInvalid(typ, " ")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI08FromString(atom, input.(string))
+	})
+}
+func TestSetUI08FromUint64(t *testing.T) {
+	typ := "UI08"
+	zero := make([]byte, 1)
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00"), nil},
+		encoderTest{uint64(15), []byte("\x0F"), nil},
+		encoderTest{uint64(240), []byte("\xF0"), nil},
+		encoderTest{uint64(255), []byte("\xFF"), nil},
+		encoderTest{uint64(3000), zero, errRange(typ, uint64(3000))},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI08FromUint64(atom, input.(uint64))
+	})
+}
+func TestSetUI16FromString(t *testing.T) {
+	typ := "UI16"
+	zero := make([]byte, 2)
+	tests := []encoderTest{
+		encoderTest{"0", []byte("\x00\x00"), nil},
+		encoderTest{"255", []byte("\x00\xFF"), nil},
+		encoderTest{"65280", []byte("\xFF\x00"), nil},
+		encoderTest{"65535", []byte("\xFF\xFF"), nil},
+		encoderTest{"65536", zero, errStrInvalid(typ, "65536")},
+		encoderTest{"-1", zero, errStrInvalid(typ, "-1")},
+		encoderTest{"dog", zero, errStrInvalid(typ, "dog")},
+		encoderTest{"", zero, errStrInvalid(typ, "")},
+		encoderTest{" ", zero, errStrInvalid(typ, " ")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI16FromString(atom, input.(string))
+	})
+}
+func TestSetUI16FromUint64(t *testing.T) {
+	typ := "UI16"
+	zero := make([]byte, 2)
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00\x00"), nil},
+		encoderTest{uint64(255), []byte("\x00\xFF"), nil},
+		encoderTest{uint64(65280), []byte("\xFF\x00"), nil},
+		encoderTest{uint64(65535), []byte("\xFF\xFF"), nil},
+		encoderTest{uint64(65536), zero, errRange(typ, uint64(65536))},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI16FromUint64(atom, input.(uint64))
+	})
+}
+func TestSetUI32FromString(t *testing.T) {
+	typ := "UI32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{"0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"0x00000000", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"255", []byte("\x00\x00\x00\xFF"), nil},
+		encoderTest{"0x000000FF", []byte("\x00\x00\x00\xFF"), nil},
+		encoderTest{"0x0000FF00", []byte("\x00\x00\xFF\x00"), nil},
+		encoderTest{"0x00FF0000", []byte("\x00\xFF\x00\x00"), nil},
+		encoderTest{"0xFF000000", []byte("\xFF\x00\x00\x00"), nil},
+		encoderTest{"0xFFFFFFFF", []byte("\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"0x0100000000", zero, errStrInvalid(typ, "0x0100000000")},
+		encoderTest{"-1", zero, errStrInvalid(typ, "-1")},
+		encoderTest{"dog", zero, errStrInvalid(typ, "dog")},
+		encoderTest{"", zero, errStrInvalid(typ, "")},
+		encoderTest{" ", zero, errStrInvalid(typ, " ")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI32FromString(atom, input.(string))
+	})
+}
+func TestSetUI32FromUint64(t *testing.T) {
+	typ := "UI32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{uint64(0x00000000), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(0x000000FF), []byte("\x00\x00\x00\xFF"), nil},
+		encoderTest{uint64(0x0000FF00), []byte("\x00\x00\xFF\x00"), nil},
+		encoderTest{uint64(0x00FF0000), []byte("\x00\xFF\x00\x00"), nil},
+		encoderTest{uint64(0xFF000000), []byte("\xFF\x00\x00\x00"), nil},
+		encoderTest{uint64(0xFFFFFFFF), []byte("\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{uint64(0xFFFFFFFF + 1), zero, errRange(typ, 0xFFFFFFFF+1)},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI32FromUint64(atom, input.(uint64))
+	})
+}
+func TestSetUI64FromString(t *testing.T) {
+	typ := "UI64"
+	zero := make([]byte, 8)
+	tests := []encoderTest{
+		encoderTest{"0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"1", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{"255", []byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), nil},
+		encoderTest{"0x0000000000000000", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0x00000000000000FF", []byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), nil},
+		encoderTest{"0x000000000000FF00", []byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), nil},
+		encoderTest{"0x0000000000FF0000", []byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), nil},
+		encoderTest{"0x00000000FF000000", []byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), nil},
+		encoderTest{"0x000000FF00000000", []byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), nil},
+		encoderTest{"0x0000FF0000000000", []byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0x00FF000000000000", []byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0xFF00000000000000", []byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0xFFFFFFFFFFFFFFFF", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"0x010000000000000000", zero, errStrInvalid(typ, "0x010000000000000000")},
+		encoderTest{"-1", zero, errStrInvalid(typ, "-1")},
+		encoderTest{"dog", zero, errStrInvalid(typ, "dog")},
+		encoderTest{"", zero, errStrInvalid(typ, "")},
+		encoderTest{" ", zero, errStrInvalid(typ, " ")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI64FromString(atom, input.(string))
+	})
+}
+func TestSetUI64FromUint64(t *testing.T) {
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(1), []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{uint64(255), []byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), nil},
+		encoderTest{uint64(0x0000000000000000), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(0x00000000000000FF), []byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), nil},
+		encoderTest{uint64(0x000000000000FF00), []byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), nil},
+		encoderTest{uint64(0x0000000000FF0000), []byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), nil},
+		encoderTest{uint64(0x00000000FF000000), []byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), nil},
+		encoderTest{uint64(0x000000FF00000000), []byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0000FF0000000000), []byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(0x00FF000000000000), []byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(0xFF00000000000000), []byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(0xFFFFFFFFFFFFFFFF), []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUI64FromUint64(atom, input.(uint64))
 	})
 }
