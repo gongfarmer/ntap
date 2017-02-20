@@ -95,8 +95,22 @@ type (
 // error constructors
 type errFunc (func(string, int, int) error)
 
-func errByteCount(adeType string, bytesWant int, bytesGot int) (e error) {
-	return fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", adeType, bytesWant, bytesGot)
+func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
+	return fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", t, bytesWant, bytesGot)
+}
+func errStrInvalid(t string, v string) error {
+	return fmt.Errorf("invalid string value for ADE type %s: \"%s\"", t, v)
+}
+func errRange(t string, v interface{}) (e error) {
+	switch v := v.(type) {
+	case uint, uint8, uint16, uint32, uint64, int, int32, int64:
+		e = fmt.Errorf("value exceeds range for type %s: %d", t, v)
+	case float32, float64:
+		e = fmt.Errorf("value exceeds range for type %s: %f", t, v)
+	default:
+		panic(fmt.Errorf("cannot handle type %T", v))
+	}
+	return
 }
 
 // NewCodec returns a codec that performs type conversion for atom data.
@@ -353,8 +367,7 @@ func UI01ToBool(buf []byte) (v bool, e error) {
 	}
 	ui32 := binary.BigEndian.Uint32(buf)
 	if ui32 > 1 {
-		e = fmt.Errorf("value %d overflows type %s", ui32, "bool")
-		return
+		e = errRange("bool", ui32)
 	}
 	return ui32 == 1, e
 }
@@ -1013,23 +1026,24 @@ Encoding functions - set Atom.data bytes from go type
 ************************************************************/
 
 func SetUI01FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	switch v {
-	case "true":
-		binary.BigEndian.PutUint32(a.data, uint32(1))
-	case "false":
+	case "false", "0":
 		binary.BigEndian.PutUint32(a.data, uint32(0))
+	case "true", "1":
+		binary.BigEndian.PutUint32(a.data, uint32(1))
 	default:
-		var i uint64
-		i, e = strconv.ParseUint(v, 0, 1)
-		if e != nil {
-			return
-		}
-		return SetUI01FromUint64(a, i)
+		e = errStrInvalid("UI01", v)
 	}
 	return
 }
 
 func SetUI01FromBool(a *Atom, v bool) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	if v {
 		binary.BigEndian.PutUint32(a.data, uint32(1))
 	} else {
@@ -1039,12 +1053,15 @@ func SetUI01FromBool(a *Atom, v bool) (e error) {
 }
 
 func SetUI01FromUint64(a *Atom, v uint64) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	if v == 1 {
 		binary.BigEndian.PutUint32(a.data, uint32(1))
 	} else if v == 0 {
 		binary.BigEndian.PutUint32(a.data, uint32(0))
 	} else {
-		e = fmt.Errorf("value %d overflows type %s", v, "UI01")
+		e = errRange("UI01", v)
 	}
 	return
 }
@@ -1061,11 +1078,11 @@ func SetUI08FromString(a *Atom, v string) (e error) {
 
 func SetUI08FromUint64(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint8 {
-		e = fmt.Errorf("value %d overflows type %s", v, "UI08")
+		e = errRange("UI08", v)
 		return
 	}
 	if len(a.data) != 1 {
-		return errByteCount("UI08", 1, len(a.data))
+		a.data = make([]byte, 1)
 	}
 	a.data[0] = uint8(v)
 	return
@@ -1082,7 +1099,7 @@ func SetUI16FromString(a *Atom, v string) (e error) {
 
 func SetUI16FromUint64(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint16 {
-		e = fmt.Errorf("value %d overflows type %s", v, "UI16")
+		e = errRange("UI16", v)
 		return
 	}
 	binary.BigEndian.PutUint16(a.data, uint16(v))
@@ -1100,7 +1117,7 @@ func SetUI32FromString(a *Atom, v string) (e error) {
 
 func SetUI32FromUint64(a *Atom, v uint64) (e error) {
 	if v > math.MaxUint32 {
-		e = fmt.Errorf("value %d overflows type %s", v, "UI32")
+		e = errRange("UI32", v)
 		return
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v))
@@ -1134,7 +1151,7 @@ func SetSI08FromString(a *Atom, v string) (e error) {
 
 func SetSI08FromInt64(a *Atom, v int64) (e error) {
 	if v > math.MaxInt8 {
-		return fmt.Errorf("value overflows type SI08: %d", v)
+		return errRange("SI08", v)
 	}
 	a.data[0] = byte(v)
 	return
@@ -1151,8 +1168,7 @@ func SetSI16FromString(a *Atom, v string) (e error) {
 
 func SetSI16FromInt64(a *Atom, v int64) (e error) {
 	if v < math.MinInt16 || v > math.MaxInt16 {
-		e = fmt.Errorf("value overflows type int16: %d", v)
-		return
+		return errRange("SI16", v)
 	}
 	binary.BigEndian.PutUint16(a.data, uint16(v))
 	return
@@ -1169,8 +1185,7 @@ func SetSI32FromString(a *Atom, v string) (e error) {
 
 func SetSI32FromInt64(a *Atom, v int64) (e error) {
 	if v < math.MinInt32 || v > math.MaxInt32 {
-		e = fmt.Errorf("value overflows type Int32: %d", v)
-		return
+		return errRange("SI32", v)
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v))
 	return
@@ -1206,8 +1221,7 @@ func SetUR32FromSliceOfUint(a *Atom, v []uint64) (e error) {
 	num = v[0]
 	den = v[1]
 	if num > math.MaxUint16 || den > math.MaxUint16 {
-		e = fmt.Errorf("cannot set UR32, fractional part overflows type uint16: %d", v)
-		return e
+		return errRange("UR32", v)
 	}
 
 	value := (uint32(num) << 16) + uint32(den)
@@ -1229,8 +1243,7 @@ func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
 	num = v[0]
 	den = v[1]
 	if num > math.MaxUint32 || den > math.MaxUint32 {
-		e = fmt.Errorf("cannot set UR64, fractional part overflows type uint32: %d", v)
-		return e
+		return errRange("UR64", v)
 	}
 
 	value := (num << 32) + den
@@ -1254,8 +1267,7 @@ func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
 	num = v[0]
 	den = v[1]
 	if num > math.MaxInt16 || den > math.MaxInt16 {
-		e = fmt.Errorf("cannot set SR32, fractional part overflows type int16: %d", v)
-		return e
+		return errRange("SR32", v)
 	}
 
 	value := (int32(num) << 16) + int32(den)
@@ -1277,8 +1289,7 @@ func SetSR64FromSliceOfInt(a *Atom, v []int64) (e error) {
 	num = v[0]
 	den = v[1]
 	if num > math.MaxInt32 || den > math.MaxInt32 || num < math.MinInt32 || den < math.MinInt32 {
-		e = fmt.Errorf("cannot set SR64, fractional part overflows type int32: %d", v)
-		return e
+		return errRange("SR64", v)
 	}
 
 	value := (num << 32) + den
@@ -1296,8 +1307,7 @@ func SetFP32FromString(a *Atom, v string) (e error) {
 
 func SetFP32FromFloat64(a *Atom, v float64) (e error) {
 	if v > math.MaxFloat32 {
-		e = fmt.Errorf("value overflows type Float32: %f", v)
-		return
+		return errRange("FP32", v)
 	}
 
 	var bits uint32 = math.Float32bits(float32(v))
@@ -1374,8 +1384,7 @@ func SetSF32FromString(a *Atom, v string) (e error) {
 
 func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 	if -32768.0 > v || v >= 32768.0 {
-		e = fmt.Errorf("range error: value %G overflows type SF32", v)
-		return
+		return errRange("SF32", v)
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v*65536.0))
 	return
