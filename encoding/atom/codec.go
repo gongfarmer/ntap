@@ -39,7 +39,7 @@ const (
 	IP32 ADEType = "IP32" // ipv4 address
 	IPAD ADEType = "IPAD" // ipv4 or ipv6 address
 	CSTR ADEType = "CSTR" // C string
-	USTR ADEType = "USTR" // unicode string
+	USTR ADEType = "USTR" // unicode string, encoded as UTF-32 Big-endian
 	DATA ADEType = "DATA" // Raw data or equivalent
 	ENUM ADEType = "ENUM" // Enumeration
 	UUID ADEType = "UUID" // UUID
@@ -281,7 +281,7 @@ func init() {
 
 	// ADE Four char code
 	dec = NewDecoder(FC32)
-	dec.String = FC32ToString
+	dec.String = FC32ToStringDelimited
 	decoderByType[FC32] = dec
 
 	// ADE ENUM type
@@ -697,11 +697,18 @@ func FC32ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 4, "FC32"); e != nil {
 		return
 	}
-	var badStartChars = "# \"'"
+	var badStartChars = `# "'`
 	if isPrintableBytes(buf) && !strings.ContainsRune(badStartChars, rune(buf[0])) {
-		v = fmt.Sprintf("'%s'", string(buf))
+		v = string(buf)
 	} else {
 		v = fmt.Sprintf("0x%08X", buf)
+	}
+	return
+}
+func FC32ToStringDelimited(buf []byte) (v string, e error) {
+	v, e = FC32ToString(buf)
+	if len(v) == 4 {
+		v = fmt.Sprintf("'%s'", v)
 	}
 	return
 }
@@ -758,6 +765,9 @@ func IPADToString(buf []byte) (v string, e error) {
 // String types
 
 func CSTRToString(buf []byte) (v string, e error) {
+	if len(buf) == 0 {
+		return v, fmt.Errorf("Illegal CSTR data lacks null byte terminator")
+	}
 	v = string(buf[0 : len(buf)-1]) // trim null terminator
 	return v, nil
 }
@@ -765,7 +775,7 @@ func CSTRToString(buf []byte) (v string, e error) {
 func CSTRToStringEscaped(buf []byte) (v string, e error) {
 	v, e = CSTRToString(buf)
 	if e == nil {
-		v = fmt.Sprintf("\"%s\"", adeCstrEscape(v))
+		v = fmt.Sprintf("\"%s\"", adeStringEscape(v))
 	}
 	return
 }
@@ -786,9 +796,9 @@ func USTRToStringEscaped(buf []byte) (v string, e error) {
 	}
 
 	// ADE escaping
-	v = fmt.Sprintf("\"%s\"", adeCstrEscape(v))
+	v = fmt.Sprintf("\"%s\"", adeStringEscape(v))
 
-	// FIXME: need escaping on decode / encode to be exact inverse operations
+	// FIXME: need escaping on decode / encode to be guaranteed inverse operations
 
 	// Go/unicode escaping
 	//v = strconv.Quote(v)
@@ -796,23 +806,18 @@ func USTRToStringEscaped(buf []byte) (v string, e error) {
 }
 
 func BytesToHexString(buf []byte) (v string, e error) {
-	v = fmt.Sprintf("0x%X", buf)
+	if len(buf) == 0 {
+		v = ""
+	} else {
+		v = fmt.Sprintf("0x%X", buf)
+	}
 	return
 }
 
 /**********************************************************/
 
-func asPrintableString(buf []byte) string {
-	if isPrintableBytes(buf) {
-		return string(buf[:])
-	} else {
-		i, _ := UI32ToUint32(buf)
-		return fmt.Sprintf("0x%08X", i)
-	}
-}
-
 // ade: libs/osl/OSL_Types.cc CStr_Escape()
-func adeCstrEscape(s string) string {
+func adeStringEscape(s string) string {
 	output := make([]rune, 0, len(s))
 	for _, r := range s {
 		charsToEscape := "\\\"\x7f"
@@ -1561,8 +1566,8 @@ func SetCSTRFromEscapedString(a *Atom, v string) (e error) {
 	return
 }
 
-// Every character in an ADE USTR is encoded as 4 bytes.
-// There's no variable-length encoding.
+// USTR is encoded as utf-32 big-endian.
+// Every character is encoded as 4 bytes.
 // No NULL terminator is used for this type, unlike CSTR.
 func SetUSTRFromEscapedString(a *Atom, v string) (e error) {
 
@@ -1578,9 +1583,7 @@ func SetUSTRFromEscapedString(a *Atom, v string) (e error) {
 		return
 	}
 
-	// write each rune as 4 bytes:
-	//	 1. Padding (0-3 bytes, as 4 - <bytes in rune UTF8 encoding>)
-	//   2. rune (1-4 bytes, UTF-8 variable-length encoding)
+	// write each rune as 4 bytes. Cast runes to uint32 to prevent UTF-8 encoding.
 	buf := new(bytes.Buffer)
 	for _, r := range s { // iterate by rune
 		e := binary.Write(buf, binary.BigEndian, uint32(r))

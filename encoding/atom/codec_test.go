@@ -9,6 +9,10 @@ import (
 	"testing"
 )
 
+// *****************************************************
+// 1. Test decoding funcs, which write to an Atom's data
+// *****************************************************
+
 // implement function currying for err funcs so that I can specify the type and
 // expected bytes at the top of the test func, and the amount of bytes provided
 // in each test separately.
@@ -26,33 +30,33 @@ func GetFunctionName(i interface{}) string {
 	return parts[len(parts)-1]
 }
 
-type fromBytesFunc func([]byte) (interface{}, error)
+type decodeFunc func([]byte) (interface{}, error)
 
-func runTests(t *testing.T, tests []tFromBytes, f fromBytesFunc) {
+func runDecoderTests(t *testing.T, tests []tDecoderTest, f decodeFunc) {
 	for _, test := range tests {
-		got_value, got_err := f(test.Input)
+		gotValue, gotErr := f(test.Input)
 
 		funcName := GetFunctionName(f)
 		switch {
-		case got_err == nil && test.WantError == nil:
-		case got_err != nil && test.WantError == nil:
-			t.Errorf("%v(%b): got err %s, want err <nil>", funcName, test.Input, got_err)
-		case got_err == nil && test.WantError != nil:
+		case gotErr == nil && test.WantError == nil:
+		case gotErr != nil && test.WantError == nil:
+			t.Errorf("%v(%b): got err %s, want err <nil>", funcName, test.Input, gotErr)
+		case gotErr == nil && test.WantError != nil:
 			t.Errorf("%v(%b): got err <nil>, want err %s", funcName, test.Input, test.WantError)
-		case got_err.Error() != test.WantError.Error():
-			t.Errorf("%v(%b): got err %s, want err %s", funcName, test.Input, got_err, test.WantError)
+		case gotErr.Error() != test.WantError.Error():
+			t.Errorf("%v(%b): got err %s, want err %s", funcName, test.Input, gotErr, test.WantError)
 			return
 		}
 
 		// value compare with DeepEqual instead of == so we can compare slice types like UR32
-		if !reflect.DeepEqual(got_value, test.WantValue) {
-			t.Errorf("%v(%x): got value %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, got_value, test.WantValue)
+		if !reflect.DeepEqual(gotValue, test.WantValue) {
+			t.Errorf("%v(%x): got %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, gotValue, test.WantValue)
 		}
 	}
 }
 
 // Test conversion of Atom data as bytes to golang native types
-type tFromBytes struct {
+type tDecoderTest struct {
 	Input     []byte
 	WantValue interface{} // interfaces are comparable as long as the underlying type is comparable
 	WantError error
@@ -60,87 +64,87 @@ type tFromBytes struct {
 
 func TestUI08ToUint64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI08", 1)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00"), uint64(0), nil},
-		tFromBytes{[]byte("\x01"), uint64(1), nil},
-		tFromBytes{[]byte("\x00"), uint64(0), nil},
-		tFromBytes{[]byte("\x0F"), uint64(15), nil},
-		tFromBytes{[]byte("\xF0"), uint64(240), nil},
-		tFromBytes{[]byte("\xFF"), uint64(255), nil},
-		tFromBytes{[]byte("\x00\x00"), uint64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\xFF\xFF"), uint64(0), byteCountErr(2)},
-		tFromBytes{[]byte(""), uint64(0), byteCountErr(0)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00"), uint64(0), nil},
+		tDecoderTest{[]byte("\x01"), uint64(1), nil},
+		tDecoderTest{[]byte("\x00"), uint64(0), nil},
+		tDecoderTest{[]byte("\x0F"), uint64(15), nil},
+		tDecoderTest{[]byte("\xF0"), uint64(240), nil},
+		tDecoderTest{[]byte("\xFF"), uint64(255), nil},
+		tDecoderTest{[]byte("\x00\x00"), uint64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\xFF\xFF"), uint64(0), byteCountErr(2)},
+		tDecoderTest{[]byte(""), uint64(0), byteCountErr(0)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI08ToUint64(input)
 	})
 }
 
 func TestUI16ToUint64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI16", 2)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00"), uint64(0), nil},
-		tFromBytes{[]byte("\x00\xFF"), uint64(255), nil},
-		tFromBytes{[]byte("\xFF\x00"), uint64(65280), nil},
-		tFromBytes{[]byte("\xFF\xFF"), uint64(65535), nil},
-		tFromBytes{[]byte{}, uint64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), uint64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\xFF"), uint64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00\x01"), uint64(0), byteCountErr(3)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00"), uint64(0), nil},
+		tDecoderTest{[]byte("\x00\xFF"), uint64(255), nil},
+		tDecoderTest{[]byte("\xFF\x00"), uint64(65280), nil},
+		tDecoderTest{[]byte("\xFF\xFF"), uint64(65535), nil},
+		tDecoderTest{[]byte{}, uint64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), uint64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\xFF"), uint64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00\x01"), uint64(0), byteCountErr(3)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI16ToUint64(input)
 	})
 }
 
 func TestUI32ToUint64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), uint64(0), nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF"), uint64(0xFF), nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x00"), uint64(0xFF00), nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x00"), uint64(0xFF0000), nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x00"), uint64(0xFF000000), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), uint64(0xFFFFFFFF), nil},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), uint64(0), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF"), uint64(0xFF), nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x00"), uint64(0xFF00), nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x00"), uint64(0xFF0000), nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x00"), uint64(0xFF000000), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF"), uint64(0xFFFFFFFF), nil},
 
-		tFromBytes{[]byte{}, uint64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x01"), uint64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\xFF\x01"), uint64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\xFF\xFF\x01"), uint64(0), byteCountErr(3)},
-		tFromBytes{[]byte("\xFF\xFF\xFF\x01"), uint64(0xFFFFFF01), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(5)},
+		tDecoderTest{[]byte{}, uint64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x01"), uint64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\xFF\x01"), uint64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\xFF\xFF\x01"), uint64(0), byteCountErr(3)},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\x01"), uint64(0xFFFFFF01), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(5)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI32ToUint64(input)
 	})
 }
 
 func TestUI64ToUint64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI64", 8)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), uint64(0), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), uint64(0xFF), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), uint64(0xFF00), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), uint64(0xFF0000), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), uint64(0xFF000000), nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), uint64(0xFF00000000), nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), uint64(0xFF0000000000), nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), uint64(0xFF000000000000), nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), uint64(0xFF00000000000000), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), uint64(0xFFFFFFFFFFFFFFFF), nil},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), uint64(0), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), uint64(0xFF), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), uint64(0xFF00), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), uint64(0xFF0000), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), uint64(0xFF000000), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), uint64(0xFF00000000), nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), uint64(0xFF0000000000), nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), uint64(0xFF000000000000), nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), uint64(0xFF00000000000000), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), uint64(0xFFFFFFFFFFFFFFFF), nil},
 
-		tFromBytes{[]byte{}, uint64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x01"), uint64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\xFF\x01"), uint64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\xFF\xFF\x01"), uint64(0), byteCountErr(3)},
-		tFromBytes{[]byte("\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(4)},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(5)},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(6)},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(7)},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0xFFFFFFFFFFFFFF01), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(9)},
+		tDecoderTest{[]byte{}, uint64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x01"), uint64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\xFF\x01"), uint64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\xFF\xFF\x01"), uint64(0), byteCountErr(3)},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(4)},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(5)},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(6)},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(7)},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0xFFFFFFFFFFFFFF01), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), uint64(0), byteCountErr(9)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI64ToUint64(input)
 	})
 }
@@ -148,304 +152,304 @@ func TestUI64ToUint64(t *testing.T) {
 func TestUI01ToBool(t *testing.T) {
 	fmtTooBig := "value %d overflows type bool"
 	byteCountErr := errFunc(errByteCount).curry("UI01", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), false, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01"), true, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x02"), false, fmt.Errorf(fmtTooBig, 2)},
-		tFromBytes{[]byte("\x00\x00\x00\xFF"), false, fmt.Errorf(fmtTooBig, 255)},
-		tFromBytes{[]byte("\x00\x00\xFF\x00"), false, fmt.Errorf(fmtTooBig, 65280)},
-		tFromBytes{[]byte("\x00\xFF\x00\x00"), false, fmt.Errorf(fmtTooBig, 16711680)},
-		tFromBytes{[]byte("\xFF\x00\x00\x00"), false, fmt.Errorf(fmtTooBig, 4278190080)},
-		tFromBytes{[]byte(""), false, byteCountErr(0)},
-		tFromBytes{[]byte("\x01"), false, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x01"), false, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x01"), false, byteCountErr(3)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x01"), false, byteCountErr(5)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x01"), false, byteCountErr(6)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), false, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), true, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x02"), false, fmt.Errorf(fmtTooBig, 2)},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF"), false, fmt.Errorf(fmtTooBig, 255)},
+		tDecoderTest{[]byte("\x00\x00\xFF\x00"), false, fmt.Errorf(fmtTooBig, 65280)},
+		tDecoderTest{[]byte("\x00\xFF\x00\x00"), false, fmt.Errorf(fmtTooBig, 16711680)},
+		tDecoderTest{[]byte("\xFF\x00\x00\x00"), false, fmt.Errorf(fmtTooBig, 4278190080)},
+		tDecoderTest{[]byte(""), false, byteCountErr(0)},
+		tDecoderTest{[]byte("\x01"), false, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x01"), false, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x01"), false, byteCountErr(3)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x01"), false, byteCountErr(5)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x01"), false, byteCountErr(6)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI01ToBool(input)
 	})
 }
 
 func funcUI32ToUint32(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte{}, uint32(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), uint32(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\xFF"), uint32(0), byteCountErr(2)},
-		tFromBytes{[]byte("\xFF\x00\xFF"), uint32(0), byteCountErr(3)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), uint32(0), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), math.MaxUint32, nil},
-		tFromBytes{[]byte("\x01\xFF\xFF\xFF\xFF"), uint32(0), nil},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte{}, uint32(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), uint32(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\xFF"), uint32(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\xFF\x00\xFF"), uint32(0), byteCountErr(3)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), uint32(0), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF"), math.MaxUint32, nil},
+		tDecoderTest{[]byte("\x01\xFF\xFF\xFF\xFF"), uint32(0), nil},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI32ToUint32(input)
 	})
 }
 
 func TestUI08ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI08", 1)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00"), "0", nil},
-		tFromBytes{[]byte("\x01"), "1", nil},
-		tFromBytes{[]byte("\x00"), "0", nil},
-		tFromBytes{[]byte("\x0F"), "15", nil},
-		tFromBytes{[]byte("\xF0"), "240", nil},
-		tFromBytes{[]byte("\xFF"), "255", nil},
-		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
-		tFromBytes{[]byte("\xFF\xFF"), "", byteCountErr(2)},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00"), "0", nil},
+		tDecoderTest{[]byte("\x01"), "1", nil},
+		tDecoderTest{[]byte("\x00"), "0", nil},
+		tDecoderTest{[]byte("\x0F"), "15", nil},
+		tDecoderTest{[]byte("\xF0"), "240", nil},
+		tDecoderTest{[]byte("\xFF"), "255", nil},
+		tDecoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tDecoderTest{[]byte("\xFF\xFF"), "", byteCountErr(2)},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI08ToString(input)
 	})
 }
 
 func TestUI16ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI16", 2)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00"), "0", nil},
-		tFromBytes{[]byte("\x00\x01"), "1", nil},
-		tFromBytes{[]byte("\x00\xFF"), "255", nil},
-		tFromBytes{[]byte("\xFF\x00"), "65280", nil},
-		tFromBytes{[]byte("\xFF\xFF"), "65535", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00\x00"), "", byteCountErr(3)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00"), "0", nil},
+		tDecoderTest{[]byte("\x00\x01"), "1", nil},
+		tDecoderTest{[]byte("\x00\xFF"), "255", nil},
+		tDecoderTest{[]byte("\xFF\x00"), "65280", nil},
+		tDecoderTest{[]byte("\xFF\xFF"), "65535", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00\x00"), "", byteCountErr(3)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI16ToString(input)
 	})
 }
 
 func TestUI32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "0", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01"), "1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF"), "255", nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x00"), "65280", nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x00"), "16711680", nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x00"), "4278190080", nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), "4294967295", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00\x00"), "", byteCountErr(3)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00"), "", byteCountErr(5)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), "1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF"), "255", nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x00"), "65280", nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x00"), "16711680", nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x00"), "4278190080", nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF"), "4294967295", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00\x00"), "", byteCountErr(3)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00"), "", byteCountErr(5)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI32ToString(input)
 	})
 }
 
 func TestUI64ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UI64", 8)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), "1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), "255", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), "65280", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), "16711680", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), "4278190080", nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), "1095216660480", nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), "280375465082880", nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), "71776119061217280", nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), "18374686479671623680", nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "18446744073709551615", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00"), "", byteCountErr(5)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(10)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), "1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), "255", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), "65280", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), "16711680", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), "4278190080", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), "1095216660480", nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), "280375465082880", nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), "71776119061217280", nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), "18374686479671623680", nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "18446744073709551615", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00"), "", byteCountErr(5)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(10)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI64ToString(input)
 	})
 }
 
 func TestSI08ToInt64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI08", 1)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00"), int64(0), nil},
-		tFromBytes{[]byte("\x01"), int64(1), nil},
-		tFromBytes{[]byte("\x0F"), int64(15), nil},
-		tFromBytes{[]byte("\x1F"), int64(31), nil},
-		tFromBytes{[]byte("\xFF"), int64(-1), nil},
-		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00"), int64(0), nil},
+		tDecoderTest{[]byte("\x01"), int64(1), nil},
+		tDecoderTest{[]byte("\x0F"), int64(15), nil},
+		tDecoderTest{[]byte("\x1F"), int64(31), nil},
+		tDecoderTest{[]byte("\xFF"), int64(-1), nil},
+		tDecoderTest{[]byte(""), int64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI08ToInt64(input)
 	})
 }
 
 func TestSI16ToInt64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI16", 2)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00"), int64(0), nil},
-		tFromBytes{[]byte("\x00\x01"), int64(1), nil},
-		tFromBytes{[]byte("\x80\x00"), int64(math.MinInt16), nil},
-		tFromBytes{[]byte("\x7F\xFF"), int64(math.MaxInt16), nil},
-		tFromBytes{[]byte("\xFF\xFF"), int64(-1), nil},
-		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), int64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00"), int64(0), nil},
+		tDecoderTest{[]byte("\x00\x01"), int64(1), nil},
+		tDecoderTest{[]byte("\x80\x00"), int64(math.MinInt16), nil},
+		tDecoderTest{[]byte("\x7F\xFF"), int64(math.MaxInt16), nil},
+		tDecoderTest{[]byte("\xFF\xFF"), int64(-1), nil},
+		tDecoderTest{[]byte(""), int64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), int64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI16ToInt64(input)
 	})
 }
 
 func TestSI32ToInt32(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), int32(0), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01"), int32(1), nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF"), int32(255), nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x01"), int32(65281), nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x01"), int32(16711681), nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x01"), int32(-16777215), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), int32(-1), nil},
-		tFromBytes{[]byte("\x80\x00\x00\x00"), int32(math.MinInt32), nil},
-		tFromBytes{[]byte("\x7F\xFF\xFF\xFF"), int32(math.MaxInt32), nil},
-		tFromBytes{[]byte(""), int32(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), int32(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), int32(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int32(0), byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), int32(0), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), int32(1), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF"), int32(255), nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x01"), int32(65281), nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x01"), int32(16711681), nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x01"), int32(-16777215), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF"), int32(-1), nil},
+		tDecoderTest{[]byte("\x80\x00\x00\x00"), int32(math.MinInt32), nil},
+		tDecoderTest{[]byte("\x7F\xFF\xFF\xFF"), int32(math.MaxInt32), nil},
+		tDecoderTest{[]byte(""), int32(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), int32(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), int32(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int32(0), byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI32ToInt32(input)
 	})
 }
 
 func TestSI32ToInt64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01"), int64(1), nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF"), int64(255), nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x01"), int64(65281), nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x01"), int64(16711681), nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x01"), int64(-16777215), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), int64(-1), nil},
-		tFromBytes{[]byte("\x80\x00\x00\x00"), int64(math.MinInt32), nil},
-		tFromBytes{[]byte("\x7F\xFF\xFF\xFF"), int64(math.MaxInt32), nil},
-		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), int64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), int64(0), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), int64(1), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF"), int64(255), nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x01"), int64(65281), nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x01"), int64(16711681), nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x01"), int64(-16777215), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF"), int64(-1), nil},
+		tDecoderTest{[]byte("\x80\x00\x00\x00"), int64(math.MinInt32), nil},
+		tDecoderTest{[]byte("\x7F\xFF\xFF\xFF"), int64(math.MaxInt32), nil},
+		tDecoderTest{[]byte(""), int64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), int64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI32ToInt64(input)
 	})
 }
 
 func TestSI64ToInt64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI64", 8)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), int64(1), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), int64(255), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), int64(65280), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), int64(16711680), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), int64(4278190080), nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), int64(1095216660480), nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), int64(280375465082880), nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), int64(71776119061217280), nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), int64(-72057594037927936), nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), int64(-1), nil},
-		tFromBytes{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), int64(math.MinInt64), nil},
-		tFromBytes{[]byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), int64(math.MaxInt64), nil},
-		tFromBytes{[]byte(""), int64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), int64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), int64(1), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), int64(255), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), int64(65280), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), int64(16711680), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), int64(4278190080), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), int64(1095216660480), nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), int64(280375465082880), nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), int64(71776119061217280), nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), int64(-72057594037927936), nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), int64(-1), nil},
+		tDecoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), int64(math.MinInt64), nil},
+		tDecoderTest{[]byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), int64(math.MaxInt64), nil},
+		tDecoderTest{[]byte(""), int64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), int64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), int64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), int64(0), byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI64ToInt64(input)
 	})
 }
 
 func TestSI08ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI08", 1)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00"), "0", nil},
-		tFromBytes{[]byte("\x01"), "1", nil},
-		tFromBytes{[]byte("\x0F"), "15", nil},
-		tFromBytes{[]byte("\x1F"), "31", nil},
-		tFromBytes{[]byte("\xFF"), "-1", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00"), "0", nil},
+		tDecoderTest{[]byte("\x01"), "1", nil},
+		tDecoderTest{[]byte("\x0F"), "15", nil},
+		tDecoderTest{[]byte("\x1F"), "31", nil},
+		tDecoderTest{[]byte("\xFF"), "-1", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI08ToString(input)
 	})
 }
 
 func TestSI16ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI16", 2)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00"), "0", nil},
-		tFromBytes{[]byte("\x00\x01"), "1", nil},
-		tFromBytes{[]byte("\x80\x00"), "-32768", nil},
-		tFromBytes{[]byte("\x7F\xFF"), "32767", nil},
-		tFromBytes{[]byte("\xFF\xFF"), "-1", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00"), "0", nil},
+		tDecoderTest{[]byte("\x00\x01"), "1", nil},
+		tDecoderTest{[]byte("\x80\x00"), "-32768", nil},
+		tDecoderTest{[]byte("\x7F\xFF"), "32767", nil},
+		tDecoderTest{[]byte("\xFF\xFF"), "-1", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI16ToString(input)
 	})
 }
 
 func TestSI32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "0", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01"), "1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF"), "255", nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x01"), "65281", nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x01"), "16711681", nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x01"), "-16777215", nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF"), "-1", nil},
-		tFromBytes{[]byte("\x80\x00\x00\x00"), "-2147483648", nil},
-		tFromBytes{[]byte("\x7F\xFF\xFF\xFF"), "2147483647", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), "1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF"), "255", nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x01"), "65281", nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x01"), "16711681", nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x01"), "-16777215", nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF"), "-1", nil},
+		tDecoderTest{[]byte("\x80\x00\x00\x00"), "-2147483648", nil},
+		tDecoderTest{[]byte("\x7F\xFF\xFF\xFF"), "2147483647", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI32ToString(input)
 	})
 }
 
 func TestSI64ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SI64", 8)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), "1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), "255", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), "65280", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), "16711680", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), "4278190080", nil},
-		tFromBytes{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), "1095216660480", nil},
-		tFromBytes{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), "280375465082880", nil},
-		tFromBytes{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), "71776119061217280", nil},
-		tFromBytes{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), "-72057594037927936", nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "-1", nil},
-		tFromBytes{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), "-9223372036854775808", nil},
-		tFromBytes{[]byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "9223372036854775807", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x01"), "1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), "255", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), "65280", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), "16711680", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), "4278190080", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), "1095216660480", nil},
+		tDecoderTest{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), "280375465082880", nil},
+		tDecoderTest{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), "71776119061217280", nil},
+		tDecoderTest{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), "-72057594037927936", nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "-1", nil},
+		tDecoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), "-9223372036854775808", nil},
+		tDecoderTest{[]byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "9223372036854775807", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI64ToString(input)
 	})
 }
@@ -454,140 +458,140 @@ func TestSI64ToString(t *testing.T) {
 // maximum of 3.4028E+38 (either can be positive or negative).
 func TestFP32ToFloat32(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), float32(0.0), nil},
-		tFromBytes{[]byte("\x00\x7F\xFD\x5F"), float32(1.1754E-38), nil},
-		tFromBytes{[]byte("\x2d\x59\x2f\xfe"), float32(1.2345678E-11), nil},
-		tFromBytes{[]byte("\x42\x03\x11\x68"), float32(32.766998), nil},
-		tFromBytes{[]byte("\x42\x82\x00\x83"), float32(65.000999), nil},
-		tFromBytes{[]byte("\x43\xa3\xd5\xc3"), float32(327.67001), nil},
-		tFromBytes{[]byte("\x47\x00\x00\x00"), float32(32768), nil},
-		tFromBytes{[]byte("\x4c\x23\xd7\x0a"), float32(42949672), nil},
-		tFromBytes{[]byte("\x4d\x9c\x40\x00"), float32(3.2768E+08), nil},
-		tFromBytes{[]byte("\x7f\x7f\xff\x8b"), float32(3.4027999E+38), nil},
-		tFromBytes{[]byte("\x7F\x7F\xFF\x8B"), float32(3.4028E+38), nil},
-		tFromBytes{[]byte("\x80\x7f\xfd\x5f"), float32(-1.1754E-38), nil},
-		tFromBytes{[]byte("\xc0\x51\xb5\x74"), float32(-3.2767), nil},
-		tFromBytes{[]byte("\xc4\x9a\x52\x2b"), float32(-1234.5677), nil},
-		tFromBytes{[]byte("\xc5\xcb\x20\x00"), float32(-6500), nil},
-		tFromBytes{[]byte(""), float32(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), float32(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), float32(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float32(0), byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), float32(0.0), nil},
+		tDecoderTest{[]byte("\x00\x7F\xFD\x5F"), float32(1.1754E-38), nil},
+		tDecoderTest{[]byte("\x2d\x59\x2f\xfe"), float32(1.2345678E-11), nil},
+		tDecoderTest{[]byte("\x42\x03\x11\x68"), float32(32.766998), nil},
+		tDecoderTest{[]byte("\x42\x82\x00\x83"), float32(65.000999), nil},
+		tDecoderTest{[]byte("\x43\xa3\xd5\xc3"), float32(327.67001), nil},
+		tDecoderTest{[]byte("\x47\x00\x00\x00"), float32(32768), nil},
+		tDecoderTest{[]byte("\x4c\x23\xd7\x0a"), float32(42949672), nil},
+		tDecoderTest{[]byte("\x4d\x9c\x40\x00"), float32(3.2768E+08), nil},
+		tDecoderTest{[]byte("\x7f\x7f\xff\x8b"), float32(3.4027999E+38), nil},
+		tDecoderTest{[]byte("\x7F\x7F\xFF\x8B"), float32(3.4028E+38), nil},
+		tDecoderTest{[]byte("\x80\x7f\xfd\x5f"), float32(-1.1754E-38), nil},
+		tDecoderTest{[]byte("\xc0\x51\xb5\x74"), float32(-3.2767), nil},
+		tDecoderTest{[]byte("\xc4\x9a\x52\x2b"), float32(-1234.5677), nil},
+		tDecoderTest{[]byte("\xc5\xcb\x20\x00"), float32(-6500), nil},
+		tDecoderTest{[]byte(""), float32(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), float32(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), float32(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float32(0), byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return FP32ToFloat32(input)
 	})
 }
 
 func TestFP32ToFloat64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
-	tests := []tFromBytes{
+	tests := []tDecoderTest{
 		// must cast expected result to float32 first, otherwise the float64 has
 		// too much precision to match the real result
-		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(float32(0)), nil},
-		tFromBytes{[]byte("\x00\x7F\xFD\x5F"), float64(float32(1.1754E-38)), nil},
-		tFromBytes{[]byte("\x2d\x59\x2f\xfe"), float64(float32(1.2345678E-11)), nil},
-		tFromBytes{[]byte("\x42\x03\x11\x68"), float64(float32(32.766998)), nil},
-		tFromBytes{[]byte("\x42\x82\x00\x83"), float64(float32(65.000999)), nil},
-		tFromBytes{[]byte("\x43\xa3\xd5\xc3"), float64(float32(327.67001)), nil},
-		tFromBytes{[]byte("\x47\x00\x00\x00"), float64(float32(32768)), nil},
-		tFromBytes{[]byte("\x4c\x23\xd7\x0a"), float64(float32(42949672)), nil},
-		tFromBytes{[]byte("\x4d\x9c\x40\x00"), float64(float32(3.2768E+08)), nil},
-		tFromBytes{[]byte("\x7f\x7f\xff\x8b"), float64(float32(3.4027999E+38)), nil},
-		tFromBytes{[]byte("\x7F\x7F\xFF\x8B"), float64(float32(3.4028E+38)), nil},
-		tFromBytes{[]byte("\x80\x7f\xfd\x5f"), float64(float32(-1.1754E-38)), nil},
-		tFromBytes{[]byte("\xc0\x51\xb5\x74"), float64(float32(-3.2767)), nil},
-		tFromBytes{[]byte("\xc4\x9a\x52\x2b"), float64(float32(-1234.5677)), nil},
-		tFromBytes{[]byte("\xc5\xcb\x20\x00"), float64(float32(-6500)), nil},
-		tFromBytes{[]byte(""), float64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), float64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float64(0), byteCountErr(8)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), float64(float32(0)), nil},
+		tDecoderTest{[]byte("\x00\x7F\xFD\x5F"), float64(float32(1.1754E-38)), nil},
+		tDecoderTest{[]byte("\x2d\x59\x2f\xfe"), float64(float32(1.2345678E-11)), nil},
+		tDecoderTest{[]byte("\x42\x03\x11\x68"), float64(float32(32.766998)), nil},
+		tDecoderTest{[]byte("\x42\x82\x00\x83"), float64(float32(65.000999)), nil},
+		tDecoderTest{[]byte("\x43\xa3\xd5\xc3"), float64(float32(327.67001)), nil},
+		tDecoderTest{[]byte("\x47\x00\x00\x00"), float64(float32(32768)), nil},
+		tDecoderTest{[]byte("\x4c\x23\xd7\x0a"), float64(float32(42949672)), nil},
+		tDecoderTest{[]byte("\x4d\x9c\x40\x00"), float64(float32(3.2768E+08)), nil},
+		tDecoderTest{[]byte("\x7f\x7f\xff\x8b"), float64(float32(3.4027999E+38)), nil},
+		tDecoderTest{[]byte("\x7F\x7F\xFF\x8B"), float64(float32(3.4028E+38)), nil},
+		tDecoderTest{[]byte("\x80\x7f\xfd\x5f"), float64(float32(-1.1754E-38)), nil},
+		tDecoderTest{[]byte("\xc0\x51\xb5\x74"), float64(float32(-3.2767)), nil},
+		tDecoderTest{[]byte("\xc4\x9a\x52\x2b"), float64(float32(-1234.5677)), nil},
+		tDecoderTest{[]byte("\xc5\xcb\x20\x00"), float64(float32(-6500)), nil},
+		tDecoderTest{[]byte(""), float64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), float64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float64(0), byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return FP32ToFloat64(input)
 	})
 }
 
 func TestFP64ToFloat64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FP64", 8)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), float64(-1.23456789012345672E+09), nil},
-		tFromBytes{[]byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), float64(3.27670000000000030E+01), nil},
-		tFromBytes{[]byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), float64(3.27670000000000016E+02), nil},
-		tFromBytes{[]byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), float64(6.50010000000000048E+01), nil},
-		tFromBytes{[]byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), float64(-3.26800000000000011E+02), nil},
-		tFromBytes{[]byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), float64(-3.27669999999999995E+00), nil},
-		tFromBytes{[]byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), float64(-6.50000000000000000E+03), nil},
-		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), float64(2.22499999999999987E-308), nil},
-		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), float64(2.22499999999999987E-308), nil},
-		tFromBytes{[]byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), float64(1.79760000000000007E+308), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float64(0.00000000000000000E+00), nil},
-		tFromBytes{[]byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), float64(3.27680000000000000E+04), nil},
-		tFromBytes{[]byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), float64(3.27680001000000000E+08), nil},
-		tFromBytes{[]byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), float64(4.29496720000000000E+07), nil},
-		tFromBytes{[]byte(""), float64(0), byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), float64(0), byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(0), byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), float64(-1.23456789012345672E+09), nil},
+		tDecoderTest{[]byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), float64(3.27670000000000030E+01), nil},
+		tDecoderTest{[]byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), float64(3.27670000000000016E+02), nil},
+		tDecoderTest{[]byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), float64(6.50010000000000048E+01), nil},
+		tDecoderTest{[]byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), float64(-3.26800000000000011E+02), nil},
+		tDecoderTest{[]byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), float64(-3.27669999999999995E+00), nil},
+		tDecoderTest{[]byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), float64(-6.50000000000000000E+03), nil},
+		tDecoderTest{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), float64(2.22499999999999987E-308), nil},
+		tDecoderTest{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), float64(2.22499999999999987E-308), nil},
+		tDecoderTest{[]byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), float64(1.79760000000000007E+308), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), float64(0.00000000000000000E+00), nil},
+		tDecoderTest{[]byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), float64(3.27680000000000000E+04), nil},
+		tDecoderTest{[]byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), float64(3.27680001000000000E+08), nil},
+		tDecoderTest{[]byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), float64(4.29496720000000000E+07), nil},
+		tDecoderTest{[]byte(""), float64(0), byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), float64(0), byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), float64(0), byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), float64(0), byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return FP64ToFloat64(input)
 	})
 }
 
 func TestFP32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "0", nil},
-		tFromBytes{[]byte("\x00\x7F\xFD\x5F"), "1.1754E-38", nil},
-		tFromBytes{[]byte("\x2d\x59\x2f\xfe"), "1.2345678E-11", nil},
-		tFromBytes{[]byte("\x42\x03\x11\x68"), "32.766998", nil},
-		tFromBytes{[]byte("\x42\x82\x00\x83"), "65.000999", nil},
-		tFromBytes{[]byte("\x43\xa3\xd5\xc3"), "327.67001", nil},
-		tFromBytes{[]byte("\x47\x00\x00\x00"), "32768", nil},
-		tFromBytes{[]byte("\x4c\x23\xd7\x0a"), "42949672", nil},
-		tFromBytes{[]byte("\x4d\x9c\x40\x00"), "3.2768E+08", nil},
-		tFromBytes{[]byte("\x7f\x7f\xff\x8b"), "3.4027999E+38", nil},
-		//FIXME		tFromBytes{[]byte("\x7F\x7F\xFF\x8B"), "3.4028E+38", nil},
-		tFromBytes{[]byte("\x80\x7f\xfd\x5f"), "-1.1754E-38", nil},
-		tFromBytes{[]byte("\xc0\x51\xb5\x74"), "-3.2767", nil},
-		tFromBytes{[]byte("\xc4\x9a\x52\x2b"), "-1234.5677", nil},
-		tFromBytes{[]byte("\xc5\xcb\x20\x00"), "-6500", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0", nil},
+		tDecoderTest{[]byte("\x00\x7F\xFD\x5F"), "1.1754E-38", nil},
+		tDecoderTest{[]byte("\x2d\x59\x2f\xfe"), "1.2345678E-11", nil},
+		tDecoderTest{[]byte("\x42\x03\x11\x68"), "32.766998", nil},
+		tDecoderTest{[]byte("\x42\x82\x00\x83"), "65.000999", nil},
+		tDecoderTest{[]byte("\x43\xa3\xd5\xc3"), "327.67001", nil},
+		tDecoderTest{[]byte("\x47\x00\x00\x00"), "32768", nil},
+		tDecoderTest{[]byte("\x4c\x23\xd7\x0a"), "42949672", nil},
+		tDecoderTest{[]byte("\x4d\x9c\x40\x00"), "3.2768E+08", nil},
+		tDecoderTest{[]byte("\x7f\x7f\xff\x8b"), "3.4027999E+38", nil},
+		//FIXME		tDecoderTest{[]byte("\x7F\x7F\xFF\x8B"), "3.4028E+38", nil},
+		tDecoderTest{[]byte("\x80\x7f\xfd\x5f"), "-1.1754E-38", nil},
+		tDecoderTest{[]byte("\xc0\x51\xb5\x74"), "-3.2767", nil},
+		tDecoderTest{[]byte("\xc4\x9a\x52\x2b"), "-1234.5677", nil},
+		tDecoderTest{[]byte("\xc5\xcb\x20\x00"), "-6500", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return FP32ToString(input)
 	})
 }
 
 func TestFP64ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FP64", 8)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), "-1.23456789012345672E+09", nil},
-		tFromBytes{[]byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), "3.27670000000000030E+01", nil},
-		tFromBytes{[]byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), "3.27670000000000016E+02", nil},
-		tFromBytes{[]byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), "6.50010000000000048E+01", nil},
-		tFromBytes{[]byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), "-3.26800000000000011E+02", nil},
-		tFromBytes{[]byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), "-3.27669999999999995E+00", nil},
-		tFromBytes{[]byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), "-6.50000000000000000E+03", nil},
-		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), "2.22499999999999987E-308", nil},
-		tFromBytes{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), "2.22499999999999987E-308", nil},
-		tFromBytes{[]byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), "1.79760000000000007E+308", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0.00000000000000000E+00", nil},
-		tFromBytes{[]byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), "3.27680000000000000E+04", nil},
-		tFromBytes{[]byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), "3.27680001000000000E+08", nil},
-		tFromBytes{[]byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), "4.29496720000000000E+07", nil},
-		tFromBytes{[]byte(""), "", byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), "-1.23456789012345672E+09", nil},
+		tDecoderTest{[]byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), "3.27670000000000030E+01", nil},
+		tDecoderTest{[]byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), "3.27670000000000016E+02", nil},
+		tDecoderTest{[]byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), "6.50010000000000048E+01", nil},
+		tDecoderTest{[]byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), "-3.26800000000000011E+02", nil},
+		tDecoderTest{[]byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), "-3.27669999999999995E+00", nil},
+		tDecoderTest{[]byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), "-6.50000000000000000E+03", nil},
+		tDecoderTest{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), "2.22499999999999987E-308", nil},
+		tDecoderTest{[]byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), "2.22499999999999987E-308", nil},
+		tDecoderTest{[]byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), "1.79760000000000007E+308", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0.00000000000000000E+00", nil},
+		tDecoderTest{[]byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), "3.27680000000000000E+04", nil},
+		tDecoderTest{[]byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), "3.27680001000000000E+08", nil},
+		tDecoderTest{[]byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), "4.29496720000000000E+07", nil},
+		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "", byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return FP64ToString(input)
 	})
 }
@@ -595,16 +599,16 @@ func TestFP64ToString(t *testing.T) {
 // // FIXME
 // func TestUF32ToFloat64(t *testing.T) {
 // 	byteCountErr := errFunc(errByteCount).curry("UF32", 4)
-// 	tests := []tFromBytes{
-// 		tFromBytes{[]byte("\x00\x00\x00\x00"), float64(float32(0.0000), nil},
-// 		tFromBytes{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
-// 		tFromBytes{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
-// 		tFromBytes{[]byte(""), "", byteCountErr(0)},
-// 		tFromBytes{[]byte("\x00"), "", byteCountErr(1)},
-// 		tFromBytes{[]byte("\x00\x00"), "", byteCountErr(2)},
-// 		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+// 	tests := []tDecoderTest{
+// 		tDecoderTest{[]byte("\x00\x00\x00\x00"), float64(float32(0.0000), nil},
+// 		tDecoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
+// 		tDecoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
+// 		tDecoderTest{[]byte(""), "", byteCountErr(0)},
+// 		tDecoderTest{[]byte("\x00"), "", byteCountErr(1)},
+// 		tDecoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+// 		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
 // 	}
-// 	runTests(t, tests, func(input []byte) (interface{}, error) {
+// 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 // 		return UF32ToFloat64(input)
 // 	})
 // }
@@ -612,204 +616,204 @@ func TestFP64ToString(t *testing.T) {
 func TestUF64ToFloat64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UF64", 8)
 	zero := float64(0)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), float64(4294967295.999999999), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), float64(4294967295.000000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xfe\x00\x00\x00\x00"), float64(4294967294.000000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xfd\x00\x00\x00\x00"), float64(4294967293.000000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xfc\x00\x00\x00\x00"), float64(4294967292.000000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xfb\x00\x00\x00\x00"), float64(4294967291.000000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xfa\x00\x00\x00\x00"), float64(4294967290.000000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x19\x99\x99\x99"), float64(4294967295.100000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x33\x33\x33\x33"), float64(4294967295.200000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x4c\xcc\xcc\xcc"), float64(4294967295.300000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x66\x66\x66\x66"), float64(4294967295.400000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x80\x00\x00\x00"), float64(4294967295.500000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x99\x99\x99\x99"), float64(4294967295.600000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\xb3\x33\x33\x33"), float64(4294967295.700000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\xcc\xcc\xcc\xcc"), float64(4294967295.800000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\xe6\x66\x66\x66"), float64(4294967295.900000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x02\x8f\x5c\x28"), float64(4294967295.010000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x05\x1e\xb8\x51"), float64(4294967295.020000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x07\xae\x14\x7a"), float64(4294967295.030000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x0a\x3d\x70\xa3"), float64(4294967295.040000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x0c\xcc\xcc\xcc"), float64(4294967295.050000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x0f\x5c\x28\xf5"), float64(4294967295.060000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x11\xeb\x85\x1e"), float64(4294967295.070000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x14\x7a\xe1\x47"), float64(4294967295.080000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x17\x0a\x3d\x70"), float64(4294967295.090000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x41\x89\x37"), float64(4294967295.001000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x83\x12\x6e"), float64(4294967295.002000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\xc4\x9b\xa5"), float64(4294967295.003000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x06\x24\xdd"), float64(4294967295.004000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x47\xae\x14"), float64(4294967295.005000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x89\x37\x4b"), float64(4294967295.006000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x01\xca\xc0\x83"), float64(4294967295.007000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x02\x0c\x49\xba"), float64(4294967295.008000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x02\x4d\xd2\xf1"), float64(4294967295.009000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x01\x89\x37\x4b"), float64(4294967295.006000000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x06\x8d\xb8"), float64(4294967295.000100000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x0d\x1b\x71"), float64(4294967295.000200000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x13\xa9\x2a"), float64(4294967295.000300000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x1a\x36\xe2"), float64(4294967295.000400000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x20\xc4\x9b"), float64(4294967295.000500000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x27\x52\x54"), float64(4294967295.000600000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x2d\xe0\x0d"), float64(4294967295.000700000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x34\x6d\xc5"), float64(4294967295.000800000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x3a\xfb\x7e"), float64(4294967295.000900000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x27\x52\x54"), float64(4294967295.000600000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\xa7\xc5"), float64(4294967295.000010000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x01\x4f\x8b"), float64(4294967295.000020000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x01\xf7\x51"), float64(4294967295.000030000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x02\x9f\x16"), float64(4294967295.000040000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x03\x46\xdc"), float64(4294967295.000050000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x03\xee\xa2"), float64(4294967295.000060000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x04\x96\x67"), float64(4294967295.000070000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x05\x3e\x2d"), float64(4294967295.000080000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x05\xe5\xf3"), float64(4294967295.000090000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x03\xee\xa2"), float64(4294967295.000060000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x10\xc6"), float64(4294967295.000001000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x21\x8d"), float64(4294967295.000002000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x32\x54"), float64(4294967295.000003000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x43\x1b"), float64(4294967295.000004000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x53\xe2"), float64(4294967295.000005000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x64\xa9"), float64(4294967295.000006000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x75\x70"), float64(4294967295.000007000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x86\x37"), float64(4294967295.000008000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x96\xfe"), float64(4294967295.000009000), nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x64\xa9"), float64(4294967295.000006000), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), float64(1.000000000), nil},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), float64(4294967295.999999999), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), float64(4294967295.000000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xfe\x00\x00\x00\x00"), float64(4294967294.000000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xfd\x00\x00\x00\x00"), float64(4294967293.000000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xfc\x00\x00\x00\x00"), float64(4294967292.000000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xfb\x00\x00\x00\x00"), float64(4294967291.000000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xfa\x00\x00\x00\x00"), float64(4294967290.000000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x19\x99\x99\x99"), float64(4294967295.100000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x33\x33\x33\x33"), float64(4294967295.200000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x4c\xcc\xcc\xcc"), float64(4294967295.300000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x66\x66\x66\x66"), float64(4294967295.400000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x80\x00\x00\x00"), float64(4294967295.500000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x99\x99\x99\x99"), float64(4294967295.600000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\xb3\x33\x33\x33"), float64(4294967295.700000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\xcc\xcc\xcc\xcc"), float64(4294967295.800000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\xe6\x66\x66\x66"), float64(4294967295.900000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x02\x8f\x5c\x28"), float64(4294967295.010000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x05\x1e\xb8\x51"), float64(4294967295.020000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x07\xae\x14\x7a"), float64(4294967295.030000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x0a\x3d\x70\xa3"), float64(4294967295.040000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x0c\xcc\xcc\xcc"), float64(4294967295.050000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x0f\x5c\x28\xf5"), float64(4294967295.060000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x11\xeb\x85\x1e"), float64(4294967295.070000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x14\x7a\xe1\x47"), float64(4294967295.080000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x17\x0a\x3d\x70"), float64(4294967295.090000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x41\x89\x37"), float64(4294967295.001000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x83\x12\x6e"), float64(4294967295.002000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\xc4\x9b\xa5"), float64(4294967295.003000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x01\x06\x24\xdd"), float64(4294967295.004000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x01\x47\xae\x14"), float64(4294967295.005000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x01\x89\x37\x4b"), float64(4294967295.006000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x01\xca\xc0\x83"), float64(4294967295.007000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x02\x0c\x49\xba"), float64(4294967295.008000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x02\x4d\xd2\xf1"), float64(4294967295.009000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x01\x89\x37\x4b"), float64(4294967295.006000000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x06\x8d\xb8"), float64(4294967295.000100000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x0d\x1b\x71"), float64(4294967295.000200000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x13\xa9\x2a"), float64(4294967295.000300000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x1a\x36\xe2"), float64(4294967295.000400000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x20\xc4\x9b"), float64(4294967295.000500000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x27\x52\x54"), float64(4294967295.000600000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x2d\xe0\x0d"), float64(4294967295.000700000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x34\x6d\xc5"), float64(4294967295.000800000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x3a\xfb\x7e"), float64(4294967295.000900000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x27\x52\x54"), float64(4294967295.000600000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\xa7\xc5"), float64(4294967295.000010000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x01\x4f\x8b"), float64(4294967295.000020000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x01\xf7\x51"), float64(4294967295.000030000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x02\x9f\x16"), float64(4294967295.000040000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x03\x46\xdc"), float64(4294967295.000050000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x03\xee\xa2"), float64(4294967295.000060000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x04\x96\x67"), float64(4294967295.000070000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x05\x3e\x2d"), float64(4294967295.000080000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x05\xe5\xf3"), float64(4294967295.000090000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x03\xee\xa2"), float64(4294967295.000060000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x10\xc6"), float64(4294967295.000001000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x21\x8d"), float64(4294967295.000002000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x32\x54"), float64(4294967295.000003000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x43\x1b"), float64(4294967295.000004000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x53\xe2"), float64(4294967295.000005000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x64\xa9"), float64(4294967295.000006000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x75\x70"), float64(4294967295.000007000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x86\x37"), float64(4294967295.000008000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x96\xfe"), float64(4294967295.000009000), nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x64\xa9"), float64(4294967295.000006000), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), float64(1.000000000), nil},
 		// FIXME this stupid type should be simply two married UINT32s.
-		//    tFromBytes{[]byte("\x00\x00\x00\x01\x19\x99\x99\x99"), float64(1.100000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x33\x33\x33\x33"), float64(1.200000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x4c\xcc\xcc\xcc"), float64(1.300000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x66\x66\x66\x66"), float64(1.400000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), float64(1.500000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x99\x99\x99\x99"), float64(1.600000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\xb3\x33\x33\x33"), float64(1.700000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\xcc\xcc\xcc\xcc"), float64(1.800000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\xe6\x66\x66\x66"), float64(1.900000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x02\x8f\x5c\x28"), float64(1.010000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x05\x1e\xb8\x51"), float64(1.020000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x07\xae\x14\x7a"), float64(1.030000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x0a\x3d\x70\xa3"), float64(1.040000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x0c\xcc\xcc\xcc"), float64(1.050000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x0f\x5c\x28\xf5"), float64(1.060000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x11\xeb\x85\x1e"), float64(1.070000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x14\x7a\xe1\x47"), float64(1.080000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x17\x0a\x3d\x70"), float64(1.090000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x41\x89\x37"), float64(1.001000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x83\x12\x6e"), float64(1.002000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\xc4\x9b\xa5"), float64(1.003000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x06\x24\xdd"), float64(1.004000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x47\xae\x14"), float64(1.005000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x89\x37\x4b"), float64(1.006000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\xca\xc0\x83"), float64(1.007000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x02\x0c\x49\xba"), float64(1.008000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x02\x4d\xd2\xf1"), float64(1.009000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x01\x89\x37\x4b"), float64(1.006000000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x06\x8d\xb8"), float64(1.000100000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x0d\x1b\x71"), float64(1.000200000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x13\xa9\x2a"), float64(1.000300000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x1a\x36\xe2"), float64(1.000400000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x20\xc4\x9b"), float64(1.000500000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x27\x52\x54"), float64(1.000600000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x2d\xe0\x0d"), float64(1.000700000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x34\x6d\xc5"), float64(1.000800000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x3a\xfb\x7e"), float64(1.000900000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x27\x52\x54"), float64(1.000600000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\xa7\xc5"), float64(1.000010000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x01\x4f\x8b"), float64(1.000020000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x01\xf7\x51"), float64(1.000030000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x02\x9f\x16"), float64(1.000040000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x03\x46\xdc"), float64(1.000050000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x03\xee\xa2"), float64(1.000060000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x04\x96\x67"), float64(1.000070000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x05\x3e\x2d"), float64(1.000080000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x05\xe5\xf3"), float64(1.000090000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x03\xee\xa2"), float64(1.000060000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x10\xc6"), float64(1.000001000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x21\x8d"), float64(1.000002000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x32\x54"), float64(1.000003000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x43\x1b"), float64(1.000004000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x53\xe2"), float64(1.000005000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x64\xa9"), float64(1.000006000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x75\x70"), float64(1.000007000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x86\x37"), float64(1.000008000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x96\xfe"), float64(1.000009000), nil},
-		//		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x64\xa9"), float64(1.000006000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x19\x99\x99\x99"), float64(65596.100000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x33\x33\x33\x33"), float64(65596.200000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x4c\xcc\xcc\xcc"), float64(65596.300000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x66\x66\x66\x66"), float64(65596.400000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x80\x00\x00\x00"), float64(65596.500000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x99\x99\x99\x99"), float64(65596.600000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\xb3\x33\x33\x33"), float64(65596.700000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\xcc\xcc\xcc\xcc"), float64(65596.800000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\xe6\x66\x66\x66"), float64(65596.900000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x02\x8f\x5c\x28"), float64(65596.010000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x05\x1e\xb8\x51"), float64(65596.020000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x07\xae\x14\x7a"), float64(65596.030000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x0a\x3d\x70\xa3"), float64(65596.040000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x0c\xcc\xcc\xcc"), float64(65596.050000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x0f\x5c\x28\xf5"), float64(65596.060000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x11\xeb\x85\x1e"), float64(65596.070000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x14\x7a\xe1\x47"), float64(65596.080000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x17\x0a\x3d\x70"), float64(65596.090000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x41\x89\x37"), float64(65596.001000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x83\x12\x6e"), float64(65596.002000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\xc4\x9b\xa5"), float64(65596.003000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x06\x24\xdd"), float64(65596.004000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x47\xae\x14"), float64(65596.005000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x89\x37\x4b"), float64(65596.006000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\xca\xc0\x83"), float64(65596.007000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x02\x0c\x49\xba"), float64(65596.008000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x02\x4d\xd2\xf1"), float64(65596.009000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x01\x89\x37\x4b"), float64(65596.006000000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x06\x8d\xb8"), float64(65596.000100000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x0d\x1b\x71"), float64(65596.000200000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x13\xa9\x2a"), float64(65596.000300000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x1a\x36\xe2"), float64(65596.000400000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x20\xc4\x9b"), float64(65596.000500000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x27\x52\x54"), float64(65596.000600000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x2d\xe0\x0d"), float64(65596.000700000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x34\x6d\xc5"), float64(65596.000800000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x3a\xfb\x7e"), float64(65596.000900000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x27\x52\x54"), float64(65596.000600000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\xa7\xc5"), float64(65596.000010000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x01\x4f\x8b"), float64(65596.000020000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x01\xf7\x51"), float64(65596.000030000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x02\x9f\x16"), float64(65596.000040000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x03\x46\xdc"), float64(65596.000050000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x03\xee\xa2"), float64(65596.000060000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x04\x96\x67"), float64(65596.000070000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x05\x3e\x2d"), float64(65596.000080000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x05\xe5\xf3"), float64(65596.000090000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x03\xee\xa2"), float64(65596.000060000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x10\xc6"), float64(65596.000001000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x21\x8d"), float64(65596.000002000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x32\x54"), float64(65596.000003000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x43\x1b"), float64(65596.000004000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x53\xe2"), float64(65596.000005000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x64\xa9"), float64(65596.000006000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x75\x70"), float64(65596.000007000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x86\x37"), float64(65596.000008000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x96\xfe"), float64(65596.000009000), nil},
-		//		tFromBytes{[]byte("\x00\x01\x00\x3c\x00\x00\x64\xa9"), float64(65596.000006000), nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		//    tDecoderTest{[]byte("\x00\x00\x00\x01\x19\x99\x99\x99"), float64(1.100000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x33\x33\x33\x33"), float64(1.200000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x4c\xcc\xcc\xcc"), float64(1.300000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x66\x66\x66\x66"), float64(1.400000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), float64(1.500000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x99\x99\x99\x99"), float64(1.600000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\xb3\x33\x33\x33"), float64(1.700000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\xcc\xcc\xcc\xcc"), float64(1.800000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\xe6\x66\x66\x66"), float64(1.900000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x02\x8f\x5c\x28"), float64(1.010000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x05\x1e\xb8\x51"), float64(1.020000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x07\xae\x14\x7a"), float64(1.030000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x0a\x3d\x70\xa3"), float64(1.040000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x0c\xcc\xcc\xcc"), float64(1.050000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x0f\x5c\x28\xf5"), float64(1.060000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x11\xeb\x85\x1e"), float64(1.070000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x14\x7a\xe1\x47"), float64(1.080000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x17\x0a\x3d\x70"), float64(1.090000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x41\x89\x37"), float64(1.001000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x83\x12\x6e"), float64(1.002000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\xc4\x9b\xa5"), float64(1.003000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x01\x06\x24\xdd"), float64(1.004000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x01\x47\xae\x14"), float64(1.005000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x01\x89\x37\x4b"), float64(1.006000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x01\xca\xc0\x83"), float64(1.007000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x02\x0c\x49\xba"), float64(1.008000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x02\x4d\xd2\xf1"), float64(1.009000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x01\x89\x37\x4b"), float64(1.006000000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x06\x8d\xb8"), float64(1.000100000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x0d\x1b\x71"), float64(1.000200000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x13\xa9\x2a"), float64(1.000300000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x1a\x36\xe2"), float64(1.000400000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x20\xc4\x9b"), float64(1.000500000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x27\x52\x54"), float64(1.000600000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x2d\xe0\x0d"), float64(1.000700000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x34\x6d\xc5"), float64(1.000800000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x3a\xfb\x7e"), float64(1.000900000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x27\x52\x54"), float64(1.000600000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\xa7\xc5"), float64(1.000010000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x01\x4f\x8b"), float64(1.000020000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x01\xf7\x51"), float64(1.000030000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x02\x9f\x16"), float64(1.000040000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x03\x46\xdc"), float64(1.000050000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x03\xee\xa2"), float64(1.000060000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x04\x96\x67"), float64(1.000070000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x05\x3e\x2d"), float64(1.000080000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x05\xe5\xf3"), float64(1.000090000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x03\xee\xa2"), float64(1.000060000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x10\xc6"), float64(1.000001000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x21\x8d"), float64(1.000002000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x32\x54"), float64(1.000003000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x43\x1b"), float64(1.000004000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x53\xe2"), float64(1.000005000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x64\xa9"), float64(1.000006000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x75\x70"), float64(1.000007000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x86\x37"), float64(1.000008000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x96\xfe"), float64(1.000009000), nil},
+		//		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x64\xa9"), float64(1.000006000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x00\x00"), float64(65596.000000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x19\x99\x99\x99"), float64(65596.100000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x33\x33\x33\x33"), float64(65596.200000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x4c\xcc\xcc\xcc"), float64(65596.300000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x66\x66\x66\x66"), float64(65596.400000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x80\x00\x00\x00"), float64(65596.500000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x99\x99\x99\x99"), float64(65596.600000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\xb3\x33\x33\x33"), float64(65596.700000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\xcc\xcc\xcc\xcc"), float64(65596.800000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\xe6\x66\x66\x66"), float64(65596.900000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x02\x8f\x5c\x28"), float64(65596.010000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x05\x1e\xb8\x51"), float64(65596.020000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x07\xae\x14\x7a"), float64(65596.030000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x0a\x3d\x70\xa3"), float64(65596.040000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x0c\xcc\xcc\xcc"), float64(65596.050000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x0f\x5c\x28\xf5"), float64(65596.060000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x11\xeb\x85\x1e"), float64(65596.070000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x14\x7a\xe1\x47"), float64(65596.080000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x17\x0a\x3d\x70"), float64(65596.090000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x41\x89\x37"), float64(65596.001000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x83\x12\x6e"), float64(65596.002000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\xc4\x9b\xa5"), float64(65596.003000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x01\x06\x24\xdd"), float64(65596.004000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x01\x47\xae\x14"), float64(65596.005000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x01\x89\x37\x4b"), float64(65596.006000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x01\xca\xc0\x83"), float64(65596.007000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x02\x0c\x49\xba"), float64(65596.008000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x02\x4d\xd2\xf1"), float64(65596.009000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x01\x89\x37\x4b"), float64(65596.006000000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x06\x8d\xb8"), float64(65596.000100000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x0d\x1b\x71"), float64(65596.000200000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x13\xa9\x2a"), float64(65596.000300000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x1a\x36\xe2"), float64(65596.000400000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x20\xc4\x9b"), float64(65596.000500000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x27\x52\x54"), float64(65596.000600000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x2d\xe0\x0d"), float64(65596.000700000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x34\x6d\xc5"), float64(65596.000800000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x3a\xfb\x7e"), float64(65596.000900000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x27\x52\x54"), float64(65596.000600000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\xa7\xc5"), float64(65596.000010000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x01\x4f\x8b"), float64(65596.000020000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x01\xf7\x51"), float64(65596.000030000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x02\x9f\x16"), float64(65596.000040000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x03\x46\xdc"), float64(65596.000050000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x03\xee\xa2"), float64(65596.000060000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x04\x96\x67"), float64(65596.000070000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x05\x3e\x2d"), float64(65596.000080000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x05\xe5\xf3"), float64(65596.000090000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x03\xee\xa2"), float64(65596.000060000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x10\xc6"), float64(65596.000001000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x21\x8d"), float64(65596.000002000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x32\x54"), float64(65596.000003000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x43\x1b"), float64(65596.000004000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x53\xe2"), float64(65596.000005000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x64\xa9"), float64(65596.000006000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x75\x70"), float64(65596.000007000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x86\x37"), float64(65596.000008000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x96\xfe"), float64(65596.000009000), nil},
+		//		tDecoderTest{[]byte("\x00\x01\x00\x3c\x00\x00\x64\xa9"), float64(65596.000006000), nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UF64ToFloat64(input)
 	})
 }
@@ -825,22 +829,22 @@ func TestUF64ToFloat64(t *testing.T) {
 func TestUR32ToSliceOfUint(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UR32", 4)
 	zero := []uint64(nil)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x01\x00\x01"), []uint64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x01\x00\x02"), []uint64{1, 2}, nil},
-		tFromBytes{[]byte("\x01\x00\x01\x00"), []uint64{256, 256}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), []uint64{0, 0}, nil},
-		tFromBytes{[]byte("\x19\x99\x99\x99"), []uint64{6553, 39321}, nil},
-		tFromBytes{[]byte("\x02\x8f\x5c\x28"), []uint64{655, 23592}, nil},
-		tFromBytes{[]byte("\xff\xff\x00\x05"), []uint64{65535, 5}, nil},
-		tFromBytes{[]byte("\xff\xff\x00\x02"), []uint64{65535, 2}, nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff"), []uint64{65535, 65535}, nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), []uint64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x02"), []uint64{1, 2}, nil},
+		tDecoderTest{[]byte("\x01\x00\x01\x00"), []uint64{256, 256}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), []uint64{0, 0}, nil},
+		tDecoderTest{[]byte("\x19\x99\x99\x99"), []uint64{6553, 39321}, nil},
+		tDecoderTest{[]byte("\x02\x8f\x5c\x28"), []uint64{655, 23592}, nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x05"), []uint64{65535, 5}, nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x02"), []uint64{65535, 2}, nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff"), []uint64{65535, 65535}, nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UR32ToSliceOfUint(input)
 	})
 }
@@ -848,21 +852,21 @@ func TestUR32ToSliceOfUint(t *testing.T) {
 func TestUR64ToSliceOfUint(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UR64", 8)
 	zero := []uint64(nil)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []uint64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []uint64{1, 2}, nil},
-		tFromBytes{[]byte("\x01\x02\x03\x04\x05\x06\x07\x08"), []uint64{16909060, 84281096}, nil},
-		tFromBytes{[]byte("\x10\x20\x30\x40\x50\x60\x70\x80"), []uint64{270544960, 1348497536}, nil},
-		tFromBytes{[]byte("\x19\x99\x99\x99\x19\x99\x99\x99"), []uint64{429496729, 429496729}, nil},
-		tFromBytes{[]byte("\xff\xff\x00\x02\xff\xff\xcc\xee"), []uint64{4294901762, 4294954222}, nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\xff\xff\xff\xff"), []uint64{4294967295, 4294967295}, nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []uint64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []uint64{1, 2}, nil},
+		tDecoderTest{[]byte("\x01\x02\x03\x04\x05\x06\x07\x08"), []uint64{16909060, 84281096}, nil},
+		tDecoderTest{[]byte("\x10\x20\x30\x40\x50\x60\x70\x80"), []uint64{270544960, 1348497536}, nil},
+		tDecoderTest{[]byte("\x19\x99\x99\x99\x19\x99\x99\x99"), []uint64{429496729, 429496729}, nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x02\xff\xff\xcc\xee"), []uint64{4294901762, 4294954222}, nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\xff\xff\xff\xff"), []uint64{4294967295, 4294967295}, nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UR64ToSliceOfUint(input)
 	})
 }
@@ -870,22 +874,22 @@ func TestUR64ToSliceOfUint(t *testing.T) {
 func TestUR32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UR32", 4)
 	zero := ""
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x01\x00\x02"), "1/2", nil},
-		tFromBytes{[]byte("\x01\x00\x01\x00"), "256/256", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "0/0", nil},
-		tFromBytes{[]byte("\x19\x99\x99\x99"), "6553/39321", nil},
-		tFromBytes{[]byte("\x02\x8f\x5c\x28"), "655/23592", nil},
-		tFromBytes{[]byte("\xff\xff\x00\x05"), "65535/5", nil},
-		tFromBytes{[]byte("\xff\xff\x00\x02"), "65535/2", nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff"), "65535/65535", nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x02"), "1/2", nil},
+		tDecoderTest{[]byte("\x01\x00\x01\x00"), "256/256", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0/0", nil},
+		tDecoderTest{[]byte("\x19\x99\x99\x99"), "6553/39321", nil},
+		tDecoderTest{[]byte("\x02\x8f\x5c\x28"), "655/23592", nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x05"), "65535/5", nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x02"), "65535/2", nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff"), "65535/65535", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UR32ToString(input)
 	})
 }
@@ -893,78 +897,78 @@ func TestUR32ToString(t *testing.T) {
 func TestUR64ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UR64", 8)
 	zero := ""
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
-		tFromBytes{[]byte("\x01\x02\x03\x04\x05\x06\x07\x08"), "16909060/84281096", nil},
-		tFromBytes{[]byte("\x10\x20\x30\x40\x50\x60\x70\x80"), "270544960/1348497536", nil},
-		tFromBytes{[]byte("\x19\x99\x99\x99\x19\x99\x99\x99"), "429496729/429496729", nil},
-		tFromBytes{[]byte("\xff\xff\x00\x02\xff\xff\xcc\xee"), "4294901762/4294954222", nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\xff\xff\xff\xff"), "4294967295/4294967295", nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
+		tDecoderTest{[]byte("\x01\x02\x03\x04\x05\x06\x07\x08"), "16909060/84281096", nil},
+		tDecoderTest{[]byte("\x10\x20\x30\x40\x50\x60\x70\x80"), "270544960/1348497536", nil},
+		tDecoderTest{[]byte("\x19\x99\x99\x99\x19\x99\x99\x99"), "429496729/429496729", nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x02\xff\xff\xcc\xee"), "4294901762/4294954222", nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\xff\xff\xff\xff"), "4294967295/4294967295", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UR64ToString(input)
 	})
 }
 func TestSR32ToSliceOfInt(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SR32", 4)
 	zero := []int64(nil)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x01\xff\xff"), []int64{1, -1}, nil},
-		tFromBytes{[]byte("\xff\xff\x00\x01"), []int64{-1, 1}, nil},
-		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x01\x00\x02"), []int64{1, 2}, nil},
-		tFromBytes{[]byte("\x00\x01\xff\xfe"), []int64{1, -2}, nil},
-		tFromBytes{[]byte("\xff\xff\x00\x02"), []int64{-1, 2}, nil},
-		tFromBytes{[]byte("\x00\x01\x00\x02"), []int64{1, 2}, nil},
-		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x80\x00\x7f\xff"), []int64{-32768, 32767}, nil},
-		tFromBytes{[]byte("\x7f\xff\x80\x00"), []int64{32767, -32768}, nil},
-		tFromBytes{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x01\x7f\xff"), []int64{1, 32767}, nil},
-		tFromBytes{[]byte("\xff\xff\x7f\xff"), []int64{-1, 32767}, nil},
-		tFromBytes{[]byte("\x00\x01\x80\x00"), []int64{1, -32768}, nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x01\xff\xff"), []int64{1, -1}, nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x01"), []int64{-1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x02"), []int64{1, 2}, nil},
+		tDecoderTest{[]byte("\x00\x01\xff\xfe"), []int64{1, -2}, nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x02"), []int64{-1, 2}, nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x02"), []int64{1, 2}, nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x80\x00\x7f\xff"), []int64{-32768, 32767}, nil},
+		tDecoderTest{[]byte("\x7f\xff\x80\x00"), []int64{32767, -32768}, nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x01\x7f\xff"), []int64{1, 32767}, nil},
+		tDecoderTest{[]byte("\xff\xff\x7f\xff"), []int64{-1, 32767}, nil},
+		tDecoderTest{[]byte("\x00\x01\x80\x00"), []int64{1, -32768}, nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SR32ToSliceOfInt(input)
 	})
 }
 func TestSR64ToSliceOfInt(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SR64", 8)
 	zero := []int64(nil)
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xff"), []int64{1, -1}, nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x01"), []int64{-1, 1}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []int64{1, 2}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xfe"), []int64{1, -2}, nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x02"), []int64{-1, 2}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []int64{1, 2}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x80\x00\x00\x00\x7f\xff\xff\xff"), []int64{-2147483648, 2147483647}, nil},
-		tFromBytes{[]byte("\x7f\xff\xff\xff\x80\x00\x00\x00"), []int64{2147483647, -2147483648}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), []int64{1, 2147483647}, nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), []int64{-1, 2147483647}, nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), []int64{1, -2147483648}, nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\xff\xff\xff\xff"), []int64{1, -1}, nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x01"), []int64{-1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []int64{1, 2}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\xff\xff\xff\xfe"), []int64{1, -2}, nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x02"), []int64{-1, 2}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), []int64{1, 2}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x80\x00\x00\x00\x7f\xff\xff\xff"), []int64{-2147483648, 2147483647}, nil},
+		tDecoderTest{[]byte("\x7f\xff\xff\xff\x80\x00\x00\x00"), []int64{2147483647, -2147483648}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), []int64{1, 2147483647}, nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), []int64{-1, 2147483647}, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), []int64{1, -2147483648}, nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SR64ToSliceOfInt(input)
 	})
 }
@@ -972,57 +976,57 @@ func TestSR64ToSliceOfInt(t *testing.T) {
 func TestSR32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SR32", 4)
 	zero := ""
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x01\xff\xff"), "1/-1", nil},
-		tFromBytes{[]byte("\xff\xff\x00\x01"), "-1/1", nil},
-		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x01\x00\x02"), "1/2", nil},
-		tFromBytes{[]byte("\x00\x01\xff\xfe"), "1/-2", nil},
-		tFromBytes{[]byte("\xff\xff\x00\x02"), "-1/2", nil},
-		tFromBytes{[]byte("\x00\x01\x00\x02"), "1/2", nil},
-		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x80\x00\x7f\xff"), "-32768/32767", nil},
-		tFromBytes{[]byte("\x7f\xff\x80\x00"), "32767/-32768", nil},
-		tFromBytes{[]byte("\x00\x01\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x01\x7f\xff"), "1/32767", nil},
-		tFromBytes{[]byte("\xff\xff\x7f\xff"), "-1/32767", nil},
-		tFromBytes{[]byte("\x00\x01\x80\x00"), "1/-32768", nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x01\xff\xff"), "1/-1", nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x01"), "-1/1", nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x02"), "1/2", nil},
+		tDecoderTest{[]byte("\x00\x01\xff\xfe"), "1/-2", nil},
+		tDecoderTest{[]byte("\xff\xff\x00\x02"), "-1/2", nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x02"), "1/2", nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x80\x00\x7f\xff"), "-32768/32767", nil},
+		tDecoderTest{[]byte("\x7f\xff\x80\x00"), "32767/-32768", nil},
+		tDecoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x01\x7f\xff"), "1/32767", nil},
+		tDecoderTest{[]byte("\xff\xff\x7f\xff"), "-1/32767", nil},
+		tDecoderTest{[]byte("\x00\x01\x80\x00"), "1/-32768", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SR32ToString(input)
 	})
 }
 func TestSR64ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("SR64", 8)
 	zero := ""
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xff"), "1/-1", nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x01"), "-1/1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\xff\xff\xff\xfe"), "1/-2", nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x00\x00\x00\x02"), "-1/2", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x80\x00\x00\x00\x7f\xff\xff\xff"), "-2147483648/2147483647", nil},
-		tFromBytes{[]byte("\x7f\xff\xff\xff\x80\x00\x00\x00"), "2147483647/-2147483648", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), "1/2147483647", nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), "-1/2147483647", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), "1/-2147483648", nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\xff\xff\xff\xff"), "1/-1", nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x01"), "-1/1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\xff\xff\xff\xfe"), "1/-2", nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x02"), "-1/2", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x02"), "1/2", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x80\x00\x00\x00\x7f\xff\xff\xff"), "-2147483648/2147483647", nil},
+		tDecoderTest{[]byte("\x7f\xff\xff\xff\x80\x00\x00\x00"), "2147483647/-2147483648", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x7f\xff\xff\xff"), "1/2147483647", nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff\x7f\xff\xff\xff"), "-1/2147483647", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), "1/-2147483648", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(12)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SR64ToString(input)
 	})
 }
@@ -1030,155 +1034,210 @@ func TestSR64ToString(t *testing.T) {
 func funcFC32ToUint32(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FC32", 4)
 	zero := 0
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x20\x7e\x7d\x7c"), uint32(0x207e7d7c), nil},
-		tFromBytes{[]byte("\x21\x20\x7e\x7d"), uint32(0x21207e7d), nil},
-		tFromBytes{[]byte("\x5c\x21\x20\x7e"), uint32(0x5c21207e), nil},
-		tFromBytes{[]byte("\x23\x5c\x21\x20"), uint32(0x235c2120), nil},
-		tFromBytes{[]byte("\x24\x23\x5c\x21"), uint32(0x24235c21), nil},
-		tFromBytes{[]byte("\x25\x24\x23\x5c"), uint32(0x2524235c), nil},
-		tFromBytes{[]byte("\x26\x25\x24\x23"), uint32(0x26252423), nil},
-		tFromBytes{[]byte("\x27\x26\x25\x24"), uint32(0x27262524), nil},
-		tFromBytes{[]byte("\x28\x27\x26\x25"), uint32(0x28272625), nil},
-		tFromBytes{[]byte("\x29\x28\x27\x26"), uint32(0x29282726), nil},
-		tFromBytes{[]byte("\x2a\x29\x28\x27"), uint32(0x2a292827), nil},
-		tFromBytes{[]byte("\x2b\x2a\x29\x28"), uint32(0x2b2a2928), nil},
-		tFromBytes{[]byte("\x2c\x2b\x2a\x29"), uint32(0x2c2b2a29), nil},
-		tFromBytes{[]byte("\x2d\x2c\x2b\x2a"), uint32(0x2d2c2b2a), nil},
-		tFromBytes{[]byte("\x2e\x2d\x2c\x2b"), uint32(0x2e2d2c2b), nil},
-		tFromBytes{[]byte("\x2f\x2e\x2d\x2c"), uint32(0x2f2e2d2c), nil},
-		tFromBytes{[]byte("\x30\x2f\x2e\x2d"), uint32(0x302f2e2d), nil},
-		tFromBytes{[]byte("\x31\x30\x2f\x2e"), uint32(0x31302f2e), nil},
-		tFromBytes{[]byte("\x32\x31\x30\x2f"), uint32(0x3231302f), nil},
-		tFromBytes{[]byte("\x5b\x5a\x59\x58"), uint32(0x5b5a5958), nil},
-		tFromBytes{[]byte("\x5c\x5b\x5a\x59"), uint32(0x5c5b5a59), nil},
-		tFromBytes{[]byte("\x5d\x5c\x5b\x5a"), uint32(0x5d5c5b5a), nil},
-		tFromBytes{[]byte("\x5e\x5d\x5c\x5b"), uint32(0x5e5d5c5b), nil},
-		tFromBytes{[]byte("\x5f\x5e\x5d\x5c"), uint32(0x5f5e5d5c), nil},
-		tFromBytes{[]byte("\x60\x5f\x5e\x5d"), uint32(0x605f5e5d), nil},
-		tFromBytes{[]byte("\x61\x60\x5f\x5e"), uint32(0x61605f5e), nil},
-		tFromBytes{[]byte("\x62\x61\x60\x5f"), uint32(0x6261605f), nil},
-		tFromBytes{[]byte("\x63\x62\x61\x60"), uint32(0x63626160), nil},
-		tFromBytes{[]byte("\x7b\x7a\x79\x78"), uint32(0x7b7a7978), nil},
-		tFromBytes{[]byte("\x7c\x7b\x7a\x79"), uint32(0x7c7b7a79), nil},
-		tFromBytes{[]byte("\x7d\x7c\x7b\x7a"), uint32(0x7d7c7b7a), nil},
-		tFromBytes{[]byte("\x7e\x7d\x7c\x7b"), uint32(0x7e7d7c7b), nil},
-		tFromBytes{[]byte("\x20\x20\x20\x20"), uint32(0x20202020), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), uint32(0x00000000), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01"), uint32(0x00000001), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x02"), uint32(0x00000002), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x03"), uint32(0x00000003), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x04"), uint32(0x00000004), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x05"), uint32(0x00000005), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x06"), uint32(0x00000006), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x07"), uint32(0x00000007), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x08"), uint32(0x00000008), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x09"), uint32(0x00000009), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0a"), uint32(0x0000000A), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0b"), uint32(0x0000000B), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0c"), uint32(0x0000000C), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0d"), uint32(0x0000000D), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0e"), uint32(0x0000000E), nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0f"), uint32(0x0000000F), nil},
-		tFromBytes{[]byte("\x01\x00\x00\x00"), uint32(0x01000000), nil},
-		tFromBytes{[]byte("\x02\x00\x00\x00"), uint32(0x02000000), nil},
-		tFromBytes{[]byte("\x03\x00\x00\x00"), uint32(0x03000000), nil},
-		tFromBytes{[]byte("\x04\x00\x00\x00"), uint32(0x04000000), nil},
-		tFromBytes{[]byte("\x05\x00\x00\x00"), uint32(0x05000000), nil},
-		tFromBytes{[]byte("\x06\x00\x00\x00"), uint32(0x06000000), nil},
-		tFromBytes{[]byte("\x07\x00\x00\x00"), uint32(0x07000000), nil},
-		tFromBytes{[]byte("\x08\x00\x00\x00"), uint32(0x08000000), nil},
-		tFromBytes{[]byte("\x09\x00\x00\x00"), uint32(0x09000000), nil},
-		tFromBytes{[]byte("\x0a\x00\x00\x00"), uint32(0x0A000000), nil},
-		tFromBytes{[]byte("\x0b\x00\x00\x00"), uint32(0x0B000000), nil},
-		tFromBytes{[]byte("\x0c\x00\x00\x00"), uint32(0x0C000000), nil},
-		tFromBytes{[]byte("\x0d\x00\x00\x00"), uint32(0x0D000000), nil},
-		tFromBytes{[]byte("\x0e\x00\x00\x00"), uint32(0x0E000000), nil},
-		tFromBytes{[]byte("\x0f\x00\x00\x00"), uint32(0x0F000000), nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x20\x7e\x7d\x7c"), uint32(0x207e7d7c), nil},
+		tDecoderTest{[]byte("\x21\x20\x7e\x7d"), uint32(0x21207e7d), nil},
+		tDecoderTest{[]byte("\x5c\x21\x20\x7e"), uint32(0x5c21207e), nil},
+		tDecoderTest{[]byte("\x23\x5c\x21\x20"), uint32(0x235c2120), nil},
+		tDecoderTest{[]byte("\x24\x23\x5c\x21"), uint32(0x24235c21), nil},
+		tDecoderTest{[]byte("\x25\x24\x23\x5c"), uint32(0x2524235c), nil},
+		tDecoderTest{[]byte("\x26\x25\x24\x23"), uint32(0x26252423), nil},
+		tDecoderTest{[]byte("\x27\x26\x25\x24"), uint32(0x27262524), nil},
+		tDecoderTest{[]byte("\x28\x27\x26\x25"), uint32(0x28272625), nil},
+		tDecoderTest{[]byte("\x29\x28\x27\x26"), uint32(0x29282726), nil},
+		tDecoderTest{[]byte("\x2a\x29\x28\x27"), uint32(0x2a292827), nil},
+		tDecoderTest{[]byte("\x2b\x2a\x29\x28"), uint32(0x2b2a2928), nil},
+		tDecoderTest{[]byte("\x2c\x2b\x2a\x29"), uint32(0x2c2b2a29), nil},
+		tDecoderTest{[]byte("\x2d\x2c\x2b\x2a"), uint32(0x2d2c2b2a), nil},
+		tDecoderTest{[]byte("\x2e\x2d\x2c\x2b"), uint32(0x2e2d2c2b), nil},
+		tDecoderTest{[]byte("\x2f\x2e\x2d\x2c"), uint32(0x2f2e2d2c), nil},
+		tDecoderTest{[]byte("\x30\x2f\x2e\x2d"), uint32(0x302f2e2d), nil},
+		tDecoderTest{[]byte("\x31\x30\x2f\x2e"), uint32(0x31302f2e), nil},
+		tDecoderTest{[]byte("\x32\x31\x30\x2f"), uint32(0x3231302f), nil},
+		tDecoderTest{[]byte("\x5b\x5a\x59\x58"), uint32(0x5b5a5958), nil},
+		tDecoderTest{[]byte("\x5c\x5b\x5a\x59"), uint32(0x5c5b5a59), nil},
+		tDecoderTest{[]byte("\x5d\x5c\x5b\x5a"), uint32(0x5d5c5b5a), nil},
+		tDecoderTest{[]byte("\x5e\x5d\x5c\x5b"), uint32(0x5e5d5c5b), nil},
+		tDecoderTest{[]byte("\x5f\x5e\x5d\x5c"), uint32(0x5f5e5d5c), nil},
+		tDecoderTest{[]byte("\x60\x5f\x5e\x5d"), uint32(0x605f5e5d), nil},
+		tDecoderTest{[]byte("\x61\x60\x5f\x5e"), uint32(0x61605f5e), nil},
+		tDecoderTest{[]byte("\x62\x61\x60\x5f"), uint32(0x6261605f), nil},
+		tDecoderTest{[]byte("\x63\x62\x61\x60"), uint32(0x63626160), nil},
+		tDecoderTest{[]byte("\x7b\x7a\x79\x78"), uint32(0x7b7a7978), nil},
+		tDecoderTest{[]byte("\x7c\x7b\x7a\x79"), uint32(0x7c7b7a79), nil},
+		tDecoderTest{[]byte("\x7d\x7c\x7b\x7a"), uint32(0x7d7c7b7a), nil},
+		tDecoderTest{[]byte("\x7e\x7d\x7c\x7b"), uint32(0x7e7d7c7b), nil},
+		tDecoderTest{[]byte("\x20\x20\x20\x20"), uint32(0x20202020), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), uint32(0x00000000), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), uint32(0x00000001), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x02"), uint32(0x00000002), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x03"), uint32(0x00000003), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x04"), uint32(0x00000004), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x05"), uint32(0x00000005), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x06"), uint32(0x00000006), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x07"), uint32(0x00000007), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x08"), uint32(0x00000008), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x09"), uint32(0x00000009), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0a"), uint32(0x0000000A), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0b"), uint32(0x0000000B), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0c"), uint32(0x0000000C), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0d"), uint32(0x0000000D), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0e"), uint32(0x0000000E), nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0f"), uint32(0x0000000F), nil},
+		tDecoderTest{[]byte("\x01\x00\x00\x00"), uint32(0x01000000), nil},
+		tDecoderTest{[]byte("\x02\x00\x00\x00"), uint32(0x02000000), nil},
+		tDecoderTest{[]byte("\x03\x00\x00\x00"), uint32(0x03000000), nil},
+		tDecoderTest{[]byte("\x04\x00\x00\x00"), uint32(0x04000000), nil},
+		tDecoderTest{[]byte("\x05\x00\x00\x00"), uint32(0x05000000), nil},
+		tDecoderTest{[]byte("\x06\x00\x00\x00"), uint32(0x06000000), nil},
+		tDecoderTest{[]byte("\x07\x00\x00\x00"), uint32(0x07000000), nil},
+		tDecoderTest{[]byte("\x08\x00\x00\x00"), uint32(0x08000000), nil},
+		tDecoderTest{[]byte("\x09\x00\x00\x00"), uint32(0x09000000), nil},
+		tDecoderTest{[]byte("\x0a\x00\x00\x00"), uint32(0x0A000000), nil},
+		tDecoderTest{[]byte("\x0b\x00\x00\x00"), uint32(0x0B000000), nil},
+		tDecoderTest{[]byte("\x0c\x00\x00\x00"), uint32(0x0C000000), nil},
+		tDecoderTest{[]byte("\x0d\x00\x00\x00"), uint32(0x0D000000), nil},
+		tDecoderTest{[]byte("\x0e\x00\x00\x00"), uint32(0x0E000000), nil},
+		tDecoderTest{[]byte("\x0f\x00\x00\x00"), uint32(0x0F000000), nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI32ToUint32(input)
 	})
 }
 
+func TestFC32ToStringDelimited(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("FC32", 4)
+	zero := ""
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
+		tDecoderTest{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
+		tDecoderTest{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
+		tDecoderTest{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
+		tDecoderTest{[]byte("\x24\x23\x5c\x21"), `'$#\!'`, nil},
+		tDecoderTest{[]byte("\x25\x24\x23\x5c"), `'%$#\'`, nil},
+		tDecoderTest{[]byte("\x26\x25\x24\x23"), `'&%$#'`, nil},
+		tDecoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
+		tDecoderTest{[]byte("\x28\x27\x26\x25"), `'('&%'`, nil},
+		tDecoderTest{[]byte("\x29\x28\x27\x26"), `')('&'`, nil},
+		tDecoderTest{[]byte("\x2a\x29\x28\x27"), `'*)(''`, nil},
+		tDecoderTest{[]byte("\x2b\x2a\x29\x28"), `'+*)('`, nil},
+		tDecoderTest{[]byte("\x2c\x2b\x2a\x29"), `',+*)'`, nil},
+		tDecoderTest{[]byte("\x2d\x2c\x2b\x2a"), `'-,+*'`, nil},
+		tDecoderTest{[]byte("\x2e\x2d\x2c\x2b"), `'.-,+'`, nil},
+		tDecoderTest{[]byte("\x2f\x2e\x2d\x2c"), `'/.-,'`, nil},
+		tDecoderTest{[]byte("\x30\x2f\x2e\x2d"), `'0/.-'`, nil},
+		tDecoderTest{[]byte("\x31\x30\x2f\x2e"), `'10/.'`, nil},
+		tDecoderTest{[]byte("\x32\x31\x30\x2f"), `'210/'`, nil},
+		tDecoderTest{[]byte("\x5b\x5a\x59\x58"), `'[ZYX'`, nil},
+		tDecoderTest{[]byte("\x5c\x5b\x5a\x59"), `'\[ZY'`, nil},
+		tDecoderTest{[]byte("\x5d\x5c\x5b\x5a"), `']\[Z'`, nil},
+		tDecoderTest{[]byte("\x5e\x5d\x5c\x5b"), `'^]\['`, nil},
+		tDecoderTest{[]byte("\x5f\x5e\x5d\x5c"), `'_^]\'`, nil},
+		tDecoderTest{[]byte("\x60\x5f\x5e\x5d"), "'`_^]'", nil},
+		tDecoderTest{[]byte("\x61\x60\x5f\x5e"), "'a`_^'", nil},
+		tDecoderTest{[]byte("\x62\x61\x60\x5f"), "'ba`_'", nil},
+		tDecoderTest{[]byte("\x63\x62\x61\x60"), "'cba`'", nil},
+		tDecoderTest{[]byte("\x7b\x7a\x79\x78"), `'{zyx'`, nil},
+		tDecoderTest{[]byte("\x7c\x7b\x7a\x79"), `'|{zy'`, nil},
+		tDecoderTest{[]byte("\x7d\x7c\x7b\x7a"), `'}|{z'`, nil},
+		tDecoderTest{[]byte("\x7e\x7d\x7c\x7b"), `'~}|{'`, nil},
+		tDecoderTest{[]byte("\x20\x20\x20\x20"), "0x20202020", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0x00000000", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), "0x00000001", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x02"), "0x00000002", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x03"), "0x00000003", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x04"), "0x00000004", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x05"), "0x00000005", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x06"), "0x00000006", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x07"), "0x00000007", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x08"), "0x00000008", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x09"), "0x00000009", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0a"), "0x0000000A", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0b"), "0x0000000B", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0c"), "0x0000000C", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0d"), "0x0000000D", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0e"), "0x0000000E", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0f"), "0x0000000F", nil},
+		tDecoderTest{[]byte("\x01\x00\x00\x00"), "0x01000000", nil},
+		tDecoderTest{[]byte("\x02\x00\x00\x00"), "0x02000000", nil},
+		tDecoderTest{[]byte("\x03\x00\x00\x00"), "0x03000000", nil},
+		tDecoderTest{[]byte("\x04\x00\x00\x00"), "0x04000000", nil},
+		tDecoderTest{[]byte("\x05\x00\x00\x00"), "0x05000000", nil},
+		tDecoderTest{[]byte("\x06\x00\x00\x00"), "0x06000000", nil},
+		tDecoderTest{[]byte("\x07\x00\x00\x00"), "0x07000000", nil},
+		tDecoderTest{[]byte("\x08\x00\x00\x00"), "0x08000000", nil},
+		tDecoderTest{[]byte("\x09\x00\x00\x00"), "0x09000000", nil},
+		tDecoderTest{[]byte("\x0a\x00\x00\x00"), "0x0A000000", nil},
+		tDecoderTest{[]byte("\x0b\x00\x00\x00"), "0x0B000000", nil},
+		tDecoderTest{[]byte("\x0c\x00\x00\x00"), "0x0C000000", nil},
+		tDecoderTest{[]byte("\x0d\x00\x00\x00"), "0x0D000000", nil},
+		tDecoderTest{[]byte("\x0e\x00\x00\x00"), "0x0E000000", nil},
+		tDecoderTest{[]byte("\x0f\x00\x00\x00"), "0x0F000000", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return FC32ToStringDelimited(input)
+	})
+}
 func TestFC32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("FC32", 4)
 	zero := ""
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
-		tFromBytes{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
-		tFromBytes{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
-		tFromBytes{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
-		tFromBytes{[]byte("\x24\x23\x5c\x21"), "'$#\\!'", nil},
-		tFromBytes{[]byte("\x25\x24\x23\x5c"), "'%$#\\'", nil},
-		tFromBytes{[]byte("\x26\x25\x24\x23"), "'&%$#'", nil},
-		tFromBytes{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
-		tFromBytes{[]byte("\x28\x27\x26\x25"), "'('&%'", nil},
-		tFromBytes{[]byte("\x29\x28\x27\x26"), "')('&'", nil},
-		tFromBytes{[]byte("\x2a\x29\x28\x27"), "'*)(''", nil},
-		tFromBytes{[]byte("\x2b\x2a\x29\x28"), "'+*)('", nil},
-		tFromBytes{[]byte("\x2c\x2b\x2a\x29"), "',+*)'", nil},
-		tFromBytes{[]byte("\x2d\x2c\x2b\x2a"), "'-,+*'", nil},
-		tFromBytes{[]byte("\x2e\x2d\x2c\x2b"), "'.-,+'", nil},
-		tFromBytes{[]byte("\x2f\x2e\x2d\x2c"), "'/.-,'", nil},
-		tFromBytes{[]byte("\x30\x2f\x2e\x2d"), "'0/.-'", nil},
-		tFromBytes{[]byte("\x31\x30\x2f\x2e"), "'10/.'", nil},
-		tFromBytes{[]byte("\x32\x31\x30\x2f"), "'210/'", nil},
-		tFromBytes{[]byte("\x5b\x5a\x59\x58"), "'[ZYX'", nil},
-		tFromBytes{[]byte("\x5c\x5b\x5a\x59"), "'\\[ZY'", nil},
-		tFromBytes{[]byte("\x5d\x5c\x5b\x5a"), "']\\[Z'", nil},
-		tFromBytes{[]byte("\x5e\x5d\x5c\x5b"), "'^]\\['", nil},
-		tFromBytes{[]byte("\x5f\x5e\x5d\x5c"), "'_^]\\'", nil},
-		tFromBytes{[]byte("\x60\x5f\x5e\x5d"), "'`_^]'", nil},
-		tFromBytes{[]byte("\x61\x60\x5f\x5e"), "'a`_^'", nil},
-		tFromBytes{[]byte("\x62\x61\x60\x5f"), "'ba`_'", nil},
-		tFromBytes{[]byte("\x63\x62\x61\x60"), "'cba`'", nil},
-		tFromBytes{[]byte("\x7b\x7a\x79\x78"), "'{zyx'", nil},
-		tFromBytes{[]byte("\x7c\x7b\x7a\x79"), "'|{zy'", nil},
-		tFromBytes{[]byte("\x7d\x7c\x7b\x7a"), "'}|{z'", nil},
-		tFromBytes{[]byte("\x7e\x7d\x7c\x7b"), "'~}|{'", nil},
-		tFromBytes{[]byte("\x20\x20\x20\x20"), "0x20202020", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "0x00000000", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01"), "0x00000001", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x02"), "0x00000002", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x03"), "0x00000003", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x04"), "0x00000004", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x05"), "0x00000005", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x06"), "0x00000006", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x07"), "0x00000007", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x08"), "0x00000008", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x09"), "0x00000009", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0a"), "0x0000000A", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0b"), "0x0000000B", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0c"), "0x0000000C", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0d"), "0x0000000D", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0e"), "0x0000000E", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0f"), "0x0000000F", nil},
-		tFromBytes{[]byte("\x01\x00\x00\x00"), "0x01000000", nil},
-		tFromBytes{[]byte("\x02\x00\x00\x00"), "0x02000000", nil},
-		tFromBytes{[]byte("\x03\x00\x00\x00"), "0x03000000", nil},
-		tFromBytes{[]byte("\x04\x00\x00\x00"), "0x04000000", nil},
-		tFromBytes{[]byte("\x05\x00\x00\x00"), "0x05000000", nil},
-		tFromBytes{[]byte("\x06\x00\x00\x00"), "0x06000000", nil},
-		tFromBytes{[]byte("\x07\x00\x00\x00"), "0x07000000", nil},
-		tFromBytes{[]byte("\x08\x00\x00\x00"), "0x08000000", nil},
-		tFromBytes{[]byte("\x09\x00\x00\x00"), "0x09000000", nil},
-		tFromBytes{[]byte("\x0a\x00\x00\x00"), "0x0A000000", nil},
-		tFromBytes{[]byte("\x0b\x00\x00\x00"), "0x0B000000", nil},
-		tFromBytes{[]byte("\x0c\x00\x00\x00"), "0x0C000000", nil},
-		tFromBytes{[]byte("\x0d\x00\x00\x00"), "0x0D000000", nil},
-		tFromBytes{[]byte("\x0e\x00\x00\x00"), "0x0E000000", nil},
-		tFromBytes{[]byte("\x0f\x00\x00\x00"), "0x0F000000", nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
+		tDecoderTest{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
+		tDecoderTest{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
+		tDecoderTest{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
+		tDecoderTest{[]byte("\x24\x23\x5c\x21"), "$#\\!", nil},
+		tDecoderTest{[]byte("\x25\x24\x23\x5c"), "%$#\\", nil},
+		tDecoderTest{[]byte("\x26\x25\x24\x23"), "&%$#", nil},
+		tDecoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
+		tDecoderTest{[]byte("\x28\x27\x26\x25"), "('&%", nil},
+		tDecoderTest{[]byte("\x29\x28\x27\x26"), ")('&", nil},
+		tDecoderTest{[]byte("\x2a\x29\x28\x27"), "*)('", nil},
+		tDecoderTest{[]byte("\x2b\x2a\x29\x28"), "+*)(", nil},
+		tDecoderTest{[]byte("\x2c\x2b\x2a\x29"), ",+*)", nil},
+		tDecoderTest{[]byte("\x2d\x2c\x2b\x2a"), "-,+*", nil},
+		tDecoderTest{[]byte("\x2e\x2d\x2c\x2b"), ".-,+", nil},
+		tDecoderTest{[]byte("\x2f\x2e\x2d\x2c"), "/.-,", nil},
+		tDecoderTest{[]byte("\x30\x2f\x2e\x2d"), "0/.-", nil},
+		tDecoderTest{[]byte("\x31\x30\x2f\x2e"), "10/.", nil},
+		tDecoderTest{[]byte("\x32\x31\x30\x2f"), "210/", nil},
+		tDecoderTest{[]byte("\x5b\x5a\x59\x58"), "[ZYX", nil},
+		tDecoderTest{[]byte("\x5c\x5b\x5a\x59"), "\\[ZY", nil},
+		tDecoderTest{[]byte("\x5d\x5c\x5b\x5a"), "]\\[Z", nil},
+		tDecoderTest{[]byte("\x5e\x5d\x5c\x5b"), "^]\\[", nil},
+		tDecoderTest{[]byte("\x5f\x5e\x5d\x5c"), "_^]\\", nil},
+		tDecoderTest{[]byte("\x60\x5f\x5e\x5d"), "`_^]", nil},
+		tDecoderTest{[]byte("\x61\x60\x5f\x5e"), "a`_^", nil},
+		tDecoderTest{[]byte("\x62\x61\x60\x5f"), "ba`_", nil},
+		tDecoderTest{[]byte("\x63\x62\x61\x60"), "cba`", nil},
+		tDecoderTest{[]byte("\x7b\x7a\x79\x78"), "{zyx", nil},
+		tDecoderTest{[]byte("\x7c\x7b\x7a\x79"), "|{zy", nil},
+		tDecoderTest{[]byte("\x7d\x7c\x7b\x7a"), "}|{z", nil},
+		tDecoderTest{[]byte("\x7e\x7d\x7c\x7b"), "~}|{", nil},
+		tDecoderTest{[]byte("\x20\x20\x20\x20"), "0x20202020", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0x00000000", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01"), "0x00000001", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x02"), "0x00000002", nil},
+		tDecoderTest{[]byte("\x0a\x00\x00\x00"), "0x0A000000", nil},
+		tDecoderTest{[]byte("\x0b\x00\x00\x00"), "0x0B000000", nil},
+		tDecoderTest{[]byte("\x0c\x00\x00\x00"), "0x0C000000", nil},
+		tDecoderTest{[]byte("\x0d\x00\x00\x00"), "0x0D000000", nil},
+		tDecoderTest{[]byte("\x0e\x00\x00\x00"), "0x0E000000", nil},
+		tDecoderTest{[]byte("\x0f\x00\x00\x00"), "0x0F000000", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return FC32ToString(input)
 	})
 }
@@ -1186,20 +1245,20 @@ func TestFC32ToString(t *testing.T) {
 func TestUUIDToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("UUID", 16)
 	zero := ""
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), "64881431-B6DC-478E-B7EE-ED306619C797", nil},
-		tFromBytes{[]byte("\xa3\xbf\xff\x54\xf4\x74\x42\xe9\xab\x53\x01\xd9\x13\xd1\x18\xb1"), "A3BFFF54-F474-42E9-AB53-01D913D118B1", nil},
-		tFromBytes{[]byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), "64881431-B6DC-478E-B7EE-ED306619C797", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), "00000000-0000-0000-0000-000000000000", nil},
-		tFromBytes{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF", nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		tFromBytes{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(20)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), "64881431-B6DC-478E-B7EE-ED306619C797", nil},
+		tDecoderTest{[]byte("\xa3\xbf\xff\x54\xf4\x74\x42\xe9\xab\x53\x01\xd9\x13\xd1\x18\xb1"), "A3BFFF54-F474-42E9-AB53-01D913D118B1", nil},
+		tDecoderTest{[]byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), "64881431-B6DC-478E-B7EE-ED306619C797", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), "00000000-0000-0000-0000-000000000000", nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(20)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UUIDToString(input)
 	})
 }
@@ -1207,170 +1266,270 @@ func TestUUIDToString(t *testing.T) {
 func TestIP32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curry("IP32", 4)
 	zero := ""
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00"), "0.0.0.0", nil},
-		tFromBytes{[]byte("\x11\x22\x33\x44"), "17.34.51.68", nil},
-		tFromBytes{[]byte("\xC0\xA8\x01\x80"), "192.168.1.128", nil},
-		tFromBytes{[]byte("\xF1\xAB\xCD\xEF"), "241.171.205.239", nil},
-		tFromBytes{[]byte("\xff\xff\xff\xff"), "255.255.255.255", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x00\xff\xff\xff\xff"), "0.0.0.0-255.255.255.255", nil},
-		tFromBytes{[]byte(""), zero, byteCountErr(0)},
-		tFromBytes{[]byte("\x00"), zero, byteCountErr(1)},
-		tFromBytes{[]byte("\x00\x00"), zero, byteCountErr(2)},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0.0.0.0", nil},
+		tDecoderTest{[]byte("\x11\x22\x33\x44"), "17.34.51.68", nil},
+		tDecoderTest{[]byte("\xC0\xA8\x01\x80"), "192.168.1.128", nil},
+		tDecoderTest{[]byte("\xF1\xAB\xCD\xEF"), "241.171.205.239", nil},
+		tDecoderTest{[]byte("\xff\xff\xff\xff"), "255.255.255.255", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\xff\xff\xff\xff"), "0.0.0.0-255.255.255.255", nil},
+		tDecoderTest{[]byte(""), zero, byteCountErr(0)},
+		tDecoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		tDecoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return IP32ToString(input)
 	})
 }
 
 func TestIPADToString(t *testing.T) {
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x30\x2e\x30\x2e\x30\x2e\x30\x00"), "\"0.0.0.0\"", nil},
-		tFromBytes{[]byte("\x31\x2e\x31\x2e\x31\x2e\x31\x00"), "\"1.1.1.1\"", nil},
-		tFromBytes{[]byte("\x31\x2e\x32\x35\x35\x2e\x33\x2e\x34\x00"), "\"1.255.3.4\"", nil},
-		tFromBytes{[]byte("\x31\x30\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x34\x00"), "\"10.255.255.254\"", nil},
-		tFromBytes{[]byte("\x31\x32\x37\x2e\x30\x2e\x30\x2e\x31\x00"), "\"127.0.0.1\"", nil},
-		tFromBytes{[]byte("\x31\x37\x32\x2e\x31\x38\x2e\x35\x2e\x34\x00"), "\"172.18.5.4\"", nil},
-		tFromBytes{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x30\x2e\x31\x00"), "\"192.168.0.1\"", nil},
-		tFromBytes{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x31\x2e\x30\x00"), "\"192.168.1.0\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), "\"2001:0000:4136:e378:8000:63bf:3fff:fdd2\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), "\"2001:0000:4136:e378:8000:63bf:3fff:fdd2\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x32\x3a\x36\x63\x3a\x3a\x34\x33\x30\x00"), "\"2001:0002:6c::430\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x31\x30\x3a\x32\x34\x30\x3a\x61\x62\x3a\x3a\x61\x00"), "\"2001:10:240:ab::a\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), "\"2001::1\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), "\"2001::1\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x31\x3a\x64\x62\x38\x3a\x38\x3a\x34\x3a\x3a\x32\x00"), "\"2001:db8:8:4::2\"", nil},
-		tFromBytes{[]byte("\x32\x30\x30\x32\x3a\x63\x62\x30\x61\x3a\x33\x63\x64\x64\x3a\x31\x3a\x3a\x31\x00"), "\"2002:cb0a:3cdd:1::1\"", nil},
-		tFromBytes{[]byte("\x32\x35\x35\x2e\x30\x2e\x30\x2e\x31\x00"), "\"255.0.0.1\"", nil},
-		tFromBytes{[]byte("\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x00"), "\"255.255.255.255\"", nil},
-		tFromBytes{[]byte("\x38\x2e\x38\x2e\x34\x2e\x34\x00"), "\"8.8.4.4\"", nil},
-		tFromBytes{[]byte("\x3a\x3a\x00"), "\"::\"", nil},
-		tFromBytes{[]byte("\x3a\x3a\x66\x66\x66\x66\x3a\x35\x2e\x36\x2e\x37\x2e\x38\x00"), "\"::ffff:5.6.7.8\"", nil},
-		tFromBytes{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), "\"fdf8:f53b:82e4::53\"", nil},
-		tFromBytes{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), "\"fdf8:f53b:82e4::53\"", nil},
-		tFromBytes{[]byte("\x66\x65\x38\x30\x3a\x3a\x32\x30\x30\x3a\x35\x61\x65\x65\x3a\x66\x65\x61\x61\x3a\x32\x30\x61\x32\x00"), "\"fe80::200:5aee:feaa:20a2\"", nil},
-		tFromBytes{[]byte("\x66\x66\x30\x31\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x32\x00"), "\"ff01:0:0:0:0:0:0:2\"", nil},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x30\x2e\x30\x2e\x30\x2e\x30\x00"), "\"0.0.0.0\"", nil},
+		tDecoderTest{[]byte("\x31\x2e\x31\x2e\x31\x2e\x31\x00"), "\"1.1.1.1\"", nil},
+		tDecoderTest{[]byte("\x31\x2e\x32\x35\x35\x2e\x33\x2e\x34\x00"), "\"1.255.3.4\"", nil},
+		tDecoderTest{[]byte("\x31\x30\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x34\x00"), "\"10.255.255.254\"", nil},
+		tDecoderTest{[]byte("\x31\x32\x37\x2e\x30\x2e\x30\x2e\x31\x00"), "\"127.0.0.1\"", nil},
+		tDecoderTest{[]byte("\x31\x37\x32\x2e\x31\x38\x2e\x35\x2e\x34\x00"), "\"172.18.5.4\"", nil},
+		tDecoderTest{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x30\x2e\x31\x00"), "\"192.168.0.1\"", nil},
+		tDecoderTest{[]byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x31\x2e\x30\x00"), "\"192.168.1.0\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), "\"2001:0000:4136:e378:8000:63bf:3fff:fdd2\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), "\"2001:0000:4136:e378:8000:63bf:3fff:fdd2\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x32\x3a\x36\x63\x3a\x3a\x34\x33\x30\x00"), "\"2001:0002:6c::430\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x31\x3a\x31\x30\x3a\x32\x34\x30\x3a\x61\x62\x3a\x3a\x61\x00"), "\"2001:10:240:ab::a\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), "\"2001::1\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), "\"2001::1\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x31\x3a\x64\x62\x38\x3a\x38\x3a\x34\x3a\x3a\x32\x00"), "\"2001:db8:8:4::2\"", nil},
+		tDecoderTest{[]byte("\x32\x30\x30\x32\x3a\x63\x62\x30\x61\x3a\x33\x63\x64\x64\x3a\x31\x3a\x3a\x31\x00"), "\"2002:cb0a:3cdd:1::1\"", nil},
+		tDecoderTest{[]byte("\x32\x35\x35\x2e\x30\x2e\x30\x2e\x31\x00"), "\"255.0.0.1\"", nil},
+		tDecoderTest{[]byte("\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x00"), "\"255.255.255.255\"", nil},
+		tDecoderTest{[]byte("\x38\x2e\x38\x2e\x34\x2e\x34\x00"), "\"8.8.4.4\"", nil},
+		tDecoderTest{[]byte("\x3a\x3a\x00"), "\"::\"", nil},
+		tDecoderTest{[]byte("\x3a\x3a\x66\x66\x66\x66\x3a\x35\x2e\x36\x2e\x37\x2e\x38\x00"), "\"::ffff:5.6.7.8\"", nil},
+		tDecoderTest{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), "\"fdf8:f53b:82e4::53\"", nil},
+		tDecoderTest{[]byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), "\"fdf8:f53b:82e4::53\"", nil},
+		tDecoderTest{[]byte("\x66\x65\x38\x30\x3a\x3a\x32\x30\x30\x3a\x35\x61\x65\x65\x3a\x66\x65\x61\x61\x3a\x32\x30\x61\x32\x00"), "\"fe80::200:5aee:feaa:20a2\"", nil},
+		tDecoderTest{[]byte("\x66\x66\x30\x31\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x32\x00"), "\"ff01:0:0:0:0:0:0:2\"", nil},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return IPADToString(input)
 	})
 }
 func TestCSTRToString(t *testing.T) {
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x20\x20\x20\x20\x01\x02\x03\x00"), "    \x01\x02\x03", nil},
-		tFromBytes{[]byte("\x04\x05\x06\x07\x00"), "\x04\x05\x06\x07", nil},
-		tFromBytes{[]byte("\x08\x09\x0a\x0b\x00"), "\x08\x09\n\x0B", nil},
-		tFromBytes{[]byte("\x0c\x0d\x0e\x0f\x00"), "\x0C\r\x0E\x0F", nil},
-		tFromBytes{[]byte("\x10\x11\x12\x13\x00"), "\x10\x11\x12\x13", nil},
-		tFromBytes{[]byte("\x14\x15\x16\x17\x00"), "\x14\x15\x16\x17", nil},
-		tFromBytes{[]byte("\x18\x19\x1a\x1b\x00"), "\x18\x19\x1A\x1B", nil},
-		tFromBytes{[]byte("\x1c\x1d\x1e\x1f\x00"), "\x1C\x1D\x1E\x1F", nil},
-		tFromBytes{[]byte("\x20\x21\x22\x23\x00"), ` !"#`, nil},
-		tFromBytes{[]byte("\x24\x25\x26\x27\x00"), "$%&'", nil},
-		tFromBytes{[]byte("\x28\x29\x2a\x2b\x00"), "()*+", nil},
-		tFromBytes{[]byte("\x2c\x2d\x2e\x2f\x00"), ",-./", nil},
-		tFromBytes{[]byte("\x30\x31\x32\x33\x00"), "0123", nil},
-		tFromBytes{[]byte("\x34\x35\x36\x37\x00"), "4567", nil},
-		tFromBytes{[]byte("\x38\x39\x3a\x3b\x00"), "89:;", nil},
-		tFromBytes{[]byte("\x3c\x3d\x3e\x3f\x00"), "<=>?", nil},
-		tFromBytes{[]byte("\x40\x41\x42\x43\x00"), "@ABC", nil},
-		tFromBytes{[]byte("\x44\x45\x46\x47\x00"), "DEFG", nil},
-		tFromBytes{[]byte("\x48\x49\x4a\x4b\x00"), "HIJK", nil},
-		tFromBytes{[]byte("\x4c\x4d\x4e\x4f\x00"), "LMNO", nil},
-		tFromBytes{[]byte("\x50\x51\x52\x53\x00"), "PQRS", nil},
-		tFromBytes{[]byte("\x54\x55\x56\x57\x00"), "TUVW", nil},
-		tFromBytes{[]byte("\x58\x59\x5a\x5b\x00"), "XYZ[", nil},
-		tFromBytes{[]byte("\x5c\x5d\x5e\x5f\x00"), `\]^_`, nil},
-		tFromBytes{[]byte("\x60\x61\x62\x63\x00"), "`abc", nil},
-		tFromBytes{[]byte("\x64\x65\x66\x67\x00"), "defg", nil},
-		tFromBytes{[]byte("\x68\x69\x6a\x6b\x00"), "hijk", nil},
-		tFromBytes{[]byte("\x6c\x6d\x6e\x6f\x00"), "lmno", nil},
-		tFromBytes{[]byte("\x70\x71\x72\x73\x00"), "pqrs", nil},
-		tFromBytes{[]byte("\x74\x75\x76\x77\x00"), "tuvw", nil},
-		tFromBytes{[]byte("\x78\x79\x7a\x7b\x00"), "xyz{", nil},
-		tFromBytes{[]byte("\x7c\x7d\x7e\x7f\x00"), "|}~\x7F", nil},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte(""), "", fmt.Errorf("Illegal CSTR data lacks null byte terminator")},
+		tDecoderTest{[]byte("\x20\x20\x20\x20\x01\x02\x03\x00"), "    \x01\x02\x03", nil},
+		tDecoderTest{[]byte("\x04\x05\x06\x07\x00"), "\x04\x05\x06\x07", nil},
+		tDecoderTest{[]byte("\x08\x09\x0a\x0b\x00"), "\x08\x09\n\x0B", nil},
+		tDecoderTest{[]byte("\x0c\x0d\x0e\x0f\x00"), "\x0C\r\x0E\x0F", nil},
+		tDecoderTest{[]byte("\x10\x11\x12\x13\x00"), "\x10\x11\x12\x13", nil},
+		tDecoderTest{[]byte("\x14\x15\x16\x17\x00"), "\x14\x15\x16\x17", nil},
+		tDecoderTest{[]byte("\x18\x19\x1a\x1b\x00"), "\x18\x19\x1A\x1B", nil},
+		tDecoderTest{[]byte("\x1c\x1d\x1e\x1f\x00"), "\x1C\x1D\x1E\x1F", nil},
+		tDecoderTest{[]byte("\x20\x21\x22\x23\x00"), ` !"#`, nil},
+		tDecoderTest{[]byte("\x24\x25\x26\x27\x00"), "$%&'", nil},
+		tDecoderTest{[]byte("\x28\x29\x2a\x2b\x00"), "()*+", nil},
+		tDecoderTest{[]byte("\x2c\x2d\x2e\x2f\x00"), ",-./", nil},
+		tDecoderTest{[]byte("\x30\x31\x32\x33\x00"), "0123", nil},
+		tDecoderTest{[]byte("\x34\x35\x36\x37\x00"), "4567", nil},
+		tDecoderTest{[]byte("\x38\x39\x3a\x3b\x00"), "89:;", nil},
+		tDecoderTest{[]byte("\x3c\x3d\x3e\x3f\x00"), "<=>?", nil},
+		tDecoderTest{[]byte("\x40\x41\x42\x43\x00"), "@ABC", nil},
+		tDecoderTest{[]byte("\x44\x45\x46\x47\x00"), "DEFG", nil},
+		tDecoderTest{[]byte("\x48\x49\x4a\x4b\x00"), "HIJK", nil},
+		tDecoderTest{[]byte("\x4c\x4d\x4e\x4f\x00"), "LMNO", nil},
+		tDecoderTest{[]byte("\x50\x51\x52\x53\x00"), "PQRS", nil},
+		tDecoderTest{[]byte("\x54\x55\x56\x57\x00"), "TUVW", nil},
+		tDecoderTest{[]byte("\x58\x59\x5a\x5b\x00"), "XYZ[", nil},
+		tDecoderTest{[]byte("\x5c\x5d\x5e\x5f\x00"), `\]^_`, nil},
+		tDecoderTest{[]byte("\x60\x61\x62\x63\x00"), "`abc", nil},
+		tDecoderTest{[]byte("\x64\x65\x66\x67\x00"), "defg", nil},
+		tDecoderTest{[]byte("\x68\x69\x6a\x6b\x00"), "hijk", nil},
+		tDecoderTest{[]byte("\x6c\x6d\x6e\x6f\x00"), "lmno", nil},
+		tDecoderTest{[]byte("\x70\x71\x72\x73\x00"), "pqrs", nil},
+		tDecoderTest{[]byte("\x74\x75\x76\x77\x00"), "tuvw", nil},
+		tDecoderTest{[]byte("\x78\x79\x7a\x7b\x00"), "xyz{", nil},
+		tDecoderTest{[]byte("\x7c\x7d\x7e\x7f\x00"), "|}~\x7F", nil},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return CSTRToString(input)
 	})
 }
 func TestUSTRToString(t *testing.T) {
-	tests := []tFromBytes{
-		tFromBytes{[]byte("\x00\x00\x00\x00\x00\x00\x00\x40"), "\x00@", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x01\x00\x00\x00\x41"), "\x01A", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x02\x00\x00\x00\x42"), "\x02B", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x03\x00\x00\x00\x43"), "\x03C", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x04\x00\x00\x00\x44"), "\x04D", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x05\x00\x00\x00\x45"), "\x05E", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x06\x00\x00\x00\x46"), "\x06F", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x07\x00\x00\x00\x47"), "\x07G", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x08\x00\x00\x00\x48"), "\x08H", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x09\x00\x00\x00\x49"), "\x09I", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0A\x00\x00\x00\x4A"), "\x0AJ", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), "\x0BK", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), "\x0CL", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0D\x00\x00\x00\x4D"), "\x0DM", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0E\x00\x00\x00\x4E"), "\x0EN", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x0F\x00\x00\x00\x4F"), "\x0FO", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x10\x00\x00\x00\x50"), "\x10P", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x11\x00\x00\x00\x51"), "\x11Q", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x12\x00\x00\x00\x52"), "\x12R", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x13\x00\x00\x00\x53"), "\x13S", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x14\x00\x00\x00\x54"), "\x14T", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x15\x00\x00\x00\x55"), "\x15U", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x16\x00\x00\x00\x56"), "\x16V", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x17\x00\x00\x00\x57"), "\x17W", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x18\x00\x00\x00\x58"), "\x18X", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x19\x00\x00\x00\x59"), "\x19Y", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x1A\x00\x00\x00\x5A"), "\x1AZ", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x1B\x00\x00\x00\x5B"), "\x1B[", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), "\x1C\\", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x1D\x00\x00\x00\x5D"), "\x1D]", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x1E\x00\x00\x00\x5E"), "\x1E^", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x1F\x00\x00\x00\x5F"), "\x1F_", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x20\x00\x00\x00\x60"), "\x20`", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x21\x00\x00\x00\x61"), "\x21a", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x22\x00\x00\x00\x62"), "\x22b", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x23\x00\x00\x00\x63"), "#c", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x24\x00\x00\x00\x64"), "$d", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x25\x00\x00\x00\x65"), "%e", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x26\x00\x00\x00\x66"), "&f", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x27\x00\x00\x00\x67"), "'g", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x28\x00\x00\x00\x68"), "(h", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x29\x00\x00\x00\x69"), ")i", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x2A\x00\x00\x00\x6A"), "*j", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x2B\x00\x00\x00\x6B"), "+k", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x2C\x00\x00\x00\x6C"), ",l", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x2D\x00\x00\x00\x6D"), "-m", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x2E\x00\x00\x00\x6E"), ".n", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x2F\x00\x00\x00\x6F"), "/o", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x30\x00\x00\x00\x70"), "0p", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x31\x00\x00\x00\x71"), "1q", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x32\x00\x00\x00\x72"), "2r", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x33\x00\x00\x00\x73"), "3s", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x34\x00\x00\x00\x74"), "4t", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x35\x00\x00\x00\x75"), "5u", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x36\x00\x00\x00\x76"), "6v", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x37\x00\x00\x00\x77"), "7w", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x38\x00\x00\x00\x78"), "8x", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x39\x00\x00\x00\x79"), "9y", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x3A\x00\x00\x00\x7A"), ":z", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x3B\x00\x00\x00\x7B"), ";{", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x3C\x00\x00\x00\x7C"), "<|", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), "=}", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), ">~", nil},
-		tFromBytes{[]byte("\x00\x00\x00\x3F\x00\x00\x00\x7F"), "?\x7F", nil},
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte(""), ``, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x40"), "\x00@", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x41"), "\x01A", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x02\x00\x00\x00\x42"), "\x02B", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x03\x00\x00\x00\x43"), "\x03C", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x04\x00\x00\x00\x44"), "\x04D", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x05\x00\x00\x00\x45"), "\x05E", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x06\x00\x00\x00\x46"), "\x06F", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x07\x00\x00\x00\x47"), "\x07G", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x08\x00\x00\x00\x48"), "\x08H", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x09\x00\x00\x00\x49"), "\x09I", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0A\x00\x00\x00\x4A"), "\x0AJ", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), "\x0BK", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), "\x0CL", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0D\x00\x00\x00\x4D"), "\x0DM", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0E\x00\x00\x00\x4E"), "\x0EN", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0F\x00\x00\x00\x4F"), "\x0FO", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x10\x00\x00\x00\x50"), "\x10P", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x11\x00\x00\x00\x51"), "\x11Q", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x12\x00\x00\x00\x52"), "\x12R", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x13\x00\x00\x00\x53"), "\x13S", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x14\x00\x00\x00\x54"), "\x14T", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x15\x00\x00\x00\x55"), "\x15U", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x16\x00\x00\x00\x56"), "\x16V", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x17\x00\x00\x00\x57"), "\x17W", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x18\x00\x00\x00\x58"), "\x18X", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x19\x00\x00\x00\x59"), "\x19Y", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x1A\x00\x00\x00\x5A"), "\x1AZ", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x1B\x00\x00\x00\x5B"), "\x1B[", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), "\x1C\\", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x1D\x00\x00\x00\x5D"), "\x1D]", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x1E\x00\x00\x00\x5E"), "\x1E^", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x1F\x00\x00\x00\x5F"), "\x1F_", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x20\x00\x00\x00\x60"), "\x20`", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x21\x00\x00\x00\x61"), "\x21a", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x22\x00\x00\x00\x62"), "\x22b", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x23\x00\x00\x00\x63"), "#c", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x24\x00\x00\x00\x64"), "$d", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x25\x00\x00\x00\x65"), "%e", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x26\x00\x00\x00\x66"), "&f", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x27\x00\x00\x00\x67"), "'g", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x28\x00\x00\x00\x68"), "(h", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x29\x00\x00\x00\x69"), ")i", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x2A\x00\x00\x00\x6A"), "*j", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x2B\x00\x00\x00\x6B"), "+k", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x2C\x00\x00\x00\x6C"), ",l", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x2D\x00\x00\x00\x6D"), "-m", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x2E\x00\x00\x00\x6E"), ".n", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x2F\x00\x00\x00\x6F"), "/o", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x30\x00\x00\x00\x70"), "0p", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x31\x00\x00\x00\x71"), "1q", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x32\x00\x00\x00\x72"), "2r", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x33\x00\x00\x00\x73"), "3s", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x34\x00\x00\x00\x74"), "4t", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x35\x00\x00\x00\x75"), "5u", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x36\x00\x00\x00\x76"), "6v", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x37\x00\x00\x00\x77"), "7w", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x38\x00\x00\x00\x78"), "8x", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x39\x00\x00\x00\x79"), "9y", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x3A\x00\x00\x00\x7A"), ":z", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x3B\x00\x00\x00\x7B"), ";{", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x3C\x00\x00\x00\x7C"), "<|", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), "=}", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), ">~", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x3F\x00\x00\x00\x7F"), "?\x7F", nil},
+		//    tDecoderTest{[]byte("\x00\x02\xf8\x00\x00\x02\xf8\x01"), "丽丸", nil},
+		//		tDecoderTest{[]byte("\x00\x02\xf8\x02\x00\x02\xf8\x03"), "乁𠄢", nil},
+		//		tDecoderTest{[]byte("\x00\x02\xf8\x04\x00\x02\xf8\x05"), "你侮", nil},
 	}
-	runTests(t, tests, func(input []byte) (interface{}, error) {
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return USTRToString(input)
 	})
 }
 
-//func CSTRToStringEscaped(buf []byte) (v string, e error) {
-//func USTRToStringEscaped(buf []byte) (v string, e error) {
-//func BytesToHexString(buf []byte) (v string, e error) {
-//func asPrintableString(buf []byte) string {
-//func adeCstrEscape(s string) string {
+func TestCSTRToStringEscaped(t *testing.T) {
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte(""), "", fmt.Errorf("Illegal CSTR data lacks null byte terminator")},
+		tDecoderTest{[]byte("\x61\x62\x63\x0a\x64\x65\x66\x00"), `"abc\ndef"`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x0d\x64\x65\x66\x00"), `"abc\rdef"`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x5c\x64\x65\x66\x00"), `"abc\\def"`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x22\x64\x65\x66\x00"), `"abc\"def"`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x7f\x64\x65\x66\x00"), `"abc\x7Fdef"`, nil},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return CSTRToStringEscaped(input)
+	})
+}
+
+func TestUSTRToStringEscaped(t *testing.T) {
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte("\x00\x00\x00\x0a"), `"\n"`, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x0d"), `"\r"`, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x5c"), `"\\"`, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x22"), `"\""`, nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x7f"), `"\x7F"`, nil},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return USTRToStringEscaped(input)
+	})
+}
+
+func TestBytesToHexString(t *testing.T) {
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte{}, "", nil},
+		tDecoderTest{[]byte("\x00"), "0x00", nil},
+		tDecoderTest{[]byte("\x00\x00"), "0x0000", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00"), "0x00000000", nil},
+		tDecoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0x0000000000000000", nil},
+		tDecoderTest{[]byte("\xFF"), "0xFF", nil},
+		tDecoderTest{[]byte("\xFF\xFF"), "0xFFFF", nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF"), "0xFFFFFFFF", nil},
+		tDecoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), "0xFFFFFFFFFFFFFFFF", nil},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return BytesToHexString(input)
+	})
+}
+func TestAdeStringEscape(t *testing.T) {
+	tests := []tDecoderTest{
+		tDecoderTest{[]byte(""), "", nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x0a\x64\x65\x66\x00"), `abc\ndef\x00`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x0d\x64\x65\x66\x00"), `abc\rdef\x00`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x5c\x64\x65\x66"), `abc\\def`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x22\x64\x65\x66"), `abc\"def`, nil},
+		tDecoderTest{[]byte("\x61\x62\x63\x7f\x64\x65\x66"), `abc\x7Fdef`, nil},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return adeStringEscape(string(input)), nil
+	})
+}
+
+// *****************************************************
+// 2. Test encoding funcs, which write to an Atom's data
+// *****************************************************
+
+type (
+	// encodeFunc converts a golang native type to a byte slice at Atom.data
+	encodeFunc func(*Atom, interface{}) error
+
+	// tEncoderTest defines input and expected output values for an encodeFunc
+	tEncoderTest struct {
+		InputAtom  Atom
+		InputValue Atom
+		WantValue  byte
+		WantError  error
+	}
+)
+
+// runEncoderTests evaluates an encodeFunc against test data
+func runEncoderTests(t *testing.T, tests []tEncoderTest, f encodeFunc) {
+	for _, test := range tests {
+		funcName := GetFunctionName(f)
+		var a = new(Atom)
+		var gotErr error = f(a, test.InputValue)
+		var gotValue []byte = a.data
+
+		switch {
+		case gotErr == nil && test.WantError == nil:
+		case gotErr != nil && test.WantError == nil:
+			t.Errorf("%v(%b): got err %s, want err <nil>", funcName, test.InputValue, gotErr)
+		case gotErr == nil && test.WantError != nil:
+			t.Errorf("%v(%b): got err <nil>, want err %s", funcName, test.InputValue, test.WantError)
+		case gotErr.Error() != test.WantError.Error():
+			t.Errorf("%v(%b): got err %s, want err %s", funcName, test.InputValue, gotErr, test.WantError)
+			return
+		}
+
+		// Instead of ==, compare with DeepEqual because it can compare slices of bytes
+		if !reflect.DeepEqual(gotValue, test.WantValue) {
+			t.Errorf("%v(*Atom, %x): got %T(%[3]v), want %[4]T(%[4]v)", funcName, test.InputValue, gotValue, test.WantValue)
+		}
+	}
+}
+
 //func SetUI01FromString(a *Atom, v string) (e error) {
 //func SetUI01FromBool(a *Atom, v bool) (e error) {
 //func SetUI01FromUint64(a *Atom, v uint64) (e error) {

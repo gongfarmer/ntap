@@ -160,8 +160,12 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 			}
 		}
 		adeType := ADEType(h.Type[:])
+		name, err := FC32ToString(h.Name[:])
+		if err != nil {
+			return atoms, err
+		}
 		var a = Atom{
-			Name: asPrintableString(h.Name[:]),
+			Name: name,
 			typ:  adeType,
 			data: data,
 		}
