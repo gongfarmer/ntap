@@ -19,6 +19,7 @@ X Implement encoding
   Implement container construction
     -client should be able to assemble raw atomContainers easily( including stuff like adding a child to a grandchild of the currently held container, use pathing here perhaps)
     -client should also be able to take a raw string of ADE ContainerText, substitute in a few values within the text, and convert it into a binary Container
+  Implement creation of a set of nested Atoms from a byte slice without any other allocation other than pointers
 
 
 

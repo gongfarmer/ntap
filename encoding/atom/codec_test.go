@@ -2156,3 +2156,108 @@ func TestSetSR64FromSliceOfInt(t *testing.T) {
 		return SetSR64FromSliceOfInt(atom, input.([]int64))
 	})
 }
+func TestSetFP32FromString(t *testing.T) {
+	typ := "FP32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{"0.0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"1.1754E-38", []byte("\x00\x7F\xFD\x5F"), nil},
+		encoderTest{"1.2345678E-11", []byte("\x2d\x59\x2f\xfe"), nil},
+		encoderTest{"32.766998", []byte("\x42\x03\x11\x68"), nil},
+		encoderTest{"65.000999", []byte("\x42\x82\x00\x83"), nil},
+		encoderTest{"327.67001", []byte("\x43\xa3\xd5\xc3"), nil},
+		encoderTest{"32768", []byte("\x47\x00\x00\x00"), nil},
+		encoderTest{"42949672", []byte("\x4c\x23\xd7\x0a"), nil},
+		encoderTest{"3.2768E+08", []byte("\x4d\x9c\x40\x00"), nil},
+		encoderTest{"3.4027999E+38", []byte("\x7f\x7f\xff\x8b"), nil},
+		encoderTest{"3.4028E+38", []byte("\x7F\x7F\xFF\x8B"), nil},
+		encoderTest{"-1.1754E-38", []byte("\x80\x7f\xfd\x5f"), nil},
+		encoderTest{"-3.2767", []byte("\xc0\x51\xb5\x74"), nil},
+		encoderTest{"-1234.5677", []byte("\xc4\x9a\x52\x2b"), nil},
+		encoderTest{"-6500", []byte("\xc5\xcb\x20\x00"), nil},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", " ", ""}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetFP32FromString(atom, input.(string))
+	})
+}
+func TestSetFP32FromFloat64(t *testing.T) {
+	typ := "FP32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{float64(0.0), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{float64(1.1754E-38), []byte("\x00\x7F\xFD\x5F"), nil},
+		encoderTest{float64(1.2345678E-11), []byte("\x2d\x59\x2f\xfe"), nil},
+		encoderTest{float64(32.766998), []byte("\x42\x03\x11\x68"), nil},
+		encoderTest{float64(65.000999), []byte("\x42\x82\x00\x83"), nil},
+		encoderTest{float64(327.67001), []byte("\x43\xa3\xd5\xc3"), nil},
+		encoderTest{float64(32768), []byte("\x47\x00\x00\x00"), nil},
+		encoderTest{float64(42949672), []byte("\x4c\x23\xd7\x0a"), nil},
+		encoderTest{float64(3.2768E+08), []byte("\x4d\x9c\x40\x00"), nil},
+		encoderTest{float64(3.4027999E+38), []byte("\x7f\x7f\xff\x8b"), nil},
+		encoderTest{float64(3.4028E+38), []byte("\x7F\x7F\xFF\x8B"), nil},
+		encoderTest{float64(-1.1754E-38), []byte("\x80\x7f\xfd\x5f"), nil},
+		encoderTest{float64(-3.2767), []byte("\xc0\x51\xb5\x74"), nil},
+		encoderTest{float64(-1234.5677), []byte("\xc4\x9a\x52\x2b"), nil},
+		encoderTest{float64(-6500), []byte("\xc5\xcb\x20\x00"), nil},
+		encoderTest{float64(math.MaxFloat32), []byte("\x7F\x7F\xFF\xFF"), nil},
+		encoderTest{float64(math.SmallestNonzeroFloat32), []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{float64(math.MaxFloat64), zero, errRange(typ, math.MaxFloat64)},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetFP32FromFloat64(atom, input.(float64))
+	})
+}
+func TestSetFP64FromString(t *testing.T) {
+	typ := "FP64"
+	zero := make([]byte, 8)
+	tests := []encoderTest{
+		encoderTest{"-1.23456789012345672E+09", []byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), nil},
+		encoderTest{"3.27670000000000030E+01", []byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), nil},
+		encoderTest{"3.27670000000000016E+02", []byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), nil},
+		encoderTest{"6.50010000000000048E+01", []byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), nil},
+		encoderTest{"-3.26800000000000011E+02", []byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), nil},
+		encoderTest{"-3.27669999999999995E+00", []byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), nil},
+		encoderTest{"-6.50000000000000000E+03", []byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"2.22499999999999987E-308", []byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), nil},
+		encoderTest{"2.22499999999999987E-308", []byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), nil},
+		encoderTest{"1.79760000000000007E+308", []byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), nil},
+		encoderTest{"0.00000000000000000E+00", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"3.27680000000000000E+04", []byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"3.27680001000000000E+08", []byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), nil},
+		encoderTest{"4.29496720000000000E+07", []byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), nil},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", " ", ""}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetFP64FromString(atom, input.(string))
+	})
+}
+func TestSetFP64FromFloat64(t *testing.T) {
+	tests := []encoderTest{
+		encoderTest{float64(-1.23456789012345672E+09), []byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), nil},
+		encoderTest{float64(3.27670000000000030E+01), []byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), nil},
+		encoderTest{float64(3.27670000000000016E+02), []byte("\x40\x74\x7a\xb8\x51\xeb\x85\x1f"), nil},
+		encoderTest{float64(6.50010000000000048E+01), []byte("\x40\x50\x40\x10\x62\x4d\xd2\xf2"), nil},
+		encoderTest{float64(-3.26800000000000011E+02), []byte("\xc0\x74\x6c\xcc\xcc\xcc\xcc\xcd"), nil},
+		encoderTest{float64(-3.27669999999999995E+00), []byte("\xc0\x0a\x36\xae\x7d\x56\x6c\xf4"), nil},
+		encoderTest{float64(-6.50000000000000000E+03), []byte("\xc0\xb9\x64\x00\x00\x00\x00\x00"), nil},
+		encoderTest{float64(2.22499999999999987E-308), []byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), nil},
+		encoderTest{float64(2.22499999999999987E-308), []byte("\x00\x0f\xff\xdd\x31\xa0\x0c\x6d"), nil},
+		encoderTest{float64(1.79760000000000007E+308), []byte("\x7f\xef\xff\x93\x59\xcc\x81\x04"), nil},
+		encoderTest{float64(0.00000000000000000E+00), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{float64(3.27680000000000000E+04), []byte("\x40\xe0\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{float64(3.27680001000000000E+08), []byte("\x41\xb3\x88\x00\x01\x00\x00\x00"), nil},
+		encoderTest{float64(4.29496720000000000E+07), []byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), nil},
+		encoderTest{float64(math.MaxFloat64), []byte("\x7F\xEF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{float64(math.SmallestNonzeroFloat64), []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetFP64FromFloat64(atom, input.(float64))
+	})
+}

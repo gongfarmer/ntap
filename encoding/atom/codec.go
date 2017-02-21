@@ -1386,28 +1386,45 @@ func SetSR64FromSliceOfInt(a *Atom, v []int64) (e error) {
 // encode of floating point types
 
 func SetFP32FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 32)
+	if e != nil {
+		return errStrInvalid("FP32", v)
+	}
 	return SetFP32FromFloat64(a, f)
 }
 
 func SetFP32FromFloat64(a *Atom, v float64) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	if v > math.MaxFloat32 {
 		return errRange("FP32", v)
 	}
-
 	var bits uint32 = math.Float32bits(float32(v))
 	binary.BigEndian.PutUint32(a.data, bits)
 	return
 }
 
 func SetFP64FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 64)
+	if e != nil {
+		return errStrInvalid("FP64", v)
+	}
 	return SetFP64FromFloat64(a, f)
 }
 
 func SetFP64FromFloat64(a *Atom, v float64) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	binary.BigEndian.PutUint64(a.data, uint64(v))
 	var bits uint64 = math.Float64bits(v)
 	binary.BigEndian.PutUint64(a.data, bits)
