@@ -107,6 +107,10 @@ func errRange(t string, v interface{}) (e error) {
 		e = fmt.Errorf("value exceeds range for type %s: %d", t, v)
 	case float32, float64:
 		e = fmt.Errorf("value exceeds range for type %s: %f", t, v)
+	case []uint64, []int64:
+		e = fmt.Errorf("value exceeds range for type %s: %v", t, v)
+	case string:
+		e = fmt.Errorf("value exceeds range for type %s: %v", t, v)
 	default:
 		panic(fmt.Errorf("cannot handle type %T", v))
 	}
@@ -1259,15 +1263,25 @@ func SetSI64FromInt64(a *Atom, v int64) (e error) {
 // encode of unsigned fractional types
 
 func SetUR32FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
+
+	// The %s is to detect trailing garbage in the line. It should not match
+	// anything in the normal case.
 	var num, den uint64
-	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
-	if err != nil {
-		return err
+	var extra string
+	matched, err := fmt.Sscanf(v, "%d/%d%s", &num, &den, &extra)
+	if err != io.EOF || matched != 2 {
+		return errStrInvalid("UR32", v)
 	}
 	return SetUR32FromSliceOfUint(a, []uint64{num, den})
 }
 
 func SetUR32FromSliceOfUint(a *Atom, v []uint64) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var num, den uint64
 	num = v[0]
 	den = v[1]
@@ -1281,15 +1295,22 @@ func SetUR32FromSliceOfUint(a *Atom, v []uint64) (e error) {
 }
 
 func SetUR64FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	var num, den uint64
-	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
-	if err != nil {
-		return err
+	var extra string
+	matched, err := fmt.Sscanf(v, "%d/%d%s", &num, &den, &extra)
+	if err != io.EOF || matched != 2 {
+		return errStrInvalid("UR64", v)
 	}
 	return SetUR64FromSliceOfUint(a, []uint64{num, den})
 }
 
 func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	var num, den uint64
 	num = v[0]
 	den = v[1]
@@ -1305,19 +1326,26 @@ func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
 // encode of signed fractional types
 
 func SetSR32FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var num, den int64
-	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
-	if err != nil {
-		return err
+	var extra string
+	matched, err := fmt.Sscanf(v, "%d/%d%s", &num, &den, &extra)
+	if err != io.EOF || matched != 2 {
+		return errStrInvalid("SR32", v)
 	}
 	return SetSR32FromSliceOfInt(a, []int64{num, den})
 }
 
 func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var num, den int64
 	num = v[0]
 	den = v[1]
-	if num > math.MaxInt16 || den > math.MaxInt16 {
+	if num > math.MaxInt16 || den > math.MaxInt16 || num < math.MinInt16 || den < math.MinInt16 {
 		return errRange("SR32", v)
 	}
 
@@ -1327,15 +1355,22 @@ func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
 }
 
 func SetSR64FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	var num, den int64
-	_, err := fmt.Sscanf(v, "%d / %d", &num, &den)
-	if err != nil {
-		return err
+	var extra string
+	matched, err := fmt.Sscanf(v, "%d/%d%s", &num, &den, &extra)
+	if err != io.EOF || matched != 2 {
+		return errStrInvalid("SR64", v)
 	}
 	return SetSR64FromSliceOfInt(a, []int64{num, den})
 }
 
 func SetSR64FromSliceOfInt(a *Atom, v []int64) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	var num, den int64
 	num = v[0]
 	den = v[1]

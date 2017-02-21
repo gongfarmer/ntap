@@ -1543,8 +1543,10 @@ func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 		case gotErr == nil && test.WantError == nil:
 		case gotErr != nil && test.WantError == nil:
 			t.Errorf("%v(%b): got err {%s}, want err <nil>", funcName, test.Input, gotErr)
+			return
 		case gotErr == nil && test.WantError != nil:
 			t.Errorf("%v(%b): got err <nil>, want err {%s}", funcName, test.Input, test.WantError)
+			return
 		case gotErr.Error() != test.WantError.Error():
 			t.Errorf("%v(%v): got err {%s}, want err {%s}", funcName, test.Input, gotErr, test.WantError)
 			return
@@ -1552,7 +1554,7 @@ func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 
 		// Instead of ==, compare with DeepEqual because it can compare slices of bytes
 		if !reflect.DeepEqual(gotValue, test.WantValue) {
-			t.Errorf("%v(Atom, %x): got %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, gotValue, test.WantValue)
+			t.Errorf("%v(Atom, %v): got %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, gotValue, test.WantValue)
 		}
 	}
 }
@@ -1755,21 +1757,6 @@ func TestSetUI64FromUint64(t *testing.T) {
 	})
 }
 
-// const (
-// 	MaxInt8   = 1<<7 - 1  = 127
-// 	MinInt8   = -1 << 7   = 128
-// 	MaxInt16  = 1<<15 - 1 = 32767
-// 	MinInt16  = -1 << 15  = -32768
-// 	MaxInt32  = 1<<31 - 1
-// 	MinInt32  = -1 << 31
-// 	MaxInt64  = 1<<63 - 1
-// 	MinInt64  = -1 << 63
-// 	MaxUint8  = 1<<8 - 1
-// 	MaxUint16 = 1<<16 - 1
-// 	MaxUint32 = 1<<32 - 1
-// 	MaxUint64 = 1<<64 - 1
-// )
-
 func TestSetSI08FromString(t *testing.T) {
 	typ := "SI08"
 	zero := make([]byte, 1)
@@ -1910,7 +1897,6 @@ func TestSetSI64FromString(t *testing.T) {
 		return SetSI64FromString(atom, input.(string))
 	})
 }
-
 func TestSetSI64FromInt64(t *testing.T) {
 	tests := []encoderTest{
 		encoderTest{int64(0), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
@@ -1920,5 +1906,253 @@ func TestSetSI64FromInt64(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSI64FromInt64(atom, input.(int64))
+	})
+}
+func TestSetUR32FromString(t *testing.T) {
+	typ := "UR32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{"0/0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"1/0", []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{"0/1", []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{"1/1", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"1/1 ", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"1/ 1", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{" 1/1", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"65535/65535", []byte("\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"65536/65535", zero, errRange(typ, "[65536 65535]")},
+		encoderTest{"65535/65536", zero, errRange(typ, "[65535 65536]")},
+		encoderTest{"65536/65536", zero, errRange(typ, "[65536 65536]")},
+	}
+	var arrInvalid = []string{"0xFF/0x00", "0x00/0xFF", "0xFF/0x00", "0xFF/0xFF",
+		"1.0/1", "1/1.0", "1/1/1", "1.1/1", "-1/-1", "-1/1", "1//1", "1/-1",
+		"1 /1", "1/", "/1", "dog", "1", "/", " ", "",
+	}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUR32FromString(atom, input.(string))
+	})
+}
+func TestSetUR32FromSliceOfUint(t *testing.T) {
+	typ := "UR32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{[]uint64{0, 0}, []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{[]uint64{1, 0}, []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{[]uint64{0, 1}, []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{[]uint64{1, 1}, []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{[]uint64{65535, 65535}, []byte("\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{[]uint64{65536, 65535}, zero, errRange(typ, "[65536 65535]")},
+		encoderTest{[]uint64{65535, 65536}, zero, errRange(typ, "[65535 65536]")},
+		encoderTest{[]uint64{65536, 65536}, zero, errRange(typ, "[65536 65536]")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUR32FromSliceOfUint(atom, input.([]uint64))
+	})
+}
+
+func TestSetUR64FromString(t *testing.T) {
+	typ := "UR64"
+	zero := make([]byte, 8)
+	tests := []encoderTest{
+		encoderTest{"0/0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"1/0", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"0/1", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{"1/1", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"1/1 ", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"1/ 1", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{" 1/1", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"4294967295/4294967295", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"4294967297/4294967296", zero, errRange(typ, "[4294967297 4294967296]")},
+		encoderTest{"4294967296/4294967297", zero, errRange(typ, "[4294967296 4294967297]")},
+		encoderTest{"4294967297/4294967297", zero, errRange(typ, "[4294967297 4294967297]")},
+	}
+	var arrInvalid = []string{"0xFF/0x00", "0x00/0xFF", "0xFF/0x00", "0xFF/0xFF",
+		"1.0/1", "1/1.0", "1/1/1", "1.1/1", "-1/-1", "-1/1", "1//1", "1/-1",
+		"1 /1", "1/", "/1", "dog", "1", "/", " ", "",
+	}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUR64FromString(atom, input.(string))
+	})
+}
+func TestSetUR64FromSliceOfUint(t *testing.T) {
+	typ := "UR64"
+	zero := make([]byte, 8)
+	tests := []encoderTest{
+		encoderTest{[]uint64{0, 0}, []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{[]uint64{1, 0}, []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{[]uint64{0, 1}, []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{[]uint64{1, 1}, []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{[]uint64{4294967295, 4294967295}, []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{[]uint64{4294967297, 4294967296}, zero, errRange(typ, "[4294967297 4294967296]")},
+		encoderTest{[]uint64{4294967296, 4294967297}, zero, errRange(typ, "[4294967296 4294967297]")},
+		encoderTest{[]uint64{4294967297, 4294967297}, zero, errRange(typ, "[4294967297 4294967297]")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUR64FromSliceOfUint(atom, input.([]uint64))
+	})
+}
+
+func TestSetSR32FromString(t *testing.T) {
+	typ := "SR32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{"+0/+0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"+1/+0", []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{"+0/+1", []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{"+1/+1", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"+0/-0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"-1/+0", []byte("\xFF\xFF\x00\x00"), nil},
+		encoderTest{"+0/-1", []byte("\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"-1/+1", []byte("\xFF\xFF\x00\x01"), nil},
+		encoderTest{"-0/-0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"-1/-1", []byte("\xFF\xFE\xFF\xFF"), nil},
+		encoderTest{"0/-0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"-0/0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{" 1/1", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"1/-1", []byte("\x00\x00\xFF\xFF"), nil},
+		encoderTest{"-1/1", []byte("\xFF\xFF\x00\x01"), nil},
+		encoderTest{"1/1 ", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"1/ 1", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"0/0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"0/0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"1/0", []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{"0/1", []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{"1/1", []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{"32767/32767", []byte("\x7F\xFF\x7F\xFF"), nil},
+		encoderTest{"32767/-32768", []byte("\x7F\xFE\x80\x00"), nil},
+		encoderTest{"-32768/32767", []byte("\x80\x00\x7F\xFF"), nil},
+		encoderTest{"+32767/+32767", []byte("\x7F\xFF\x7F\xFF"), nil},
+		encoderTest{"+32767/-32768", []byte("\x7F\xFE\x80\x00"), nil},
+		encoderTest{"-32768/-32768", []byte("\x7F\xFF\x80\x00"), nil},
+		encoderTest{"32768/32767", zero, errRange(typ, "[32768 32767]")},
+		encoderTest{"32767/32768", zero, errRange(typ, "[32767 32768]")},
+		encoderTest{"32768/32768", zero, errRange(typ, "[32768 32768]")},
+	}
+	var arrInvalid = []string{"0xFF/0x00", "0x00/0xFF", "0xFF/0x00", "0xFF/0xFF",
+		"1.0/1", "1/1.0", "1/1/1", "1.1/1", "1//1", "1 /1", "1/", "/1",
+		"dog", "1", "/", " ", "",
+	}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSR32FromString(atom, input.(string))
+	})
+}
+func TestSetSR32FromSliceOfInt(t *testing.T) {
+	typ := "SR32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{[]int64{-0, -0}, []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{-1, -1}, []byte("\xFF\xFE\xFF\xFF"), nil},
+		encoderTest{[]int64{0, -0}, []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{-0, 0}, []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{[]int64{1, -1}, []byte("\x00\x00\xFF\xFF"), nil},
+		encoderTest{[]int64{-1, 1}, []byte("\xFF\xFF\x00\x01"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{[]int64{0, 0}, []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{0, 0}, []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{1, 0}, []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{[]int64{0, 1}, []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x01\x00\x01"), nil},
+		encoderTest{[]int64{32767, 32767}, []byte("\x7F\xFF\x7F\xFF"), nil},
+		encoderTest{[]int64{32767, -32768}, []byte("\x7F\xFE\x80\x00"), nil},
+		encoderTest{[]int64{-32768, 32767}, []byte("\x80\x00\x7F\xFF"), nil},
+		encoderTest{[]int64{-32768, -32768}, []byte("\x7F\xFF\x80\x00"), nil},
+		encoderTest{[]int64{32768, 32767}, zero, errRange(typ, "[32768 32767]")},
+		encoderTest{[]int64{32767, 32768}, zero, errRange(typ, "[32767 32768]")},
+		encoderTest{[]int64{32768, 32768}, zero, errRange(typ, "[32768 32768]")},
+		encoderTest{[]int64{32767, -32769}, zero, errRange(typ, "[32767 -32769]")},
+		encoderTest{[]int64{-32769, 32767}, zero, errRange(typ, "[-32769 32767]")},
+		encoderTest{[]int64{-32769, -32769}, zero, errRange(typ, "[-32769 -32769]")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSR32FromSliceOfInt(atom, input.([]int64))
+	})
+}
+
+func TestSetSR64FromString(t *testing.T) {
+	typ := "SR64"
+	zero := make([]byte, 8)
+	tests := []encoderTest{
+		encoderTest{"+0/+0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"+1/+0", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"+0/+1", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{"+1/+1", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"+0/-0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"-1/+0", []byte("\xFF\xFF\xFF\xFF\x00\x00\x00\x00"), nil},
+		encoderTest{"+0/-1", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"-1/+1", []byte("\xFF\xFF\xFF\xFF\x00\x00\x00\x01"), nil},
+		encoderTest{"-0/-0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"-1/-1", []byte("\xFF\xFF\xFF\xFE\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"0/-0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"-0/0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{" 1/1", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"1/-1", []byte("\x00\x00\x00\x00\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"-1/1", []byte("\xFF\xFF\xFF\xFF\x00\x00\x00\x01"), nil},
+		encoderTest{"1/1 ", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"1/ 1", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"0/0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0/0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"1/0", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"0/1", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{"1/1", []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{"2147483647/2147483647", []byte("\x7F\xFF\xFF\xFF\x7F\xFF\xFF\xFF"), nil},
+		encoderTest{"2147483647/-2147483648", []byte("\x7F\xFF\xFF\xFE\x80\x00\x00\x00"), nil},
+		encoderTest{"-2147483648/2147483647", []byte("\x80\x00\x00\x00\x7F\xFF\xFF\xFF"), nil},
+		encoderTest{"+2147483647/+2147483647", []byte("\x7F\xFF\xFF\xFF\x7F\xFF\xFF\xFF"), nil},
+		encoderTest{"+2147483647/-2147483648", []byte("\x7F\xFF\xFF\xFE\x80\x00\x00\x00"), nil},
+		encoderTest{"-2147483648/-2147483648", []byte("\x7F\xFF\xFF\xFF\x80\x00\x00\x00"), nil},
+		encoderTest{"2147483648/2147483647", zero, errRange(typ, "[2147483648 2147483647]")},
+		encoderTest{"2147483647/2147483648", zero, errRange(typ, "[2147483647 2147483648]")},
+		encoderTest{"2147483648/2147483648", zero, errRange(typ, "[2147483648 2147483648]")},
+	}
+	var arrInvalid = []string{"0xFF/0x00", "0x00/0xFF", "0xFF/0x00", "0xFF/0xFF",
+		"1.0/1", "1/1.0", "1/1/1", "1.1/1", "1//1", "1 /1", "1/", "/1",
+		"dog", "1", "/", " ", "",
+	}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSR64FromString(atom, input.(string))
+	})
+}
+func TestSetSR64FromSliceOfInt(t *testing.T) {
+	typ := "SR64"
+	zero := make([]byte, 8)
+	tests := []encoderTest{
+		encoderTest{[]int64{-0, -0}, []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{-1, -1}, []byte("\xFF\xFF\xFF\xFE\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{[]int64{0, -0}, []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{-0, 0}, []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{[]int64{1, -1}, []byte("\x00\x00\x00\x00\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{[]int64{-1, 1}, []byte("\xFF\xFF\xFF\xFF\x00\x00\x00\x01"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{[]int64{0, 0}, []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{0, 0}, []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{1, 0}, []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{[]int64{0, 1}, []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{[]int64{1, 1}, []byte("\x00\x00\x00\x01\x00\x00\x00\x01"), nil},
+		encoderTest{[]int64{2147483647, 2147483647}, []byte("\x7F\xFF\xFF\xFF\x7F\xFF\xFF\xFF"), nil},
+		encoderTest{[]int64{2147483647, -2147483648}, []byte("\x7F\xFF\xFF\xFE\x80\x00\x00\x00"), nil},
+		encoderTest{[]int64{-2147483648, 2147483647}, []byte("\x80\x00\x00\x00\x7F\xFF\xFF\xFF"), nil},
+		encoderTest{[]int64{-2147483648, -2147483648}, []byte("\x7F\xFF\xFF\xFF\x80\x00\x00\x00"), nil},
+		encoderTest{[]int64{2147483648, 2147483647}, zero, errRange(typ, "[2147483648 2147483647]")},
+		encoderTest{[]int64{2147483647, 2147483648}, zero, errRange(typ, "[2147483647 2147483648]")},
+		encoderTest{[]int64{2147483648, 2147483648}, zero, errRange(typ, "[2147483648 2147483648]")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSR64FromSliceOfInt(atom, input.([]int64))
 	})
 }
