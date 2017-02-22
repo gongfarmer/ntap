@@ -557,7 +557,6 @@ func acceptFCHR32AsSingleQuotedString(l *lexer) error {
 	if l.next() != '\'' {
 		return fmt.Errorf("expected single quote to end four-char code value, got: %s", l.buffer())
 	}
-
 	return nil
 }
 
@@ -745,15 +744,19 @@ func readItem(p *parser) (it item) {
 			}
 		}
 	}
+	if it.typ == itemError {
+		p.err = fmt.Errorf("line %d: %s", it.line, it.value)
+	}
 	p.line = it.line
 	return
 }
-func (p *parser) errorf(format string, args ...interface{}) {
+func (p *parser) errorf(format string, args ...interface{}) parseFunc {
 	p.err = fmt.Errorf(
 		strings.Join([]string{
 			fmt.Sprintf("parse error on line %d: ", p.line),
 			fmt.Sprintf(format, args...),
 		}, ""))
+	return nil
 }
 func (ptr *atomStack) push(a *Atom) {
 	*ptr = append(*ptr, a)
@@ -790,7 +793,9 @@ func parseAtomName(p *parser) parseFunc {
 	switch it.typ {
 	case itemAtomName:
 		p.theAtom.Name = it.value // may be hex.. either way, store as string for now
-	case itemError, itemEOF:
+	case itemError:
+		return p.errorf(it.value)
+	case itemEOF:
 		return nil
 	case itemContainerEnd:
 		return parseContainerEnd(p)
@@ -816,15 +821,16 @@ func parseContainerEnd(p *parser) parseFunc {
 
 func parseAtomType(p *parser) parseFunc {
 	it := readItem(p)
+	if it.typ == itemError {
+		return p.errorf(it.value)
+	}
 	if it.typ == itemEOF {
-		p.err = fmt.Errorf("end of input while parsing atom %s", p.theAtom.Name)
-		return nil
+		return p.errorf("end of input while parsing atom %s", p.theAtom.Name)
 	}
 
 	// verify item type
 	if it.typ != itemAtomType {
-		p.err = fmt.Errorf("expecting token type itemAtomType, got %s", it.typ)
-		return nil
+		return p.errorf("expecting token type itemAtomType, got %s", it.typ)
 	}
 	p.theAtom.SetType(ADEType(it.value))
 
@@ -860,15 +866,16 @@ func parseAtomData(p *parser) parseFunc {
 
 func parseNumber(p *parser) parseFunc {
 	it := readItem(p)
-
+	if it.typ == itemError {
+		return p.errorf(it.value)
+	}
 	if it.typ != itemNumber {
-		p.errorf("expected atom data with type Number, got type %s", it.typ)
+		return p.errorf("expected atom data with type Number, got type %s", it.typ)
 	}
 
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
-		p.errorf(err.Error())
-		return nil
+		return p.errorf(err.Error())
 	}
 	return parseAtomName
 }
@@ -889,15 +896,13 @@ func parseFraction(p *parser) parseFunc {
 
 	// Verify token types are correct for fractional type data
 	if !(items[0].typ == itemNumber && items[1].typ == itemVinculum && items[2].typ == itemNumber) {
-		p.errorf("malformed fraction: %s %s %s", values[0], values[1], values[2])
-		return nil
+		return p.errorf("malformed fraction: %s %s %s", values[0], values[1], values[2])
 	}
 
 	// Send tokens for type conversion
 	err := p.theAtom.Value.SetString(strings.Join(values, ""))
 	if err != nil {
-		p.errorf(err.Error())
-		return nil
+		return p.errorf(err.Error())
 	}
 
 	return parseAtomName
@@ -908,15 +913,15 @@ func parseFC32Value(p *parser) parseFunc {
 	switch it.typ {
 	case itemFC32Hex, itemFC32Quoted:
 		p.theAtom.Value.SetString(it.value)
+	case itemError:
+		return p.errorf(it.value)
 	default:
-		p.errorf("expected atom data with type FC32, got type %s", it.typ)
-		return nil
+		return p.errorf("expected atom data with type FC32, got type %s", it.typ)
 	}
 
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
-		p.errorf("failed to set FC32 atom data (%s): %s", it.value, err.Error())
-		return nil
+		return p.errorf("failed to set FC32 atom data (%s): %s", it.value, err.Error())
 	}
 	return parseAtomName
 }
@@ -925,14 +930,12 @@ func parseIP32(p *parser) parseFunc {
 	it := readItem(p)
 
 	if it.typ != itemIP32 {
-		p.errorf("expected atom data with type IP32, got type %s", it.typ)
-		return nil
+		return p.errorf("expected atom data with type IP32, got type %s", it.typ)
 	}
 
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
-		p.errorf(err.Error())
-		return nil
+		return p.errorf(err.Error())
 	}
 	return parseAtomName
 }
@@ -940,14 +943,12 @@ func parseIP32(p *parser) parseFunc {
 func parseString(p *parser) parseFunc {
 	it := readItem(p)
 	if it.typ == itemError {
-		p.errorf(it.value)
-		return nil
+		return p.errorf(it.value)
 	}
 
 	err := p.theAtom.Value.SetString(it.value)
 	if err != nil {
-		p.errorf(err.Error())
-		return nil
+		return p.errorf(err.Error())
 	}
 	return parseAtomName
 }

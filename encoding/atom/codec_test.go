@@ -2325,6 +2325,7 @@ func TestSetFC32FromString(t *testing.T) {
 		encoderTest{"|{zy", []byte("\x7c\x7b\x7a\x79"), nil},
 		encoderTest{"}|{z", []byte("\x7d\x7c\x7b\x7a"), nil},
 		encoderTest{"~}|{", []byte("\x7e\x7d\x7c\x7b"), nil},
+		encoderTest{"	 A", []byte("\x09\x20\x07\x41"), nil},
 
 		// accept strings expressed as hex, even if unprintable
 		encoderTest{"0x00000000", []byte("\x00\x00\x00\x00"), nil},

@@ -780,20 +780,21 @@ func UUIDToString(buf []byte) (v string, e error) {
 func IP32ToString(buf []byte) (v string, e error) {
 
 	// single address is expressed as dotted quad
-	if len(buf) == 4 {
+	size := len(buf)
+	if size == 4 {
 		v = fmt.Sprintf("%d.%d.%d.%d", buf[0], buf[1], buf[2], buf[3])
 		return
 	}
 
 	// need 4 bytes to make a complete address
-	if 0 != len(buf)%4 || 0 == len(buf) {
-		e = errByteCount("IP32", 4, len(buf))
+	if 0 != size%4 || 0 == size {
+		e = errByteCount("IP32", 4, size)
 		return
 	}
 
 	// multiple addresses are expressed as hex
 	var addrs = []string{"0x"}
-	for i := 0; i < len(buf); i += 4 {
+	for i := 0; i < size; i += 4 {
 		addrs = append(addrs, fmt.Sprintf("%02X%02X%02X%02X", buf[i], buf[i+1], buf[i+2], buf[i+3]))
 	}
 	v = strings.Join(addrs, "")
