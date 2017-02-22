@@ -2726,3 +2726,115 @@ func TestSetUSTRFromQuotedEscapedString(t *testing.T) {
 		return SetUSTRFromQuotedEscapedString(atom, input.(string))
 	})
 }
+
+func TestSetCSTRFromString(t *testing.T) {
+	tests := []encoderTest{
+		encoderTest{"", []byte("\x00"), nil},
+		encoderTest{"    \x01\x02\x03", []byte("\x20\x20\x20\x20\x01\x02\x03\x00"), nil},
+		encoderTest{"\x04\x05\x06\x07", []byte("\x04\x05\x06\x07\x00"), nil},
+		encoderTest{"\x08\x09\n\x0B", []byte("\x08\x09\x0a\x0b\x00"), nil},
+		encoderTest{"\x0C\r\x0E\x0F", []byte("\x0c\x0d\x0e\x0f\x00"), nil},
+		encoderTest{"\x10\x11\x12\x13", []byte("\x10\x11\x12\x13\x00"), nil},
+		encoderTest{"\x14\x15\x16\x17", []byte("\x14\x15\x16\x17\x00"), nil},
+		encoderTest{"\x18\x19\x1A\x1B", []byte("\x18\x19\x1a\x1b\x00"), nil},
+		encoderTest{"\x1C\x1D\x1E\x1F", []byte("\x1c\x1d\x1e\x1f\x00"), nil},
+		encoderTest{` !"#`, []byte("\x20\x21\x22\x23\x00"), nil},
+		encoderTest{"$%&'", []byte("\x24\x25\x26\x27\x00"), nil},
+		encoderTest{"()*+", []byte("\x28\x29\x2a\x2b\x00"), nil},
+		encoderTest{",-./", []byte("\x2c\x2d\x2e\x2f\x00"), nil},
+		encoderTest{"0123", []byte("\x30\x31\x32\x33\x00"), nil},
+		encoderTest{"4567", []byte("\x34\x35\x36\x37\x00"), nil},
+		encoderTest{"89:;", []byte("\x38\x39\x3a\x3b\x00"), nil},
+		encoderTest{"<=>?", []byte("\x3c\x3d\x3e\x3f\x00"), nil},
+		encoderTest{"@ABC", []byte("\x40\x41\x42\x43\x00"), nil},
+		encoderTest{"DEFG", []byte("\x44\x45\x46\x47\x00"), nil},
+		encoderTest{"HIJK", []byte("\x48\x49\x4a\x4b\x00"), nil},
+		encoderTest{"LMNO", []byte("\x4c\x4d\x4e\x4f\x00"), nil},
+		encoderTest{"PQRS", []byte("\x50\x51\x52\x53\x00"), nil},
+		encoderTest{"TUVW", []byte("\x54\x55\x56\x57\x00"), nil},
+		encoderTest{"XYZ[", []byte("\x58\x59\x5a\x5b\x00"), nil},
+		encoderTest{`\]^_`, []byte("\x5c\x5d\x5e\x5f\x00"), nil},
+		encoderTest{"`abc", []byte("\x60\x61\x62\x63\x00"), nil},
+		encoderTest{"defg", []byte("\x64\x65\x66\x67\x00"), nil},
+		encoderTest{"hijk", []byte("\x68\x69\x6a\x6b\x00"), nil},
+		encoderTest{"lmno", []byte("\x6c\x6d\x6e\x6f\x00"), nil},
+		encoderTest{"pqrs", []byte("\x70\x71\x72\x73\x00"), nil},
+		encoderTest{"tuvw", []byte("\x74\x75\x76\x77\x00"), nil},
+		encoderTest{"xyz{", []byte("\x78\x79\x7a\x7b\x00"), nil},
+		encoderTest{"|}~\x7F", []byte("\x7c\x7d\x7e\x7f\x00"), nil},
+		encoderTest{"\\x00", []byte("\x5c\x78\x30\x30\x00"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetCSTRFromString(atom, input.(string))
+	})
+}
+func TestSetCSTRFromQuotedEscapedString(t *testing.T) {
+	typ := "CSTR"
+	zero := []byte(nil)
+	tests := []encoderTest{
+		encoderTest{`""`, []byte("\x00"), nil},
+		encoderTest{`"    \x01\x02\x03"`, []byte("\x20\x20\x20\x20\x01\x02\x03\x00"), nil},
+		encoderTest{`"\x04\x05\x06\x07"`, []byte("\x04\x05\x06\x07\x00"), nil},
+		encoderTest{`"\x08\x09\n\x0B"`, []byte("\x08\x09\x0a\x0b\x00"), nil},
+		encoderTest{`"\x0C\r\x0E\x0F"`, []byte("\x0c\x0d\x0e\x0f\x00"), nil},
+		encoderTest{`"\x10\x11\x12\x13"`, []byte("\x10\x11\x12\x13\x00"), nil},
+		encoderTest{`"\x14\x15\x16\x17"`, []byte("\x14\x15\x16\x17\x00"), nil},
+		encoderTest{`"\x18\x19\x1A\x1B"`, []byte("\x18\x19\x1a\x1b\x00"), nil},
+		encoderTest{`"\x1C\x1D\x1E\x1F"`, []byte("\x1c\x1d\x1e\x1f\x00"), nil},
+		encoderTest{`" !\"#"`, []byte("\x20\x21\x22\x23\x00"), nil},
+		encoderTest{`"$%&'"`, []byte("\x24\x25\x26\x27\x00"), nil},
+		encoderTest{`"()*+"`, []byte("\x28\x29\x2a\x2b\x00"), nil},
+		encoderTest{`",-./"`, []byte("\x2c\x2d\x2e\x2f\x00"), nil},
+		encoderTest{`"0123"`, []byte("\x30\x31\x32\x33\x00"), nil},
+		encoderTest{`"4567"`, []byte("\x34\x35\x36\x37\x00"), nil},
+		encoderTest{`"89:;"`, []byte("\x38\x39\x3a\x3b\x00"), nil},
+		encoderTest{`"<=>?"`, []byte("\x3c\x3d\x3e\x3f\x00"), nil},
+		encoderTest{`"@ABC"`, []byte("\x40\x41\x42\x43\x00"), nil},
+		encoderTest{`"DEFG"`, []byte("\x44\x45\x46\x47\x00"), nil},
+		encoderTest{`"HIJK"`, []byte("\x48\x49\x4a\x4b\x00"), nil},
+		encoderTest{`"LMNO"`, []byte("\x4c\x4d\x4e\x4f\x00"), nil},
+		encoderTest{`"PQRS"`, []byte("\x50\x51\x52\x53\x00"), nil},
+		encoderTest{`"TUVW"`, []byte("\x54\x55\x56\x57\x00"), nil},
+		encoderTest{`"XYZ["`, []byte("\x58\x59\x5a\x5b\x00"), nil},
+		encoderTest{`"\\]^_"`, []byte("\x5c\x5d\x5e\x5f\x00"), nil},
+		encoderTest{"\"`abc\"", []byte("\x60\x61\x62\x63\x00"), nil},
+		encoderTest{`"defg"`, []byte("\x64\x65\x66\x67\x00"), nil},
+		encoderTest{`"hijk"`, []byte("\x68\x69\x6a\x6b\x00"), nil},
+		encoderTest{`"lmno"`, []byte("\x6c\x6d\x6e\x6f\x00"), nil},
+		encoderTest{`"pqrs"`, []byte("\x70\x71\x72\x73\x00"), nil},
+		encoderTest{`"tuvw"`, []byte("\x74\x75\x76\x77\x00"), nil},
+		encoderTest{`"xyz{"`, []byte("\x78\x79\x7a\x7b\x00"), nil},
+		encoderTest{`"|}~\x7F"`, []byte("\x7c\x7d\x7e\x7f\x00"), nil},
+		encoderTest{`"\\x00"`, []byte("\x5c\x78\x30\x30\x00"), nil},
+	}
+	var arrInvalid = []string{"dog", "0-0-0-0-0", ".", " ", ""}
+	for _, str := range arrInvalid {
+		err := fmt.Errorf("CSTR input string must be double-quoted: (%s)", str)
+		tests = append(tests, encoderTest{str, zero, err})
+	}
+	arrInvalid = []string{`"\"`, `"""`}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetCSTRFromQuotedEscapedString(atom, input.(string))
+	})
+}
+
+func TestSetDATAFromHexString(t *testing.T) {
+	zero := []byte(nil)
+	tests := []encoderTest{
+		encoderTest{"0x00", []byte("\x00"), nil},
+		encoderTest{"0x0000", []byte("\x00\x00"), nil},
+		encoderTest{"0x00000000", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"0x0000000000000000", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0xFF", []byte("\xFF"), nil},
+		encoderTest{"0xFFFF", []byte("\xFF\xFF"), nil},
+		encoderTest{"0xFFFFFFFF", []byte("\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"0xFFFFFFFFFFFFFFFF", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"", zero, fmt.Errorf("hexadecimal string should start with 0x, got \"\"")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetDATAFromHexString(atom, input.(string))
+	})
+}

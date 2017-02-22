@@ -263,8 +263,8 @@ func (a *Atom) MarshalBinary() (data []byte, err error) {
 	return buf.Bytes(), err
 }
 
-// Encode this atom and its children to binary bytes.
-// Write bytes to the given io.Writer.
+// Serialize this atom and its children to bytes.
+// Write byte stream to the given io.Writer.
 func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	// write atom header
 	var name [4]byte

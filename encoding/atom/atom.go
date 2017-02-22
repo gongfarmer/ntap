@@ -16,7 +16,7 @@ import (
 	"unicode"
 )
 
-// Verify that type Atom meets encoding interfaces at compile time
+// Verify that type Atom satisifies these encoding interfaces at compile time
 var _ encoding.BinaryUnmarshaler = &Atom{}
 var _ encoding.BinaryMarshaler = &Atom{}
 var _ encoding.TextUnmarshaler = &Atom{}
@@ -100,18 +100,21 @@ func (a Atom) String() string {
 }
 
 // AddChild makes the Atom pointed to by the argument a child of this Atom.
-// Panics when called on non-container AToms.
-func (c *Atom) AddChild(a *Atom) {
-	if c.Type() == CONT {
-		c.Children = append(c.Children, a)
-	} else {
-		panic(fmt.Errorf("Cannot add child to non-CONT atom %s:%s", c.Name, c.Type()))
+// Returns false when called on non-container Atoms.
+func (c *Atom) AddChild(a *Atom) bool {
+	if c.typ != CONT {
+		return false
 	}
+	c.Children = append(c.Children, a)
+	return true
 }
 
 // NumChildren returns a count of the number of children of this Atom.
-// Returns 0 for non-container Atoms.
+// Returns -1 for non-container Atoms.
 func (c *Atom) NumChildren() int {
+	if c.typ != CONT {
+		return -1
+	}
 	return len(c.Children)
 }
 
@@ -127,9 +130,7 @@ func (c *Atom) getAtomList(list *([]*Atom)) []*Atom {
 	return *list
 }
 
-// FromFile reads the filepath given as an argument, and attempts to read it in
-// as a binary AtomContainer.
-// On success, returns an Atom object. Returns an error otherwise.
+// FromFile reads a binary AtomContainer from the named file path.
 func FromFile(path string) (a Atom, err error) {
 	fstat, err := os.Stat(path)
 	if err != nil {

@@ -60,26 +60,26 @@ const (
 type (
 	// FIXME: switch these to interfaces?
 	decoder struct {
-		String      func(buf []byte) (string, error)
-		StringRaw   func(buf []byte) (string, error)
-		Bool        func(buf []byte) (bool, error)
-		Uint        func(buf []byte) (uint64, error)
-		Int         func(buf []byte) (int64, error)
-		Float       func(buf []byte) (float64, error)
-		SliceOfUint func(buf []byte) ([]uint64, error)
-		SliceOfInt  func(buf []byte) ([]int64, error)
-		SliceOfByte func(buf []byte) ([]byte, error)
+		String        func(buf []byte) (string, error)
+		StringEscaped func(buf []byte) (string, error)
+		Bool          func(buf []byte) (bool, error)
+		Uint          func(buf []byte) (uint64, error)
+		Int           func(buf []byte) (int64, error)
+		Float         func(buf []byte) (float64, error)
+		SliceOfUint   func(buf []byte) ([]uint64, error)
+		SliceOfInt    func(buf []byte) ([]int64, error)
+		SliceOfByte   func(buf []byte) ([]byte, error)
 	}
 	encoder struct {
-		SetString      func(*Atom, string) error
-		SetStringRaw   func(*Atom, string) error
-		SetBool        func(*Atom, bool) error
-		SetUint        func(*Atom, uint64) error
-		SetInt         func(*Atom, int64) error
-		SetFloat       func(*Atom, float64) error
-		SetSliceOfUint func(*Atom, []uint64) error
-		SetSliceOfInt  func(*Atom, []int64) error
-		SetSliceOfByte func(*Atom, []byte) error
+		SetString        func(*Atom, string) error
+		SetStringEscaped func(*Atom, string) error
+		SetBool          func(*Atom, bool) error
+		SetUint          func(*Atom, uint64) error
+		SetInt           func(*Atom, int64) error
+		SetFloat         func(*Atom, float64) error
+		SetSliceOfUint   func(*Atom, []uint64) error
+		SetSliceOfInt    func(*Atom, []int64) error
+		SetSliceOfByte   func(*Atom, []byte) error
 	}
 	codec struct {
 		Atom    *Atom
@@ -143,14 +143,15 @@ func NewCodec(a *Atom) *codec {
 // the ADE data type's codec.
 func NewEncoder(i interface{}) encoder {
 	return encoder{
-		SetString:      func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
-		SetBool:        func(a *Atom, v bool) (e error) { return noEncoder(a, "bool") },
-		SetUint:        func(a *Atom, v uint64) (e error) { return noEncoder(a, "uint64") },
-		SetInt:         func(a *Atom, v int64) (e error) { return noEncoder(a, "int64") },
-		SetFloat:       func(a *Atom, v float64) (e error) { return noEncoder(a, "float64") },
-		SetSliceOfUint: func(a *Atom, v []uint64) (e error) { return noEncoder(a, "[]uint64") },
-		SetSliceOfInt:  func(a *Atom, v []int64) (e error) { return noEncoder(a, "[]int64") },
-		SetSliceOfByte: func(a *Atom, v []byte) (e error) { return noEncoder(a, "[]byte") },
+		SetString:        func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
+		SetStringEscaped: func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
+		SetBool:          func(a *Atom, v bool) (e error) { return noEncoder(a, "bool") },
+		SetUint:          func(a *Atom, v uint64) (e error) { return noEncoder(a, "uint64") },
+		SetInt:           func(a *Atom, v int64) (e error) { return noEncoder(a, "int64") },
+		SetFloat:         func(a *Atom, v float64) (e error) { return noEncoder(a, "float64") },
+		SetSliceOfUint:   func(a *Atom, v []uint64) (e error) { return noEncoder(a, "[]uint64") },
+		SetSliceOfInt:    func(a *Atom, v []int64) (e error) { return noEncoder(a, "[]int64") },
+		SetSliceOfByte:   func(a *Atom, v []byte) (e error) { return noEncoder(a, "[]byte") },
 	}
 }
 
@@ -162,15 +163,15 @@ func NewEncoder(i interface{}) encoder {
 // the ADE data type's codec.
 func NewDecoder(from ADEType) decoder {
 	return decoder{
-		String:      func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
-		StringRaw:   func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
-		Bool:        func([]byte) (v bool, e error) { return v, noDecoder(from, "bool") },
-		Uint:        func([]byte) (v uint64, e error) { return v, noDecoder(from, "uint64") },
-		Int:         func([]byte) (v int64, e error) { return v, noDecoder(from, "int64") },
-		Float:       func([]byte) (v float64, e error) { return v, noDecoder(from, "float64") },
-		SliceOfUint: func([]byte) (v []uint64, e error) { return v, noDecoder(from, "[]uint64") },
-		SliceOfInt:  func([]byte) (v []int64, e error) { return v, noDecoder(from, "[]int64") },
-		SliceOfByte: func(data []byte) (v []byte, e error) { return data, nil },
+		String:        func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
+		StringEscaped: func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
+		Bool:          func([]byte) (v bool, e error) { return v, noDecoder(from, "bool") },
+		Uint:          func([]byte) (v uint64, e error) { return v, noDecoder(from, "uint64") },
+		Int:           func([]byte) (v int64, e error) { return v, noDecoder(from, "int64") },
+		Float:         func([]byte) (v float64, e error) { return v, noDecoder(from, "float64") },
+		SliceOfUint:   func([]byte) (v []uint64, e error) { return v, noDecoder(from, "[]uint64") },
+		SliceOfInt:    func([]byte) (v []int64, e error) { return v, noDecoder(from, "[]int64") },
+		SliceOfByte:   func(data []byte) (v []byte, e error) { return data, nil },
 	}
 }
 
@@ -186,7 +187,7 @@ func noDecoder(from ADEType, to GoType) error {
 
 // Decoder methods: pass atom data to the decoder for type conversion to go type
 func (c codec) String() (string, error)        { return c.Decoder.String(c.Atom.data) }
-func (c codec) StringRaw() (string, error)     { return c.Decoder.StringRaw(c.Atom.data) }
+func (c codec) StringEscaped() (string, error) { return c.Decoder.StringEscaped(c.Atom.data) }
 func (c codec) Bool() (bool, error)            { return c.Decoder.Bool(c.Atom.data) }
 func (c codec) Uint() (uint64, error)          { return c.Decoder.Uint(c.Atom.data) }
 func (c codec) Int() (int64, error)            { return c.Decoder.Int(c.Atom.data) }
@@ -197,6 +198,7 @@ func (c codec) SliceOfByte() ([]byte, error)   { return c.Atom.data, nil }
 
 // Encoder methods: convert given data type to []byte and store in ATom
 func (c codec) SetString(v string) error        { return c.Encoder.SetString(c.Atom, v) }
+func (c codec) SetStringEscaped(v string) error { return c.Encoder.SetStringEscaped(c.Atom, v) }
 func (c codec) SetBool(v bool) error            { return c.Encoder.SetBool(c.Atom, v) }
 func (c codec) SetUint(v uint64) error          { return c.Encoder.SetUint(c.Atom, v) }
 func (c codec) SetInt(v int64) error            { return c.Encoder.SetInt(c.Atom, v) }
@@ -341,13 +343,13 @@ func init() {
 
 	// ADE String types
 	dec = NewDecoder(CSTR)
-	dec.StringRaw = CSTRToString
-	dec.String = CSTRToStringEscaped
+	dec.String = CSTRToString
+	dec.StringEscaped = CSTRToStringEscaped
 	decoderByType[CSTR] = dec
 
 	dec = NewDecoder(USTR)
-	dec.StringRaw = USTRToString
-	dec.String = USTRToStringEscaped
+	dec.String = USTRToString
+	dec.StringEscaped = USTRToStringEscaped
 	decoderByType[USTR] = dec
 
 	// DATA type, and aliases
@@ -1029,13 +1031,13 @@ func init() {
 
 	// ADE String types
 	enc = NewEncoder(CSTR)
-	//	enc.SetStringRaw = StringToCSTR
-	enc.SetString = SetCSTRFromEscapedString
+	enc.SetString = SetCSTRFromString
+	enc.SetStringEscaped = SetCSTRFromQuotedEscapedString
 	encoderByType[CSTR] = enc
 
 	enc = NewEncoder(USTR)
-	enc.SetStringRaw = SetUSTRFromString
-	enc.SetString = SetUSTRFromQuotedEscapedString
+	enc.SetString = SetUSTRFromString
+	enc.SetStringEscaped = SetUSTRFromQuotedEscapedString
 	encoderByType[USTR] = enc
 
 	// DATA type, and aliases
@@ -1755,18 +1757,38 @@ func SetUUIDFromString(a *Atom, v string) (e error) {
 }
 
 // Uses NULL terminator
-func SetCSTRFromEscapedString(a *Atom, v string) (e error) {
-	size := len(v)
-	buf := make([]byte, size)
-	copy(buf[:], v)
+func SetCSTRFromQuotedEscapedString(a *Atom, v string) (e error) {
 
-	// verify delimiters
-	if buf[0] != '"' || buf[size-1] != '"' {
+	// verify delimiters (required for strconv.Unquote() )
+	size := len(v)
+	if size < 2 || v[0] != '"' || v[size-1] != '"' {
 		return fmt.Errorf("CSTR input string must be double-quoted: (%s)", v)
 	}
 
-	buf[size-1] = '\x00' // replace end delimiter with null byte terminator
-	a.data = buf[1:]     // from 1, skips start delimiter
+	// unescape the string
+	var s string
+	s, e = strconv.Unquote(v)
+	if e != nil {
+		return errStrInvalid("CSTR", v)
+	}
+
+	// allocate space
+	size = len(s)
+	buf := make([]byte, size+1)
+	copy(buf[:], s)
+
+	buf[size] = '\x00'
+	a.data = buf
+	return
+}
+
+// Uses NULL terminator
+func SetCSTRFromString(a *Atom, v string) (e error) {
+	size := len(v)
+	buf := make([]byte, size+1)
+	copy(buf[:], v)
+	buf[size] = '\x00'
+	a.data = buf
 	return
 }
 
