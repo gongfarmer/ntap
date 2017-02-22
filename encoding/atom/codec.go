@@ -1762,7 +1762,7 @@ func SetCSTRFromEscapedString(a *Atom, v string) (e error) {
 
 	// verify delimiters
 	if buf[0] != '"' || buf[size-1] != '"' {
-		return fmt.Errorf("CSTR value must be double-quoted: (%s)", v)
+		return fmt.Errorf("CSTR input string must be double-quoted: (%s)", v)
 	}
 
 	buf[size-1] = '\x00' // replace end delimiter with null byte terminator
@@ -1780,7 +1780,7 @@ func SetCSTRFromEscapedString(a *Atom, v string) (e error) {
 func SetUSTRFromQuotedEscapedString(a *Atom, v string) (e error) {
 
 	// verify delimiters (required for strconv.Unquote() )
-	if len(v) > 2 && (v[0] != '"' || v[len(v)-1] != '"') {
+	if len(v) < 2 || (v[0] != '"' || v[len(v)-1] != '"') {
 		return fmt.Errorf("USTR input string must be double-quoted: (%s)", v)
 	}
 
@@ -1788,7 +1788,7 @@ func SetUSTRFromQuotedEscapedString(a *Atom, v string) (e error) {
 	var s string
 	s, e = strconv.Unquote(v)
 	if e != nil {
-		return
+		return errStrInvalid("USTR", v)
 	}
 
 	return SetUSTRFromString(a, s)
