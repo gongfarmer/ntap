@@ -894,7 +894,7 @@ func parseFraction(p *parser) parseFunc {
 	}
 
 	// Send tokens for type conversion
-	err := p.theAtom.Value.SetString(strings.Join(values, " "))
+	err := p.theAtom.Value.SetString(strings.Join(values, ""))
 	if err != nil {
 		p.errorf(err.Error())
 		return nil
