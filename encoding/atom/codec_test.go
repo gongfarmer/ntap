@@ -1005,6 +1005,7 @@ func TestSR32ToString(t *testing.T) {
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
 		decoderTest{[]byte("\x00\x01\xff\xff"), "1/-1", nil},
+		decoderTest{[]byte("\x00\x01\xff\xff"), "1/-1", nil},
 		decoderTest{[]byte("\xff\xff\x00\x01"), "-1/1", nil},
 		decoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
 		decoderTest{[]byte("\x00\x01\x00\x02"), "1/2", nil},
@@ -1298,7 +1299,7 @@ func TestIP32ToString(t *testing.T) {
 		decoderTest{[]byte("\xC0\xA8\x01\x80"), "192.168.1.128", nil},
 		decoderTest{[]byte("\xF1\xAB\xCD\xEF"), "241.171.205.239", nil},
 		decoderTest{[]byte("\xff\xff\xff\xff"), "255.255.255.255", nil},
-		decoderTest{[]byte("\x00\x00\x00\x00\xff\xff\xff\xff"), "0.0.0.0-255.255.255.255", nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\xff\xff\xff\xff"), "0x00000000FFFFFFFF", nil},
 		decoderTest{[]byte(""), zero, byteCountErr(0)},
 		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
 		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
@@ -2822,7 +2823,6 @@ func TestSetCSTRFromQuotedEscapedString(t *testing.T) {
 }
 
 func TestSetDATAFromHexString(t *testing.T) {
-	zero := []byte(nil)
 	tests := []encoderTest{
 		encoderTest{"0x00", []byte("\x00"), nil},
 		encoderTest{"0x0000", []byte("\x00\x00"), nil},
@@ -2832,7 +2832,7 @@ func TestSetDATAFromHexString(t *testing.T) {
 		encoderTest{"0xFFFF", []byte("\xFF\xFF"), nil},
 		encoderTest{"0xFFFFFFFF", []byte("\xFF\xFF\xFF\xFF"), nil},
 		encoderTest{"0xFFFFFFFFFFFFFFFF", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
-		encoderTest{"", zero, fmt.Errorf("hexadecimal string should start with 0x, got \"\"")},
+		encoderTest{"", []byte{}, nil},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetDATAFromHexString(atom, input.(string))

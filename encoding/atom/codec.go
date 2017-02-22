@@ -776,7 +776,7 @@ func UUIDToString(buf []byte) (v string, e error) {
 //
 // The IP32 type may optionally include multiple 4-byte values, which have
 // occasionally (rarely) been used to represent address ranges.
-// These are represented as hex.  This matches the ADE behaviour.
+// These are represented as hex, matching the ADE ccat behaviour.
 func IP32ToString(buf []byte) (v string, e error) {
 
 	// single address is expressed as dotted quad
@@ -786,7 +786,7 @@ func IP32ToString(buf []byte) (v string, e error) {
 	}
 
 	// need 4 bytes to make a complete address
-	if 0 != len(buf)%4 {
+	if 0 != len(buf)%4 || 0 == len(buf) {
 		e = errByteCount("IP32", 4, len(buf))
 		return
 	}
@@ -1850,10 +1850,17 @@ func SetUSTRFromString(a *Atom, v string) (e error) {
 }
 
 func SetDATAFromHexString(a *Atom, v string) (e error) {
+
+	// empty input string results in empty data section
+	if len(v) == 0 {
+		a.data = []byte{}
+		return
+	}
+
+	// non-empty input must be strictly hex
 	if !strings.HasPrefix(v, "0x") {
 		return fmt.Errorf("hexadecimal string should start with 0x, got \"%s\"", v)
 	}
-
 	buffer, e := hex.DecodeString(v[2:])
 	if e != nil {
 		return

@@ -456,12 +456,14 @@ func lexIPAD(l *lexer) stateFn {
 }
 
 func lexHexData(l *lexer) stateFn {
-	l.next()
-	l.next()
-	if l.buffer() != "0x" {
-		return l.errorf("hex data type should start with 0x, got %s", l.buffer())
+	if l.peek() != '\n' { // empty data section is legal
+		l.next()
+		l.next()
+		if l.buffer() != "0x" {
+			return l.errorf("hex data type should start with 0x, got %s", l.buffer())
+		}
+		l.acceptRun(hexDigits)
 	}
-	l.acceptRun(hexDigits)
 	l.emit(itemString)
 	return lexEndOfLine
 }
