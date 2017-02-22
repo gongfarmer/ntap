@@ -771,21 +771,33 @@ func UUIDToString(buf []byte) (v string, e error) {
 	return uuid.String(), e
 }
 
-// IP32ToString returns an IP32 value as a string.
+// IP32ToString returns an IP32 value as a string with the IP address
+// represented as a dotted quad (eg. 192.168.1.128).
 //
-// The IP32 type may optionally include a second 4-byte value, which represents
-// a range of IPv4 addresses.  In this case, both addresses will be returned,
-// separated by a dash (-) character.
+// The IP32 type may optionally include multiple 4-byte values, which have
+// occasionally (rarely) been used to represent address ranges.
+// These are represented as hex.  This matches the ADE behaviour.
 func IP32ToString(buf []byte) (v string, e error) {
-	switch len(buf) {
-	case 4:
+
+	// single address is expressed as dotted quad
+	if len(buf) == 4 {
 		v = fmt.Sprintf("%d.%d.%d.%d", buf[0], buf[1], buf[2], buf[3])
-	case 8:
-		v = fmt.Sprintf("%d.%d.%d.%d-%d.%d.%d.%d",
-			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7])
-	default:
-		e = errByteCount("IP32", 4, len(buf))
+		return
 	}
+
+	// need 4 bytes to make a complete address
+	if 0 != len(buf)%4 {
+		e = errByteCount("IP32", 4, len(buf))
+		return
+	}
+
+	// multiple addresses are expressed as hex
+	var addrs = []string{"0x"}
+	for i := 0; i < len(buf); i += 4 {
+		addrs = append(addrs, fmt.Sprintf("%02X%02X%02X%02X", buf[i], buf[i+1], buf[i+2], buf[i+3]))
+	}
+	v = strings.Join(addrs, "")
+
 	return
 }
 

@@ -15,7 +15,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,8 +25,6 @@ type cont struct {
 	atomPtr *Atom
 	end     uint32
 }
-
-var ErrInvalidInput = errors.New("Input is invalid for conversion to Atom")
 
 // LIFO stack of Atoms of type container.
 type containerStack []cont
@@ -156,7 +153,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		if !h.isContainer() {
 			data, err = readAtomData(r, h.Size-headerSize, &bytesRead)
 			if err != nil {
-				return atoms, ErrInvalidInput
+				return atoms, fmt.Errorf("Input is invalid for conversion to Atom")
 			}
 		}
 		adeType := ADEType(h.Type[:])

@@ -108,7 +108,7 @@ func main() {
 
 	// Parse input as binary stream
 	atoms, err := atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
-	if err != nil && err != atom.ErrInvalidInput {
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
