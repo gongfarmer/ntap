@@ -1308,6 +1308,25 @@ func TestIP32ToString(t *testing.T) {
 	})
 }
 
+func TestIP32ToUint64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curry("IP32", 4)
+	zero := uint64(0)
+	tests := []decoderTest{
+		decoderTest{[]byte("\x00\x00\x00\x00"), uint64(0), nil},
+		decoderTest{[]byte("\x11\x22\x33\x44"), uint64(287454020), nil},
+		decoderTest{[]byte("\xC0\xA8\x01\x80"), uint64(3232235904), nil},
+		decoderTest{[]byte("\xF1\xAB\xCD\xEF"), uint64(4054568431), nil},
+		decoderTest{[]byte("\xff\xff\xff\xff"), uint64(math.MaxUint32), nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\xff\xff\xff\xff"), uint64(math.MaxUint32), nil},
+		decoderTest{[]byte(""), zero, byteCountErr(0)},
+		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return IP32ToUint64(input)
+	})
+}
+
 func TestIPADToString(t *testing.T) {
 	tests := []decoderTest{
 		decoderTest{[]byte("\x30\x2e\x30\x2e\x30\x2e\x30\x00"), "\"0.0.0.0\"", nil},
@@ -2259,5 +2278,287 @@ func TestSetFP64FromFloat64(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetFP64FromFloat64(atom, input.(float64))
+	})
+}
+
+// FIXME
+//func SetUF32FromString(a *Atom, v string) (e error) {
+//func SetUF32FromFloat64(a *Atom, v float64) (e error) {
+//func SetUF64FromString(a *Atom, v string) (e error) {
+//func SetUF64FromFloat64(a *Atom, v float64) (e error) {
+//func SetSF32FromString(a *Atom, v string) (e error) {
+//func SetSF32FromFloat64(a *Atom, v float64) (e error) {
+//func SetSF64FromString(a *Atom, v string) (e error) {
+//func SetSF64FromFloat64(a *Atom, v float64) (e error) {
+
+func TestSetFC32FromString(t *testing.T) {
+	typ := "FC32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		// accept most printable chars
+		encoderTest{`$#\!`, []byte("\x24\x23\x5c\x21"), nil},
+		encoderTest{`%$#\`, []byte("\x25\x24\x23\x5c"), nil},
+		encoderTest{"&%$#", []byte("\x26\x25\x24\x23"), nil},
+		encoderTest{"0x27262524", []byte("\x27\x26\x25\x24"), nil},
+		encoderTest{"('&%", []byte("\x28\x27\x26\x25"), nil},
+		encoderTest{")('&", []byte("\x29\x28\x27\x26"), nil},
+		encoderTest{"*)('", []byte("\x2a\x29\x28\x27"), nil},
+		encoderTest{"+*)(", []byte("\x2b\x2a\x29\x28"), nil},
+		encoderTest{",+*)", []byte("\x2c\x2b\x2a\x29"), nil},
+		encoderTest{"-,+*", []byte("\x2d\x2c\x2b\x2a"), nil},
+		encoderTest{".-,+", []byte("\x2e\x2d\x2c\x2b"), nil},
+		encoderTest{"/.-,", []byte("\x2f\x2e\x2d\x2c"), nil},
+		encoderTest{"0/.-", []byte("\x30\x2f\x2e\x2d"), nil},
+		encoderTest{"10/.", []byte("\x31\x30\x2f\x2e"), nil},
+		encoderTest{"210/", []byte("\x32\x31\x30\x2f"), nil},
+		encoderTest{"[ZYX", []byte("\x5b\x5a\x59\x58"), nil},
+		encoderTest{`\[ZY`, []byte("\x5c\x5b\x5a\x59"), nil},
+		encoderTest{`]\[Z`, []byte("\x5d\x5c\x5b\x5a"), nil},
+		encoderTest{`^]\[`, []byte("\x5e\x5d\x5c\x5b"), nil},
+		encoderTest{`_^]\`, []byte("\x5f\x5e\x5d\x5c"), nil},
+		encoderTest{"`_^]", []byte("\x60\x5f\x5e\x5d"), nil},
+		encoderTest{"a`_^", []byte("\x61\x60\x5f\x5e"), nil},
+		encoderTest{"ba`_", []byte("\x62\x61\x60\x5f"), nil},
+		encoderTest{"cba`", []byte("\x63\x62\x61\x60"), nil},
+		encoderTest{"{zyx", []byte("\x7b\x7a\x79\x78"), nil},
+		encoderTest{"|{zy", []byte("\x7c\x7b\x7a\x79"), nil},
+		encoderTest{"}|{z", []byte("\x7d\x7c\x7b\x7a"), nil},
+		encoderTest{"~}|{", []byte("\x7e\x7d\x7c\x7b"), nil},
+
+		// accept strings expressed as hex, even if unprintable
+		encoderTest{"0x00000000", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"0x00000001", []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{"0x00000002", []byte("\x00\x00\x00\x02"), nil},
+		encoderTest{"0x0A000000", []byte("\x0a\x00\x00\x00"), nil},
+		encoderTest{"0x0B000000", []byte("\x0b\x00\x00\x00"), nil},
+		encoderTest{"0x0C000000", []byte("\x0c\x00\x00\x00"), nil},
+		encoderTest{"0x0D000000", []byte("\x0d\x00\x00\x00"), nil},
+		encoderTest{"0x0E000000", []byte("\x0e\x00\x00\x00"), nil},
+		encoderTest{"0x0F000000", []byte("\x0f\x00\x00\x00"), nil},
+		encoderTest{"0x207E7D7C", []byte("\x20\x7e\x7d\x7c"), nil},
+		encoderTest{"0x21207E7D", []byte("\x21\x20\x7e\x7d"), nil},
+		encoderTest{"0x5C21207E", []byte("\x5c\x21\x20\x7e"), nil},
+		encoderTest{"0x235C2120", []byte("\x23\x5c\x21\x20"), nil},
+		encoderTest{"0x20202020", []byte("\x20\x20\x20\x20"), nil},
+		encoderTest{"0x202020", zero, errStrInvalid(typ, "0x202020")},
+		encoderTest{"0x2020", zero, fmt.Errorf("FC32 value is too long: (%s)", "0x2020")},
+		encoderTest{"0x20", []byte("0x20"), nil},
+		encoderTest{"0x", zero, errStrInvalid(typ, "0x")},
+
+		// also accept strings with delimiters
+		encoderTest{"'('&%'", []byte("\x28\x27\x26\x25"), nil},
+		encoderTest{"')('&'", []byte("\x29\x28\x27\x26"), nil},
+		encoderTest{"'*)(''", []byte("\x2a\x29\x28\x27"), nil},
+		encoderTest{"'+*)('", []byte("\x2b\x2a\x29\x28"), nil},
+		encoderTest{"',+*)'", []byte("\x2c\x2b\x2a\x29"), nil},
+		encoderTest{"'-,+*'", []byte("\x2d\x2c\x2b\x2a"), nil},
+		encoderTest{"'.-,+'", []byte("\x2e\x2d\x2c\x2b"), nil},
+		encoderTest{"'abcd", zero, errStrInvalid(typ, "'abcd")},
+		encoderTest{"abcd'", zero, errStrInvalid(typ, "abcd'")},
+
+		// don't accept both hex and delimiters, it's one or the other
+		encoderTest{"'0x207E7D7C'", zero, errStrInvalid(typ, "'0x207E7D7C'")},
+		encoderTest{"'0x21207E7D'", zero, errStrInvalid(typ, "'0x21207E7D'")},
+		encoderTest{"'0x'", []byte("'0x'"), nil},
+
+		// don't accept strings with incorrect lengths
+		encoderTest{"", zero, errStrInvalid(typ, "")},
+		encoderTest{"0", zero, errStrInvalid(typ, "0")},
+		encoderTest{"00", zero, errStrInvalid(typ, "00")},
+		encoderTest{"R0000000", zero, errStrInvalid(typ, "R0000000")},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetFC32FromString(atom, input.(string))
+	})
+}
+
+func TestSetFC32FromUint64(t *testing.T) {
+	typ := "FC32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{uint64(0x207e7d7c), []byte("\x20\x7e\x7d\x7c"), nil},
+		encoderTest{uint64(0x21207e7d), []byte("\x21\x20\x7e\x7d"), nil},
+		encoderTest{uint64(0x5c21207e), []byte("\x5c\x21\x20\x7e"), nil},
+		encoderTest{uint64(0x235c2120), []byte("\x23\x5c\x21\x20"), nil},
+		encoderTest{uint64(0x24235c21), []byte("\x24\x23\x5c\x21"), nil},
+		encoderTest{uint64(0x2524235c), []byte("\x25\x24\x23\x5c"), nil},
+		encoderTest{uint64(0x26252423), []byte("\x26\x25\x24\x23"), nil},
+		encoderTest{uint64(0x27262524), []byte("\x27\x26\x25\x24"), nil},
+		encoderTest{uint64(0x28272625), []byte("\x28\x27\x26\x25"), nil},
+		encoderTest{uint64(0x29282726), []byte("\x29\x28\x27\x26"), nil},
+		encoderTest{uint64(0x2a292827), []byte("\x2a\x29\x28\x27"), nil},
+		encoderTest{uint64(0x2b2a2928), []byte("\x2b\x2a\x29\x28"), nil},
+		encoderTest{uint64(0x2c2b2a29), []byte("\x2c\x2b\x2a\x29"), nil},
+		encoderTest{uint64(0x2d2c2b2a), []byte("\x2d\x2c\x2b\x2a"), nil},
+		encoderTest{uint64(0x2e2d2c2b), []byte("\x2e\x2d\x2c\x2b"), nil},
+		encoderTest{uint64(0x2f2e2d2c), []byte("\x2f\x2e\x2d\x2c"), nil},
+		encoderTest{uint64(0x302f2e2d), []byte("\x30\x2f\x2e\x2d"), nil},
+		encoderTest{uint64(0x31302f2e), []byte("\x31\x30\x2f\x2e"), nil},
+		encoderTest{uint64(0x3231302f), []byte("\x32\x31\x30\x2f"), nil},
+		encoderTest{uint64(0x5b5a5958), []byte("\x5b\x5a\x59\x58"), nil},
+		encoderTest{uint64(0x5c5b5a59), []byte("\x5c\x5b\x5a\x59"), nil},
+		encoderTest{uint64(0x5d5c5b5a), []byte("\x5d\x5c\x5b\x5a"), nil},
+		encoderTest{uint64(0x5e5d5c5b), []byte("\x5e\x5d\x5c\x5b"), nil},
+		encoderTest{uint64(0x5f5e5d5c), []byte("\x5f\x5e\x5d\x5c"), nil},
+		encoderTest{uint64(0x605f5e5d), []byte("\x60\x5f\x5e\x5d"), nil},
+		encoderTest{uint64(0x61605f5e), []byte("\x61\x60\x5f\x5e"), nil},
+		encoderTest{uint64(0x6261605f), []byte("\x62\x61\x60\x5f"), nil},
+		encoderTest{uint64(0x63626160), []byte("\x63\x62\x61\x60"), nil},
+		encoderTest{uint64(0x7b7a7978), []byte("\x7b\x7a\x79\x78"), nil},
+		encoderTest{uint64(0x7c7b7a79), []byte("\x7c\x7b\x7a\x79"), nil},
+		encoderTest{uint64(0x7d7c7b7a), []byte("\x7d\x7c\x7b\x7a"), nil},
+		encoderTest{uint64(0x7e7d7c7b), []byte("\x7e\x7d\x7c\x7b"), nil},
+		encoderTest{uint64(0x20202020), []byte("\x20\x20\x20\x20"), nil},
+		encoderTest{uint64(0x00000000), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(0x00000001), []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{uint64(0x00000002), []byte("\x00\x00\x00\x02"), nil},
+		encoderTest{uint64(0x00000003), []byte("\x00\x00\x00\x03"), nil},
+		encoderTest{uint64(0x00000004), []byte("\x00\x00\x00\x04"), nil},
+		encoderTest{uint64(0x00000005), []byte("\x00\x00\x00\x05"), nil},
+		encoderTest{uint64(0x00000006), []byte("\x00\x00\x00\x06"), nil},
+		encoderTest{uint64(0x00000007), []byte("\x00\x00\x00\x07"), nil},
+		encoderTest{uint64(0x00000008), []byte("\x00\x00\x00\x08"), nil},
+		encoderTest{uint64(0x00000009), []byte("\x00\x00\x00\x09"), nil},
+		encoderTest{uint64(0x0000000A), []byte("\x00\x00\x00\x0a"), nil},
+		encoderTest{uint64(0x0000000B), []byte("\x00\x00\x00\x0b"), nil},
+		encoderTest{uint64(0x0000000C), []byte("\x00\x00\x00\x0c"), nil},
+		encoderTest{uint64(0x0000000D), []byte("\x00\x00\x00\x0d"), nil},
+		encoderTest{uint64(0x0000000E), []byte("\x00\x00\x00\x0e"), nil},
+		encoderTest{uint64(0x0000000F), []byte("\x00\x00\x00\x0f"), nil},
+		encoderTest{uint64(0x01000000), []byte("\x01\x00\x00\x00"), nil},
+		encoderTest{uint64(0x02000000), []byte("\x02\x00\x00\x00"), nil},
+		encoderTest{uint64(0x03000000), []byte("\x03\x00\x00\x00"), nil},
+		encoderTest{uint64(0x04000000), []byte("\x04\x00\x00\x00"), nil},
+		encoderTest{uint64(0x05000000), []byte("\x05\x00\x00\x00"), nil},
+		encoderTest{uint64(0x06000000), []byte("\x06\x00\x00\x00"), nil},
+		encoderTest{uint64(0x07000000), []byte("\x07\x00\x00\x00"), nil},
+		encoderTest{uint64(0x08000000), []byte("\x08\x00\x00\x00"), nil},
+		encoderTest{uint64(0x09000000), []byte("\x09\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0A000000), []byte("\x0a\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0B000000), []byte("\x0b\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0C000000), []byte("\x0c\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0D000000), []byte("\x0d\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0E000000), []byte("\x0e\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0F000000), []byte("\x0f\x00\x00\x00"), nil},
+		encoderTest{uint64(0x0100000000), zero, errRange(typ, uint64(0x0100000000))},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetFC32FromUint64(atom, input.(uint64))
+	})
+}
+
+func TestSetIP32FromString(t *testing.T) {
+	zero := make([]byte, 4)
+	typ := "IP32"
+	tests := []encoderTest{
+		encoderTest{"0.0.0.0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"17.34.51.68", []byte("\x11\x22\x33\x44"), nil},
+		encoderTest{"192.168.1.128", []byte("\xC0\xA8\x01\x80"), nil},
+		encoderTest{"241.171.205.239", []byte("\xF1\xAB\xCD\xEF"), nil},
+		encoderTest{"255.255.255.255", []byte("\xff\xff\xff\xff"), nil},
+		encoderTest{"127.0.0.1", []byte("\x7F\x00\x00\x01"), nil},
+		encoderTest{"0.0.0.0-255.255.255.255", zero, errStrInvalid("IP32", "0.0.0.0-255.255.255.255")},
+
+		// hex form supports multiple addresses
+		encoderTest{"0x7F000001", []byte("\x7F\x00\x00\x01"), nil},
+		encoderTest{"0x7F0000017F000001", []byte("\x7F\x00\x00\x01\x7F\x00\x00\x01"), nil},
+		encoderTest{"0x7F0000017F0000017F000001", []byte("\x7F\x00\x00\x01\x7F\x00\x00\x01\x7F\x00\x00\x01"), nil},
+		encoderTest{"0x7F0000017F0000017F0000017F000001", []byte("\x7F\x00\x00\x01\x7F\x00\x00\x01\x7F\x00\x00\x01\x7F\x00\x00\x01"), nil},
+		encoderTest{"0x00000000FFFFFFFF", []byte("\x00\x00\x00\x00\xff\xff\xff\xff"), nil},
+	}
+
+	var arrInvalid = []string{"dog", "...", ".", " ", "",
+		"192.168.1.1.128", "192.168..1", "192.168.1.", "192..168.1", ".192.168.1",
+		"1.1.1", "1.1.1.256", "256.1.1.1", "1000.1.1.1",
+		"0x", "0x7f", "0x7f00", "0x7f0000", "0x7f00000", "0x00000000FFFFFFF", "0x00000000FFFFFFFR",
+	}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetIP32FromString(atom, input.(string))
+	})
+}
+func TestSetIP32FromUint64(t *testing.T) {
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(287454020), []byte("\x11\x22\x33\x44"), nil},
+		encoderTest{uint64(3232235904), []byte("\xC0\xA8\x01\x80"), nil},
+		encoderTest{uint64(4054568431), []byte("\xF1\xAB\xCD\xEF"), nil},
+		encoderTest{uint64(0xFFFFFFFF), []byte("\xff\xff\xff\xff"), nil},
+		encoderTest{uint64(0x7F000001), []byte("\x7F\x00\x00\x01"), nil},
+		encoderTest{uint64(0x00000000FFFFFFFF), []byte("\xff\xff\xff\xff"), nil},
+		encoderTest{uint64(0x00000001FFFFFFFF), []byte("\x00\x00\x00\x01\xff\xff\xff\xff"), nil},
+		encoderTest{uint64(0xFFFFFFFFFFFFFFFF), []byte("\xff\xff\xff\xff\xff\xff\xff\xff"), nil},
+		encoderTest{uint64(0x7F0000017F000001), []byte("\x7F\x00\x00\x01\x7F\x00\x00\x01"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetIP32FromUint64(atom, input.(uint64))
+	})
+}
+func TestSetIPADFromString(t *testing.T) {
+	typ := "IPAD"
+	zero := []byte(nil)
+	tests := []encoderTest{
+		encoderTest{"0.0.0.0", []byte("\x30\x2e\x30\x2e\x30\x2e\x30\x00"), nil},
+		encoderTest{"1.1.1.1", []byte("\x31\x2e\x31\x2e\x31\x2e\x31\x00"), nil},
+		encoderTest{"1.255.3.4", []byte("\x31\x2e\x32\x35\x35\x2e\x33\x2e\x34\x00"), nil},
+		encoderTest{"10.255.255.254", []byte("\x31\x30\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x34\x00"), nil},
+		encoderTest{"127.0.0.1", []byte("\x31\x32\x37\x2e\x30\x2e\x30\x2e\x31\x00"), nil},
+		encoderTest{"172.18.5.4", []byte("\x31\x37\x32\x2e\x31\x38\x2e\x35\x2e\x34\x00"), nil},
+		encoderTest{"192.168.0.1", []byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x30\x2e\x31\x00"), nil},
+		encoderTest{"192.168.1.0", []byte("\x31\x39\x32\x2e\x31\x36\x38\x2e\x31\x2e\x30\x00"), nil},
+		encoderTest{"2001:0000:4136:e378:8000:63bf:3fff:fdd2", []byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), nil},
+		encoderTest{"2001:0000:4136:e378:8000:63bf:3fff:fdd2", []byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x30\x3a\x34\x31\x33\x36\x3a\x65\x33\x37\x38\x3a\x38\x30\x30\x30\x3a\x36\x33\x62\x66\x3a\x33\x66\x66\x66\x3a\x66\x64\x64\x32\x00"), nil},
+		encoderTest{"2001:0002:6c::430", []byte("\x32\x30\x30\x31\x3a\x30\x30\x30\x32\x3a\x36\x63\x3a\x3a\x34\x33\x30\x00"), nil},
+		encoderTest{"2001:10:240:ab::a", []byte("\x32\x30\x30\x31\x3a\x31\x30\x3a\x32\x34\x30\x3a\x61\x62\x3a\x3a\x61\x00"), nil},
+		encoderTest{"2001::1", []byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), nil},
+		encoderTest{"2001::1", []byte("\x32\x30\x30\x31\x3a\x3a\x31\x00"), nil},
+		encoderTest{"2001:db8:8:4::2", []byte("\x32\x30\x30\x31\x3a\x64\x62\x38\x3a\x38\x3a\x34\x3a\x3a\x32\x00"), nil},
+		encoderTest{"2002:cb0a:3cdd:1::1", []byte("\x32\x30\x30\x32\x3a\x63\x62\x30\x61\x3a\x33\x63\x64\x64\x3a\x31\x3a\x3a\x31\x00"), nil},
+		encoderTest{"255.0.0.1", []byte("\x32\x35\x35\x2e\x30\x2e\x30\x2e\x31\x00"), nil},
+		encoderTest{"255.255.255.255", []byte("\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x2e\x32\x35\x35\x00"), nil},
+		encoderTest{"8.8.4.4", []byte("\x38\x2e\x38\x2e\x34\x2e\x34\x00"), nil},
+		encoderTest{"::", []byte("\x3a\x3a\x00"), nil},
+		encoderTest{"::ffff:5.6.7.8", []byte("\x3a\x3a\x66\x66\x66\x66\x3a\x35\x2e\x36\x2e\x37\x2e\x38\x00"), nil},
+		encoderTest{"fdf8:f53b:82e4::53", []byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), nil},
+		encoderTest{"fdf8:f53b:82e4::53", []byte("\x66\x64\x66\x38\x3a\x66\x35\x33\x62\x3a\x38\x32\x65\x34\x3a\x3a\x35\x33\x00"), nil},
+		encoderTest{"fe80::200:5aee:feaa:20a2", []byte("\x66\x65\x38\x30\x3a\x3a\x32\x30\x30\x3a\x35\x61\x65\x65\x3a\x66\x65\x61\x61\x3a\x32\x30\x61\x32\x00"), nil},
+		encoderTest{"ff01:0:0:0:0:0:0:2", []byte("\x66\x66\x30\x31\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x30\x3a\x32\x00"), nil},
+	}
+	var arrInvalid = []string{"dog", "0-0-0-0-0", ".", " ", "",
+		"\"2001:0000:4136:e378:8000:63bf:3fff:fdd2:dog\"",
+		"\"2001:0000:4136:e378:derp:63bf:3fff:fdd2\"",
+	}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetIPADFromString(atom, input.(string))
+	})
+}
+func TestSetUUIDFromString(t *testing.T) {
+	typ := "UUID"
+	zero := make([]byte, 36)
+	tests := []encoderTest{
+		encoderTest{"64881431-B6DC-478E-B7EE-ED306619C797", []byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), nil},
+		encoderTest{"A3BFFF54-F474-42E9-AB53-01D913D118B1", []byte("\xa3\xbf\xff\x54\xf4\x74\x42\xe9\xab\x53\x01\xd9\x13\xd1\x18\xb1"), nil},
+		encoderTest{"64881431-B6DC-478E-B7EE-ED306619C797", []byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), nil},
+		encoderTest{"00000000-0000-0000-0000-000000000000", []byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{"\"00000000-0000-0000-0000-000000000000\"", []byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"\"FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF\"", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+	}
+	var arrInvalid = []string{"dog", "0-0-0-0-0", ".", " ", "",
+		"FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFF", "FFFFFFFF-FFFF-FFFF-FFF-FFFFFFFFFFFF",
+		"FFFFFFFF-FFFF-FFF-FFFF-FFFFFFFFFFFF", "FFFFFFFF-FFF-FFFF-FFFF-FFFFFFFFFFFF",
+		"FFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF", "64881431B6DC478EB7EEED306619C797",
+		"00000000-1111-2222-3333-44444444444455555555-6666-7777-8888-999999999999",
+	}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUUIDFromString(atom, input.(string))
 	})
 }

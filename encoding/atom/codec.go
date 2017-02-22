@@ -90,6 +90,14 @@ type (
 		Encoder encoder
 		Writer  io.Writer // writes bytes directly to Atom.data
 	}
+	uuidType struct {
+		TimeLow          uint32
+		TimeMid          uint16
+		TimeHiAndVersion uint16
+		ClkSeqHiRes      uint8
+		ClkSeqLow        uint8
+		Node             [6]byte
+	}
 )
 
 // error constructors
@@ -316,6 +324,7 @@ func init() {
 	// IP Address types
 	dec = NewDecoder(IP32)
 	dec.String = IP32ToString
+	dec.Uint = IP32ToUint64
 	decoderByType[IP32] = dec
 
 	dec = NewDecoder(IPAD)
@@ -734,26 +743,12 @@ func UUIDToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 16, "UUID"); e != nil {
 		return
 	}
-	var uuid struct {
-		TimeLow          uint32
-		TimeMid          uint16
-		TimeHiAndVersion uint16
-		ClkSeqHiRes      uint8
-		ClkSeqLow        uint8
-		Node             [6]byte
-	}
+	var uuid uuidType
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &uuid)
-	if e == nil {
-		v = fmt.Sprintf(
-			"%08X-%04X-%04X-%02X%02X-%012X",
-			uuid.TimeLow,
-			uuid.TimeMid,
-			uuid.TimeHiAndVersion,
-			uuid.ClkSeqHiRes,
-			uuid.ClkSeqLow,
-			uuid.Node)
+	if e != nil {
+		return
 	}
-	return
+	return uuid.String(), e
 }
 
 // IP Address types
@@ -767,6 +762,20 @@ func IP32ToString(buf []byte) (v string, e error) {
 	case 8:
 		v = fmt.Sprintf("%d.%d.%d.%d-%d.%d.%d.%d",
 			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7])
+	default:
+		e = errByteCount("IP32", 4, len(buf))
+	}
+	return
+}
+
+func IP32ToUint64(buf []byte) (v uint64, e error) {
+	switch len(buf) {
+	case 4:
+		v = uint64(binary.BigEndian.Uint32(buf))
+	case 8:
+		v = binary.BigEndian.Uint64(buf)
+	case 12, 16:
+		e = fmt.Errorf("extra-long IP32 value overflows uint64: %x", buf)
 	default:
 		e = errByteCount("IP32", 4, len(buf))
 	}
@@ -972,13 +981,13 @@ func init() {
 	// ADE Four char code
 	enc = NewEncoder(FC32)
 	enc.SetString = SetFC32FromString
-	enc.SetUint = SetFC32FromUint
+	enc.SetUint = SetFC32FromUint64
 	encoderByType[FC32] = enc
 
 	// IP Address types
 	enc = NewEncoder(IP32)
 	enc.SetString = SetIP32FromString
-	enc.SetUint = SetIP32FromUint
+	enc.SetUint = SetIP32FromUint64
 	encoderByType[IP32] = enc
 
 	enc = NewEncoder(IPAD)
@@ -1534,7 +1543,11 @@ func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 }
 
 func SetFC32FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var buf = make([]byte, 0, 4)
+	var extra string
 
 	// nonprintable chars are allowed if the name is hex-encoded
 	// this is because hex-encoded FCHR32 values may be generated
@@ -1543,25 +1556,32 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 		if !strings.HasPrefix(v, "0x") {
 			return fmt.Errorf("FC32 value is too long: (%s)", v)
 		}
-		_, e = fmt.Sscanf(v, "0x%x", &buf)
+		matched, e := fmt.Sscanf(v, "0x%x%s", &buf, &extra)
+		if e != io.EOF || matched != 1 {
+			return errStrInvalid("FC32", v)
+		}
 	case 8: // 8 hex digits
-		_, e = fmt.Sscanf(v, "%x", &buf)
+		matched, e := fmt.Sscanf(v, "%x%s", &buf, &extra)
+		if e != io.EOF || matched != 1 {
+			return errStrInvalid("FC32", v)
+		}
 	case 6: // 4 printable chars, single quote delimited
 		if !isPrintableString(v) {
 			return fmt.Errorf("FC32 value is not printable: 0x%x", v)
 		}
 		if v[0] != '\'' || v[5] != '\'' {
-			return fmt.Errorf("FC32 value lacks single quote delimiters: (%s)", v)
+			return fmt.Errorf("FC32 value is too long: (%s)", v)
 		}
 		buf = []byte(v)[1:5]
+	case 4:
+		buf = []byte(v)
 	default:
-		return fmt.Errorf("FC32 value is incorrect size: (%s)", v)
+		return errStrInvalid("FC32", v)
 	}
 
 	if len(buf) != 4 {
-		return fmt.Errorf("invalid FC32 value: (%s)", buf)
+		return errStrInvalid("FC32", v)
 	}
-
 	copied := copy(a.data, buf)
 	if copied != 4 {
 		return fmt.Errorf("expected 4 chars copied for FC32 value(%s), got %d: e", v, copied)
@@ -1569,29 +1589,38 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 	return nil
 }
 
-func SetFC32FromUint(a *Atom, v uint64) (e error) {
+func SetFC32FromUint64(a *Atom, v uint64) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	if v > math.MaxUint32 {
-		return fmt.Errorf("invalid four-char code: %x", v)
+		return errRange("FC32", v)
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v))
 	return
 }
 
+// IP32 is usually a simple 4 bytes = 4 octets type, but it also has a
+// rarely used multi-width form used to define a range.
+// The double-width form seems to be expressed solely in hex.
 func SetIP32FromString(a *Atom, v string) (e error) {
-	if strings.HasPrefix(v, "0x") {
-		i, err := strconv.ParseUint(strings.TrimPrefix(v, "0x"), 16, 64)
-		if err != nil {
-			e = fmt.Errorf("invalid hex IP32 value \"%s\": %s", v, err.Error())
-			return
-		}
-		return a.Value.SetUint(i)
+	// Set data to zero value in case of error
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
 	}
 
+	// handle multi-address form separately
+	if strings.HasPrefix(v, "0x") {
+		return SetIP32FromHexString(a, v)
+	}
+	// Only a single IPv4 address is allowed from here on.
+
+	// Extract 4 octets from string as decimal numbers
 	var oct1, oct2, oct3, oct4 uint8
-	_, e = fmt.Sscanf(v, "%d.%d.%d.%d", &oct1, &oct2, &oct3, &oct4)
-	if e != nil {
-		e = fmt.Errorf("invalid IP32 value \"%s\": %s", v, e.Error())
-		return
+	var extra string
+	matched, err := fmt.Sscanf(v, "%d.%d.%d.%d%s", &oct1, &oct2, &oct3, &oct4, &extra)
+	if err != io.EOF || matched != 4 {
+		return errStrInvalid("IP32", v)
 	}
 	copied := copy(a.data, []byte{oct1, oct2, oct3, oct4})
 	if copied != 4 {
@@ -1600,65 +1629,100 @@ func SetIP32FromString(a *Atom, v string) (e error) {
 	return
 }
 
-func SetIP32FromUint(a *Atom, v uint64) (e error) {
-	if v > math.MaxUint32 {
-		return fmt.Errorf("invalid IP32 data: %x", v)
+// Restrictions:
+// string must start with "0x"
+// following that must be only hex digits, in any number of sets of 8
+func SetIP32FromHexString(a *Atom, v string) (e error) {
+	if !strings.HasPrefix(v, "0x") {
+		return errStrInvalid("IP32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(v))
+
+	// allocate enough space
+	size := len(v[2:])
+	if 0 != size%8 || size == 0 {
+		return errStrInvalid("IP32", v)
+	}
+	if len(a.data) != size {
+		a.data = make([]byte, size/2)
+	}
+
+	// scan each chunk of 8 hex digits, and store as 4 byte address
+	for i := 2; i < len(v); i += 8 {
+		addr, err := strconv.ParseUint(v[i:i+8], 16, 32)
+		if err != nil {
+			a.data = make([]byte, 4) // zero before returning error
+			return errStrInvalid("IP32", v)
+		}
+		iByte := (i - 2) / 2 // number of bytes seen so far
+		binary.BigEndian.PutUint32(a.data[iByte:], uint32(addr))
+	}
+	return
+}
+
+func SetIP32FromUint64(a *Atom, v uint64) (e error) {
+	if v > math.MaxUint32 {
+		// store as 2 IPv4 addresses in 8 bytes
+		if len(a.data) != 8 {
+			a.data = make([]byte, 8)
+		}
+		binary.BigEndian.PutUint64(a.data, v)
+	} else {
+		// store as a single IPv4 address in 4 bytes
+		if len(a.data) != 4 {
+			a.data = make([]byte, 4)
+		}
+		binary.BigEndian.PutUint32(a.data, uint32(v))
+	}
 	return
 }
 
 func SetIPADFromString(a *Atom, v string) (e error) {
 	size := len(v)
 	buf := make([]byte, size)
+	if len(v) < 3 && v != "::" {
+		return errStrInvalid("IPAD", v)
+	}
 	copy(buf[:], v)
 
-	// verify delimiters
-	if buf[0] != '"' || buf[size-1] != '"' {
-		return fmt.Errorf("IPAD value lacks delimiters: (%s)", v)
+	// check for optional delimiters
+	if buf[0] == '"' && buf[size-1] == '"' {
+		buf = buf[1 : size-1] // ignore the delimiters from here on
 	}
 
 	// verify valid chars for IPv6
 	chars := "0123456789abcdefABCDEF:."
-	for _, r := range buf[1 : size-1] {
+	for _, r := range buf {
 		if !strings.ContainsRune(chars, rune(r)) {
-			return fmt.Errorf("invalid char in IPAD value: '%c'", r)
+			return errStrInvalid("IPAD", v)
 		}
 	}
 
-	buf[size-1] = '\x00' // replace end delimiter with null byte terminator
-	a.data = buf[1:]     // from 1, skips start delimiter
+	buf = append(buf, '\x00') // add null terminator like a CSTR
+	a.data = buf
 	return
 }
 
 // No NULL terminator is used for this type
+// Double-quote delimiters are optional on the input string
 func SetUUIDFromString(a *Atom, v string) (e error) {
+	if len(a.data) != 36 {
+		a.data = make([]byte, 36)
+	}
+
+	// Read the UUID string into a UUID object, discarding delimiters
+	var uuid uuidType
 	size := len(v)
-	buf := make([]byte, size)
-	copy(buf[:], v)
-
-	// verify delimiters
-	if buf[0] != '"' || buf[size-1] != '"' {
-		return fmt.Errorf("UUID lacks delimiters: (%s)", v)
+	if size == 38 && v[0] == '"' && v[size-1] == '"' {
+		e = uuid.SetFromString(v[1 : size-1])
+	} else {
+		e = uuid.SetFromString(v)
+	}
+	if e != nil {
+		return errStrInvalid("UUID", v)
 	}
 
-	// verify valid chars for UUID
-	chars := "0123456789abcdefABCDEF-"
-	for _, r := range buf[1 : size-1] {
-		if !strings.ContainsRune(chars, rune(r)) {
-			return fmt.Errorf("invalid char in UUID: '%c'", r)
-		}
-	}
-
-	// Verify format (example 64881431-B6DC-478E-B7EE-ED306619C797 )
-	groups := strings.Split(v, "-")
-	if len(groups) != 5 || len(groups[0]) != 8 ||
-		len(groups[1]) != 4 || len(groups[2]) != 4 ||
-		len(groups[3]) != 4 || len(groups[4]) != 12 {
-		return fmt.Errorf("invalid format for UUID: %s", v)
-	}
-
-	a.data = buf[1 : size-1] // slice range skips delimiters
+	// write raw bytes to Atom.data
+	a.data = uuid.Bytes()
 	return
 }
 
@@ -1695,7 +1759,8 @@ func SetUSTRFromEscapedString(a *Atom, v string) (e error) {
 		return
 	}
 
-	// write each rune as 4 bytes. Cast runes to uint32 to prevent UTF-8 encoding.
+	// write each rune as 4 bytes.
+	// Cast runes to uint32 to prevent implicit UTF-8 encoding.
 	buf := new(bytes.Buffer)
 	for _, r := range s { // iterate by rune
 		e := binary.Write(buf, binary.BigEndian, uint32(r))
@@ -1726,4 +1791,78 @@ func checkByteCount(buf []byte, bytesExpected int, strType string) (e error) {
 		e = errByteCount(strType, bytesExpected, len(buf))
 	}
 	return
+}
+
+// UUID methods
+
+// SetFromString initializes a UUID from a string.
+// The string should be a properly formatted UUID string, including dashes, but
+// without delimiters at the start and end.
+func (p *uuidType) SetFromString(s string) (e error) {
+	if !ValidUUIDString(s) {
+		return errStrInvalid("UUID", s)
+	}
+	var sizes = []int{32, 16, 16, 16, 48} // index corresponds to UUID field
+	var values = make([]uint64, 0, 5)     // index corresponds to UUID field
+	for i, octet := range strings.Split(s, "-") {
+		value, err := strconv.ParseUint(octet, 16, sizes[i])
+		if err != nil {
+			return errStrInvalid("UUID", s)
+		}
+		values = append(values, value)
+	}
+	return p.SetFromUints(values)
+}
+
+func (p *uuidType) SetFromUints(values []uint64) (e error) {
+	if len(values) != 5 {
+		return fmt.Errorf("invalid integer values for type UUID: %v", values)
+	}
+	p.TimeLow = uint32(values[0])
+	p.TimeMid = uint16(values[1])
+	p.TimeHiAndVersion = uint16(values[2])
+	p.ClkSeqHiRes = uint8(values[3] >> 8)
+	p.ClkSeqLow = uint8(values[3] & 0x00000000000000FF)
+
+	var buf = make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, values[4])
+	copy(p.Node[:], buf[2:])
+	return
+}
+
+// Bytes returns the UUID data as a slice of bytes.
+func (u uuidType) Bytes() []byte {
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, u)
+	return buf.Bytes()
+}
+
+func (u uuidType) String() string {
+	return fmt.Sprintf(
+		"%08X-%04X-%04X-%02X%02X-%012X",
+		u.TimeLow,
+		u.TimeMid,
+		u.TimeHiAndVersion,
+		u.ClkSeqHiRes,
+		u.ClkSeqLow,
+		u.Node)
+}
+
+// ValidUUIDString returns true if a string contains a properly formatted UUID.
+// Example: 64881431-B6DC-478E-B7EE-ED306619C797
+func ValidUUIDString(s string) bool {
+	// verify valid chars
+	for _, c := range s {
+		if !strings.ContainsRune("0123456789abcdefABCDEF-", rune(c)) {
+			return false
+		}
+	}
+	// Verify format
+	groups := strings.Split(string(s), "-")
+	return len(groups) == 5 &&
+		len(groups[0]) == 8 &&
+		len(groups[1]) == 4 &&
+		len(groups[2]) == 4 &&
+		len(groups[3]) == 4 &&
+		len(groups[4]) == 12
 }
