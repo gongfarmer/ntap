@@ -33,7 +33,9 @@ import (
 /**********************************************************/
 // Marshaling from Atom to text
 /**********************************************************/
-// Write Atom object to a byte slice in ADE ContainerText format.
+
+// MarshalText writes an Atom to a byte slice in ADE ContainerText format.
+// It implements the encoding.TextMarshaler interface.
 func (a *Atom) MarshalText() (text []byte, err error) {
 	buf := atomToTextBuffer(a, 0)
 	return buf.Bytes(), err
@@ -66,9 +68,8 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
  Identifies token strings (and structure problems) in input text
 **********************************************************/
 
-// UnmarshalText gets called on a zero-value Atom receiver, and populates it
-// based on the contents of the argument string, which contains an ADE
-// ContainerText representation with a single top-level CONT atom.
+// UnmarshalText sets its Atom receiver to a copy of a serialized atom given as
+// an argument.
 func (a *Atom) UnmarshalText(input []byte) (err error) {
 	// Convert text into Atom values
 	var atoms []*Atom

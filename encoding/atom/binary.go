@@ -98,8 +98,9 @@ func (h atomHeader) isContainer() bool {
 // Unmarshal from binary
 /**********************************************************/
 
-// UnmarshalBinary implements encoding.BinaryUnmarshaler.
-// It can be used to rehydrate an Atom starting from the zero value of Atom.
+// UnmarshalBinary reads an Atom from a byte slice.
+//
+// It implements the encoding.BinaryMarshaler interface.
 func (a *Atom) UnmarshalBinary(data []byte) error {
 	return a.UnmarshalFromReader(bytes.NewReader(data))
 }
@@ -131,8 +132,7 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 // ReadAtomsFromBinary reads bytes from a reader. It expectst he byte stream to
 // describe 0 or more ADE binary AtomContainers.
 // It reconstructs all the AtomContainers found and returns them in an array of Atom objects.
-// Returns an error if the byte stream is not a valid binary AtomContainer, or
-// there is more than one container in the stream.
+// Returns an error if the byte stream contains invalid binary container data.
 func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 	defer func() {
 		if p := recover(); p != nil {
@@ -254,8 +254,9 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 // Marshal to binary
 /**********************************************************/
 
-// MarshalBinary implements encoding.BinaryMarshaler.
-// It can be used to rehydrate an Atom starting from the zero value of Atom.
+// MarshalBinary serializes an Atom to a byte slice in ADE binary format.
+//
+// It implements the encoding.BinaryMarshaler interface.
 func (a *Atom) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 	err = a.BinaryWrite(buf)

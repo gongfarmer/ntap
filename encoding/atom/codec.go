@@ -12,9 +12,8 @@ import (
 	"unicode"
 )
 
-// ADE Data types
-// Defined in 112-0002_r4.0B_StorageGRID_Data_Types
-// The ADE code type definitions are in OSL_Types.h
+// ADE Data types are defined in 112-0002_r4.0B_StorageGRID_Data_Types.
+// The ADE headers for these types are in OSL_Types.h.
 const (
 	UI01 ADEType = "UI01" // unsigned int / bool
 	UI08 ADEType = "UI08" // unsigned int
@@ -54,9 +53,6 @@ const (
 	Bool   GoType = "Bool"
 	Bytes  GoType = "Bytes"
 	Float  GoType = "Float"
-
-	MaxUint16Plus1 = math.MaxUint16 + 1
-	MaxUint32Plus1 = math.MaxUint32 + 1
 )
 
 /**********************************************************/
@@ -76,6 +72,7 @@ type (
 	}
 	encoder struct {
 		SetString      func(*Atom, string) error
+		SetStringRaw   func(*Atom, string) error
 		SetBool        func(*Atom, bool) error
 		SetUint        func(*Atom, uint64) error
 		SetInt         func(*Atom, int64) error
@@ -100,7 +97,7 @@ type (
 	}
 )
 
-// error constructors
+// error constructor functions
 type errFunc (func(string, int, int) error)
 
 func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
@@ -126,8 +123,8 @@ func errRange(t string, v interface{}) (e error) {
 }
 
 // NewCodec returns a codec that performs type conversion for atom data.
-// It provides methods to convert data from an atom's ADE type into suitable Go
-// types, and vice versa.
+// A codec provides encoder/decoder methods for converting data from an atom's
+// ADE type into suitable Go types, and vice versa.
 func NewCodec(a *Atom) *codec {
 	c := codec{
 		Atom:    a,
@@ -138,6 +135,12 @@ func NewCodec(a *Atom) *codec {
 	return &c
 }
 
+// NewEncoder returns a new encoder that provides functions for converting Go
+// native types into ADE Atom data.  The returned encoder contains all of the
+// default encoding methods, which simply return an error stating that the
+// encoding is not supported.
+// The caller should implement whichever encoding methods are appropriate for
+// the ADE data type's codec.
 func NewEncoder(i interface{}) encoder {
 	return encoder{
 		SetString:      func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
@@ -151,7 +154,12 @@ func NewEncoder(i interface{}) encoder {
 	}
 }
 
-// NewDecoder returns a decoder which has every type conversion set to panic.
+// NewEncoder returns a new encoder that provides functions for converting Go
+// native types into ADE Atom data.  The returned encoder contains all of the
+// default encoding methods, which simply return an error stating that the
+// encoding is not supported.
+// The caller should implement whichever encoding methods are appropriate for
+// the ADE data type's codec.
 func NewDecoder(from ADEType) decoder {
 	return decoder{
 		String:      func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
@@ -169,8 +177,8 @@ func NewDecoder(from ADEType) decoder {
 var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
 
-func noEncoder(a *Atom, goType interface{}) error {
-	panic(fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'.", goType, a.typ))
+func noEncoder(a *Atom, from interface{}) error {
+	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'.", from, a.typ)
 }
 func noDecoder(from ADEType, to GoType) error {
 	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'.", from, to)
@@ -605,7 +613,7 @@ func SF32ToFloat64(buf []byte) (v float64, e error) {
 	if e != nil {
 		return
 	}
-	v = float64(i) / MaxUint16Plus1
+	v = float64(i) / (math.MaxUint16 + 1)
 	return
 }
 func SF64ToFloat64(buf []byte) (v float64, e error) {
@@ -614,7 +622,7 @@ func SF64ToFloat64(buf []byte) (v float64, e error) {
 	if e != nil {
 		return
 	}
-	v = float64(i) / MaxUint32Plus1
+	v = float64(i) / (math.MaxUint32 + 1)
 	return
 }
 func SF32ToString(buf []byte) (v string, e error) {
@@ -716,9 +724,12 @@ func SR64ToString(buf []byte) (v string, e error) {
 	return
 }
 
-// FC32, Four-char code type
-// Mantis #27726: ccat/ctac can't parse container names starting with "#" or " ".
-// If string is printable but starts with "# \"'", print it as hex.
+// FC32ToString returns a four-char code value as a printable string.
+// The string may be either 4 printable characters, or 0x followed by 8 hex
+// digits.
+//
+// This code includes a fix for Mantis #27726: ccat/ctac can't parse container
+// names starting with "#" or " ".
 func FC32ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 4, "FC32"); e != nil {
 		return
@@ -731,6 +742,13 @@ func FC32ToString(buf []byte) (v string, e error) {
 	}
 	return
 }
+
+// FC32ToStringDelimited returns a four-char code value as a printable string.
+// The string may be either 4 printable characters, or 0x followed by 8 hex
+// digits.
+//
+// If the 4 printable characters version is returned, it will be surrounded by
+// single-quote delimiters.
 func FC32ToStringDelimited(buf []byte) (v string, e error) {
 	v, e = FC32ToString(buf)
 	if len(v) == 4 {
@@ -751,10 +769,11 @@ func UUIDToString(buf []byte) (v string, e error) {
 	return uuid.String(), e
 }
 
-// IP Address types
-
-// IP32 may optionally include a second 4-byte value, in which case it
-// represents a range of IPv4 addresses.
+// IP32ToString returns an IP32 value as a string.
+//
+// The IP32 type may optionally include a second 4-byte value, which represents
+// a range of IPv4 addresses.  In this case, both addresses will be returned,
+// separated by a dash (-) character.
 func IP32ToString(buf []byte) (v string, e error) {
 	switch len(buf) {
 	case 4:
@@ -768,6 +787,15 @@ func IP32ToString(buf []byte) (v string, e error) {
 	return
 }
 
+// IP32ToUint64 returns an IP32 value as an unsigned integer.
+//
+// If the IP32 contains a single address, it is returned in the lower 4 bytes
+// of a uint64.  Casting that to uint32 retains all 4 octets.
+//
+// The IP32 type may optionally include a second 4-byte value, which represents
+// a range of IPv4 addresses.  In this case, both addresses will be returned in
+// the UINT64 value, with one address in the upper 32 bits and one in the lower
+// 32 bits.
 func IP32ToUint64(buf []byte) (v uint64, e error) {
 	switch len(buf) {
 	case 4:
@@ -1006,8 +1034,8 @@ func init() {
 	encoderByType[CSTR] = enc
 
 	enc = NewEncoder(USTR)
-	//	enc.SetStringRaw = StringToUSTR
-	enc.SetString = SetUSTRFromEscapedString
+	enc.SetStringRaw = SetUSTRFromString
+	enc.SetString = SetUSTRFromQuotedEscapedString
 	encoderByType[USTR] = enc
 
 	// DATA type, and aliases
@@ -1742,14 +1770,18 @@ func SetCSTRFromEscapedString(a *Atom, v string) (e error) {
 	return
 }
 
-// USTR is encoded as utf-32 big-endian.
-// Every character is encoded as 4 bytes.
-// No NULL terminator is used for this type, unlike CSTR.
-func SetUSTRFromEscapedString(a *Atom, v string) (e error) {
+// SetUSTRFromQuotedEscapedString sets the atom data to the byte representation
+// of the input string, which must conform to the following rules:
+//     1) must start and end with double quotes. These are stripped before encoding.
+//     2) special chars must be escaped with a backslash, including '"\
+//     3) carriage return (\n) and line feed (\r) must be expressed as 2 literal chars: \n and \r respectively
+//     4)  nonprintable chars are expressed with 4 literal characters \xXX, where the XX part is the hex value.
+//
+func SetUSTRFromQuotedEscapedString(a *Atom, v string) (e error) {
 
 	// verify delimiters (required for strconv.Unquote() )
-	if v[0] != '"' || v[len(v)-1] != '"' {
-		return fmt.Errorf("USTR value must be double-quoted: (%s)", v)
+	if len(v) > 2 && (v[0] != '"' || v[len(v)-1] != '"') {
+		return fmt.Errorf("USTR input string must be double-quoted: (%s)", v)
 	}
 
 	// unescape the string
@@ -1759,17 +1791,27 @@ func SetUSTRFromEscapedString(a *Atom, v string) (e error) {
 		return
 	}
 
+	return SetUSTRFromString(a, s)
+}
+
+// SetUSTRFromString sets the atom data to the byte representation of the
+// input string.
+//
+// The string is encoded as UTF32 big-endian (ie. 4 bytes for each rune, no
+// variable-length encoding allowed.)
+//
+// No NULL terminator is used for this type, unlike CSTR.
+func SetUSTRFromString(a *Atom, v string) (e error) {
 	// write each rune as 4 bytes.
-	// Cast runes to uint32 to prevent implicit UTF-8 encoding.
-	buf := new(bytes.Buffer)
-	for _, r := range s { // iterate by rune
+	buf := bytes.NewBuffer(make([]byte, 0, 4*len(v)))
+	for _, r := range v { // iterate by rune, not byte
+		// cast rune to uint32 to prevent implicit UTF-8 encoding
 		e := binary.Write(buf, binary.BigEndian, uint32(r))
 		if e != nil {
 			return e
 		}
 	}
 	a.data = buf.Bytes()
-
 	return
 }
 
