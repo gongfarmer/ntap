@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="ILMD">
+		<atom name="BVER" type="UI32" value="3"/>
+		<atom name="BTIM" type="UI64" value="1484723604156175"/>
+		<container name="HPNM">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="USTR" value="Baseline 2 Copies Policy"/>
+			</container>
+		</container>
+		<container name="HPVS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="USTR" value="1.0"/>
+			</container>
+		</container>
+		<container name="HPRS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="USTR" value="r2_1.0"/>
+			</container>
+		</container>
+		<container name="HPPS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="USTR" value="p1"/>
+			</container>
+		</container>
+		<container name="HPDR">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="USTR" value="r2_1.0"/>
+			</container>
+		</container>
+		<container name="HPST">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="1484722540396779"/>
+			</container>
+		</container>
+		<container name="HPET">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="0"/>
+			</container>
+		</container>
+		<container name="HPAS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value="t"/>
+			</container>
+		</container>
+		<container name="PPPS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value="f"/>
+			</container>
+		</container>
+		<container name="PXML">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="USTR" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;!DOCTYPE ilm-specification SYSTEM &quot;bycast-ilm.dtd&quot;&gt;&lt;ilm-specification name=&quot;Baseline 2 Copies Policy&quot; id=&quot;00000000-0000-0000-0000-000000000000&quot; version=&quot;1.0&quot;&gt;&lt;topology&gt;&lt;pool id=&quot;p1&quot; label=&quot;All Storage Nodes&quot;&gt;&lt;disk/&gt;&lt;/pool&gt;&lt;/topology&gt;&lt;rules&gt;&lt;rule id=&quot;p1_r2&quot; label=&quot;Make 2 Copies&quot; default=&quot;yes&quot; version=&quot;1.0&quot; schema-version=&quot;1.0&quot;&gt;&lt;baseline&gt;&lt;ingest/&gt;&lt;/baseline&gt;&lt;filter label=&quot;Filter 1&quot;/&gt;&lt;epoch start=&quot;0&quot;&gt;&lt;place pool=&quot;p1&quot;&gt;2&lt;/place&gt;&lt;/epoch&gt;&lt;/rule&gt;&lt;/rules&gt;&lt;/ilm-specification&gt;"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

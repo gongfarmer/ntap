@@ -1,0 +1,4251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="STRD">
+		<atom name="BTIM" type="UI64" value="1484723625527723"/>
+		<atom name="BVER" type="UI32" value="1"/>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Network Management System"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.2"/>
+			<atom name="ENUS" type="CSTR" value="System Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.3"/>
+			<atom name="ENUS" type="CSTR" value="Last Refreshed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.4"/>
+			<atom name="ENUS" type="CSTR" value="Updated"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.5"/>
+			<atom name="ENUS" type="CSTR" value="to"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.6"/>
+			<atom name="ENUS" type="CSTR" value="Actions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.7"/>
+			<atom name="ENUS" type="CSTR" value="Insert"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.8"/>
+			<atom name="ENUS" type="CSTR" value="Delete"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.9"/>
+			<atom name="ENUS" type="CSTR" value="Are you sure you want to delete this entry?"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.10"/>
+			<atom name="ENUS" type="CSTR" value="Edit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.11"/>
+			<atom name="ENUS" type="CSTR" value="Apply Changes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.12"/>
+			<atom name="ENUS" type="CSTR" value="No String Found."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.13"/>
+			<atom name="ENUS" type="CSTR" value="Are you sure you want to delete"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.15"/>
+			<atom name="ENUS" type="CSTR" value="Not Applicable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.16"/>
+			<atom name="ENUS" type="CSTR" value="Undo"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.17"/>
+			<atom name="ENUS" type="CSTR" value="Records Per Page"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.18"/>
+			<atom name="ENUS" type="CSTR" value="Show"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.19"/>
+			<atom name="ENUS" type="CSTR" value="of"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.20"/>
+			<atom name="ENUS" type="CSTR" value="Result(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.21"/>
+			<atom name="ENUS" type="CSTR" value="Attribute description not found. &lt;br/&gt; Contact support."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.22"/>
+			<atom name="ENUS" type="CSTR" value="Copy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.23"/>
+			<atom name="ENUS" type="CSTR" value="Revert"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.24"/>
+			<atom name="ENUS" type="CSTR" value="Export"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.25"/>
+			<atom name="ENUS" type="CSTR" value="None"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.1.26"/>
+			<atom name="ENUS" type="CSTR" value="Submit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.1"/>
+			<atom name="ENUS" type="CSTR" value="us"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.2"/>
+			<atom name="ENUS" type="CSTR" value="s"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.3"/>
+			<atom name="ENUS" type="CSTR" value="microsecond"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.4"/>
+			<atom name="ENUS" type="CSTR" value="microseconds"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.5"/>
+			<atom name="ENUS" type="CSTR" value="millisecond"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.6"/>
+			<atom name="ENUS" type="CSTR" value="milliseconds"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.7"/>
+			<atom name="ENUS" type="CSTR" value="second"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.8"/>
+			<atom name="ENUS" type="CSTR" value="seconds"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.9"/>
+			<atom name="ENUS" type="CSTR" value="minute"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.10"/>
+			<atom name="ENUS" type="CSTR" value="minutes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.11"/>
+			<atom name="ENUS" type="CSTR" value="hour"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.12"/>
+			<atom name="ENUS" type="CSTR" value="hours"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.13"/>
+			<atom name="ENUS" type="CSTR" value="day"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.14"/>
+			<atom name="ENUS" type="CSTR" value="days"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.15"/>
+			<atom name="ENUS" type="CSTR" value="year"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.16"/>
+			<atom name="ENUS" type="CSTR" value="years"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.17"/>
+			<atom name="ENUS" type="CSTR" value="weeks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.18"/>
+			<atom name="ENUS" type="CSTR" value="months"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.19"/>
+			<atom name="ENUS" type="CSTR" value="microsecond(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.20"/>
+			<atom name="ENUS" type="CSTR" value="millisecond(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.21"/>
+			<atom name="ENUS" type="CSTR" value="second(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.22"/>
+			<atom name="ENUS" type="CSTR" value="minute(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.23"/>
+			<atom name="ENUS" type="CSTR" value="hour(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.24"/>
+			<atom name="ENUS" type="CSTR" value="day(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.25"/>
+			<atom name="ENUS" type="CSTR" value="week(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.26"/>
+			<atom name="ENUS" type="CSTR" value="month(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.1.27"/>
+			<atom name="ENUS" type="CSTR" value="year(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.2.1"/>
+			<atom name="ENUS" type="CSTR" value="1/s"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.2.2"/>
+			<atom name="ENUS" type="CSTR" value="B/s"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.2.3"/>
+			<atom name="ENUS" type="CSTR" value="b/s"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.2.4"/>
+			<atom name="ENUS" type="CSTR" value="ppm/s"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.1"/>
+			<atom name="ENUS" type="CSTR" value="Deg C"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.2"/>
+			<atom name="ENUS" type="CSTR" value="Deg F"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.3"/>
+			<atom name="ENUS" type="CSTR" value="m"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.4"/>
+			<atom name="ENUS" type="CSTR" value="B"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.5"/>
+			<atom name="ENUS" type="CSTR" value="Bytes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.6"/>
+			<atom name="ENUS" type="CSTR" value="b"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.7"/>
+			<atom name="ENUS" type="CSTR" value="Bits"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.8"/>
+			<atom name="ENUS" type="CSTR" value="%"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.9"/>
+			<atom name="ENUS" type="CSTR" value="ppm"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.3.10"/>
+			<atom name="ENUS" type="CSTR" value="rad"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.1"/>
+			<atom name="ENUS" type="CSTR" value="K"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.2"/>
+			<atom name="ENUS" type="CSTR" value="M"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.3"/>
+			<atom name="ENUS" type="CSTR" value="G"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.4"/>
+			<atom name="ENUS" type="CSTR" value="T"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.5"/>
+			<atom name="ENUS" type="CSTR" value="P"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.6"/>
+			<atom name="ENUS" type="CSTR" value="Ki"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.7"/>
+			<atom name="ENUS" type="CSTR" value="Mi"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.8"/>
+			<atom name="ENUS" type="CSTR" value="Gi"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.9"/>
+			<atom name="ENUS" type="CSTR" value="Ti"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.10"/>
+			<atom name="ENUS" type="CSTR" value="Pe"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.11"/>
+			<atom name="ENUS" type="CSTR" value="Peta"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.12"/>
+			<atom name="ENUS" type="CSTR" value="Tera"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.13"/>
+			<atom name="ENUS" type="CSTR" value="Giga"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.14"/>
+			<atom name="ENUS" type="CSTR" value="Kilo"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.15"/>
+			<atom name="ENUS" type="CSTR" value="Si"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.16"/>
+			<atom name="ENUS" type="CSTR" value="Milli"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.17"/>
+			<atom name="ENUS" type="CSTR" value="Micro"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.18"/>
+			<atom name="ENUS" type="CSTR" value="Nano"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.19"/>
+			<atom name="ENUS" type="CSTR" value="m"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.2.4.20"/>
+			<atom name="ENUS" type="CSTR" value="n"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.1"/>
+			<atom name="ENUS" type="CSTR" value="Select an attribute and then either a Quick Query or a Custom Query"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.2"/>
+			<atom name="ENUS" type="CSTR" value="Attribute"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.3"/>
+			<atom name="ENUS" type="CSTR" value="Quick Query"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.4"/>
+			<atom name="ENUS" type="CSTR" value="Last 5 Minutes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.5"/>
+			<atom name="ENUS" type="CSTR" value="Last Hour"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.6"/>
+			<atom name="ENUS" type="CSTR" value="Last Day"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.7"/>
+			<atom name="ENUS" type="CSTR" value="Last Week"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.8"/>
+			<atom name="ENUS" type="CSTR" value="Last Month"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.9"/>
+			<atom name="ENUS" type="CSTR" value="Custom Query"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.10"/>
+			<atom name="ENUS" type="CSTR" value="Start Date"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.11"/>
+			<atom name="ENUS" type="CSTR" value="End Date"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.12"/>
+			<atom name="ENUS" type="CSTR" value="Last Year"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.13"/>
+			<atom name="ENUS" type="CSTR" value="All"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.3.14"/>
+			<atom name="ENUS" type="CSTR" value="Update"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.4.1"/>
+			<atom name="ENUS" type="CSTR" value="Name is already in used."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.4.2"/>
+			<atom name="ENUS" type="CSTR" value="Access to this page is restricted."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.4.3"/>
+			<atom name="ENUS" type="CSTR" value="Service Unavailable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.1.4.4"/>
+			<atom name="ENUS" type="CSTR" value="Internal Error"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.1"/>
+			<atom name="ENUS" type="CSTR" value="Information Region"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.2"/>
+			<atom name="ENUS" type="CSTR" value="Sign Out"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.3"/>
+			<atom name="ENUS" type="CSTR" value="Refresh Page"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4"/>
+			<atom name="ENUS" type="CSTR" value="Current User"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5"/>
+			<atom name="ENUS" type="CSTR" value="API Docs"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.1"/>
+			<atom name="ENUS" type="CSTR" value="Grid Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.2"/>
+			<atom name="ENUS" type="CSTR" value="Grid Topology"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.3"/>
+			<atom name="ENUS" type="CSTR" value="Account Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.5"/>
+			<atom name="ENUS" type="CSTR" value="Grid Provisioning Tool"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.6"/>
+			<atom name="ENUS" type="CSTR" value="ILM Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.8"/>
+			<atom name="ENUS" type="CSTR" value="NMS Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.9"/>
+			<atom name="ENUS" type="CSTR" value="Group"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.10"/>
+			<atom name="ENUS" type="CSTR" value="Settings"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.12"/>
+			<atom name="ENUS" type="CSTR" value="Grid Configuration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.12.1"/>
+			<atom name="ENUS" type="CSTR" value="Grid Specification File"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.12.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Click the export button to view the Grid Specification File."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.13"/>
+			<atom name="ENUS" type="CSTR" value="is not compatible with"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.14.1"/>
+			<atom name="ENUS" type="CSTR" value="NMS Names"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.15"/>
+			<atom name="ENUS" type="CSTR" value="API service endpoints (LDR services) are secured and identified by X.509 server certificates. By default, every LDR service is issued a certificate signed by the grid CA. These CA signed certificates can be replaced by a single common custom server certificate and corresponding private key."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.16"/>
+			<atom name="ENUS" type="CSTR" value="Dashboard"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.17"/>
+			<atom name="ENUS" type="CSTR" value="Not available because the root domain name has not been configured."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.18"/>
+			<atom name="ENUS" type="CSTR" value="Auto-generated DNS resource record entries that can be used to configure the DNS server for S3 path-style requests, and CDMI requests."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.19"/>
+			<atom name="ENUS" type="CSTR" value="Specify the root domain name to use for your StorageGRID Webscale system. This value must be common to all API service endpoints. A list of suggested server-specific DNS entries is generated based on the Root Domain Name value and displayed in the Overview page. For example, if the Root Domain Name value is sg.company.com, the suggested API service endpoints might be s1.sg.company.com, s2.sg.company.com, gw1.sg.company.com."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.20"/>
+			<atom name="ENUS" type="CSTR" value="Download DNS Resource Records"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.4.21"/>
+			<atom name="ENUS" type="CSTR" value="Auto-generated DNS resource record entries that can be used to configure the DNS server for S3 virtual hosted-style requests."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.1"/>
+			<atom name="ENUS" type="CSTR" value="ILM Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Expand All"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.1.2"/>
+			<atom name="ENUS" type="CSTR" value="Close All"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.1.3"/>
+			<atom name="ENUS" type="CSTR" value="Refresh"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.1.4"/>
+			<atom name="ENUS" type="CSTR" value="Default"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.1.5"/>
+			<atom name="ENUS" type="CSTR" value="Actions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.1"/>
+			<atom name="ENUS" type="CSTR" value="Storage Pools"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.2"/>
+			<atom name="ENUS" type="CSTR" value="Pool Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.3"/>
+			<atom name="ENUS" type="CSTR" value="Storage Nodes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.4"/>
+			<atom name="ENUS" type="CSTR" value="Installed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.5"/>
+			<atom name="ENUS" type="CSTR" value="Used"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.6"/>
+			<atom name="ENUS" type="CSTR" value="Usable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.7"/>
+			<atom name="ENUS" type="CSTR" value="Configure Site Names"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.8"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grade"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.9"/>
+			<atom name="ENUS" type="CSTR" value="Site"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.10"/>
+			<atom name="ENUS" type="CSTR" value="All Disks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.11"/>
+			<atom name="ENUS" type="CSTR" value="Archive Nodes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.12"/>
+			<atom name="ENUS" type="CSTR" value="The Installed, Used, and Usable capacity calculations do not include Archive Nodes."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.13"/>
+			<atom name="ENUS" type="CSTR" value="All Sites"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.14"/>
+			<atom name="ENUS" type="CSTR" value="In"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.15"/>
+			<atom name="ENUS" type="CSTR" value="Control Nodes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.16"/>
+			<atom name="ENUS" type="CSTR" value="Changes made to a storage pool that is currently in use by an ILM policy do not take effect until the ILM policy is activated again."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.17"/>
+			<atom name="ENUS" type="CSTR" value="Insert Pool"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.2.18"/>
+			<atom name="ENUS" type="CSTR" value="Insert Storage"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.1"/>
+			<atom name="ENUS" type="CSTR" value="Rules"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.2"/>
+			<atom name="ENUS" type="CSTR" value="Rule Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.3"/>
+			<atom name="ENUS" type="CSTR" value="Select Rule"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.4"/>
+			<atom name="ENUS" type="CSTR" value="New Rule"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.5"/>
+			<atom name="ENUS" type="CSTR" value="Matching Criteria"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.6"/>
+			<atom name="ENUS" type="CSTR" value="Filter"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.7"/>
+			<atom name="ENUS" type="CSTR" value="Object referenced by API"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.8"/>
+			<atom name="ENUS" type="CSTR" value="Object not referenced by API"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.9"/>
+			<atom name="ENUS" type="CSTR" value="Both"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.10"/>
+			<atom name="ENUS" type="CSTR" value="All Objects"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.11"/>
+			<atom name="ENUS" type="CSTR" value="Metadata"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.12"/>
+			<atom name="ENUS" type="CSTR" value="Content Placement"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.13"/>
+			<atom name="ENUS" type="CSTR" value="Retention Diagram"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.14"/>
+			<atom name="ENUS" type="CSTR" value="OR"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.15"/>
+			<atom name="ENUS" type="CSTR" value="AND"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.16"/>
+			<atom name="ENUS" type="CSTR" value="Equals"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.17"/>
+			<atom name="ENUS" type="CSTR" value="Starts With"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.18"/>
+			<atom name="ENUS" type="CSTR" value="Ends With"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.19"/>
+			<atom name="ENUS" type="CSTR" value="Contains"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.20"/>
+			<atom name="ENUS" type="CSTR" value="Less Than"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.21"/>
+			<atom name="ENUS" type="CSTR" value="Less or Equals"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.22"/>
+			<atom name="ENUS" type="CSTR" value="Greater Than"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.23"/>
+			<atom name="ENUS" type="CSTR" value="Greater or Equals"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.24"/>
+			<atom name="ENUS" type="CSTR" value="Exists"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.25"/>
+			<atom name="ENUS" type="CSTR" value="Not Equal"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.26"/>
+			<atom name="ENUS" type="CSTR" value="Not Start With"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.27"/>
+			<atom name="ENUS" type="CSTR" value="Not End With"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.28"/>
+			<atom name="ENUS" type="CSTR" value="Not Contain"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.29"/>
+			<atom name="ENUS" type="CSTR" value="Not Exist"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.30"/>
+			<atom name="ENUS" type="CSTR" value="On"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.31"/>
+			<atom name="ENUS" type="CSTR" value="Day"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.32"/>
+			<atom name="ENUS" type="CSTR" value="Year"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.33"/>
+			<atom name="ENUS" type="CSTR" value="Days"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.34"/>
+			<atom name="ENUS" type="CSTR" value="Years"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.35"/>
+			<atom name="ENUS" type="CSTR" value="keep a"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.36"/>
+			<atom name="ENUS" type="CSTR" value="temp copies in"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.37"/>
+			<atom name="ENUS" type="CSTR" value="for"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.38"/>
+			<atom name="ENUS" type="CSTR" value="forever"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.39"/>
+			<atom name="ENUS" type="CSTR" value="Reference Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.40"/>
+			<atom name="ENUS" type="CSTR" value="Ingest Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.41"/>
+			<atom name="ENUS" type="CSTR" value="File Path Format"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.42"/>
+			<atom name="ENUS" type="CSTR" value="You have unsaved rule definition. Do you want to continue without saving"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.43"/>
+			<atom name="ENUS" type="CSTR" value="in"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.44"/>
+			<atom name="ENUS" type="CSTR" value="The secondary storage pool must be different from the primary storage pool."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.45"/>
+			<atom name="ENUS" type="CSTR" value="Filter Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.46"/>
+			<atom name="ENUS" type="CSTR" value="Metadata Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.47"/>
+			<atom name="ENUS" type="CSTR" value="Metadata Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.48"/>
+			<atom name="ENUS" type="CSTR" value="Placement Start Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.49"/>
+			<atom name="ENUS" type="CSTR" value="Retention Period"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.50"/>
+			<atom name="ENUS" type="CSTR" value="Objects with all of the following SGAPI metadata:"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.51"/>
+			<atom name="ENUS" type="CSTR" value="Objects with all of the following CDMI metadata:"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.52"/>
+			<atom name="ENUS" type="CSTR" value="Objects with all of the following S3 or Swift properties:"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.53"/>
+			<atom name="ENUS" type="CSTR" value="copy in"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.54"/>
+			<atom name="ENUS" type="CSTR" value="replicated"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.55"/>
+			<atom name="ENUS" type="CSTR" value="erasure coded"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.56"/>
+			<atom name="ENUS" type="CSTR" value="Last Access Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.57"/>
+			<atom name="ENUS" type="CSTR" value="User Defined Creation Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.3.58"/>
+			<atom name="ENUS" type="CSTR" value="Noncurrent Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.1"/>
+			<atom name="ENUS" type="CSTR" value="Proposed Policy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.2"/>
+			<atom name="ENUS" type="CSTR" value="Errors in an ILM policy can cause irreparable data loss.  Review the policy carefully before activating it."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.3"/>
+			<atom name="ENUS" type="CSTR" value="Policy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.4"/>
+			<atom name="ENUS" type="CSTR" value="ILM Policy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.5"/>
+			<atom name="ENUS" type="CSTR" value="Evaluated Top Down"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.6"/>
+			<atom name="ENUS" type="CSTR" value="Active Policy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.7"/>
+			<atom name="ENUS" type="CSTR" value="Add to Policy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.8"/>
+			<atom name="ENUS" type="CSTR" value="Save"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.9"/>
+			<atom name="ENUS" type="CSTR" value="Revert to Active Policy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.10"/>
+			<atom name="ENUS" type="CSTR" value="Activate"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.11"/>
+			<atom name="ENUS" type="CSTR" value="Are you sure you want to make these changes to the proposed policy?"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.12"/>
+			<atom name="ENUS" type="CSTR" value="Evaluated Top Down"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.13"/>
+			<atom name="ENUS" type="CSTR" value="Are you sure you want to activate the proposed policy?"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.14"/>
+			<atom name="ENUS" type="CSTR" value="Are you sure you want to revert the proposed policy?"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.15"/>
+			<atom name="ENUS" type="CSTR" value="Re-evaluate Content"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.16"/>
+			<atom name="ENUS" type="CSTR" value="Are you sure that you want to re-apply the ILM policy to all objects in the StorageGRID Webscale system? ILM re-evaluation may result in changes to the number of copies, object locations, and object deletions."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.17"/>
+			<atom name="ENUS" type="CSTR" value="Click OK to start the ILM Re-evaluation (User-Triggered) grid task."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.4.18"/>
+			<atom name="ENUS" type="CSTR" value="Warning: Removing the Root Domain Name value disables support for S3 Virtual Hosted-Style requests."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.5.1"/>
+			<atom name="ENUS" type="CSTR" value="Saved Rules"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.5.2"/>
+			<atom name="ENUS" type="CSTR" value="Active"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.6.1"/>
+			<atom name="ENUS" type="CSTR" value="Active Policy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.6.2"/>
+			<atom name="ENUS" type="CSTR" value="In"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.7.1"/>
+			<atom name="ENUS" type="CSTR" value="Historical Policies"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.7.2"/>
+			<atom name="ENUS" type="CSTR" value="Policies"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.8.1"/>
+			<atom name="ENUS" type="CSTR" value="Historical Rules"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.8.2"/>
+			<atom name="ENUS" type="CSTR" value="Most Recent Start"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.8.3"/>
+			<atom name="ENUS" type="CSTR" value="Most Recent End"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.8.4"/>
+			<atom name="ENUS" type="CSTR" value="Load"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.9.1.1"/>
+			<atom name="ENUS" type="CSTR" value="&lt;p&gt;The name of the storage pool.  Maximum length: 20 characters.&lt;/p&gt;&lt;p&gt;For the purpose of object replication, storage is organized into storage pools. A storage pool is a logical grouping of Storage Nodes or Archive Nodes.&lt;/p&gt;&lt;p&gt;When configuring ILM rules, there is a one to one relationship between copies, Storage Nodes, and Archive Nodes. For each copy required by an ILM rule, there must be a corresponding Storage Node or Archive Node in the selected storage pool.&lt;/p&gt;"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.9.1.3"/>
+			<atom name="ENUS" type="CSTR" value="The total number of Archive Nodes in the storage pool.  Archive Nodes and Storage Nodes cannot be configured in the same storage pool."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.9.1.4"/>
+			<atom name="ENUS" type="CSTR" value="The total number of Storage Nodes in the storage pool.  An ILM rule allows one copy for each Storage Node or Archive Node in a storage pool."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.9.1.5"/>
+			<atom name="ENUS" type="CSTR" value="The total amount of installed storage capacity for the storage pool."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.9.1.6"/>
+			<atom name="ENUS" type="CSTR" value="The total amount of installed storage capacity that has been consumed. This value is derived from the difference between Installed capacity and Usable capacity."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.9.1.7"/>
+			<atom name="ENUS" type="CSTR" value="The total amount of installed storage capacity that is currently usable for the storage pool."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.5.10.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Erasure Coding"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.8.1"/>
+			<atom name="ENUS" type="CSTR" value="NMS Information"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.1"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.2"/>
+			<atom name="ENUS" type="CSTR" value="Metadata"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.3"/>
+			<atom name="ENUS" type="CSTR" value="The following pages configure client permission profiles to allow connections to the grid via the HTTP protocol."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.4"/>
+			<atom name="ENUS" type="CSTR" value="Create HTTP permission profiles with required rights"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.5"/>
+			<atom name="ENUS" type="CSTR" value="Add certificate authorities and client certificates"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.6"/>
+			<atom name="ENUS" type="CSTR" value="Configure security partitions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.7"/>
+			<atom name="ENUS" type="CSTR" value="Associate an IP range to an HTTP permission profile"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.10.8"/>
+			<atom name="ENUS" type="CSTR" value="View a list of metadata that can be used by HTTP clients"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.1"/>
+			<atom name="ENUS" type="CSTR" value="Grid Maintenance"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.1.1"/>
+			<atom name="ENUS" type="CSTR" value="The following pages are maintenance procedures for your StorageGRID Webscale system that you can perform in the NMS."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.1.2"/>
+			<atom name="ENUS" type="CSTR" value="Upgrade the StorageGRID Webscale system to the latest version."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.1.3"/>
+			<atom name="ENUS" type="CSTR" value="Add grid nodes and data center sites to the StorageGRID Webscale system."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.1.4"/>
+			<atom name="ENUS" type="CSTR" value="Download the Grid Provisioning archive file containing encryption keys and passwords."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.1.5"/>
+			<atom name="ENUS" type="CSTR" value="Remove grid nodes from the StorageGRID Webscale system."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.2"/>
+			<atom name="ENUS" type="CSTR" value="Expansion"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.3"/>
+			<atom name="ENUS" type="CSTR" value="Software Upgrade"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.4"/>
+			<atom name="ENUS" type="CSTR" value="Provisioning Backup"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.12.5"/>
+			<atom name="ENUS" type="CSTR" value="Decommission"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.13.1"/>
+			<atom name="ENUS" type="CSTR" value="Storage Tenants"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.13.1.1"/>
+			<atom name="ENUS" type="CSTR" value="The following pages allow you to manage the Storage Tenants of your StorageGRID Webscale system."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.13.1.2"/>
+			<atom name="ENUS" type="CSTR" value="View, add, edit, and remove Tenant Accounts."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.13.1.3"/>
+			<atom name="ENUS" type="CSTR" value="View and edit Identity Federation."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.13.2"/>
+			<atom name="ENUS" type="CSTR" value="Tenant Accounts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.2.13.3"/>
+			<atom name="ENUS" type="CSTR" value="Identity Federation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.11.1"/>
+			<atom name="ENUS" type="CSTR" value="Account Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.11.2"/>
+			<atom name="ENUS" type="CSTR" value="Accounts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.11.3"/>
+			<atom name="ENUS" type="CSTR" value="User Accounts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.11.4"/>
+			<atom name="ENUS" type="CSTR" value="Group Accounts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.11.5"/>
+			<atom name="ENUS" type="CSTR" value="Browser Default"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.12.1"/>
+			<atom name="ENUS" type="CSTR" value="About"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.12.2"/>
+			<atom name="ENUS" type="CSTR" value="Management Interface version"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.12.3"/>
+			<atom name="ENUS" type="CSTR" value="Build"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.12.4"/>
+			<atom name="ENUS" type="CSTR" value="THIS SOFTWARE IS CONFIDENTIAL AND PROPRIETARY INFORMATION OF NETAPP, INC. OR ITS LICENSORS."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.12.5"/>
+			<atom name="ENUS" type="CSTR" value="Copyright"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.12.6"/>
+			<atom name="ENUS" type="CSTR" value="NetApp, All rights reserved. Specifications are subject to change without notice. NetApp, the NetApp logo, and Go Further, Faster are trademarks or registered trademarks of NetApp, Inc. in the United States and/or other countries."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.12.7"/>
+			<atom name="ENUS" type="CSTR" value="Inc."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.1"/>
+			<atom name="ENUS" type="CSTR" value="Alarm Severity Changed to"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.2"/>
+			<atom name="ENUS" type="CSTR" value="New"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.3"/>
+			<atom name="ENUS" type="CSTR" value="Alarm"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.4"/>
+			<atom name="ENUS" type="CSTR" value="Alert"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.5"/>
+			<atom name="ENUS" type="CSTR" value="Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.6"/>
+			<atom name="ENUS" type="CSTR" value="UTC"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.7"/>
+			<atom name="ENUS" type="CSTR" value="Current Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.8"/>
+			<atom name="ENUS" type="CSTR" value="Attribute"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.9"/>
+			<atom name="ENUS" type="CSTR" value="Alarm Cleared"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.10"/>
+			<atom name="ENUS" type="CSTR" value="State Changed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.11"/>
+			<atom name="ENUS" type="CSTR" value="to"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.12"/>
+			<atom name="ENUS" type="CSTR" value="Results (e-mail)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.13"/>
+			<atom name="ENUS" type="CSTR" value="Message"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.14"/>
+			<atom name="ENUS" type="CSTR" value="Trigger Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.15"/>
+			<atom name="ENUS" type="CSTR" value="Acknowledged"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.16"/>
+			<atom name="ENUS" type="CSTR" value="Un-Acknowledged"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.17"/>
+			<atom name="ENUS" type="CSTR" value="E-mail Server (SMTP) Information"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.18"/>
+			<atom name="ENUS" type="CSTR" value="You must specify both the mail server name and port. Clear both fields to disable notifications."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.19"/>
+			<atom name="ENUS" type="CSTR" value="Test E-mail"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.20"/>
+			<atom name="ENUS" type="CSTR" value="Authentication Credentials"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.21"/>
+			<atom name="ENUS" type="CSTR" value="Alarm Removed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.13.22"/>
+			<atom name="ENUS" type="CSTR" value="All e-mail notifications are now suppressed."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.14.1"/>
+			<atom name="ENUS" type="CSTR" value="Languages"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.14.2"/>
+			<atom name="ENUS" type="CSTR" value="United States - English"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.14.3"/>
+			<atom name="ENUS" type="CSTR" value="Japan - Japanese"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.14.4"/>
+			<atom name="ENUS" type="CSTR" value="Braille - English"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.14.5"/>
+			<atom name="ENUS" type="CSTR" value="China - Chinese"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.1"/>
+			<atom name="ENUS" type="CSTR" value="AutoSupport"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.2"/>
+			<atom name="ENUS" type="CSTR" value="User-Triggered AutoSupport"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.2.1"/>
+			<atom name="ENUS" type="CSTR" value="User-Triggered"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.2.2"/>
+			<atom name="ENUS" type="CSTR" value="Send"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.2.3"/>
+			<atom name="ENUS" type="CSTR" value="Sending..."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.3"/>
+			<atom name="ENUS" type="CSTR" value="Weekly AutoSupport"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.3.1"/>
+			<atom name="ENUS" type="CSTR" value="Weekly"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.15.3.2"/>
+			<atom name="ENUS" type="CSTR" value="AutoSupport messages cannot be sent due to incorrect settings on the E-mail Server page."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.1"/>
+			<atom name="ENUS" type="CSTR" value="Devices Tab Bar"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.2"/>
+			<atom name="ENUS" type="CSTR" value="Overview"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.3"/>
+			<atom name="ENUS" type="CSTR" value="Main"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.4"/>
+			<atom name="ENUS" type="CSTR" value="Alarms"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.5"/>
+			<atom name="ENUS" type="CSTR" value="History"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.6"/>
+			<atom name="ENUS" type="CSTR" value="Reports"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.7"/>
+			<atom name="ENUS" type="CSTR" value="Charts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.8"/>
+			<atom name="ENUS" type="CSTR" value="Text"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.9"/>
+			<atom name="ENUS" type="CSTR" value="Configuration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.10"/>
+			<atom name="ENUS" type="CSTR" value="Notification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.11"/>
+			<atom name="ENUS" type="CSTR" value="Account Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.12"/>
+			<atom name="ENUS" type="CSTR" value="Information"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.13"/>
+			<atom name="ENUS" type="CSTR" value="Tree"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.14"/>
+			<atom name="ENUS" type="CSTR" value="Logging"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.15"/>
+			<atom name="ENUS" type="CSTR" value="Server"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.16"/>
+			<atom name="ENUS" type="CSTR" value="Lists"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.17"/>
+			<atom name="ENUS" type="CSTR" value="Template"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.18"/>
+			<atom name="ENUS" type="CSTR" value="Notifications"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.19"/>
+			<atom name="ENUS" type="CSTR" value="General"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.20"/>
+			<atom name="ENUS" type="CSTR" value="Summary"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.4.21"/>
+			<atom name="ENUS" type="CSTR" value="Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.1"/>
+			<atom name="ENUS" type="CSTR" value="Sign In"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.2"/>
+			<atom name="ENUS" type="CSTR" value="Access denied."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.3"/>
+			<atom name="ENUS" type="CSTR" value="Your account has been suspended.  Please contact your account administrator."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.4"/>
+			<atom name="ENUS" type="CSTR" value="Your account has been disabled.  Please contact your account administrator."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.5"/>
+			<atom name="ENUS" type="CSTR" value="Invalid user name.  Please enter a valid user name and password."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.6"/>
+			<atom name="ENUS" type="CSTR" value="Invalid password.  Please enter a valid user name and password."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.7"/>
+			<atom name="ENUS" type="CSTR" value="Username"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.8"/>
+			<atom name="ENUS" type="CSTR" value="Password"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.9"/>
+			<atom name="ENUS" type="CSTR" value="Signed out."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.10"/>
+			<atom name="ENUS" type="CSTR" value="Waiting for Configuration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.11"/>
+			<atom name="ENUS" type="CSTR" value="Continue"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.12"/>
+			<atom name="ENUS" type="CSTR" value="Invalid credentials."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.13"/>
+			<atom name="ENUS" type="CSTR" value="Connection to NMS Unavailable."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.5.14"/>
+			<atom name="ENUS" type="CSTR" value="Signing out"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.6.1"/>
+			<atom name="ENUS" type="CSTR" value="Overview Region"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.6.2"/>
+			<atom name="ENUS" type="CSTR" value="View current alarms."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.6.3"/>
+			<atom name="ENUS" type="CSTR" value="Chart this attribute over the last day."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.1"/>
+			<atom name="ENUS" type="CSTR" value="Alarms Region"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.2"/>
+			<atom name="ENUS" type="CSTR" value="Severity"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.3"/>
+			<atom name="ENUS" type="CSTR" value="Attribute Code"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.4"/>
+			<atom name="ENUS" type="CSTR" value="CId"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.5"/>
+			<atom name="ENUS" type="CSTR" value="Node ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.6"/>
+			<atom name="ENUS" type="CSTR" value="Description"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.7"/>
+			<atom name="ENUS" type="CSTR" value="Alarm Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.8"/>
+			<atom name="ENUS" type="CSTR" value="Current Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.9"/>
+			<atom name="ENUS" type="CSTR" value="Normal"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.10"/>
+			<atom name="ENUS" type="CSTR" value="Unknown"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.11"/>
+			<atom name="ENUS" type="CSTR" value="Notice"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.12"/>
+			<atom name="ENUS" type="CSTR" value="Minor"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.13"/>
+			<atom name="ENUS" type="CSTR" value="Major"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.14"/>
+			<atom name="ENUS" type="CSTR" value="Critical"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.15"/>
+			<atom name="ENUS" type="CSTR" value="Cleared"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.16"/>
+			<atom name="ENUS" type="CSTR" value="Alarms History"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.17"/>
+			<atom name="ENUS" type="CSTR" value="System History"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.18"/>
+			<atom name="ENUS" type="CSTR" value="Id"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.19"/>
+			<atom name="ENUS" type="CSTR" value="Active"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.20"/>
+			<atom name="ENUS" type="CSTR" value="Primary Message"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.21"/>
+			<atom name="ENUS" type="CSTR" value="Secondary Message"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.22"/>
+			<atom name="ENUS" type="CSTR" value="Op"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.23"/>
+			<atom name="ENUS" type="CSTR" value="Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.24"/>
+			<atom name="ENUS" type="CSTR" value="Value Type"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.25"/>
+			<atom name="ENUS" type="CSTR" value="E-mail"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.26"/>
+			<atom name="ENUS" type="CSTR" value="Offline"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.27"/>
+			<atom name="ENUS" type="CSTR" value="Indeterminate"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.28"/>
+			<atom name="ENUS" type="CSTR" value="EQ"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.29"/>
+			<atom name="ENUS" type="CSTR" value="GE"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.30"/>
+			<atom name="ENUS" type="CSTR" value="LE"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.31"/>
+			<atom name="ENUS" type="CSTR" value="NE"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.32"/>
+			<atom name="ENUS" type="CSTR" value="Administratively Down"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.33"/>
+			<atom name="ENUS" type="CSTR" value="Service States"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.34"/>
+			<atom name="ENUS" type="CSTR" value="Service"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.35"/>
+			<atom name="ENUS" type="CSTR" value="Acknowledge Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.36"/>
+			<atom name="ENUS" type="CSTR" value="Trigger Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.37"/>
+			<atom name="ENUS" type="CSTR" value="Acknowledge"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.38"/>
+			<atom name="ENUS" type="CSTR" value="Global Custom Alarms"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.39"/>
+			<atom name="ENUS" type="CSTR" value="Default Alarms"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.40"/>
+			<atom name="ENUS" type="CSTR" value="Custom Alarms"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.41"/>
+			<atom name="ENUS" type="CSTR" value="Severity Levels"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.42"/>
+			<atom name="ENUS" type="CSTR" value="Admin Down"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.43"/>
+			<atom name="ENUS" type="CSTR" value="Connected"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.44"/>
+			<atom name="ENUS" type="CSTR" value="Filter by"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.45"/>
+			<atom name="ENUS" type="CSTR" value="equals"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.46"/>
+			<atom name="ENUS" type="CSTR" value="Attribute Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.47"/>
+			<atom name="ENUS" type="CSTR" value="Invalid filter."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.48"/>
+			<atom name="ENUS" type="CSTR" value="Must contain one or more characters."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.49"/>
+			<atom name="ENUS" type="CSTR" value="Must contain alphanumeric characters or wildcards * or ?."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.50"/>
+			<atom name="ENUS" type="CSTR" value="Specify 4 characters or use wildcards (e.g. A??? or AB*)."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.51"/>
+			<atom name="ENUS" type="CSTR" value="Loading"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.52"/>
+			<atom name="ENUS" type="CSTR" value="Disabled Defaults"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.53"/>
+			<atom name="ENUS" type="CSTR" value="Show Acknowledged Alarms"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.7.54"/>
+			<atom name="ENUS" type="CSTR" value="Custom"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.1"/>
+			<atom name="ENUS" type="CSTR" value="Report Region"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.2"/>
+			<atom name="ENUS" type="CSTR" value="Vertical Scaling"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.3"/>
+			<atom name="ENUS" type="CSTR" value="Text Results for"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.4"/>
+			<atom name="ENUS" type="CSTR" value="vs"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.5"/>
+			<atom name="ENUS" type="CSTR" value="Reports"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.6"/>
+			<atom name="ENUS" type="CSTR" value="Text"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.7"/>
+			<atom name="ENUS" type="CSTR" value="To"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.8"/>
+			<atom name="ENUS" type="CSTR" value="Time Received"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.9"/>
+			<atom name="ENUS" type="CSTR" value="Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.10"/>
+			<atom name="ENUS" type="CSTR" value="Raw Values"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.11"/>
+			<atom name="ENUS" type="CSTR" value="Results Per Page"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.12"/>
+			<atom name="ENUS" type="CSTR" value="Average Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.13"/>
+			<atom name="ENUS" type="CSTR" value="Minimum Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.14"/>
+			<atom name="ENUS" type="CSTR" value="Maximum Value"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.15"/>
+			<atom name="ENUS" type="CSTR" value="Previous"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.16"/>
+			<atom name="ENUS" type="CSTR" value="Next"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.17"/>
+			<atom name="ENUS" type="CSTR" value="A chart is not available for this attribute."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.18"/>
+			<atom name="ENUS" type="CSTR" value="A text report is not available for this attribute."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.19"/>
+			<atom name="ENUS" type="CSTR" value="Sample Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.20"/>
+			<atom name="ENUS" type="CSTR" value="Aggregate Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.21"/>
+			<atom name="ENUS" type="CSTR" value="OID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.22"/>
+			<atom name="ENUS" type="CSTR" value="Node Path"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.23"/>
+			<atom name="ENUS" type="CSTR" value="Query"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.24"/>
+			<atom name="ENUS" type="CSTR" value="Epoch"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.25"/>
+			<atom name="ENUS" type="CSTR" value="Type"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.8.26"/>
+			<atom name="ENUS" type="CSTR" value="No results for specified time period."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.1"/>
+			<atom name="ENUS" type="CSTR" value="Configuration Region"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.2"/>
+			<atom name="ENUS" type="CSTR" value="Move Up"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.3"/>
+			<atom name="ENUS" type="CSTR" value="Move Down"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.4"/>
+			<atom name="ENUS" type="CSTR" value="Refresh"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.5"/>
+			<atom name="ENUS" type="CSTR" value="You do not have permission to view this page."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.6"/>
+			<atom name="ENUS" type="CSTR" value="No configuration options available."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.7"/>
+			<atom name="ENUS" type="CSTR" value="Grid ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.9.8"/>
+			<atom name="ENUS" type="CSTR" value="Export Date"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.1"/>
+			<atom name="ENUS" type="CSTR" value="Input Validation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.2"/>
+			<atom name="ENUS" type="CSTR" value="Input Error"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.3"/>
+			<atom name="ENUS" type="CSTR" value="The following fields contain errors."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.4"/>
+			<atom name="ENUS" type="CSTR" value="Invalid numeric value entered."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.5"/>
+			<atom name="ENUS" type="CSTR" value="Invalid text entered."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.6"/>
+			<atom name="ENUS" type="CSTR" value="No Object To Pass."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.7"/>
+			<atom name="ENUS" type="CSTR" value="Device Not Connected To MPX."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.8"/>
+			<atom name="ENUS" type="CSTR" value="MPX / RMI Not Running."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.9"/>
+			<atom name="ENUS" type="CSTR" value="RMI Error!"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.10"/>
+			<atom name="ENUS" type="CSTR" value="Invalid Input. Please Try Again!"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.11"/>
+			<atom name="ENUS" type="CSTR" value="Password Confirmation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.12"/>
+			<atom name="ENUS" type="CSTR" value="Confirm Password"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.13"/>
+			<atom name="ENUS" type="CSTR" value="Password"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.14"/>
+			<atom name="ENUS" type="CSTR" value="Passwords do not match.  Please enter and confirm a password."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.15"/>
+			<atom name="ENUS" type="CSTR" value="OK"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.16"/>
+			<atom name="ENUS" type="CSTR" value="Current Sender"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.17"/>
+			<atom name="ENUS" type="CSTR" value="Change Verification State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.1.10.18"/>
+			<atom name="ENUS" type="CSTR" value="Configure Storage Pools"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.1"/>
+			<atom name="ENUS" type="CSTR" value="ADC"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.12"/>
+			<atom name="ENUS" type="CSTR" value="MFS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.13"/>
+			<atom name="ENUS" type="CSTR" value="DDS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.2"/>
+			<atom name="ENUS" type="CSTR" value="LDR"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.3"/>
+			<atom name="ENUS" type="CSTR" value="CMS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.4"/>
+			<atom name="ENUS" type="CSTR" value="NMS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.5"/>
+			<atom name="ENUS" type="CSTR" value="AMS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.6"/>
+			<atom name="ENUS" type="CSTR" value="SSM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.7"/>
+			<atom name="ENUS" type="CSTR" value="CLB"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.8"/>
+			<atom name="ENUS" type="CSTR" value="CMN"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.9"/>
+			<atom name="ENUS" type="CSTR" value="ARC"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.1.11"/>
+			<atom name="ENUS" type="CSTR" value="Summary"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.1"/>
+			<atom name="ENUS" type="CSTR" value="DICOM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.10"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Advanced"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.11"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Indexes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.13"/>
+			<atom name="ENUS" type="CSTR" value="Grid Options"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.14"/>
+			<atom name="ENUS" type="CSTR" value="NMS Entities"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.15"/>
+			<atom name="ENUS" type="CSTR" value="Grid Tasks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.16"/>
+			<atom name="ENUS" type="CSTR" value="Storage"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.2"/>
+			<atom name="ENUS" type="CSTR" value="HTTP"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.20"/>
+			<atom name="ENUS" type="CSTR" value="Database"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.21"/>
+			<atom name="ENUS" type="CSTR" value="Volumes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.22"/>
+			<atom name="ENUS" type="CSTR" value="Services"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.23"/>
+			<atom name="ENUS" type="CSTR" value="Timing"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.24"/>
+			<atom name="ENUS" type="CSTR" value="Network"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.25"/>
+			<atom name="ENUS" type="CSTR" value="RAID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.26"/>
+			<atom name="ENUS" type="CSTR" value="Content"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.29"/>
+			<atom name="ENUS" type="CSTR" value="Synchronization"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.30"/>
+			<atom name="ENUS" type="CSTR" value="Verification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.31"/>
+			<atom name="ENUS" type="CSTR" value="Replication"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.32"/>
+			<atom name="ENUS" type="CSTR" value="Store"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.33"/>
+			<atom name="ENUS" type="CSTR" value="Retrieve"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.34"/>
+			<atom name="ENUS" type="CSTR" value="Target"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.36"/>
+			<atom name="ENUS" type="CSTR" value="Resources"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.37"/>
+			<atom name="ENUS" type="CSTR" value="Object Lookup"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.3"/>
+			<atom name="ENUS" type="CSTR" value="Connectivity"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.4"/>
+			<atom name="ENUS" type="CSTR" value="Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.5"/>
+			<atom name="ENUS" type="CSTR" value="Audit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.6"/>
+			<atom name="ENUS" type="CSTR" value="IP Ranges"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.7"/>
+			<atom name="ENUS" type="CSTR" value="Clients"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.8"/>
+			<atom name="ENUS" type="CSTR" value="Permissions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.9"/>
+			<atom name="ENUS" type="CSTR" value="DICOM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.35"/>
+			<atom name="ENUS" type="CSTR" value="Identifiers"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.38"/>
+			<atom name="ENUS" type="CSTR" value="Tasks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.39"/>
+			<atom name="ENUS" type="CSTR" value="Link Cost"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.40"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grades"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.42"/>
+			<atom name="ENUS" type="CSTR" value="Connect to Support"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.43"/>
+			<atom name="ENUS" type="CSTR" value="Shares"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.44"/>
+			<atom name="ENUS" type="CSTR" value="Security Partitions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.45"/>
+			<atom name="ENUS" type="CSTR" value="Interface Engine"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.46"/>
+			<atom name="ENUS" type="CSTR" value="Certificates"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.47"/>
+			<atom name="ENUS" type="CSTR" value="CDMI"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.48"/>
+			<atom name="ENUS" type="CSTR" value="Data Store"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.49"/>
+			<atom name="ENUS" type="CSTR" value="Accounts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.50"/>
+			<atom name="ENUS" type="CSTR" value="S3"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.51"/>
+			<atom name="ENUS" type="CSTR" value="Network"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.52"/>
+			<atom name="ENUS" type="CSTR" value="Endpoints"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.53"/>
+			<atom name="ENUS" type="CSTR" value="Domain Names"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.54"/>
+			<atom name="ENUS" type="CSTR" value="Erasure Coding"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.2.55"/>
+			<atom name="ENUS" type="CSTR" value="Swift"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.1"/>
+			<atom name="ENUS" type="CSTR" value="Node Information"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.2"/>
+			<atom name="ENUS" type="CSTR" value="System Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.3"/>
+			<atom name="ENUS" type="CSTR" value="Connectivity Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.4"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Associations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.5"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Sessions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.6"/>
+			<atom name="ENUS" type="CSTR" value="HTTP GET"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.7"/>
+			<atom name="ENUS" type="CSTR" value="HTTP PUT"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.8"/>
+			<atom name="ENUS" type="CSTR" value="HTTP POST"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.9"/>
+			<atom name="ENUS" type="CSTR" value="HTTP HEAD"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.10"/>
+			<atom name="ENUS" type="CSTR" value="HTTP DELETE"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.11"/>
+			<atom name="ENUS" type="CSTR" value="HTTP OPTION"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.12"/>
+			<atom name="ENUS" type="CSTR" value="Grid Information"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.13"/>
+			<atom name="ENUS" type="CSTR" value="File System Operations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.22"/>
+			<atom name="ENUS" type="CSTR" value="Background Verification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.23"/>
+			<atom name="ENUS" type="CSTR" value="DICOM C-ECHO"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.24"/>
+			<atom name="ENUS" type="CSTR" value="DICOM C-STORE"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.25"/>
+			<atom name="ENUS" type="CSTR" value="DICOM C-FIND"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.26"/>
+			<atom name="ENUS" type="CSTR" value="DICOM C-MOVE"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.27"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Storage Commitment"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.28"/>
+			<atom name="ENUS" type="CSTR" value="Configuration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.29"/>
+			<atom name="ENUS" type="CSTR" value="Tablespace"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.30"/>
+			<atom name="ENUS" type="CSTR" value="Server Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.31"/>
+			<atom name="ENUS" type="CSTR" value="System Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.32"/>
+			<atom name="ENUS" type="CSTR" value="GPS Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.33"/>
+			<atom name="ENUS" type="CSTR" value="Destinations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.36"/>
+			<atom name="ENUS" type="CSTR" value="Information Lifecycle Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.38"/>
+			<atom name="ENUS" type="CSTR" value="Object Deleting"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.43"/>
+			<atom name="ENUS" type="CSTR" value="Verification Configuration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.44"/>
+			<atom name="ENUS" type="CSTR" value="Verification Progress"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.45"/>
+			<atom name="ENUS" type="CSTR" value="Verification Results"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.46"/>
+			<atom name="ENUS" type="CSTR" value="Inbound Replication"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.47"/>
+			<atom name="ENUS" type="CSTR" value="Outbound Replication"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.48"/>
+			<atom name="ENUS" type="CSTR" value="Archive Store Overview"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.49"/>
+			<atom name="ENUS" type="CSTR" value="Staging Volume"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.50"/>
+			<atom name="ENUS" type="CSTR" value="Archive Retrieve Overview"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.51"/>
+			<atom name="ENUS" type="CSTR" value="Archive Retrieve Statistics"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.52"/>
+			<atom name="ENUS" type="CSTR" value="Tivoli Storage Manager Overview"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.53"/>
+			<atom name="ENUS" type="CSTR" value="Tivoli Storage Manager Account"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.55"/>
+			<atom name="ENUS" type="CSTR" value="Computational Resources"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.56"/>
+			<atom name="ENUS" type="CSTR" value="Memory"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.57"/>
+			<atom name="ENUS" type="CSTR" value="Service Health"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.58"/>
+			<atom name="ENUS" type="CSTR" value="Storage Resources"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.59"/>
+			<atom name="ENUS" type="CSTR" value="Network Resources"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.60"/>
+			<atom name="ENUS" type="CSTR" value="Local Clock"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.61"/>
+			<atom name="ENUS" type="CSTR" value="Neighboring Clocks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.62"/>
+			<atom name="ENUS" type="CSTR" value="NTP Synchronization"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.63"/>
+			<atom name="ENUS" type="CSTR" value="Spanning Tree"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.64"/>
+			<atom name="ENUS" type="CSTR" value="Grid Services"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.65"/>
+			<atom name="ENUS" type="CSTR" value="Utilization"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.66"/>
+			<atom name="ENUS" type="CSTR" value="Attribute Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.67"/>
+			<atom name="ENUS" type="CSTR" value="Attribute Relay"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.68"/>
+			<atom name="ENUS" type="CSTR" value="Attribute Repository"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.69.1"/>
+			<atom name="ENUS" type="CSTR" value="Storage Capacity"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.69.2"/>
+			<atom name="ENUS" type="CSTR" value="Metadata Capacity"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.69.3"/>
+			<atom name="ENUS" type="CSTR" value="API Operations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.69.4"/>
+			<atom name="ENUS" type="CSTR" value="Current ILM Activity - Legacy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.69.5"/>
+			<atom name="ENUS" type="CSTR" value="Future ILM Activity- Legacy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.69.6"/>
+			<atom name="ENUS" type="CSTR" value="Erasure Coded Operations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.69.7"/>
+			<atom name="ENUS" type="CSTR" value="ILM Activity"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.71"/>
+			<atom name="ENUS" type="CSTR" value="Audit Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.72"/>
+			<atom name="ENUS" type="CSTR" value="Object Transfer"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.76"/>
+			<atom name="ENUS" type="CSTR" value="Metadata Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.77"/>
+			<atom name="ENUS" type="CSTR" value="Foreground Verification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.82"/>
+			<atom name="ENUS" type="CSTR" value="Archive Nodes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.84"/>
+			<atom name="ENUS" type="CSTR" value="Binding Information"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.85"/>
+			<atom name="ENUS" type="CSTR" value="Configuration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.86"/>
+			<atom name="ENUS" type="CSTR" value="E-mail Notification Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.87"/>
+			<atom name="ENUS" type="CSTR" value="Database Connection Pool"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.88"/>
+			<atom name="ENUS" type="CSTR" value="Data Connection Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.89"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Metadata PUT"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.90"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Metadata GET"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.91"/>
+			<atom name="ENUS" type="CSTR" value="CDMI Read Values"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.92"/>
+			<atom name="ENUS" type="CSTR" value="CDMI Read Metadata"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.93"/>
+			<atom name="ENUS" type="CSTR" value="CDMI Read Capabilities"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.94"/>
+			<atom name="ENUS" type="CSTR" value="CDMI Write"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.95"/>
+			<atom name="ENUS" type="CSTR" value="CDMI Modify Metadata"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.96"/>
+			<atom name="ENUS" type="CSTR" value="CDMI Delete"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.97"/>
+			<atom name="ENUS" type="CSTR" value="Operations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.98"/>
+			<atom name="ENUS" type="CSTR" value="Data Transfers"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.99.1"/>
+			<atom name="ENUS" type="CSTR" value="Object Counts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.99.2"/>
+			<atom name="ENUS" type="CSTR" value="Queries"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.99.3"/>
+			<atom name="ENUS" type="CSTR" value="Nodetool Repair"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.100"/>
+			<atom name="ENUS" type="CSTR" value="Operations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.101"/>
+			<atom name="ENUS" type="CSTR" value="Data Transfers"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.102"/>
+			<atom name="ENUS" type="CSTR" value="Data Store Resources"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.103"/>
+			<atom name="ENUS" type="CSTR" value="Operations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.104"/>
+			<atom name="ENUS" type="CSTR" value="Storage Hardware"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.105"/>
+			<atom name="ENUS" type="CSTR" value="Cloud Tiering Service (S3) Overview"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.106"/>
+			<atom name="ENUS" type="CSTR" value="Please choose a Target Type on the Target Configuration tab."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.107"/>
+			<atom name="ENUS" type="CSTR" value="Replication"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.108"/>
+			<atom name="ENUS" type="CSTR" value="Background Verification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.109"/>
+			<atom name="ENUS" type="CSTR" value="Operations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.3.110"/>
+			<atom name="ENUS" type="CSTR" value="Data Transfers"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.1"/>
+			<atom name="ENUS" type="CSTR" value="Connections"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.10"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Profiles"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.11"/>
+			<atom name="ENUS" type="CSTR" value="Coerce Tag Profiles"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.12"/>
+			<atom name="ENUS" type="CSTR" value="Advanced Config Profiles"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.13"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Indexed Tags"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.15"/>
+			<atom name="ENUS" type="CSTR" value="Pending"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.16"/>
+			<atom name="ENUS" type="CSTR" value="Active"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.17"/>
+			<atom name="ENUS" type="CSTR" value="Historical"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.18"/>
+			<atom name="ENUS" type="CSTR" value="NMS Entities"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.2"/>
+			<atom name="ENUS" type="CSTR" value="Audit Levels"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.20"/>
+			<atom name="ENUS" type="CSTR" value="Object Stores"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.21"/>
+			<atom name="ENUS" type="CSTR" value="Processors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.22"/>
+			<atom name="ENUS" type="CSTR" value="Volumes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.23"/>
+			<atom name="ENUS" type="CSTR" value="Services"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.24"/>
+			<atom name="ENUS" type="CSTR" value="Packages"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.25"/>
+			<atom name="ENUS" type="CSTR" value="Network Interfaces"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.26"/>
+			<atom name="ENUS" type="CSTR" value="Receive"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.27"/>
+			<atom name="ENUS" type="CSTR" value="Transmit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.28"/>
+			<atom name="ENUS" type="CSTR" value="Controllers"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.29"/>
+			<atom name="ENUS" type="CSTR" value="Enclosures"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.3"/>
+			<atom name="ENUS" type="CSTR" value="Client Site IP Ranges"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.30"/>
+			<atom name="ENUS" type="CSTR" value="Arrays"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.31"/>
+			<atom name="ENUS" type="CSTR" value="Drives"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.32"/>
+			<atom name="ENUS" type="CSTR" value="Established Connections"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.4"/>
+			<atom name="ENUS" type="CSTR" value="Locations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.5"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Entities"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.7"/>
+			<atom name="ENUS" type="CSTR" value="HTTP /CDMI Namespace"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.65"/>
+			<atom name="ENUS" type="CSTR" value="Accounts"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.9"/>
+			<atom name="ENUS" type="CSTR" value="DICOM AEs"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.34"/>
+			<atom name="ENUS" type="CSTR" value="Inbound Replication Summaries"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.35"/>
+			<atom name="ENUS" type="CSTR" value="Outbound Replication Summaries"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.36"/>
+			<atom name="ENUS" type="CSTR" value="Active Volumes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.38"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Metadata Indexing"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.39"/>
+			<atom name="ENUS" type="CSTR" value="Grid Options"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.40"/>
+			<atom name="ENUS" type="CSTR" value="Verify Object Store(s)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.41"/>
+			<atom name="ENUS" type="CSTR" value="Link Costs"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.42"/>
+			<atom name="ENUS" type="CSTR" value="Site Names"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.43"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grades"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.44"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grade Definitions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.47"/>
+			<atom name="ENUS" type="CSTR" value="Recovery Sources"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.50"/>
+			<atom name="ENUS" type="CSTR" value="File System Shares"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.51"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Authorities"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.52"/>
+			<atom name="ENUS" type="CSTR" value="Clients"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.53"/>
+			<atom name="ENUS" type="CSTR" value="Partitions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.54"/>
+			<atom name="ENUS" type="CSTR" value="Client Partitions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.55"/>
+			<atom name="ENUS" type="CSTR" value="Read-Only Client Partitions"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.57"/>
+			<atom name="ENUS" type="CSTR" value="Disk Devices"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.58"/>
+			<atom name="ENUS" type="CSTR" value="Network Addresses"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.59"/>
+			<atom name="ENUS" type="CSTR" value="Storage Watermarks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.60"/>
+			<atom name="ENUS" type="CSTR" value="Ports"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.61"/>
+			<atom name="ENUS" type="CSTR" value="Custom Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.62"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Audit Feed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.64"/>
+			<atom name="ENUS" type="CSTR" value="Object Segmentation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.66"/>
+			<atom name="ENUS" type="CSTR" value="CA Certificates"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.67"/>
+			<atom name="ENUS" type="CSTR" value="Network"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.68"/>
+			<atom name="ENUS" type="CSTR" value="Root Domain Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.69"/>
+			<atom name="ENUS" type="CSTR" value="DNS Resource Records - Common"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.70"/>
+			<atom name="ENUS" type="CSTR" value="API Endpoint Domain Names"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.2.4.71"/>
+			<atom name="ENUS" type="CSTR" value="DNS Resource Records - S3 Virtual Hosted-Style"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Administrative Domain Controller (ADC)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.10"/>
+			<atom name="ENUS" type="CSTR" value="Server Status Monitor (SSM)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.11"/>
+			<atom name="ENUS" type="CSTR" value="Time Synchronization"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.12"/>
+			<atom name="ENUS" type="CSTR" value="Database Engine"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.13"/>
+			<atom name="ENUS" type="CSTR" value="System Logging"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.14"/>
+			<atom name="ENUS" type="CSTR" value="RAID Monitor"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.16"/>
+			<atom name="ENUS" type="CSTR" value="Server Manager"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.17"/>
+			<atom name="ENUS" type="CSTR" value="Local Distribution Router (LDR)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.2"/>
+			<atom name="ENUS" type="CSTR" value="Archive Node (ARC)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.3"/>
+			<atom name="ENUS" type="CSTR" value="Audit Management System (AMS)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.4"/>
+			<atom name="ENUS" type="CSTR" value="Connection Load Balancer (CLB)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.5"/>
+			<atom name="ENUS" type="CSTR" value="Configuration Management Node (CMN)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.6"/>
+			<atom name="ENUS" type="CSTR" value="Content Management System (CMS)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.7"/>
+			<atom name="ENUS" type="CSTR" value="Network Management System (NMS)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.8"/>
+			<atom name="ENUS" type="CSTR" value="Storage Node (LDR)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.19"/>
+			<atom name="ENUS" type="CSTR" value="GPFS File System Gateway (MFS)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.20"/>
+			<atom name="ENUS" type="CSTR" value="NMS Reporting Engine"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.21"/>
+			<atom name="ENUS" type="CSTR" value="NMS Processing Engine"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.22"/>
+			<atom name="ENUS" type="CSTR" value="NMS Data Downsampler 1"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.23"/>
+			<atom name="ENUS" type="CSTR" value="NMS Data Downsampler 2"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.24"/>
+			<atom name="ENUS" type="CSTR" value="NMS Data Cleanup"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.25"/>
+			<atom name="ENUS" type="CSTR" value="Distributed File System (GPFS)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.26"/>
+			<atom name="ENUS" type="CSTR" value="CIFS Filesharing (smbd)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.30"/>
+			<atom name="ENUS" type="CSTR" value="CIFS Filesharing (nmbd)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.31"/>
+			<atom name="ENUS" type="CSTR" value="CIFS Filesharing (winbindd)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.27"/>
+			<atom name="ENUS" type="CSTR" value="NFS Filesharing"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.28"/>
+			<atom name="ENUS" type="CSTR" value="Clustered Samba (CTDB)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.29"/>
+			<atom name="ENUS" type="CSTR" value="Heartbeat Cluster Manager"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.32"/>
+			<atom name="ENUS" type="CSTR" value="Distributed Data Store (DDS)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.33"/>
+			<atom name="ENUS" type="CSTR" value="Cassandra"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.34"/>
+			<atom name="ENUS" type="CSTR" value="Cloud Tiering Service (CTS)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.35"/>
+			<atom name="ENUS" type="CSTR" value="Management Application Program Interface (mgmt-api)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.36"/>
+			<atom name="ENUS" type="CSTR" value="Grid Deployment Utility Server"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.37"/>
+			<atom name="ENUS" type="CSTR" value="Account Service"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.38"/>
+			<atom name="ENUS" type="CSTR" value="Identity Service"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.1.39"/>
+			<atom name="ENUS" type="CSTR" value="Keystone Service"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.10.1"/>
+			<atom name="ENUS" type="CSTR" value="BAE Systems"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.11.1"/>
+			<atom name="ENUS" type="CSTR" value="DEBUG"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.1"/>
+			<atom name="ENUS" type="CSTR" value="IDE Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.2"/>
+			<atom name="ENUS" type="CSTR" value="I/O Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.3"/>
+			<atom name="ENUS" type="CSTR" value="SCSI Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.4"/>
+			<atom name="ENUS" type="CSTR" value="File System Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.5"/>
+			<atom name="ENUS" type="CSTR" value="Network Receive Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.6"/>
+			<atom name="ENUS" type="CSTR" value="Network Transmit Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.7"/>
+			<atom name="ENUS" type="CSTR" value="Kernel Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.8"/>
+			<atom name="ENUS" type="CSTR" value="Kernel Memory Allocation Failure"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.9"/>
+			<atom name="ENUS" type="CSTR" value="Peer TCP Protocol Violation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.10"/>
+			<atom name="ENUS" type="CSTR" value="Abnormal Software Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.11"/>
+			<atom name="ENUS" type="CSTR" value="System Time Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.12"/>
+			<atom name="ENUS" type="CSTR" value="Custom Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.13"/>
+			<atom name="ENUS" type="CSTR" value="Out Of Memory Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.19"/>
+			<atom name="ENUS" type="CSTR" value="Cassandra Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.20"/>
+			<atom name="ENUS" type="CSTR" value="Storage Hardware Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.21"/>
+			<atom name="ENUS" type="CSTR" value="Account Service Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.22"/>
+			<atom name="ENUS" type="CSTR" value="Identity Service Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.23"/>
+			<atom name="ENUS" type="CSTR" value="Grid Node Errors"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.24"/>
+			<atom name="ENUS" type="CSTR" value="Forced Termination Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.25"/>
+			<atom name="ENUS" type="CSTR" value="Keystone Service Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.2.26"/>
+			<atom name="ENUS" type="CSTR" value="Hotfix Installation Failure Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.1"/>
+			<atom name="ENUS" type="CSTR" value="Administrative Domain Controller"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.11"/>
+			<atom name="ENUS" type="CSTR" value="GPFS File System Gateway"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.12"/>
+			<atom name="ENUS" type="CSTR" value="Distributed Data Store"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.2"/>
+			<atom name="ENUS" type="CSTR" value="Local Distribution Router"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.3"/>
+			<atom name="ENUS" type="CSTR" value="Content Management System"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.4"/>
+			<atom name="ENUS" type="CSTR" value="Network Management System"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.5"/>
+			<atom name="ENUS" type="CSTR" value="Audit Management System"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.6"/>
+			<atom name="ENUS" type="CSTR" value="Server Status Monitor"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.7"/>
+			<atom name="ENUS" type="CSTR" value="Connection Load Balancer"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.8"/>
+			<atom name="ENUS" type="CSTR" value="Configuration Management Node"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.4.9"/>
+			<atom name="ENUS" type="CSTR" value="Archive Node"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.5.1"/>
+			<atom name="ENUS" type="CSTR" value="System"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.5.2"/>
+			<atom name="ENUS" type="CSTR" value="Object Storage"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.5.3"/>
+			<atom name="ENUS" type="CSTR" value="Volume Management"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.5.4"/>
+			<atom name="ENUS" type="CSTR" value="Protocol - DICOM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.5.5"/>
+			<atom name="ENUS" type="CSTR" value="Protocol - HTTP"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.5.6"/>
+			<atom name="ENUS" type="CSTR" value="Protocol - File"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.1"/>
+			<atom name="ENUS" type="CSTR" value="SOP Class UID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.10"/>
+			<atom name="ENUS" type="CSTR" value="Station Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.11"/>
+			<atom name="ENUS" type="CSTR" value="Study Description"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.12"/>
+			<atom name="ENUS" type="CSTR" value="Manufacturer Model Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.13"/>
+			<atom name="ENUS" type="CSTR" value="Patient Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.14"/>
+			<atom name="ENUS" type="CSTR" value="Patient ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.15"/>
+			<atom name="ENUS" type="CSTR" value="Patient Birth Date"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.16"/>
+			<atom name="ENUS" type="CSTR" value="Patient's Sex"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.17"/>
+			<atom name="ENUS" type="CSTR" value="Patient's Age"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.18"/>
+			<atom name="ENUS" type="CSTR" value="Study Instance UID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.19"/>
+			<atom name="ENUS" type="CSTR" value="Series Instance UID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.2"/>
+			<atom name="ENUS" type="CSTR" value="SOP Instance UID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.20"/>
+			<atom name="ENUS" type="CSTR" value="Series Number"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.21"/>
+			<atom name="ENUS" type="CSTR" value="Instance (Image) Number"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.22"/>
+			<atom name="ENUS" type="CSTR" value="Study ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.3"/>
+			<atom name="ENUS" type="CSTR" value="Study Date"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.4"/>
+			<atom name="ENUS" type="CSTR" value="Study Time"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.5"/>
+			<atom name="ENUS" type="CSTR" value="Accession Number"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.6"/>
+			<atom name="ENUS" type="CSTR" value="Modality"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.7"/>
+			<atom name="ENUS" type="CSTR" value="Manufacturer"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.8"/>
+			<atom name="ENUS" type="CSTR" value="Institution Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.6.9"/>
+			<atom name="ENUS" type="CSTR" value="Referring Physician Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.1"/>
+			<atom name="ENUS" type="CSTR" value="Grid Task Manager started"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.10"/>
+			<atom name="ENUS" type="CSTR" value="Completed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.11"/>
+			<atom name="ENUS" type="CSTR" value="Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.12"/>
+			<atom name="ENUS" type="CSTR" value="Aborted"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.13"/>
+			<atom name="ENUS" type="CSTR" value="Unknown"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.14"/>
+			<atom name="ENUS" type="CSTR" value="Submit a new task by pasting in a Signed Task Text Block"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.15"/>
+			<atom name="ENUS" type="CSTR" value="Loaded"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.2"/>
+			<atom name="ENUS" type="CSTR" value="Task ID:"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.3"/>
+			<atom name="ENUS" type="CSTR" value="Load Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.4"/>
+			<atom name="ENUS" type="CSTR" value="Started"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.5"/>
+			<atom name="ENUS" type="CSTR" value="Completed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.6"/>
+			<atom name="ENUS" type="CSTR" value="Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.7"/>
+			<atom name="ENUS" type="CSTR" value="Aborted"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.8"/>
+			<atom name="ENUS" type="CSTR" value="Cancelled"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.9.9"/>
+			<atom name="ENUS" type="CSTR" value="Started"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.13.1"/>
+			<atom name="ENUS" type="CSTR" value="Xcelera A"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.13.2"/>
+			<atom name="ENUS" type="CSTR" value="syngo Dynamics A"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.1"/>
+			<atom name="ENUS" type="CSTR" value="Enabled"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.2"/>
+			<atom name="ENUS" type="CSTR" value="Disabled"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.3"/>
+			<atom name="ENUS" type="CSTR" value="Compression"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.4"/>
+			<atom name="ENUS" type="CSTR" value="Encryption"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.5"/>
+			<atom name="ENUS" type="CSTR" value="Prevent Client Modify"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.9"/>
+			<atom name="ENUS" type="CSTR" value="Grid Language"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.10"/>
+			<atom name="ENUS" type="CSTR" value="Minimum ADE Interoperability"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.14.12"/>
+			<atom name="ENUS" type="CSTR" value="Named Object Support"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Content Block"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.2"/>
+			<atom name="ENUS" type="CSTR" value="Content Handle"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.3"/>
+			<atom name="ENUS" type="CSTR" value="Locations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.4"/>
+			<atom name="ENUS" type="CSTR" value="Location"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.5"/>
+			<atom name="ENUS" type="CSTR" value="Node ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.6"/>
+			<atom name="ENUS" type="CSTR" value="Metadata"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.7"/>
+			<atom name="ENUS" type="CSTR" value="Object ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.8"/>
+			<atom name="ENUS" type="CSTR" value="CDMI Data Object Name"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.1.9"/>
+			<atom name="ENUS" type="CSTR" value="S3 Bucket and Object Key"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.1"/>
+			<atom name="ENUS" type="CSTR" value="Content Lookup Successful"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.2"/>
+			<atom name="ENUS" type="CSTR" value="Object Not Found"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.3"/>
+			<atom name="ENUS" type="CSTR" value="Service Unavailable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.4"/>
+			<atom name="ENUS" type="CSTR" value="EC Profile"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.5"/>
+			<atom name="ENUS" type="CSTR" value="Archive Copy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.6"/>
+			<atom name="ENUS" type="CSTR" value="Disk Copy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.7"/>
+			<atom name="ENUS" type="CSTR" value="Erasure Coded Copy"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.3.15.2.8"/>
+			<atom name="ENUS" type="CSTR" value="Bucket Not Found"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Node ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.10"/>
+			<atom name="ENUS" type="CSTR" value="ARC"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.20"/>
+			<atom name="ENUS" type="CSTR" value="MFS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.12"/>
+			<atom name="ENUS" type="CSTR" value="Storage Node Decommissioning"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.13"/>
+			<atom name="ENUS" type="CSTR" value="StorageNode Lost"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.14"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Update"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.15"/>
+			<atom name="ENUS" type="CSTR" value="Debug Print"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.16"/>
+			<atom name="ENUS" type="CSTR" value="Enable DICOM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.37"/>
+			<atom name="ENUS" type="CSTR" value="Disable DICOM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.17"/>
+			<atom name="ENUS" type="CSTR" value="Resources Update"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.19"/>
+			<atom name="ENUS" type="CSTR" value="Unknown Task"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.2"/>
+			<atom name="ENUS" type="CSTR" value="ADC"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.3"/>
+			<atom name="ENUS" type="CSTR" value="LDR"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.4"/>
+			<atom name="ENUS" type="CSTR" value="CMS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.5"/>
+			<atom name="ENUS" type="CSTR" value="NMS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.6"/>
+			<atom name="ENUS" type="CSTR" value="AMS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.7"/>
+			<atom name="ENUS" type="CSTR" value="SSM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.8"/>
+			<atom name="ENUS" type="CSTR" value="CLB"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.9"/>
+			<atom name="ENUS" type="CSTR" value="CMN"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.29"/>
+			<atom name="ENUS" type="CSTR" value="Source"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.30"/>
+			<atom name="ENUS" type="CSTR" value="Destination"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.31"/>
+			<atom name="ENUS" type="CSTR" value="Nodes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.32"/>
+			<atom name="ENUS" type="CSTR" value="Sites"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.21"/>
+			<atom name="ENUS" type="CSTR" value="LDR Foreground Verification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.22"/>
+			<atom name="ENUS" type="CSTR" value="Storage Node Hardware Refresh"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.23"/>
+			<atom name="ENUS" type="CSTR" value="LDR Content Rebalancing"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.24"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Import"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.25"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Commit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.26"/>
+			<atom name="ENUS" type="CSTR" value="Legacy CBID Continuation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.27"/>
+			<atom name="ENUS" type="CSTR" value="Grid Expansion"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.28"/>
+			<atom name="ENUS" type="CSTR" value="Software Upgrade"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.33"/>
+			<atom name="ENUS" type="CSTR" value="Unknown"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.34"/>
+			<atom name="ENUS" type="CSTR" value="Initial"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.35"/>
+			<atom name="ENUS" type="CSTR" value="Add Server"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.36"/>
+			<atom name="ENUS" type="CSTR" value="Entity Removal"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.38"/>
+			<atom name="ENUS" type="CSTR" value="Update Flags"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.39"/>
+			<atom name="ENUS" type="CSTR" value="Enable HTTPS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.40"/>
+			<atom name="ENUS" type="CSTR" value="ARC Foreground Verification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.41"/>
+			<atom name="ENUS" type="CSTR" value="Node Decommissioning"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.42"/>
+			<atom name="ENUS" type="CSTR" value="Server"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.43"/>
+			<atom name="ENUS" type="CSTR" value="Control/Storage Node Hardware Refresh"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.44"/>
+			<atom name="ENUS" type="CSTR" value="Admin Node Decommissioning"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.45"/>
+			<atom name="ENUS" type="CSTR" value="Gateway Node Decommissioning"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.46"/>
+			<atom name="ENUS" type="CSTR" value="Admin/Gateway Node Decommissioning"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.47"/>
+			<atom name="ENUS" type="CSTR" value="Control Node Hardware Refresh"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.48"/>
+			<atom name="ENUS" type="CSTR" value="Remove NMS Cluster Bindings"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.49"/>
+			<atom name="ENUS" type="CSTR" value="Verify Managed Locations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.50"/>
+			<atom name="ENUS" type="CSTR" value="Edit Bundle"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.51"/>
+			<atom name="ENUS" type="CSTR" value="ILM Re-evaluation (User Triggered)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.52"/>
+			<atom name="ENUS" type="CSTR" value="Import Bundles for Metadata Replication"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.53"/>
+			<atom name="ENUS" type="CSTR" value="Verify Locations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.54"/>
+			<atom name="ENUS" type="CSTR" value="Control/Storage Node Hardware Refresh Cleanup"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.55"/>
+			<atom name="ENUS" type="CSTR" value="Object Location Indexing"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.56"/>
+			<atom name="ENUS" type="CSTR" value="DDS"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.57"/>
+			<atom name="ENUS" type="CSTR" value="Site"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.58"/>
+			<atom name="ENUS" type="CSTR" value="Clean Up Unused Cassandra Keys"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.59"/>
+			<atom name="ENUS" type="CSTR" value="CMS Node Decommissioning"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.60"/>
+			<atom name="ENUS" type="CSTR" value="ILM Evaluation (Volume Lost)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.1.61"/>
+			<atom name="ENUS" type="CSTR" value="Cassandra Site Expansion"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.1"/>
+			<atom name="ENUS" type="CSTR" value="LDR and CMS version check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.10"/>
+			<atom name="ENUS" type="CSTR" value="CMS version check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.11"/>
+			<atom name="ENUS" type="CSTR" value="Node Lost"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.12"/>
+			<atom name="ENUS" type="CSTR" value="ADC version check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.13"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Update"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.14"/>
+			<atom name="ENUS" type="CSTR" value="Node version check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.15"/>
+			<atom name="ENUS" type="CSTR" value="Print Debug Message"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.16"/>
+			<atom name="ENUS" type="CSTR" value="Resources Preload"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.17"/>
+			<atom name="ENUS" type="CSTR" value="Resources Wait For Unload"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.18"/>
+			<atom name="ENUS" type="CSTR" value="Resources Wait For Version"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.2"/>
+			<atom name="ENUS" type="CSTR" value="LDR storage state lock"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.3"/>
+			<atom name="ENUS" type="CSTR" value="LDR storage read only"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.4"/>
+			<atom name="ENUS" type="CSTR" value="CMS migrate content (1)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.5"/>
+			<atom name="ENUS" type="CSTR" value="LDR Verify Data"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.6"/>
+			<atom name="ENUS" type="CSTR" value="CMS migrate content (2)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.7"/>
+			<atom name="ENUS" type="CSTR" value="LDR storage offline"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.8"/>
+			<atom name="ENUS" type="CSTR" value="FAIL/ABORT - LDR storage online"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.9"/>
+			<atom name="ENUS" type="CSTR" value="FAIL/ABORT - LDR storage state unlock"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.19"/>
+			<atom name="ENUS" type="CSTR" value="Prepare Task"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.20"/>
+			<atom name="ENUS" type="CSTR" value="Finish Task"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.21"/>
+			<atom name="ENUS" type="CSTR" value="Wait For Software Version"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.22"/>
+			<atom name="ENUS" type="CSTR" value="LDR State Set"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.24"/>
+			<atom name="ENUS" type="CSTR" value="Content Rebalancing"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.25"/>
+			<atom name="ENUS" type="CSTR" value="CBID Table Recalculate"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.26"/>
+			<atom name="ENUS" type="CSTR" value="Content Remap"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.27"/>
+			<atom name="ENUS" type="CSTR" value="Content Migration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.28"/>
+			<atom name="ENUS" type="CSTR" value="Content Verification"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.29"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Revocation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.30"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Import"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.31"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Commit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.32"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grade Register"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.33"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grade Unregister"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.34"/>
+			<atom name="ENUS" type="CSTR" value="Group Register"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.35"/>
+			<atom name="ENUS" type="CSTR" value="Group Unregister"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.36"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Enable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.37"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Disable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.38"/>
+			<atom name="ENUS" type="CSTR" value="NMS Entity Register"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.39"/>
+			<atom name="ENUS" type="CSTR" value="NMS Entity Unregister"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.40"/>
+			<atom name="ENUS" type="CSTR" value="Resources Unload"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.41"/>
+			<atom name="ENUS" type="CSTR" value="Legacy CBID Synchronization"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.42"/>
+			<atom name="ENUS" type="CSTR" value="Node Shutdown"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.43"/>
+			<atom name="ENUS" type="CSTR" value="Unknown"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.44"/>
+			<atom name="ENUS" type="CSTR" value="Wait For Locks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.45"/>
+			<atom name="ENUS" type="CSTR" value="Resources Update"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.46"/>
+			<atom name="ENUS" type="CSTR" value="Wait For Restart"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.47"/>
+			<atom name="ENUS" type="CSTR" value="Wait For Pending Replications"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.48"/>
+			<atom name="ENUS" type="CSTR" value="Node Unregister"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.49"/>
+			<atom name="ENUS" type="CSTR" value="Verify Target Existence"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.50"/>
+			<atom name="ENUS" type="CSTR" value="CMS Database Migration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.51"/>
+			<atom name="ENUS" type="CSTR" value="Finish CMS Migration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.52"/>
+			<atom name="ENUS" type="CSTR" value="Disable External Services"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.53"/>
+			<atom name="ENUS" type="CSTR" value="Flush Audit Queues"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.54"/>
+			<atom name="ENUS" type="CSTR" value="Flush Audit Relay Queues"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.55"/>
+			<atom name="ENUS" type="CSTR" value="Wait For CMN Deactivation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.56"/>
+			<atom name="ENUS" type="CSTR" value="NMS Cluster Register"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.57"/>
+			<atom name="ENUS" type="CSTR" value="HTTP Permissions Register"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.58"/>
+			<atom name="ENUS" type="CSTR" value="Add Rows to a Bundle"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.59"/>
+			<atom name="ENUS" type="CSTR" value="Evaluating ILM"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.60"/>
+			<atom name="ENUS" type="CSTR" value="Edit Rows in a Bundle"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.61"/>
+			<atom name="ENUS" type="CSTR" value="Metadata Replication Enable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.62"/>
+			<atom name="ENUS" type="CSTR" value="Verify Locations"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.63"/>
+			<atom name="ENUS" type="CSTR" value="Wait For LDR State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.64"/>
+			<atom name="ENUS" type="CSTR" value="Send Object Lost State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.65"/>
+			<atom name="ENUS" type="CSTR" value="Object Location Indexing Conversion"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.66"/>
+			<atom name="ENUS" type="CSTR" value="CMS Database Recovery"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.67"/>
+			<atom name="ENUS" type="CSTR" value="Delete Rows from a Bundle"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.69"/>
+			<atom name="ENUS" type="CSTR" value="Checking Cassandra status on new DDSs"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.70"/>
+			<atom name="ENUS" type="CSTR" value="Running Cassandra Node Cleanup"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.71"/>
+			<atom name="ENUS" type="CSTR" value="Checking Cassandra Data Migration Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.2.72"/>
+			<atom name="ENUS" type="CSTR" value="Running Cassandra Node Repair"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.3.1"/>
+			<atom name="ENUS" type="CSTR" value="Bycast Inc."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.1"/>
+			<atom name="ENUS" type="CSTR" value="N/A"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.2"/>
+			<atom name="ENUS" type="CSTR" value="Done"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.3"/>
+			<atom name="ENUS" type="CSTR" value="Unknown Error"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.4"/>
+			<atom name="ENUS" type="CSTR" value="Starting..."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.5"/>
+			<atom name="ENUS" type="CSTR" value="Pausing..."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.6"/>
+			<atom name="ENUS" type="CSTR" value="Paused"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.7"/>
+			<atom name="ENUS" type="CSTR" value="Aborting..."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.8"/>
+			<atom name="ENUS" type="CSTR" value="Aborted"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.9"/>
+			<atom name="ENUS" type="CSTR" value="Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.10"/>
+			<atom name="ENUS" type="CSTR" value="Service Unavailable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.11"/>
+			<atom name="ENUS" type="CSTR" value="Transaction Malformed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.12"/>
+			<atom name="ENUS" type="CSTR" value="Action Unsupported"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.13"/>
+			<atom name="ENUS" type="CSTR" value="Retrying"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.14"/>
+			<atom name="ENUS" type="CSTR" value="Internal Error"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.15"/>
+			<atom name="ENUS" type="CSTR" value="Check Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.16"/>
+			<atom name="ENUS" type="CSTR" value="Pause Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.17"/>
+			<atom name="ENUS" type="CSTR" value="Resume Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.18"/>
+			<atom name="ENUS" type="CSTR" value="Abort Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.19"/>
+			<atom name="ENUS" type="CSTR" value="Node ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.20"/>
+			<atom name="ENUS" type="CSTR" value="All Nodes"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.21"/>
+			<atom name="ENUS" type="CSTR" value="Action Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.22"/>
+			<atom name="ENUS" type="CSTR" value="Stop Action Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.23"/>
+			<atom name="ENUS" type="CSTR" value="Start Action Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.24"/>
+			<atom name="ENUS" type="CSTR" value="Pause Action Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.25"/>
+			<atom name="ENUS" type="CSTR" value="No Long Term Action"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.26"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Update Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.27"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Revocation Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.28"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Store Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.29"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Retrieve Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.30"/>
+			<atom name="ENUS" type="CSTR" value="Resources Lock Failed"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.31"/>
+			<atom name="ENUS" type="CSTR" value="Waiting..."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.32"/>
+			<atom name="ENUS" type="CSTR" value="Paused for user to run cms-refresh.sh script"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.33"/>
+			<atom name="ENUS" type="CSTR" value="Unable to find node ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.34"/>
+			<atom name="ENUS" type="CSTR" value="No remaining audit repositories"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.35"/>
+			<atom name="ENUS" type="CSTR" value="No remaining NMS cluster"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.36"/>
+			<atom name="ENUS" type="CSTR" value="About to update all nodes of type"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.37"/>
+			<atom name="ENUS" type="CSTR" value="About to update Node ID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.5.38"/>
+			<atom name="ENUS" type="CSTR" value="Waiting for ILM Evaluation to complete"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.1"/>
+			<atom name="ENUS" type="CSTR" value="Debug Print"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.2"/>
+			<atom name="ENUS" type="CSTR" value="Software Version Check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.3"/>
+			<atom name="ENUS" type="CSTR" value="Long-Term Action Completion Check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.4"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Import"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.5"/>
+			<atom name="ENUS" type="CSTR" value="Bundle Commit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.6"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Enable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.7"/>
+			<atom name="ENUS" type="CSTR" value="DICOM Disable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.8"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grade Register"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.9"/>
+			<atom name="ENUS" type="CSTR" value="Storage Grade Unregister"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.10"/>
+			<atom name="ENUS" type="CSTR" value="Group Register"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.11"/>
+			<atom name="ENUS" type="CSTR" value="Group Unregister"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.12"/>
+			<atom name="ENUS" type="CSTR" value="Storage Maintenance Flag"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.13"/>
+			<atom name="ENUS" type="CSTR" value="Storage Desired State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.14"/>
+			<atom name="ENUS" type="CSTR" value="Storage Current State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.15"/>
+			<atom name="ENUS" type="CSTR" value="Foreground Verification Attributes Reset"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.16"/>
+			<atom name="ENUS" type="CSTR" value="Foreground Verification Start"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.17"/>
+			<atom name="ENUS" type="CSTR" value="Orphan Detection Activation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.20"/>
+			<atom name="ENUS" type="CSTR" value="CBID Table Recalculate"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.21"/>
+			<atom name="ENUS" type="CSTR" value="Alternate CBID Table Drop"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.22"/>
+			<atom name="ENUS" type="CSTR" value="Content Rebalancing"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.23"/>
+			<atom name="ENUS" type="CSTR" value="Content Migration"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.24"/>
+			<atom name="ENUS" type="CSTR" value="Node Shutdown"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.25"/>
+			<atom name="ENUS" type="CSTR" value="Gateway Cache Flush"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.26"/>
+			<atom name="ENUS" type="CSTR" value="Gateway Cache Count"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.27"/>
+			<atom name="ENUS" type="CSTR" value="Resources Preload"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.28"/>
+			<atom name="ENUS" type="CSTR" value="Resources Unload"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.29"/>
+			<atom name="ENUS" type="CSTR" value="Resources Unload Check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.30"/>
+			<atom name="ENUS" type="CSTR" value="List Registered Actions And Checks"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.31"/>
+			<atom name="ENUS" type="CSTR" value="List Long-Term Instances"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.32"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Update"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.33"/>
+			<atom name="ENUS" type="CSTR" value="Certificate Revocation"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.34"/>
+			<atom name="ENUS" type="CSTR" value="Resources Lock"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.35"/>
+			<atom name="ENUS" type="CSTR" value="Start Time Check"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.36"/>
+			<atom name="ENUS" type="CSTR" value="Resources Update"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.37"/>
+			<atom name="ENUS" type="CSTR" value="Node Unregister"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.38"/>
+			<atom name="ENUS" type="CSTR" value="Gateway Replication Status"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.39"/>
+			<atom name="ENUS" type="CSTR" value="Toggle Audit"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.40"/>
+			<atom name="ENUS" type="CSTR" value="Audit Queue Count"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.41"/>
+			<atom name="ENUS" type="CSTR" value="Set External Services State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.42"/>
+			<atom name="ENUS" type="CSTR" value="Remove Audit Repository"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.43"/>
+			<atom name="ENUS" type="CSTR" value="Audit Relay Queue Count"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.44"/>
+			<atom name="ENUS" type="CSTR" value="CMN State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.45"/>
+			<atom name="ENUS" type="CSTR" value="Remove NMS Cluster"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.46"/>
+			<atom name="ENUS" type="CSTR" value="Register NMS Cluster"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.47"/>
+			<atom name="ENUS" type="CSTR" value="Register HTTP Client"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.48"/>
+			<atom name="ENUS" type="CSTR" value="Add/Edit/Delete Rows In Bundle"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.49"/>
+			<atom name="ENUS" type="CSTR" value="Metadata Replication Enable"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.50"/>
+			<atom name="ENUS" type="CSTR" value="CLOC_LOST Queue Forwarding State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.51"/>
+			<atom name="ENUS" type="CSTR" value="Send Object Lost"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.52"/>
+			<atom name="ENUS" type="CSTR" value="DDS Current State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.53"/>
+			<atom name="ENUS" type="CSTR" value="DDS Desired State"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.54"/>
+			<atom name="ENUS" type="CSTR" value="DDS Node Repair"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.6.55"/>
+			<atom name="ENUS" type="CSTR" value="DDS Node Clean up"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.4.1"/>
+			<atom name="ENUS" type="CSTR" value="No Events"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.4.4.2"/>
+			<atom name="ENUS" type="CSTR" value="Unable to open fifo"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.5.2.2"/>
+			<atom name="ENUS" type="CSTR" value="Error"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.0.5.2.9"/>
+			<atom name="ENUS" type="CSTR" value="N/A"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.1.1.13"/>
+			<atom name="ENUS" type="CSTR" value="StorageGRID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.1.1.14"/>
+			<atom name="ENUS" type="CSTR" value="Bycast StorageGRID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.1.1.15"/>
+			<atom name="ENUS" type="CSTR" value="NetApp"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.1.1.16"/>
+			<atom name="ENUS" type="CSTR" value="Webscale"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.1.1.17"/>
+			<atom name="ENUS" type="CSTR" value="System"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.1.1.1"/>
+			<atom name="ENUS" type="CSTR" value="Bycast Network Management System"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.5.1"/>
+			<atom name="ENUS" type="CSTR" value="Sign In"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.5.11"/>
+			<atom name="ENUS" type="CSTR" value="Continue"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.1.5.12"/>
+			<atom name="ENUS" type="CSTR" value="NMS GUI Timeout"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.3.3.1"/>
+			<atom name="ENUS" type="CSTR" value="NetApp Inc."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.3.7.1"/>
+			<atom name="ENUS" type="CSTR" value="Bycast StorageGRID"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.4.3.1"/>
+			<atom name="ENUS" type="CSTR" value="Bycast Inc."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.1.5.6.1"/>
+			<atom name="ENUS" type="CSTR" value="Use tab to select the button, and enter to activate it."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.1"/>
+			<atom name="ENUS" type="CSTR" value="cannot be empty."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.2"/>
+			<atom name="ENUS" type="CSTR" value="is invalid."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.3"/>
+			<atom name="ENUS" type="CSTR" value="Only printable characters (ASCII 9, 32-126) are permitted."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.4"/>
+			<atom name="ENUS" type="CSTR" value="Only integers 0 to 100000 are permitted."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.5"/>
+			<atom name="ENUS" type="CSTR" value="is not a valid integer."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.6"/>
+			<atom name="ENUS" type="CSTR" value="Out of range. (Max. 9223372036854775807)"/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.7"/>
+			<atom name="ENUS" type="CSTR" value="A valid X.509 certificate in PEM format is required."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.8"/>
+			<atom name="ENUS" type="CSTR" value="A valid unencrypted RSA private key in PEM format is required."/>
+		</container>
+		<container name="SENT">
+			<atom name="SOID" type="CSTR" value="2.16.124.113590.3.3.2.1.1.9"/>
+			<atom name="ENUS" type="CSTR" value="Not configured"/>
+		</container>
+	</container>
+</containerxml>

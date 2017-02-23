@@ -129,8 +129,8 @@ ROOT:CONT:
 		FCCA:FC32:'FC32'
 		FCCA:FC32:'AAAA'
 		FCCA:FC32:'1234'
-		FCCA:FC32:'1. 0'
-		FCCA:FC32:''''''
+		FCCA:FC32:0x312E2030
+		FCCA:FC32:0x27272727
 		FCCA:FC32:'FRED'
 		FCCA:FC32:'1234'
 		FCCA:FC32:'%SDN'
@@ -148,9 +148,9 @@ ROOT:CONT:
 		ENUM:ENUM:10
 		ENUM:ENUM:255
 		ENUM:ENUM:39023
+		CSTR:CSTR:"abc"
 		CSTR:CSTR:"A very exciting test\nstring!"
-		CSTR:CSTR:"\"\"\"\"A very exciting test\nstring!\"\""
-		USTR:USTR:"\"\\イロハニホヘト ホヘト ホヘ\n\r\"\"\""
+		USTR:USTR:"\\イロハニホヘト ホヘト ホヘ\n\r"
 		EMPT:CSTR:""
 		EMPT:USTR:""
 		AVAL:CONT:

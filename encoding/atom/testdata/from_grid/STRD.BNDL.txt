@@ -1,0 +1,4248 @@
+STRD:CONT:
+	BTIM:UI64:1484723625527723
+	BVER:UI32:1
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.1"
+		ENUS:CSTR:"Network Management System"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.2"
+		ENUS:CSTR:"System Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.3"
+		ENUS:CSTR:"Last Refreshed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.4"
+		ENUS:CSTR:"Updated"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.5"
+		ENUS:CSTR:"to"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.6"
+		ENUS:CSTR:"Actions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.7"
+		ENUS:CSTR:"Insert"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.8"
+		ENUS:CSTR:"Delete"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.9"
+		ENUS:CSTR:"Are you sure you want to delete this entry?"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.10"
+		ENUS:CSTR:"Edit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.11"
+		ENUS:CSTR:"Apply Changes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.12"
+		ENUS:CSTR:"No String Found."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.13"
+		ENUS:CSTR:"Are you sure you want to delete"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.15"
+		ENUS:CSTR:"Not Applicable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.16"
+		ENUS:CSTR:"Undo"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.17"
+		ENUS:CSTR:"Records Per Page"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.18"
+		ENUS:CSTR:"Show"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.19"
+		ENUS:CSTR:"of"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.20"
+		ENUS:CSTR:"Result(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.21"
+		ENUS:CSTR:"Attribute description not found. <br/> Contact support."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.22"
+		ENUS:CSTR:"Copy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.23"
+		ENUS:CSTR:"Revert"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.24"
+		ENUS:CSTR:"Export"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.25"
+		ENUS:CSTR:"None"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.1.26"
+		ENUS:CSTR:"Submit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.1"
+		ENUS:CSTR:"us"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.2"
+		ENUS:CSTR:"s"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.3"
+		ENUS:CSTR:"microsecond"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.4"
+		ENUS:CSTR:"microseconds"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.5"
+		ENUS:CSTR:"millisecond"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.6"
+		ENUS:CSTR:"milliseconds"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.7"
+		ENUS:CSTR:"second"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.8"
+		ENUS:CSTR:"seconds"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.9"
+		ENUS:CSTR:"minute"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.10"
+		ENUS:CSTR:"minutes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.11"
+		ENUS:CSTR:"hour"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.12"
+		ENUS:CSTR:"hours"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.13"
+		ENUS:CSTR:"day"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.14"
+		ENUS:CSTR:"days"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.15"
+		ENUS:CSTR:"year"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.16"
+		ENUS:CSTR:"years"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.17"
+		ENUS:CSTR:"weeks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.18"
+		ENUS:CSTR:"months"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.19"
+		ENUS:CSTR:"microsecond(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.20"
+		ENUS:CSTR:"millisecond(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.21"
+		ENUS:CSTR:"second(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.22"
+		ENUS:CSTR:"minute(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.23"
+		ENUS:CSTR:"hour(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.24"
+		ENUS:CSTR:"day(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.25"
+		ENUS:CSTR:"week(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.26"
+		ENUS:CSTR:"month(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.1.27"
+		ENUS:CSTR:"year(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.1"
+		ENUS:CSTR:"1/s"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.2"
+		ENUS:CSTR:"B/s"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.3"
+		ENUS:CSTR:"b/s"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.2.4"
+		ENUS:CSTR:"ppm/s"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.1"
+		ENUS:CSTR:"Deg C"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.2"
+		ENUS:CSTR:"Deg F"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.3"
+		ENUS:CSTR:"m"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.4"
+		ENUS:CSTR:"B"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.5"
+		ENUS:CSTR:"Bytes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.6"
+		ENUS:CSTR:"b"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.7"
+		ENUS:CSTR:"Bits"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.8"
+		ENUS:CSTR:"%"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.9"
+		ENUS:CSTR:"ppm"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.3.10"
+		ENUS:CSTR:"rad"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.1"
+		ENUS:CSTR:"K"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.2"
+		ENUS:CSTR:"M"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.3"
+		ENUS:CSTR:"G"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.4"
+		ENUS:CSTR:"T"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.5"
+		ENUS:CSTR:"P"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.6"
+		ENUS:CSTR:"Ki"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.7"
+		ENUS:CSTR:"Mi"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.8"
+		ENUS:CSTR:"Gi"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.9"
+		ENUS:CSTR:"Ti"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.10"
+		ENUS:CSTR:"Pe"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.11"
+		ENUS:CSTR:"Peta"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.12"
+		ENUS:CSTR:"Tera"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.13"
+		ENUS:CSTR:"Giga"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.14"
+		ENUS:CSTR:"Kilo"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.15"
+		ENUS:CSTR:"Si"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.16"
+		ENUS:CSTR:"Milli"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.17"
+		ENUS:CSTR:"Micro"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.18"
+		ENUS:CSTR:"Nano"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.19"
+		ENUS:CSTR:"m"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.2.4.20"
+		ENUS:CSTR:"n"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.1"
+		ENUS:CSTR:"Select an attribute and then either a Quick Query or a Custom Query"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.2"
+		ENUS:CSTR:"Attribute"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.3"
+		ENUS:CSTR:"Quick Query"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.4"
+		ENUS:CSTR:"Last 5 Minutes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.5"
+		ENUS:CSTR:"Last Hour"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.6"
+		ENUS:CSTR:"Last Day"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.7"
+		ENUS:CSTR:"Last Week"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.8"
+		ENUS:CSTR:"Last Month"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.9"
+		ENUS:CSTR:"Custom Query"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.10"
+		ENUS:CSTR:"Start Date"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.11"
+		ENUS:CSTR:"End Date"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.12"
+		ENUS:CSTR:"Last Year"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.13"
+		ENUS:CSTR:"All"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.3.14"
+		ENUS:CSTR:"Update"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.4.1"
+		ENUS:CSTR:"Name is already in used."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.4.2"
+		ENUS:CSTR:"Access to this page is restricted."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.4.3"
+		ENUS:CSTR:"Service Unavailable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.1.4.4"
+		ENUS:CSTR:"Internal Error"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.1"
+		ENUS:CSTR:"Information Region"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.2"
+		ENUS:CSTR:"Sign Out"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.3"
+		ENUS:CSTR:"Refresh Page"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4"
+		ENUS:CSTR:"Current User"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5"
+		ENUS:CSTR:"API Docs"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.1"
+		ENUS:CSTR:"Grid Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.2"
+		ENUS:CSTR:"Grid Topology"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.3"
+		ENUS:CSTR:"Account Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.5"
+		ENUS:CSTR:"Grid Provisioning Tool"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.6"
+		ENUS:CSTR:"ILM Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.8"
+		ENUS:CSTR:"NMS Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.9"
+		ENUS:CSTR:"Group"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.10"
+		ENUS:CSTR:"Settings"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.12"
+		ENUS:CSTR:"Grid Configuration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.12.1"
+		ENUS:CSTR:"Grid Specification File"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.12.1.1"
+		ENUS:CSTR:"Click the export button to view the Grid Specification File."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.13"
+		ENUS:CSTR:"is not compatible with"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.14.1"
+		ENUS:CSTR:"NMS Names"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.15"
+		ENUS:CSTR:"API service endpoints (LDR services) are secured and identified by X.509 server certificates. By default, every LDR service is issued a certificate signed by the grid CA. These CA signed certificates can be replaced by a single common custom server certificate and corresponding private key."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.16"
+		ENUS:CSTR:"Dashboard"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.17"
+		ENUS:CSTR:"Not available because the root domain name has not been configured."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.18"
+		ENUS:CSTR:"Auto-generated DNS resource record entries that can be used to configure the DNS server for S3 path-style requests, and CDMI requests."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.19"
+		ENUS:CSTR:"Specify the root domain name to use for your StorageGRID Webscale system. This value must be common to all API service endpoints. A list of suggested server-specific DNS entries is generated based on the Root Domain Name value and displayed in the Overview page. For example, if the Root Domain Name value is sg.company.com, the suggested API service endpoints might be s1.sg.company.com, s2.sg.company.com, gw1.sg.company.com."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.20"
+		ENUS:CSTR:"Download DNS Resource Records"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.4.21"
+		ENUS:CSTR:"Auto-generated DNS resource record entries that can be used to configure the DNS server for S3 virtual hosted-style requests."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.1"
+		ENUS:CSTR:"ILM Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.1.1"
+		ENUS:CSTR:"Expand All"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.1.2"
+		ENUS:CSTR:"Close All"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.1.3"
+		ENUS:CSTR:"Refresh"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.1.4"
+		ENUS:CSTR:"Default"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.1.5"
+		ENUS:CSTR:"Actions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.1"
+		ENUS:CSTR:"Storage Pools"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.2"
+		ENUS:CSTR:"Pool Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.3"
+		ENUS:CSTR:"Storage Nodes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.4"
+		ENUS:CSTR:"Installed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.5"
+		ENUS:CSTR:"Used"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.6"
+		ENUS:CSTR:"Usable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.7"
+		ENUS:CSTR:"Configure Site Names"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.8"
+		ENUS:CSTR:"Storage Grade"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.9"
+		ENUS:CSTR:"Site"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.10"
+		ENUS:CSTR:"All Disks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.11"
+		ENUS:CSTR:"Archive Nodes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.12"
+		ENUS:CSTR:"The Installed, Used, and Usable capacity calculations do not include Archive Nodes."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.13"
+		ENUS:CSTR:"All Sites"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.14"
+		ENUS:CSTR:"In"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.15"
+		ENUS:CSTR:"Control Nodes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.16"
+		ENUS:CSTR:"Changes made to a storage pool that is currently in use by an ILM policy do not take effect until the ILM policy is activated again."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.17"
+		ENUS:CSTR:"Insert Pool"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.2.18"
+		ENUS:CSTR:"Insert Storage"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.1"
+		ENUS:CSTR:"Rules"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.2"
+		ENUS:CSTR:"Rule Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.3"
+		ENUS:CSTR:"Select Rule"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.4"
+		ENUS:CSTR:"New Rule"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.5"
+		ENUS:CSTR:"Matching Criteria"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.6"
+		ENUS:CSTR:"Filter"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.7"
+		ENUS:CSTR:"Object referenced by API"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.8"
+		ENUS:CSTR:"Object not referenced by API"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.9"
+		ENUS:CSTR:"Both"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.10"
+		ENUS:CSTR:"All Objects"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.11"
+		ENUS:CSTR:"Metadata"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.12"
+		ENUS:CSTR:"Content Placement"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.13"
+		ENUS:CSTR:"Retention Diagram"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.14"
+		ENUS:CSTR:"OR"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.15"
+		ENUS:CSTR:"AND"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.16"
+		ENUS:CSTR:"Equals"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.17"
+		ENUS:CSTR:"Starts With"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.18"
+		ENUS:CSTR:"Ends With"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.19"
+		ENUS:CSTR:"Contains"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.20"
+		ENUS:CSTR:"Less Than"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.21"
+		ENUS:CSTR:"Less or Equals"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.22"
+		ENUS:CSTR:"Greater Than"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.23"
+		ENUS:CSTR:"Greater or Equals"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.24"
+		ENUS:CSTR:"Exists"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.25"
+		ENUS:CSTR:"Not Equal"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.26"
+		ENUS:CSTR:"Not Start With"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.27"
+		ENUS:CSTR:"Not End With"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.28"
+		ENUS:CSTR:"Not Contain"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.29"
+		ENUS:CSTR:"Not Exist"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.30"
+		ENUS:CSTR:"On"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.31"
+		ENUS:CSTR:"Day"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.32"
+		ENUS:CSTR:"Year"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.33"
+		ENUS:CSTR:"Days"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.34"
+		ENUS:CSTR:"Years"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.35"
+		ENUS:CSTR:"keep a"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.36"
+		ENUS:CSTR:"temp copies in"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.37"
+		ENUS:CSTR:"for"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.38"
+		ENUS:CSTR:"forever"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.39"
+		ENUS:CSTR:"Reference Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.40"
+		ENUS:CSTR:"Ingest Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.41"
+		ENUS:CSTR:"File Path Format"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.42"
+		ENUS:CSTR:"You have unsaved rule definition. Do you want to continue without saving"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.43"
+		ENUS:CSTR:"in"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.44"
+		ENUS:CSTR:"The secondary storage pool must be different from the primary storage pool."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.45"
+		ENUS:CSTR:"Filter Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.46"
+		ENUS:CSTR:"Metadata Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.47"
+		ENUS:CSTR:"Metadata Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.48"
+		ENUS:CSTR:"Placement Start Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.49"
+		ENUS:CSTR:"Retention Period"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.50"
+		ENUS:CSTR:"Objects with all of the following SGAPI metadata:"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.51"
+		ENUS:CSTR:"Objects with all of the following CDMI metadata:"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.52"
+		ENUS:CSTR:"Objects with all of the following S3 or Swift properties:"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.53"
+		ENUS:CSTR:"copy in"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.54"
+		ENUS:CSTR:"replicated"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.55"
+		ENUS:CSTR:"erasure coded"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.56"
+		ENUS:CSTR:"Last Access Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.57"
+		ENUS:CSTR:"User Defined Creation Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.3.58"
+		ENUS:CSTR:"Noncurrent Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.1"
+		ENUS:CSTR:"Proposed Policy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.2"
+		ENUS:CSTR:"Errors in an ILM policy can cause irreparable data loss.  Review the policy carefully before activating it."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.3"
+		ENUS:CSTR:"Policy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.4"
+		ENUS:CSTR:"ILM Policy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.5"
+		ENUS:CSTR:"Evaluated Top Down"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.6"
+		ENUS:CSTR:"Active Policy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.7"
+		ENUS:CSTR:"Add to Policy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.8"
+		ENUS:CSTR:"Save"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.9"
+		ENUS:CSTR:"Revert to Active Policy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.10"
+		ENUS:CSTR:"Activate"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.11"
+		ENUS:CSTR:"Are you sure you want to make these changes to the proposed policy?"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.12"
+		ENUS:CSTR:"Evaluated Top Down"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.13"
+		ENUS:CSTR:"Are you sure you want to activate the proposed policy?"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.14"
+		ENUS:CSTR:"Are you sure you want to revert the proposed policy?"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.15"
+		ENUS:CSTR:"Re-evaluate Content"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.16"
+		ENUS:CSTR:"Are you sure that you want to re-apply the ILM policy to all objects in the StorageGRID Webscale system? ILM re-evaluation may result in changes to the number of copies, object locations, and object deletions."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.17"
+		ENUS:CSTR:"Click OK to start the ILM Re-evaluation (User-Triggered) grid task."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.4.18"
+		ENUS:CSTR:"Warning: Removing the Root Domain Name value disables support for S3 Virtual Hosted-Style requests."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.5.1"
+		ENUS:CSTR:"Saved Rules"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.5.2"
+		ENUS:CSTR:"Active"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.6.1"
+		ENUS:CSTR:"Active Policy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.6.2"
+		ENUS:CSTR:"In"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.7.1"
+		ENUS:CSTR:"Historical Policies"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.7.2"
+		ENUS:CSTR:"Policies"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.8.1"
+		ENUS:CSTR:"Historical Rules"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.8.2"
+		ENUS:CSTR:"Most Recent Start"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.8.3"
+		ENUS:CSTR:"Most Recent End"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.8.4"
+		ENUS:CSTR:"Load"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.9.1.1"
+		ENUS:CSTR:"<p>The name of the storage pool.  Maximum length: 20 characters.</p><p>For the purpose of object replication, storage is organized into storage pools. A storage pool is a logical grouping of Storage Nodes or Archive Nodes.</p><p>When configuring ILM rules, there is a one to one relationship between copies, Storage Nodes, and Archive Nodes. For each copy required by an ILM rule, there must be a corresponding Storage Node or Archive Node in the selected storage pool.</p>"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.9.1.3"
+		ENUS:CSTR:"The total number of Archive Nodes in the storage pool.  Archive Nodes and Storage Nodes cannot be configured in the same storage pool."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.9.1.4"
+		ENUS:CSTR:"The total number of Storage Nodes in the storage pool.  An ILM rule allows one copy for each Storage Node or Archive Node in a storage pool."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.9.1.5"
+		ENUS:CSTR:"The total amount of installed storage capacity for the storage pool."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.9.1.6"
+		ENUS:CSTR:"The total amount of installed storage capacity that has been consumed. This value is derived from the difference between Installed capacity and Usable capacity."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.9.1.7"
+		ENUS:CSTR:"The total amount of installed storage capacity that is currently usable for the storage pool."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.5.10.1.1"
+		ENUS:CSTR:"Erasure Coding"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.8.1"
+		ENUS:CSTR:"NMS Information"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.1"
+		ENUS:CSTR:"HTTP Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.2"
+		ENUS:CSTR:"Metadata"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.3"
+		ENUS:CSTR:"The following pages configure client permission profiles to allow connections to the grid via the HTTP protocol."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.4"
+		ENUS:CSTR:"Create HTTP permission profiles with required rights"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.5"
+		ENUS:CSTR:"Add certificate authorities and client certificates"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.6"
+		ENUS:CSTR:"Configure security partitions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.7"
+		ENUS:CSTR:"Associate an IP range to an HTTP permission profile"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.10.8"
+		ENUS:CSTR:"View a list of metadata that can be used by HTTP clients"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.1"
+		ENUS:CSTR:"Grid Maintenance"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.1.1"
+		ENUS:CSTR:"The following pages are maintenance procedures for your StorageGRID Webscale system that you can perform in the NMS."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.1.2"
+		ENUS:CSTR:"Upgrade the StorageGRID Webscale system to the latest version."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.1.3"
+		ENUS:CSTR:"Add grid nodes and data center sites to the StorageGRID Webscale system."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.1.4"
+		ENUS:CSTR:"Download the Grid Provisioning archive file containing encryption keys and passwords."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.1.5"
+		ENUS:CSTR:"Remove grid nodes from the StorageGRID Webscale system."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.2"
+		ENUS:CSTR:"Expansion"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.3"
+		ENUS:CSTR:"Software Upgrade"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.4"
+		ENUS:CSTR:"Provisioning Backup"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.12.5"
+		ENUS:CSTR:"Decommission"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.13.1"
+		ENUS:CSTR:"Storage Tenants"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.13.1.1"
+		ENUS:CSTR:"The following pages allow you to manage the Storage Tenants of your StorageGRID Webscale system."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.13.1.2"
+		ENUS:CSTR:"View, add, edit, and remove Tenant Accounts."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.13.1.3"
+		ENUS:CSTR:"View and edit Identity Federation."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.13.2"
+		ENUS:CSTR:"Tenant Accounts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.2.13.3"
+		ENUS:CSTR:"Identity Federation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.1"
+		ENUS:CSTR:"Account Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.2"
+		ENUS:CSTR:"Accounts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.3"
+		ENUS:CSTR:"User Accounts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.4"
+		ENUS:CSTR:"Group Accounts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.11.5"
+		ENUS:CSTR:"Browser Default"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.1"
+		ENUS:CSTR:"About"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.2"
+		ENUS:CSTR:"Management Interface version"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.3"
+		ENUS:CSTR:"Build"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.4"
+		ENUS:CSTR:"THIS SOFTWARE IS CONFIDENTIAL AND PROPRIETARY INFORMATION OF NETAPP, INC. OR ITS LICENSORS."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.5"
+		ENUS:CSTR:"Copyright"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.6"
+		ENUS:CSTR:"NetApp, All rights reserved. Specifications are subject to change without notice. NetApp, the NetApp logo, and Go Further, Faster are trademarks or registered trademarks of NetApp, Inc. in the United States and/or other countries."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.12.7"
+		ENUS:CSTR:"Inc."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.1"
+		ENUS:CSTR:"Alarm Severity Changed to"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.2"
+		ENUS:CSTR:"New"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.3"
+		ENUS:CSTR:"Alarm"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.4"
+		ENUS:CSTR:"Alert"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.5"
+		ENUS:CSTR:"Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.6"
+		ENUS:CSTR:"UTC"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.7"
+		ENUS:CSTR:"Current Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.8"
+		ENUS:CSTR:"Attribute"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.9"
+		ENUS:CSTR:"Alarm Cleared"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.10"
+		ENUS:CSTR:"State Changed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.11"
+		ENUS:CSTR:"to"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.12"
+		ENUS:CSTR:"Results (e-mail)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.13"
+		ENUS:CSTR:"Message"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.14"
+		ENUS:CSTR:"Trigger Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.15"
+		ENUS:CSTR:"Acknowledged"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.16"
+		ENUS:CSTR:"Un-Acknowledged"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.17"
+		ENUS:CSTR:"E-mail Server (SMTP) Information"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.18"
+		ENUS:CSTR:"You must specify both the mail server name and port. Clear both fields to disable notifications."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.19"
+		ENUS:CSTR:"Test E-mail"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.20"
+		ENUS:CSTR:"Authentication Credentials"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.21"
+		ENUS:CSTR:"Alarm Removed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.13.22"
+		ENUS:CSTR:"All e-mail notifications are now suppressed."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.1"
+		ENUS:CSTR:"Languages"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.2"
+		ENUS:CSTR:"United States - English"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.3"
+		ENUS:CSTR:"Japan - Japanese"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.4"
+		ENUS:CSTR:"Braille - English"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.14.5"
+		ENUS:CSTR:"China - Chinese"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.1"
+		ENUS:CSTR:"AutoSupport"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.2"
+		ENUS:CSTR:"User-Triggered AutoSupport"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.2.1"
+		ENUS:CSTR:"User-Triggered"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.2.2"
+		ENUS:CSTR:"Send"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.2.3"
+		ENUS:CSTR:"Sending..."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.3"
+		ENUS:CSTR:"Weekly AutoSupport"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.3.1"
+		ENUS:CSTR:"Weekly"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.15.3.2"
+		ENUS:CSTR:"AutoSupport messages cannot be sent due to incorrect settings on the E-mail Server page."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.1"
+		ENUS:CSTR:"Devices Tab Bar"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.2"
+		ENUS:CSTR:"Overview"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.3"
+		ENUS:CSTR:"Main"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.4"
+		ENUS:CSTR:"Alarms"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.5"
+		ENUS:CSTR:"History"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.6"
+		ENUS:CSTR:"Reports"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.7"
+		ENUS:CSTR:"Charts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.8"
+		ENUS:CSTR:"Text"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.9"
+		ENUS:CSTR:"Configuration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.10"
+		ENUS:CSTR:"Notification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.11"
+		ENUS:CSTR:"Account Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.12"
+		ENUS:CSTR:"Information"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.13"
+		ENUS:CSTR:"Tree"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.14"
+		ENUS:CSTR:"Logging"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.15"
+		ENUS:CSTR:"Server"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.16"
+		ENUS:CSTR:"Lists"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.17"
+		ENUS:CSTR:"Template"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.18"
+		ENUS:CSTR:"Notifications"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.19"
+		ENUS:CSTR:"General"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.20"
+		ENUS:CSTR:"Summary"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.4.21"
+		ENUS:CSTR:"Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.1"
+		ENUS:CSTR:"Sign In"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.2"
+		ENUS:CSTR:"Access denied."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.3"
+		ENUS:CSTR:"Your account has been suspended.  Please contact your account administrator."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.4"
+		ENUS:CSTR:"Your account has been disabled.  Please contact your account administrator."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.5"
+		ENUS:CSTR:"Invalid user name.  Please enter a valid user name and password."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.6"
+		ENUS:CSTR:"Invalid password.  Please enter a valid user name and password."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.7"
+		ENUS:CSTR:"Username"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.8"
+		ENUS:CSTR:"Password"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.9"
+		ENUS:CSTR:"Signed out."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.10"
+		ENUS:CSTR:"Waiting for Configuration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.11"
+		ENUS:CSTR:"Continue"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.12"
+		ENUS:CSTR:"Invalid credentials."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.13"
+		ENUS:CSTR:"Connection to NMS Unavailable."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.5.14"
+		ENUS:CSTR:"Signing out"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.6.1"
+		ENUS:CSTR:"Overview Region"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.6.2"
+		ENUS:CSTR:"View current alarms."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.6.3"
+		ENUS:CSTR:"Chart this attribute over the last day."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.1"
+		ENUS:CSTR:"Alarms Region"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.2"
+		ENUS:CSTR:"Severity"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.3"
+		ENUS:CSTR:"Attribute Code"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.4"
+		ENUS:CSTR:"CId"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.5"
+		ENUS:CSTR:"Node ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.6"
+		ENUS:CSTR:"Description"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.7"
+		ENUS:CSTR:"Alarm Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.8"
+		ENUS:CSTR:"Current Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.9"
+		ENUS:CSTR:"Normal"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.10"
+		ENUS:CSTR:"Unknown"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.11"
+		ENUS:CSTR:"Notice"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.12"
+		ENUS:CSTR:"Minor"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.13"
+		ENUS:CSTR:"Major"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.14"
+		ENUS:CSTR:"Critical"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.15"
+		ENUS:CSTR:"Cleared"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.16"
+		ENUS:CSTR:"Alarms History"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.17"
+		ENUS:CSTR:"System History"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.18"
+		ENUS:CSTR:"Id"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.19"
+		ENUS:CSTR:"Active"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.20"
+		ENUS:CSTR:"Primary Message"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.21"
+		ENUS:CSTR:"Secondary Message"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.22"
+		ENUS:CSTR:"Op"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.23"
+		ENUS:CSTR:"Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.24"
+		ENUS:CSTR:"Value Type"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.25"
+		ENUS:CSTR:"E-mail"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.26"
+		ENUS:CSTR:"Offline"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.27"
+		ENUS:CSTR:"Indeterminate"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.28"
+		ENUS:CSTR:"EQ"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.29"
+		ENUS:CSTR:"GE"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.30"
+		ENUS:CSTR:"LE"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.31"
+		ENUS:CSTR:"NE"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.32"
+		ENUS:CSTR:"Administratively Down"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.33"
+		ENUS:CSTR:"Service States"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.34"
+		ENUS:CSTR:"Service"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.35"
+		ENUS:CSTR:"Acknowledge Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.36"
+		ENUS:CSTR:"Trigger Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.37"
+		ENUS:CSTR:"Acknowledge"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.38"
+		ENUS:CSTR:"Global Custom Alarms"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.39"
+		ENUS:CSTR:"Default Alarms"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.40"
+		ENUS:CSTR:"Custom Alarms"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.41"
+		ENUS:CSTR:"Severity Levels"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.42"
+		ENUS:CSTR:"Admin Down"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.43"
+		ENUS:CSTR:"Connected"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.44"
+		ENUS:CSTR:"Filter by"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.45"
+		ENUS:CSTR:"equals"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.46"
+		ENUS:CSTR:"Attribute Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.47"
+		ENUS:CSTR:"Invalid filter."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.48"
+		ENUS:CSTR:"Must contain one or more characters."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.49"
+		ENUS:CSTR:"Must contain alphanumeric characters or wildcards * or ?."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.50"
+		ENUS:CSTR:"Specify 4 characters or use wildcards (e.g. A??? or AB*)."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.51"
+		ENUS:CSTR:"Loading"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.52"
+		ENUS:CSTR:"Disabled Defaults"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.53"
+		ENUS:CSTR:"Show Acknowledged Alarms"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.7.54"
+		ENUS:CSTR:"Custom"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.1"
+		ENUS:CSTR:"Report Region"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.2"
+		ENUS:CSTR:"Vertical Scaling"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.3"
+		ENUS:CSTR:"Text Results for"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.4"
+		ENUS:CSTR:"vs"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.5"
+		ENUS:CSTR:"Reports"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.6"
+		ENUS:CSTR:"Text"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.7"
+		ENUS:CSTR:"To"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.8"
+		ENUS:CSTR:"Time Received"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.9"
+		ENUS:CSTR:"Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.10"
+		ENUS:CSTR:"Raw Values"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.11"
+		ENUS:CSTR:"Results Per Page"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.12"
+		ENUS:CSTR:"Average Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.13"
+		ENUS:CSTR:"Minimum Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.14"
+		ENUS:CSTR:"Maximum Value"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.15"
+		ENUS:CSTR:"Previous"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.16"
+		ENUS:CSTR:"Next"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.17"
+		ENUS:CSTR:"A chart is not available for this attribute."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.18"
+		ENUS:CSTR:"A text report is not available for this attribute."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.19"
+		ENUS:CSTR:"Sample Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.20"
+		ENUS:CSTR:"Aggregate Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.21"
+		ENUS:CSTR:"OID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.22"
+		ENUS:CSTR:"Node Path"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.23"
+		ENUS:CSTR:"Query"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.24"
+		ENUS:CSTR:"Epoch"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.25"
+		ENUS:CSTR:"Type"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.8.26"
+		ENUS:CSTR:"No results for specified time period."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.1"
+		ENUS:CSTR:"Configuration Region"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.2"
+		ENUS:CSTR:"Move Up"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.3"
+		ENUS:CSTR:"Move Down"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.4"
+		ENUS:CSTR:"Refresh"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.5"
+		ENUS:CSTR:"You do not have permission to view this page."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.6"
+		ENUS:CSTR:"No configuration options available."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.7"
+		ENUS:CSTR:"Grid ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.9.8"
+		ENUS:CSTR:"Export Date"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.1"
+		ENUS:CSTR:"Input Validation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.2"
+		ENUS:CSTR:"Input Error"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.3"
+		ENUS:CSTR:"The following fields contain errors."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.4"
+		ENUS:CSTR:"Invalid numeric value entered."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.5"
+		ENUS:CSTR:"Invalid text entered."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.6"
+		ENUS:CSTR:"No Object To Pass."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.7"
+		ENUS:CSTR:"Device Not Connected To MPX."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.8"
+		ENUS:CSTR:"MPX / RMI Not Running."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.9"
+		ENUS:CSTR:"RMI Error!"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.10"
+		ENUS:CSTR:"Invalid Input. Please Try Again!"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.11"
+		ENUS:CSTR:"Password Confirmation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.12"
+		ENUS:CSTR:"Confirm Password"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.13"
+		ENUS:CSTR:"Password"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.14"
+		ENUS:CSTR:"Passwords do not match.  Please enter and confirm a password."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.15"
+		ENUS:CSTR:"OK"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.16"
+		ENUS:CSTR:"Current Sender"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.17"
+		ENUS:CSTR:"Change Verification State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.1.10.18"
+		ENUS:CSTR:"Configure Storage Pools"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.1"
+		ENUS:CSTR:"ADC"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.12"
+		ENUS:CSTR:"MFS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.13"
+		ENUS:CSTR:"DDS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.2"
+		ENUS:CSTR:"LDR"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.3"
+		ENUS:CSTR:"CMS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.4"
+		ENUS:CSTR:"NMS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.5"
+		ENUS:CSTR:"AMS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.6"
+		ENUS:CSTR:"SSM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.7"
+		ENUS:CSTR:"CLB"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.8"
+		ENUS:CSTR:"CMN"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.9"
+		ENUS:CSTR:"ARC"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.1.11"
+		ENUS:CSTR:"Summary"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.1"
+		ENUS:CSTR:"DICOM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.10"
+		ENUS:CSTR:"DICOM Advanced"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.11"
+		ENUS:CSTR:"DICOM Indexes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.13"
+		ENUS:CSTR:"Grid Options"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.14"
+		ENUS:CSTR:"NMS Entities"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.15"
+		ENUS:CSTR:"Grid Tasks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.16"
+		ENUS:CSTR:"Storage"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.2"
+		ENUS:CSTR:"HTTP"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.20"
+		ENUS:CSTR:"Database"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.21"
+		ENUS:CSTR:"Volumes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.22"
+		ENUS:CSTR:"Services"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.23"
+		ENUS:CSTR:"Timing"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.24"
+		ENUS:CSTR:"Network"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.25"
+		ENUS:CSTR:"RAID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.26"
+		ENUS:CSTR:"Content"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.29"
+		ENUS:CSTR:"Synchronization"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.30"
+		ENUS:CSTR:"Verification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.31"
+		ENUS:CSTR:"Replication"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.32"
+		ENUS:CSTR:"Store"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.33"
+		ENUS:CSTR:"Retrieve"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.34"
+		ENUS:CSTR:"Target"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.36"
+		ENUS:CSTR:"Resources"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.37"
+		ENUS:CSTR:"Object Lookup"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.3"
+		ENUS:CSTR:"Connectivity"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.4"
+		ENUS:CSTR:"Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.5"
+		ENUS:CSTR:"Audit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.6"
+		ENUS:CSTR:"IP Ranges"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.7"
+		ENUS:CSTR:"Clients"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.8"
+		ENUS:CSTR:"Permissions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.9"
+		ENUS:CSTR:"DICOM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.35"
+		ENUS:CSTR:"Identifiers"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.38"
+		ENUS:CSTR:"Tasks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.39"
+		ENUS:CSTR:"Link Cost"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.40"
+		ENUS:CSTR:"Storage Grades"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.42"
+		ENUS:CSTR:"Connect to Support"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.43"
+		ENUS:CSTR:"Shares"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.44"
+		ENUS:CSTR:"Security Partitions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.45"
+		ENUS:CSTR:"Interface Engine"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.46"
+		ENUS:CSTR:"Certificates"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.47"
+		ENUS:CSTR:"CDMI"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.48"
+		ENUS:CSTR:"Data Store"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.49"
+		ENUS:CSTR:"Accounts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.50"
+		ENUS:CSTR:"S3"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.51"
+		ENUS:CSTR:"Network"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.52"
+		ENUS:CSTR:"Endpoints"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.53"
+		ENUS:CSTR:"Domain Names"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.54"
+		ENUS:CSTR:"Erasure Coding"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.2.55"
+		ENUS:CSTR:"Swift"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.1"
+		ENUS:CSTR:"Node Information"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.2"
+		ENUS:CSTR:"System Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.3"
+		ENUS:CSTR:"Connectivity Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.4"
+		ENUS:CSTR:"DICOM Associations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.5"
+		ENUS:CSTR:"HTTP Sessions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.6"
+		ENUS:CSTR:"HTTP GET"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.7"
+		ENUS:CSTR:"HTTP PUT"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.8"
+		ENUS:CSTR:"HTTP POST"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.9"
+		ENUS:CSTR:"HTTP HEAD"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.10"
+		ENUS:CSTR:"HTTP DELETE"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.11"
+		ENUS:CSTR:"HTTP OPTION"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.12"
+		ENUS:CSTR:"Grid Information"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.13"
+		ENUS:CSTR:"File System Operations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.22"
+		ENUS:CSTR:"Background Verification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.23"
+		ENUS:CSTR:"DICOM C-ECHO"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.24"
+		ENUS:CSTR:"DICOM C-STORE"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.25"
+		ENUS:CSTR:"DICOM C-FIND"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.26"
+		ENUS:CSTR:"DICOM C-MOVE"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.27"
+		ENUS:CSTR:"DICOM Storage Commitment"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.28"
+		ENUS:CSTR:"Configuration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.29"
+		ENUS:CSTR:"Tablespace"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.30"
+		ENUS:CSTR:"Server Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.31"
+		ENUS:CSTR:"System Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.32"
+		ENUS:CSTR:"GPS Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.33"
+		ENUS:CSTR:"Destinations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.36"
+		ENUS:CSTR:"Information Lifecycle Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.38"
+		ENUS:CSTR:"Object Deleting"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.43"
+		ENUS:CSTR:"Verification Configuration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.44"
+		ENUS:CSTR:"Verification Progress"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.45"
+		ENUS:CSTR:"Verification Results"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.46"
+		ENUS:CSTR:"Inbound Replication"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.47"
+		ENUS:CSTR:"Outbound Replication"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.48"
+		ENUS:CSTR:"Archive Store Overview"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.49"
+		ENUS:CSTR:"Staging Volume"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.50"
+		ENUS:CSTR:"Archive Retrieve Overview"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.51"
+		ENUS:CSTR:"Archive Retrieve Statistics"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.52"
+		ENUS:CSTR:"Tivoli Storage Manager Overview"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.53"
+		ENUS:CSTR:"Tivoli Storage Manager Account"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.55"
+		ENUS:CSTR:"Computational Resources"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.56"
+		ENUS:CSTR:"Memory"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.57"
+		ENUS:CSTR:"Service Health"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.58"
+		ENUS:CSTR:"Storage Resources"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.59"
+		ENUS:CSTR:"Network Resources"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.60"
+		ENUS:CSTR:"Local Clock"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.61"
+		ENUS:CSTR:"Neighboring Clocks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.62"
+		ENUS:CSTR:"NTP Synchronization"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.63"
+		ENUS:CSTR:"Spanning Tree"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.64"
+		ENUS:CSTR:"Grid Services"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.65"
+		ENUS:CSTR:"Utilization"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.66"
+		ENUS:CSTR:"Attribute Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.67"
+		ENUS:CSTR:"Attribute Relay"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.68"
+		ENUS:CSTR:"Attribute Repository"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.69.1"
+		ENUS:CSTR:"Storage Capacity"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.69.2"
+		ENUS:CSTR:"Metadata Capacity"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.69.3"
+		ENUS:CSTR:"API Operations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.69.4"
+		ENUS:CSTR:"Current ILM Activity - Legacy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.69.5"
+		ENUS:CSTR:"Future ILM Activity- Legacy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.69.6"
+		ENUS:CSTR:"Erasure Coded Operations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.69.7"
+		ENUS:CSTR:"ILM Activity"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.71"
+		ENUS:CSTR:"Audit Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.72"
+		ENUS:CSTR:"Object Transfer"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.76"
+		ENUS:CSTR:"Metadata Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.77"
+		ENUS:CSTR:"Foreground Verification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.82"
+		ENUS:CSTR:"Archive Nodes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.84"
+		ENUS:CSTR:"Binding Information"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.85"
+		ENUS:CSTR:"Configuration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.86"
+		ENUS:CSTR:"E-mail Notification Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.87"
+		ENUS:CSTR:"Database Connection Pool"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.88"
+		ENUS:CSTR:"Data Connection Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.89"
+		ENUS:CSTR:"HTTP Metadata PUT"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.90"
+		ENUS:CSTR:"HTTP Metadata GET"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.91"
+		ENUS:CSTR:"CDMI Read Values"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.92"
+		ENUS:CSTR:"CDMI Read Metadata"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.93"
+		ENUS:CSTR:"CDMI Read Capabilities"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.94"
+		ENUS:CSTR:"CDMI Write"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.95"
+		ENUS:CSTR:"CDMI Modify Metadata"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.96"
+		ENUS:CSTR:"CDMI Delete"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.97"
+		ENUS:CSTR:"Operations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.98"
+		ENUS:CSTR:"Data Transfers"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.99.1"
+		ENUS:CSTR:"Object Counts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.99.2"
+		ENUS:CSTR:"Queries"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.99.3"
+		ENUS:CSTR:"Nodetool Repair"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.100"
+		ENUS:CSTR:"Operations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.101"
+		ENUS:CSTR:"Data Transfers"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.102"
+		ENUS:CSTR:"Data Store Resources"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.103"
+		ENUS:CSTR:"Operations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.104"
+		ENUS:CSTR:"Storage Hardware"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.105"
+		ENUS:CSTR:"Cloud Tiering Service (S3) Overview"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.106"
+		ENUS:CSTR:"Please choose a Target Type on the Target Configuration tab."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.107"
+		ENUS:CSTR:"Replication"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.108"
+		ENUS:CSTR:"Background Verification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.109"
+		ENUS:CSTR:"Operations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.3.110"
+		ENUS:CSTR:"Data Transfers"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.1"
+		ENUS:CSTR:"Connections"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.10"
+		ENUS:CSTR:"DICOM Profiles"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.11"
+		ENUS:CSTR:"Coerce Tag Profiles"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.12"
+		ENUS:CSTR:"Advanced Config Profiles"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.13"
+		ENUS:CSTR:"DICOM Indexed Tags"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.15"
+		ENUS:CSTR:"Pending"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.16"
+		ENUS:CSTR:"Active"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.17"
+		ENUS:CSTR:"Historical"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.18"
+		ENUS:CSTR:"NMS Entities"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.2"
+		ENUS:CSTR:"Audit Levels"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.20"
+		ENUS:CSTR:"Object Stores"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.21"
+		ENUS:CSTR:"Processors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.22"
+		ENUS:CSTR:"Volumes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.23"
+		ENUS:CSTR:"Services"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.24"
+		ENUS:CSTR:"Packages"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.25"
+		ENUS:CSTR:"Network Interfaces"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.26"
+		ENUS:CSTR:"Receive"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.27"
+		ENUS:CSTR:"Transmit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.28"
+		ENUS:CSTR:"Controllers"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.29"
+		ENUS:CSTR:"Enclosures"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.3"
+		ENUS:CSTR:"Client Site IP Ranges"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.30"
+		ENUS:CSTR:"Arrays"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.31"
+		ENUS:CSTR:"Drives"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.32"
+		ENUS:CSTR:"Established Connections"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.4"
+		ENUS:CSTR:"Locations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.5"
+		ENUS:CSTR:"HTTP Entities"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.7"
+		ENUS:CSTR:"HTTP /CDMI Namespace"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.65"
+		ENUS:CSTR:"Accounts"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.9"
+		ENUS:CSTR:"DICOM AEs"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.34"
+		ENUS:CSTR:"Inbound Replication Summaries"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.35"
+		ENUS:CSTR:"Outbound Replication Summaries"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.36"
+		ENUS:CSTR:"Active Volumes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.38"
+		ENUS:CSTR:"HTTP Metadata Indexing"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.39"
+		ENUS:CSTR:"Grid Options"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.40"
+		ENUS:CSTR:"Verify Object Store(s)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.41"
+		ENUS:CSTR:"Link Costs"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.42"
+		ENUS:CSTR:"Site Names"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.43"
+		ENUS:CSTR:"Storage Grades"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.44"
+		ENUS:CSTR:"Storage Grade Definitions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.47"
+		ENUS:CSTR:"Recovery Sources"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.50"
+		ENUS:CSTR:"File System Shares"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.51"
+		ENUS:CSTR:"Certificate Authorities"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.52"
+		ENUS:CSTR:"Clients"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.53"
+		ENUS:CSTR:"Partitions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.54"
+		ENUS:CSTR:"Client Partitions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.55"
+		ENUS:CSTR:"Read-Only Client Partitions"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.57"
+		ENUS:CSTR:"Disk Devices"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.58"
+		ENUS:CSTR:"Network Addresses"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.59"
+		ENUS:CSTR:"Storage Watermarks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.60"
+		ENUS:CSTR:"Ports"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.61"
+		ENUS:CSTR:"Custom Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.62"
+		ENUS:CSTR:"HTTP Audit Feed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.64"
+		ENUS:CSTR:"Object Segmentation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.66"
+		ENUS:CSTR:"CA Certificates"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.67"
+		ENUS:CSTR:"Network"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.68"
+		ENUS:CSTR:"Root Domain Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.69"
+		ENUS:CSTR:"DNS Resource Records - Common"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.70"
+		ENUS:CSTR:"API Endpoint Domain Names"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.2.4.71"
+		ENUS:CSTR:"DNS Resource Records - S3 Virtual Hosted-Style"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.1"
+		ENUS:CSTR:"Administrative Domain Controller (ADC)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.10"
+		ENUS:CSTR:"Server Status Monitor (SSM)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.11"
+		ENUS:CSTR:"Time Synchronization"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.12"
+		ENUS:CSTR:"Database Engine"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.13"
+		ENUS:CSTR:"System Logging"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.14"
+		ENUS:CSTR:"RAID Monitor"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.16"
+		ENUS:CSTR:"Server Manager"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.17"
+		ENUS:CSTR:"Local Distribution Router (LDR)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.2"
+		ENUS:CSTR:"Archive Node (ARC)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.3"
+		ENUS:CSTR:"Audit Management System (AMS)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.4"
+		ENUS:CSTR:"Connection Load Balancer (CLB)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.5"
+		ENUS:CSTR:"Configuration Management Node (CMN)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.6"
+		ENUS:CSTR:"Content Management System (CMS)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.7"
+		ENUS:CSTR:"Network Management System (NMS)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.8"
+		ENUS:CSTR:"Storage Node (LDR)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.19"
+		ENUS:CSTR:"GPFS File System Gateway (MFS)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.20"
+		ENUS:CSTR:"NMS Reporting Engine"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.21"
+		ENUS:CSTR:"NMS Processing Engine"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.22"
+		ENUS:CSTR:"NMS Data Downsampler 1"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.23"
+		ENUS:CSTR:"NMS Data Downsampler 2"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.24"
+		ENUS:CSTR:"NMS Data Cleanup"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.25"
+		ENUS:CSTR:"Distributed File System (GPFS)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.26"
+		ENUS:CSTR:"CIFS Filesharing (smbd)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.30"
+		ENUS:CSTR:"CIFS Filesharing (nmbd)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.31"
+		ENUS:CSTR:"CIFS Filesharing (winbindd)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.27"
+		ENUS:CSTR:"NFS Filesharing"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.28"
+		ENUS:CSTR:"Clustered Samba (CTDB)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.29"
+		ENUS:CSTR:"Heartbeat Cluster Manager"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.32"
+		ENUS:CSTR:"Distributed Data Store (DDS)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.33"
+		ENUS:CSTR:"Cassandra"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.34"
+		ENUS:CSTR:"Cloud Tiering Service (CTS)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.35"
+		ENUS:CSTR:"Management Application Program Interface (mgmt-api)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.36"
+		ENUS:CSTR:"Grid Deployment Utility Server"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.37"
+		ENUS:CSTR:"Account Service"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.38"
+		ENUS:CSTR:"Identity Service"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.1.39"
+		ENUS:CSTR:"Keystone Service"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.10.1"
+		ENUS:CSTR:"BAE Systems"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.11.1"
+		ENUS:CSTR:"DEBUG"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.1"
+		ENUS:CSTR:"IDE Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.2"
+		ENUS:CSTR:"I/O Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.3"
+		ENUS:CSTR:"SCSI Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.4"
+		ENUS:CSTR:"File System Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.5"
+		ENUS:CSTR:"Network Receive Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.6"
+		ENUS:CSTR:"Network Transmit Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.7"
+		ENUS:CSTR:"Kernel Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.8"
+		ENUS:CSTR:"Kernel Memory Allocation Failure"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.9"
+		ENUS:CSTR:"Peer TCP Protocol Violation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.10"
+		ENUS:CSTR:"Abnormal Software Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.11"
+		ENUS:CSTR:"System Time Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.12"
+		ENUS:CSTR:"Custom Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.13"
+		ENUS:CSTR:"Out Of Memory Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.19"
+		ENUS:CSTR:"Cassandra Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.20"
+		ENUS:CSTR:"Storage Hardware Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.21"
+		ENUS:CSTR:"Account Service Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.22"
+		ENUS:CSTR:"Identity Service Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.23"
+		ENUS:CSTR:"Grid Node Errors"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.24"
+		ENUS:CSTR:"Forced Termination Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.25"
+		ENUS:CSTR:"Keystone Service Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.2.26"
+		ENUS:CSTR:"Hotfix Installation Failure Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.1"
+		ENUS:CSTR:"Administrative Domain Controller"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.11"
+		ENUS:CSTR:"GPFS File System Gateway"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.12"
+		ENUS:CSTR:"Distributed Data Store"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.2"
+		ENUS:CSTR:"Local Distribution Router"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.3"
+		ENUS:CSTR:"Content Management System"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.4"
+		ENUS:CSTR:"Network Management System"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.5"
+		ENUS:CSTR:"Audit Management System"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.6"
+		ENUS:CSTR:"Server Status Monitor"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.7"
+		ENUS:CSTR:"Connection Load Balancer"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.8"
+		ENUS:CSTR:"Configuration Management Node"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.4.9"
+		ENUS:CSTR:"Archive Node"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.1"
+		ENUS:CSTR:"System"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.2"
+		ENUS:CSTR:"Object Storage"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.3"
+		ENUS:CSTR:"Volume Management"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.4"
+		ENUS:CSTR:"Protocol - DICOM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.5"
+		ENUS:CSTR:"Protocol - HTTP"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.5.6"
+		ENUS:CSTR:"Protocol - File"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.1"
+		ENUS:CSTR:"SOP Class UID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.10"
+		ENUS:CSTR:"Station Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.11"
+		ENUS:CSTR:"Study Description"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.12"
+		ENUS:CSTR:"Manufacturer Model Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.13"
+		ENUS:CSTR:"Patient Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.14"
+		ENUS:CSTR:"Patient ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.15"
+		ENUS:CSTR:"Patient Birth Date"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.16"
+		ENUS:CSTR:"Patient's Sex"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.17"
+		ENUS:CSTR:"Patient's Age"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.18"
+		ENUS:CSTR:"Study Instance UID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.19"
+		ENUS:CSTR:"Series Instance UID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.2"
+		ENUS:CSTR:"SOP Instance UID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.20"
+		ENUS:CSTR:"Series Number"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.21"
+		ENUS:CSTR:"Instance (Image) Number"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.22"
+		ENUS:CSTR:"Study ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.3"
+		ENUS:CSTR:"Study Date"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.4"
+		ENUS:CSTR:"Study Time"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.5"
+		ENUS:CSTR:"Accession Number"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.6"
+		ENUS:CSTR:"Modality"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.7"
+		ENUS:CSTR:"Manufacturer"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.8"
+		ENUS:CSTR:"Institution Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.6.9"
+		ENUS:CSTR:"Referring Physician Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.1"
+		ENUS:CSTR:"Grid Task Manager started"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.10"
+		ENUS:CSTR:"Completed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.11"
+		ENUS:CSTR:"Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.12"
+		ENUS:CSTR:"Aborted"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.13"
+		ENUS:CSTR:"Unknown"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.14"
+		ENUS:CSTR:"Submit a new task by pasting in a Signed Task Text Block"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.15"
+		ENUS:CSTR:"Loaded"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.2"
+		ENUS:CSTR:"Task ID:"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.3"
+		ENUS:CSTR:"Load Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.4"
+		ENUS:CSTR:"Started"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.5"
+		ENUS:CSTR:"Completed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.6"
+		ENUS:CSTR:"Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.7"
+		ENUS:CSTR:"Aborted"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.8"
+		ENUS:CSTR:"Cancelled"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.9.9"
+		ENUS:CSTR:"Started"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.13.1"
+		ENUS:CSTR:"Xcelera A"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.13.2"
+		ENUS:CSTR:"syngo Dynamics A"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.1"
+		ENUS:CSTR:"Enabled"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.2"
+		ENUS:CSTR:"Disabled"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.3"
+		ENUS:CSTR:"Compression"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.4"
+		ENUS:CSTR:"Encryption"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.5"
+		ENUS:CSTR:"Prevent Client Modify"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.9"
+		ENUS:CSTR:"Grid Language"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.10"
+		ENUS:CSTR:"Minimum ADE Interoperability"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.14.12"
+		ENUS:CSTR:"Named Object Support"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.1"
+		ENUS:CSTR:"Content Block"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.2"
+		ENUS:CSTR:"Content Handle"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.3"
+		ENUS:CSTR:"Locations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.4"
+		ENUS:CSTR:"Location"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.5"
+		ENUS:CSTR:"Node ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.6"
+		ENUS:CSTR:"Metadata"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.7"
+		ENUS:CSTR:"Object ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.8"
+		ENUS:CSTR:"CDMI Data Object Name"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.1.9"
+		ENUS:CSTR:"S3 Bucket and Object Key"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.1"
+		ENUS:CSTR:"Content Lookup Successful"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.2"
+		ENUS:CSTR:"Object Not Found"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.3"
+		ENUS:CSTR:"Service Unavailable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.4"
+		ENUS:CSTR:"EC Profile"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.5"
+		ENUS:CSTR:"Archive Copy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.6"
+		ENUS:CSTR:"Disk Copy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.7"
+		ENUS:CSTR:"Erasure Coded Copy"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.3.15.2.8"
+		ENUS:CSTR:"Bucket Not Found"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.1"
+		ENUS:CSTR:"Node ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.10"
+		ENUS:CSTR:"ARC"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.20"
+		ENUS:CSTR:"MFS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.12"
+		ENUS:CSTR:"Storage Node Decommissioning"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.13"
+		ENUS:CSTR:"StorageNode Lost"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.14"
+		ENUS:CSTR:"Certificate Update"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.15"
+		ENUS:CSTR:"Debug Print"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.16"
+		ENUS:CSTR:"Enable DICOM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.37"
+		ENUS:CSTR:"Disable DICOM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.17"
+		ENUS:CSTR:"Resources Update"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.19"
+		ENUS:CSTR:"Unknown Task"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.2"
+		ENUS:CSTR:"ADC"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.3"
+		ENUS:CSTR:"LDR"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.4"
+		ENUS:CSTR:"CMS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.5"
+		ENUS:CSTR:"NMS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.6"
+		ENUS:CSTR:"AMS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.7"
+		ENUS:CSTR:"SSM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.8"
+		ENUS:CSTR:"CLB"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.9"
+		ENUS:CSTR:"CMN"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.29"
+		ENUS:CSTR:"Source"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.30"
+		ENUS:CSTR:"Destination"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.31"
+		ENUS:CSTR:"Nodes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.32"
+		ENUS:CSTR:"Sites"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.21"
+		ENUS:CSTR:"LDR Foreground Verification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.22"
+		ENUS:CSTR:"Storage Node Hardware Refresh"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.23"
+		ENUS:CSTR:"LDR Content Rebalancing"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.24"
+		ENUS:CSTR:"Bundle Import"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.25"
+		ENUS:CSTR:"Bundle Commit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.26"
+		ENUS:CSTR:"Legacy CBID Continuation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.27"
+		ENUS:CSTR:"Grid Expansion"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.28"
+		ENUS:CSTR:"Software Upgrade"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.33"
+		ENUS:CSTR:"Unknown"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.34"
+		ENUS:CSTR:"Initial"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.35"
+		ENUS:CSTR:"Add Server"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.36"
+		ENUS:CSTR:"Entity Removal"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.38"
+		ENUS:CSTR:"Update Flags"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.39"
+		ENUS:CSTR:"Enable HTTPS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.40"
+		ENUS:CSTR:"ARC Foreground Verification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.41"
+		ENUS:CSTR:"Node Decommissioning"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.42"
+		ENUS:CSTR:"Server"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.43"
+		ENUS:CSTR:"Control/Storage Node Hardware Refresh"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.44"
+		ENUS:CSTR:"Admin Node Decommissioning"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.45"
+		ENUS:CSTR:"Gateway Node Decommissioning"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.46"
+		ENUS:CSTR:"Admin/Gateway Node Decommissioning"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.47"
+		ENUS:CSTR:"Control Node Hardware Refresh"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.48"
+		ENUS:CSTR:"Remove NMS Cluster Bindings"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.49"
+		ENUS:CSTR:"Verify Managed Locations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.50"
+		ENUS:CSTR:"Edit Bundle"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.51"
+		ENUS:CSTR:"ILM Re-evaluation (User Triggered)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.52"
+		ENUS:CSTR:"Import Bundles for Metadata Replication"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.53"
+		ENUS:CSTR:"Verify Locations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.54"
+		ENUS:CSTR:"Control/Storage Node Hardware Refresh Cleanup"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.55"
+		ENUS:CSTR:"Object Location Indexing"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.56"
+		ENUS:CSTR:"DDS"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.57"
+		ENUS:CSTR:"Site"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.58"
+		ENUS:CSTR:"Clean Up Unused Cassandra Keys"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.59"
+		ENUS:CSTR:"CMS Node Decommissioning"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.60"
+		ENUS:CSTR:"ILM Evaluation (Volume Lost)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.1.61"
+		ENUS:CSTR:"Cassandra Site Expansion"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.1"
+		ENUS:CSTR:"LDR and CMS version check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.10"
+		ENUS:CSTR:"CMS version check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.11"
+		ENUS:CSTR:"Node Lost"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.12"
+		ENUS:CSTR:"ADC version check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.13"
+		ENUS:CSTR:"Certificate Update"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.14"
+		ENUS:CSTR:"Node version check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.15"
+		ENUS:CSTR:"Print Debug Message"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.16"
+		ENUS:CSTR:"Resources Preload"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.17"
+		ENUS:CSTR:"Resources Wait For Unload"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.18"
+		ENUS:CSTR:"Resources Wait For Version"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.2"
+		ENUS:CSTR:"LDR storage state lock"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.3"
+		ENUS:CSTR:"LDR storage read only"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.4"
+		ENUS:CSTR:"CMS migrate content (1)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.5"
+		ENUS:CSTR:"LDR Verify Data"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.6"
+		ENUS:CSTR:"CMS migrate content (2)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.7"
+		ENUS:CSTR:"LDR storage offline"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.8"
+		ENUS:CSTR:"FAIL/ABORT - LDR storage online"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.9"
+		ENUS:CSTR:"FAIL/ABORT - LDR storage state unlock"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.19"
+		ENUS:CSTR:"Prepare Task"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.20"
+		ENUS:CSTR:"Finish Task"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.21"
+		ENUS:CSTR:"Wait For Software Version"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.22"
+		ENUS:CSTR:"LDR State Set"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.24"
+		ENUS:CSTR:"Content Rebalancing"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.25"
+		ENUS:CSTR:"CBID Table Recalculate"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.26"
+		ENUS:CSTR:"Content Remap"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.27"
+		ENUS:CSTR:"Content Migration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.28"
+		ENUS:CSTR:"Content Verification"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.29"
+		ENUS:CSTR:"Certificate Revocation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.30"
+		ENUS:CSTR:"Bundle Import"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.31"
+		ENUS:CSTR:"Bundle Commit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.32"
+		ENUS:CSTR:"Storage Grade Register"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.33"
+		ENUS:CSTR:"Storage Grade Unregister"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.34"
+		ENUS:CSTR:"Group Register"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.35"
+		ENUS:CSTR:"Group Unregister"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.36"
+		ENUS:CSTR:"DICOM Enable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.37"
+		ENUS:CSTR:"DICOM Disable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.38"
+		ENUS:CSTR:"NMS Entity Register"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.39"
+		ENUS:CSTR:"NMS Entity Unregister"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.40"
+		ENUS:CSTR:"Resources Unload"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.41"
+		ENUS:CSTR:"Legacy CBID Synchronization"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.42"
+		ENUS:CSTR:"Node Shutdown"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.43"
+		ENUS:CSTR:"Unknown"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.44"
+		ENUS:CSTR:"Wait For Locks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.45"
+		ENUS:CSTR:"Resources Update"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.46"
+		ENUS:CSTR:"Wait For Restart"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.47"
+		ENUS:CSTR:"Wait For Pending Replications"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.48"
+		ENUS:CSTR:"Node Unregister"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.49"
+		ENUS:CSTR:"Verify Target Existence"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.50"
+		ENUS:CSTR:"CMS Database Migration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.51"
+		ENUS:CSTR:"Finish CMS Migration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.52"
+		ENUS:CSTR:"Disable External Services"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.53"
+		ENUS:CSTR:"Flush Audit Queues"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.54"
+		ENUS:CSTR:"Flush Audit Relay Queues"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.55"
+		ENUS:CSTR:"Wait For CMN Deactivation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.56"
+		ENUS:CSTR:"NMS Cluster Register"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.57"
+		ENUS:CSTR:"HTTP Permissions Register"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.58"
+		ENUS:CSTR:"Add Rows to a Bundle"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.59"
+		ENUS:CSTR:"Evaluating ILM"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.60"
+		ENUS:CSTR:"Edit Rows in a Bundle"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.61"
+		ENUS:CSTR:"Metadata Replication Enable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.62"
+		ENUS:CSTR:"Verify Locations"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.63"
+		ENUS:CSTR:"Wait For LDR State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.64"
+		ENUS:CSTR:"Send Object Lost State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.65"
+		ENUS:CSTR:"Object Location Indexing Conversion"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.66"
+		ENUS:CSTR:"CMS Database Recovery"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.67"
+		ENUS:CSTR:"Delete Rows from a Bundle"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.69"
+		ENUS:CSTR:"Checking Cassandra status on new DDSs"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.70"
+		ENUS:CSTR:"Running Cassandra Node Cleanup"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.71"
+		ENUS:CSTR:"Checking Cassandra Data Migration Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.2.72"
+		ENUS:CSTR:"Running Cassandra Node Repair"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.3.1"
+		ENUS:CSTR:"Bycast Inc."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.1"
+		ENUS:CSTR:"N/A"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.2"
+		ENUS:CSTR:"Done"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.3"
+		ENUS:CSTR:"Unknown Error"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.4"
+		ENUS:CSTR:"Starting..."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.5"
+		ENUS:CSTR:"Pausing..."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.6"
+		ENUS:CSTR:"Paused"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.7"
+		ENUS:CSTR:"Aborting..."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.8"
+		ENUS:CSTR:"Aborted"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.9"
+		ENUS:CSTR:"Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.10"
+		ENUS:CSTR:"Service Unavailable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.11"
+		ENUS:CSTR:"Transaction Malformed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.12"
+		ENUS:CSTR:"Action Unsupported"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.13"
+		ENUS:CSTR:"Retrying"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.14"
+		ENUS:CSTR:"Internal Error"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.15"
+		ENUS:CSTR:"Check Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.16"
+		ENUS:CSTR:"Pause Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.17"
+		ENUS:CSTR:"Resume Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.18"
+		ENUS:CSTR:"Abort Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.19"
+		ENUS:CSTR:"Node ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.20"
+		ENUS:CSTR:"All Nodes"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.21"
+		ENUS:CSTR:"Action Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.22"
+		ENUS:CSTR:"Stop Action Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.23"
+		ENUS:CSTR:"Start Action Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.24"
+		ENUS:CSTR:"Pause Action Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.25"
+		ENUS:CSTR:"No Long Term Action"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.26"
+		ENUS:CSTR:"Certificate Update Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.27"
+		ENUS:CSTR:"Certificate Revocation Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.28"
+		ENUS:CSTR:"Bundle Store Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.29"
+		ENUS:CSTR:"Bundle Retrieve Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.30"
+		ENUS:CSTR:"Resources Lock Failed"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.31"
+		ENUS:CSTR:"Waiting..."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.32"
+		ENUS:CSTR:"Paused for user to run cms-refresh.sh script"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.33"
+		ENUS:CSTR:"Unable to find node ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.34"
+		ENUS:CSTR:"No remaining audit repositories"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.35"
+		ENUS:CSTR:"No remaining NMS cluster"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.36"
+		ENUS:CSTR:"About to update all nodes of type"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.37"
+		ENUS:CSTR:"About to update Node ID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.5.38"
+		ENUS:CSTR:"Waiting for ILM Evaluation to complete"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.1"
+		ENUS:CSTR:"Debug Print"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.2"
+		ENUS:CSTR:"Software Version Check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.3"
+		ENUS:CSTR:"Long-Term Action Completion Check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.4"
+		ENUS:CSTR:"Bundle Import"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.5"
+		ENUS:CSTR:"Bundle Commit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.6"
+		ENUS:CSTR:"DICOM Enable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.7"
+		ENUS:CSTR:"DICOM Disable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.8"
+		ENUS:CSTR:"Storage Grade Register"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.9"
+		ENUS:CSTR:"Storage Grade Unregister"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.10"
+		ENUS:CSTR:"Group Register"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.11"
+		ENUS:CSTR:"Group Unregister"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.12"
+		ENUS:CSTR:"Storage Maintenance Flag"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.13"
+		ENUS:CSTR:"Storage Desired State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.14"
+		ENUS:CSTR:"Storage Current State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.15"
+		ENUS:CSTR:"Foreground Verification Attributes Reset"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.16"
+		ENUS:CSTR:"Foreground Verification Start"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.17"
+		ENUS:CSTR:"Orphan Detection Activation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.20"
+		ENUS:CSTR:"CBID Table Recalculate"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.21"
+		ENUS:CSTR:"Alternate CBID Table Drop"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.22"
+		ENUS:CSTR:"Content Rebalancing"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.23"
+		ENUS:CSTR:"Content Migration"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.24"
+		ENUS:CSTR:"Node Shutdown"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.25"
+		ENUS:CSTR:"Gateway Cache Flush"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.26"
+		ENUS:CSTR:"Gateway Cache Count"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.27"
+		ENUS:CSTR:"Resources Preload"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.28"
+		ENUS:CSTR:"Resources Unload"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.29"
+		ENUS:CSTR:"Resources Unload Check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.30"
+		ENUS:CSTR:"List Registered Actions And Checks"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.31"
+		ENUS:CSTR:"List Long-Term Instances"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.32"
+		ENUS:CSTR:"Certificate Update"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.33"
+		ENUS:CSTR:"Certificate Revocation"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.34"
+		ENUS:CSTR:"Resources Lock"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.35"
+		ENUS:CSTR:"Start Time Check"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.36"
+		ENUS:CSTR:"Resources Update"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.37"
+		ENUS:CSTR:"Node Unregister"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.38"
+		ENUS:CSTR:"Gateway Replication Status"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.39"
+		ENUS:CSTR:"Toggle Audit"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.40"
+		ENUS:CSTR:"Audit Queue Count"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.41"
+		ENUS:CSTR:"Set External Services State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.42"
+		ENUS:CSTR:"Remove Audit Repository"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.43"
+		ENUS:CSTR:"Audit Relay Queue Count"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.44"
+		ENUS:CSTR:"CMN State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.45"
+		ENUS:CSTR:"Remove NMS Cluster"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.46"
+		ENUS:CSTR:"Register NMS Cluster"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.47"
+		ENUS:CSTR:"Register HTTP Client"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.48"
+		ENUS:CSTR:"Add/Edit/Delete Rows In Bundle"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.49"
+		ENUS:CSTR:"Metadata Replication Enable"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.50"
+		ENUS:CSTR:"CLOC_LOST Queue Forwarding State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.51"
+		ENUS:CSTR:"Send Object Lost"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.52"
+		ENUS:CSTR:"DDS Current State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.53"
+		ENUS:CSTR:"DDS Desired State"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.54"
+		ENUS:CSTR:"DDS Node Repair"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.6.55"
+		ENUS:CSTR:"DDS Node Clean up"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.4.1"
+		ENUS:CSTR:"No Events"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.4.4.2"
+		ENUS:CSTR:"Unable to open fifo"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.2"
+		ENUS:CSTR:"Error"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.0.5.2.9"
+		ENUS:CSTR:"N/A"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.13"
+		ENUS:CSTR:"StorageGRID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.14"
+		ENUS:CSTR:"Bycast StorageGRID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.15"
+		ENUS:CSTR:"NetApp"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.16"
+		ENUS:CSTR:"Webscale"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.17"
+		ENUS:CSTR:"System"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.1.1.1"
+		ENUS:CSTR:"Bycast Network Management System"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.5.1"
+		ENUS:CSTR:"Sign In"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.5.11"
+		ENUS:CSTR:"Continue"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.1.5.12"
+		ENUS:CSTR:"NMS GUI Timeout"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.3.3.1"
+		ENUS:CSTR:"NetApp Inc."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.3.7.1"
+		ENUS:CSTR:"Bycast StorageGRID"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.4.3.1"
+		ENUS:CSTR:"Bycast Inc."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.1.5.6.1"
+		ENUS:CSTR:"Use tab to select the button, and enter to activate it."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.1"
+		ENUS:CSTR:"cannot be empty."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.2"
+		ENUS:CSTR:"is invalid."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.3"
+		ENUS:CSTR:"Only printable characters (ASCII 9, 32-126) are permitted."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.4"
+		ENUS:CSTR:"Only integers 0 to 100000 are permitted."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.5"
+		ENUS:CSTR:"is not a valid integer."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.6"
+		ENUS:CSTR:"Out of range. (Max. 9223372036854775807)"
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.7"
+		ENUS:CSTR:"A valid X.509 certificate in PEM format is required."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.8"
+		ENUS:CSTR:"A valid unencrypted RSA private key in PEM format is required."
+	END
+	SENT:CONT:
+		SOID:CSTR:"2.16.124.113590.3.3.2.1.1.9"
+		ENUS:CSTR:"Not configured"
+	END
+END

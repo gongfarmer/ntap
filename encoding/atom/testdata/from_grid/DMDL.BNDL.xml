@@ -1,0 +1,4227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="DMDL">
+		<atom name="BVER" type="UI32" value="1"/>
+		<atom name="BTIM" type="UI64" value="1484723559402292"/>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BAMS"/>
+			<atom name="DMVR" type="CSTR" value="43-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.5','AMS'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BAM"/>
+				<atom name="ATTR" type="FC32" value="AUME"/>
+				<atom name="ATTR" type="FC32" value="AUMA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AURX"/>
+					<atom name="ATTR" type="FC32" value="AMRC"/>
+					<atom name="ATTR" type="FC32" value="AMRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+					<atom name="ATTR" type="FC32" value="AMTR"/>
+					<atom name="ATTR" type="FC32" value="ASXP"/>
+					<atom name="ATTR" type="FC32" value="AUXS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BCMS"/>
+			<atom name="DMVR" type="CSTR" value="15-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.3','CMS'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BCM"/>
+				<atom name="ATTR" type="FC32" value="CMSS"/>
+				<atom name="ATTR" type="FC32" value="CMST"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="CONT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.26','Content'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CILM"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.36','Information Lifecycle Management'}"/>
+					<atom name="ATTR" type="FC32" value="ILMN"/>
+					<atom name="ATTR" type="FC32" value="ILMV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="REP3"/>
+					<atom name="ATTR" type="FC32" value="ILev"/>
+					<atom name="ATTR" type="FC32" value="ILer"/>
+					<atom name="ATTR" type="FC32" value="ILet"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="REPL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.72','Object Transfer'}"/>
+					<atom name="ATTR" type="FC32" value="DCdA"/>
+					<atom name="ATTR" type="FC32" value="DCdR"/>
+					<atom name="ATTR" type="FC32" value="DCdT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="PURG"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.38','Object Deleting'}"/>
+					<atom name="ATTR" type="FC32" value="DCpR"/>
+					<atom name="ATTR" type="FC32" value="DCpT"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="600"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BADC"/>
+			<atom name="DMVR" type="CSTR" value="49-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.1','ADC'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BAD"/>
+				<atom name="ATTR" type="FC32" value="ADCE"/>
+				<atom name="ATTR" type="FC32" value="ADCA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="SYNC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.29','Synchronization'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SPTR"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.63','Spanning Tree'}"/>
+					<atom name="ATTR" type="FC32" value="TTRN"/>
+					<atom name="ATTR" type="FC32" value="TBRR"/>
+					<atom name="ATTR" type="FC32" value="TBTR"/>
+					<atom name="ATTR" type="FC32" value="TPOP"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="GRSE"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.64','Grid Services'}"/>
+					<atom name="ATTR" type="FC32" value="SQAS"/>
+					<atom name="ATTR" type="FC32" value="SQKS"/>
+					<atom name="ATTR" type="FC32" value="SSSO"/>
+					<atom name="ATTR" type="FC32" value="SSSR"/>
+					<atom name="ATTR" type="FC32" value="SQSO"/>
+					<atom name="ATTR" type="FC32" value="SQSR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CFMG"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.28','Configuration'}"/>
+					<atom name="ATTR" type="FC32" value="BRBL"/>
+					<atom name="ATTR" type="FC32" value="BRSO"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AURX"/>
+					<atom name="ATTR" type="FC32" value="AMRC"/>
+					<atom name="ATTR" type="FC32" value="AMRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="CAMS"/>
+					<atom name="ATTR" type="FC32" value="XAMS"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+					<atom name="ATTR" type="FC32" value="AMTR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATRL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.67','Attribute Relay'}"/>
+					<atom name="ATTR" type="FC32" value="ALIS"/>
+					<atom name="ATTR" type="FC32" value="ALAR"/>
+					<atom name="ATTR" type="FC32" value="ALRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATSA"/>
+					<atom name="ATTR" type="FC32" value="ALUR"/>
+					<atom name="ATTR" type="FC32" value="ALOS"/>
+					<atom name="ATTR" type="FC32" value="ALAS"/>
+					<atom name="ATTR" type="FC32" value="ALSR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MINF"/>
+					<atom name="ATTR" type="FC32" value="CMTO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BDDS"/>
+			<atom name="DMVR" type="CSTR" value="1-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.13','DDS'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="NDBS"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.48','Data Store'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CASS"/>
+					<atom name="ATTR" type="FC32" value="CASA"/>
+					<atom name="ATTR" type="FC32" value="CASE"/>
+					<atom name="ATTR" type="FC32" value="CADL"/>
+					<atom name="ATTR" type="FC32" value="CDLP"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="DDOC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.99.1','Object Counts'}"/>
+					<atom name="ATTR" type="FC32" value="CNLC"/>
+					<atom name="ATTR" type="FC32" value="SDOC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".LST"/>
+					<atom name="ATTR" type="FC32" value="LOST"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".RCA"/>
+					<atom name="ATTR" type="FC32" value="RLOC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".SBK"/>
+					<atom name="ATTR" type="FC32" value="SBKC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="DDQY"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.99.2','Queries'}"/>
+					<atom name="ATTR" type="FC32" value="CQST"/>
+					<atom name="ATTR" type="FC32" value="CQTQ"/>
+					<atom name="ATTR" type="FC32" value="CQTX"/>
+					<atom name="ATTR" type="FC32" value="CQUA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="DDRP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.99.3','Nodetool Repair'}"/>
+					<atom name="ATTR" type="FC32" value="NTRP"/>
+					<atom name="ATTR" type="FC32" value="NTPG"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="JHGR"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.102','Data Store Resources'}"/>
+					<atom name="ATTR" type="FC32" value="CAHU"/>
+					<atom name="ATTR" type="FC32" value="CAHM"/>
+					<atom name="ATTR" type="FC32" value="CAHP"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BLDR"/>
+			<atom name="DMVR" type="CSTR" value="112-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.2','LDR'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BLD"/>
+				<atom name="ATTR" type="FC32" value="LDRE"/>
+				<atom name="ATTR" type="FC32" value="LDRA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".STR"/>
+				<atom name="ATTR" type="FC32" value="SSCR"/>
+				<atom name="ATTR" type="FC32" value="SSTS"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".SVT"/>
+				<atom name="ATTR" type="FC32" value="VSTU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RPE"/>
+				<atom name="ATTR" type="FC32" value="IRSU"/>
+				<atom name="ATTR" type="FC32" value="ORSU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".THT"/>
+				<atom name="ATTR" type="FC32" value="HSTE"/>
+				<atom name="ATTR" type="FC32" value="HSTU"/>
+				<atom name="ATTR" type="FC32" value="HTAS"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="NDBS"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.48','Data Store'}"/>
+				<atom name="COID" type="UI32" value="50"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="DDQY"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.99.2','Queries'}"/>
+					<atom name="ATTR" type="FC32" value="CQST"/>
+					<atom name="ATTR" type="FC32" value="CQTQ"/>
+					<atom name="ATTR" type="FC32" value="CQTX"/>
+					<atom name="ATTR" type="FC32" value="CQUA"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="STOR"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.16','Storage'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".STO"/>
+					<atom name="ATTR" type="FC32" value="SSDS"/>
+					<atom name="ATTR" type="FC32" value="SSCR"/>
+					<atom name="ATTR" type="FC32" value="SSTS"/>
+					<atom name="ATTR" type="FC32" value="SHCT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AVLB"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.65','Utilization'}"/>
+					<atom name="ATTR" type="FC32" value="STTS"/>
+					<atom name="ATTR" type="FC32" value="STAS"/>
+					<atom name="ATTR" type="FC32" value="SAVP"/>
+					<atom name="ATTR" type="FC32" value="SPSD"/>
+					<atom name="ATTR" type="FC32" value="SPDP"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RDWR"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.107','Replication'}"/>
+					<atom name="ATTR" type="FC32" value="SRDS"/>
+					<atom name="ATTR" type="FC32" value="SWRS"/>
+					<atom name="ATTR" type="FC32" value="ORET"/>
+					<atom name="ATTR" type="FC32" value="OCOM"/>
+					<atom name="ATTR" type="FC32" value="OPUR"/>
+					<atom name="ATTR" type="FC32" value="RMST"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="STVC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.20','Object Stores'}"/>
+					<atom name="AVKY" type="CSTR" value="SVOL"/>
+					<atom name="ATTR" type="FC32" value="SVOL"/>
+					<atom name="ATTR" type="FC32" value="STOT"/>
+					<atom name="ATTR" type="FC32" value="SAVL"/>
+					<atom name="ATTR" type="FC32" value="SPER"/>
+					<atom name="ATTR" type="FC32" value="SPEP"/>
+					<atom name="ATTR" type="FC32" value="SHLH"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="STVF"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.30','Verification'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".STV"/>
+					<atom name="ATTR" type="FC32" value="VSTU"/>
+					<atom name="ATTR" type="FC32" value="VCMI"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="FVOS"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.77','Foreground Verification'}"/>
+					<atom name="ATTR" type="FC32" value="FVOI"/>
+					<atom name="ATTR" type="FC32" value="FVOV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFCF"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.22','Background Verification'}"/>
+					<atom name="ATTR" type="FC32" value="VPRI"/>
+					<atom name="ATTR" type="FC32" value="VCOV"/>
+					<atom name="ATTR" type="FC32" value="VCCR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFPG"/>
+					<atom name="ATTR" type="FC32" value="SVFP"/>
+					<atom name="ATTR" type="FC32" value="OSTM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFOB"/>
+					<atom name="ATTR" type="FC32" value="OVER"/>
+					<atom name="ATTR" type="FC32" value="OVRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFBY"/>
+					<atom name="ATTR" type="FC32" value="SBVF"/>
+					<atom name="ATTR" type="FC32" value="SBVR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFRS"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.45','Verification Results'}"/>
+					<atom name="ATTR" type="FC32" value="OMIS"/>
+					<atom name="ATTR" type="FC32" value="OCOR"/>
+					<atom name="ATTR" type="FC32" value="OQRT"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ERSR"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.54','Erasure Coding'}"/>
+				<atom name="COID" type="UI32" value="250"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECOP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.103','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="ECWC"/>
+					<atom name="ATTR" type="FC32" value="ECWF"/>
+					<atom name="ATTR" type="FC32" value="ECRC"/>
+					<atom name="ATTR" type="FC32" value="ECRF"/>
+					<atom name="ATTR" type="FC32" value="ECDC"/>
+					<atom name="ATTR" type="FC32" value="ECDF"/>
+					<atom name="ATTR" type="FC32" value="RSWF"/>
+					<atom name="ATTR" type="FC32" value="RSRF"/>
+					<atom name="ATTR" type="FC32" value="RSDF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECGP"/>
+					<atom name="ATTR" type="FC32" value="ECOR"/>
+					<atom name="ATTR" type="FC32" value="RSCC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECBV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.108','Background Verification'}"/>
+					<atom name="ATTR" type="FC32" value="ECST"/>
+					<atom name="ATTR" type="FC32" value="ECNS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECGV"/>
+					<atom name="ATTR" type="FC32" value="ECVC"/>
+					<atom name="ATTR" type="FC32" value="ECBC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECGC"/>
+					<atom name="ATTR" type="FC32" value="ECCD"/>
+					<atom name="ATTR" type="FC32" value="RSCD"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="REPL"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.31','Replication'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".REP"/>
+					<atom name="ATTR" type="FC32" value="RICR"/>
+					<atom name="ATTR" type="FC32" value="ROCR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIN"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.46','Inbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSIR"/>
+					<atom name="ATTR" type="FC32" value="IRSU"/>
+					<atom name="ATTR" type="FC32" value="RIRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIR"/>
+					<atom name="ATTR" type="FC32" value="RIQT"/>
+					<atom name="ATTR" type="FC32" value="RIRQ"/>
+					<atom name="ATTR" type="FC32" value="RIRS"/>
+					<atom name="ATTR" type="FC32" value="RIRA"/>
+					<atom name="ATTR" type="FC32" value="RIRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIC"/>
+					<atom name="ATTR" type="FC32" value="RIRC"/>
+					<atom name="ATTR" type="FC32" value="RIRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIV"/>
+					<atom name="ATTR" type="FC32" value="RITT"/>
+					<atom name="ATTR" type="FC32" value="RIBR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="RISC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.34','Inbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISS"/>
+					<atom name="ATTR" type="FC32" value="RIST"/>
+					<atom name="ATTR" type="FC32" value="RISP"/>
+					<atom name="ATTR" type="FC32" value="RISA"/>
+					<atom name="ATTR" type="FC32" value="RISR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOT"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.47','Outbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSOR"/>
+					<atom name="ATTR" type="FC32" value="ORSU"/>
+					<atom name="ATTR" type="FC32" value="RORR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOR"/>
+					<atom name="ATTR" type="FC32" value="ROQT"/>
+					<atom name="ATTR" type="FC32" value="RORQ"/>
+					<atom name="ATTR" type="FC32" value="RORS"/>
+					<atom name="ATTR" type="FC32" value="RORA"/>
+					<atom name="ATTR" type="FC32" value="RORT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOC"/>
+					<atom name="ATTR" type="FC32" value="RORC"/>
+					<atom name="ATTR" type="FC32" value="RORF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOS"/>
+					<atom name="ATTR" type="FC32" value="ROTT"/>
+					<atom name="ATTR" type="FC32" value="ROBS"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="ROSC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.35','Outbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSS"/>
+					<atom name="ATTR" type="FC32" value="ROST"/>
+					<atom name="ATTR" type="FC32" value="ROSP"/>
+					<atom name="ATTR" type="FC32" value="ROSA"/>
+					<atom name="ATTR" type="FC32" value="ROSR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="CDMI"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.47','CDMI'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".CDM"/>
+					<atom name="ATTR" type="FC32" value="CACR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="OPER"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.97','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="CRAT"/>
+					<atom name="ATTR" type="FC32" value="CSUC"/>
+					<atom name="ATTR" type="FC32" value="CFAL"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="DTTX"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.98','Data Transfers'}"/>
+					<atom name="ATTR" type="FC32" value="CIRT"/>
+					<atom name="ATTR" type="FC32" value="CRXB"/>
+					<atom name="ATTR" type="FC32" value="CRRT"/>
+					<atom name="ATTR" type="FC32" value="CTXB"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="S3AP"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.50','S3'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="S3OP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.100','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="SRAT"/>
+					<atom name="ATTR" type="FC32" value="SSUC"/>
+					<atom name="ATTR" type="FC32" value="SFAL"/>
+					<atom name="ATTR" type="FC32" value="SUAU"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="S3DX"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.101','Data Transfers'}"/>
+					<atom name="ATTR" type="FC32" value="SIRT"/>
+					<atom name="ATTR" type="FC32" value="SRXB"/>
+					<atom name="ATTR" type="FC32" value="SRRT"/>
+					<atom name="ATTR" type="FC32" value="STXB"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="SWAP"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.55','Swift'}"/>
+				<atom name="COID" type="UI32" value="550"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SWOP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.109','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="WRAT"/>
+					<atom name="ATTR" type="FC32" value="WSUC"/>
+					<atom name="ATTR" type="FC32" value="WFAL"/>
+					<atom name="ATTR" type="FC32" value="WUAU"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SWDX"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.110','Data Transfers'}"/>
+					<atom name="ATTR" type="FC32" value="WIRT"/>
+					<atom name="ATTR" type="FC32" value="WRXB"/>
+					<atom name="ATTR" type="FC32" value="WRRT"/>
+					<atom name="ATTR" type="FC32" value="WTXB"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="HTTP"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.2','HTTP'}"/>
+				<atom name="COID" type="UI32" value="600"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".HTT"/>
+					<atom name="ATTR" type="FC32" value="LHAC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="HTSA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.5','HTTP Sessions'}"/>
+					<atom name="ATTR" type="FC32" value="HCCS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="HTSS"/>
+					<atom name="ATTR" type="FC32" value="HAIS"/>
+					<atom name="ATTR" type="FC32" value="HISC"/>
+					<atom name="ATTR" type="FC32" value="HEIS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="700"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="800"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MINF"/>
+					<atom name="ATTR" type="FC32" value="CMTO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BLDR"/>
+			<atom name="DMVR" type="CSTR" value="113-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.2','LDR'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BLD"/>
+				<atom name="ATTR" type="FC32" value="LDRE"/>
+				<atom name="ATTR" type="FC32" value="LDRA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".STR"/>
+				<atom name="ATTR" type="FC32" value="SSCR"/>
+				<atom name="ATTR" type="FC32" value="SSTS"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".SVT"/>
+				<atom name="ATTR" type="FC32" value="VSTU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RPE"/>
+				<atom name="ATTR" type="FC32" value="IRSU"/>
+				<atom name="ATTR" type="FC32" value="ORSU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".THT"/>
+				<atom name="ATTR" type="FC32" value="HSTE"/>
+				<atom name="ATTR" type="FC32" value="HSTU"/>
+				<atom name="ATTR" type="FC32" value="HTAS"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="NDBS"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.48','Data Store'}"/>
+				<atom name="COID" type="UI32" value="50"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".LST"/>
+					<atom name="ATTR" type="FC32" value="LOST"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".RCA"/>
+					<atom name="ATTR" type="FC32" value="RLOC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="DDQY"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.99.2','Queries'}"/>
+					<atom name="ATTR" type="FC32" value="CQST"/>
+					<atom name="ATTR" type="FC32" value="CQTQ"/>
+					<atom name="ATTR" type="FC32" value="CQTX"/>
+					<atom name="ATTR" type="FC32" value="CQUA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="IMQY"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.7','ILM Activity'}"/>
+					<atom name="ATTR" type="FC32" value="ILMN"/>
+					<atom name="ATTR" type="FC32" value="ILMV"/>
+					<atom name="ATTR" type="FC32" value="QUSZ"/>
+					<atom name="ATTR" type="FC32" value="CQUZ"/>
+					<atom name="ATTR" type="FC32" value="BQUZ"/>
+					<atom name="ATTR" type="FC32" value="SCRT"/>
+					<atom name="ATTR" type="FC32" value="SCTM"/>
+					<atom name="ATTR" type="FC32" value="EVRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="REPL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.72','Object Transfer'}"/>
+					<atom name="ATTR" type="FC32" value="DCdA"/>
+					<atom name="ATTR" type="FC32" value="DCdR"/>
+					<atom name="ATTR" type="FC32" value="DCdT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="PURG"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.38','Object Deleting'}"/>
+					<atom name="ATTR" type="FC32" value="DCpR"/>
+					<atom name="ATTR" type="FC32" value="DCpT"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="STOR"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.16','Storage'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".STO"/>
+					<atom name="ATTR" type="FC32" value="SSDS"/>
+					<atom name="ATTR" type="FC32" value="SSCR"/>
+					<atom name="ATTR" type="FC32" value="SSTS"/>
+					<atom name="ATTR" type="FC32" value="SHCT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AVLB"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.65','Utilization'}"/>
+					<atom name="ATTR" type="FC32" value="STTS"/>
+					<atom name="ATTR" type="FC32" value="STAS"/>
+					<atom name="ATTR" type="FC32" value="SAVP"/>
+					<atom name="ATTR" type="FC32" value="SPSD"/>
+					<atom name="ATTR" type="FC32" value="SPDP"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RDWR"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.107','Replication'}"/>
+					<atom name="ATTR" type="FC32" value="SRDS"/>
+					<atom name="ATTR" type="FC32" value="SWRS"/>
+					<atom name="ATTR" type="FC32" value="ORET"/>
+					<atom name="ATTR" type="FC32" value="OCOM"/>
+					<atom name="ATTR" type="FC32" value="OPUR"/>
+					<atom name="ATTR" type="FC32" value="RMST"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="STVC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.20','Object Stores'}"/>
+					<atom name="AVKY" type="CSTR" value="SVOL"/>
+					<atom name="ATTR" type="FC32" value="SVOL"/>
+					<atom name="ATTR" type="FC32" value="STOT"/>
+					<atom name="ATTR" type="FC32" value="SAVL"/>
+					<atom name="ATTR" type="FC32" value="SPER"/>
+					<atom name="ATTR" type="FC32" value="SPEP"/>
+					<atom name="ATTR" type="FC32" value="SHLH"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="STVF"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.30','Verification'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".STV"/>
+					<atom name="ATTR" type="FC32" value="VSTU"/>
+					<atom name="ATTR" type="FC32" value="VCMI"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="FVOS"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.77','Foreground Verification'}"/>
+					<atom name="ATTR" type="FC32" value="FVOI"/>
+					<atom name="ATTR" type="FC32" value="FVOV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFCF"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.22','Background Verification'}"/>
+					<atom name="ATTR" type="FC32" value="VPRI"/>
+					<atom name="ATTR" type="FC32" value="VCOV"/>
+					<atom name="ATTR" type="FC32" value="VCCR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFPG"/>
+					<atom name="ATTR" type="FC32" value="SVFP"/>
+					<atom name="ATTR" type="FC32" value="OSTM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFOB"/>
+					<atom name="ATTR" type="FC32" value="OVER"/>
+					<atom name="ATTR" type="FC32" value="OVRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFBY"/>
+					<atom name="ATTR" type="FC32" value="SBVF"/>
+					<atom name="ATTR" type="FC32" value="SBVR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="VFRS"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.45','Verification Results'}"/>
+					<atom name="ATTR" type="FC32" value="OMIS"/>
+					<atom name="ATTR" type="FC32" value="OCOR"/>
+					<atom name="ATTR" type="FC32" value="OQRT"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ERSR"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.54','Erasure Coding'}"/>
+				<atom name="COID" type="UI32" value="250"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECOP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.103','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="ECWC"/>
+					<atom name="ATTR" type="FC32" value="ECWF"/>
+					<atom name="ATTR" type="FC32" value="ECRC"/>
+					<atom name="ATTR" type="FC32" value="ECRF"/>
+					<atom name="ATTR" type="FC32" value="ECDC"/>
+					<atom name="ATTR" type="FC32" value="ECDF"/>
+					<atom name="ATTR" type="FC32" value="RSWF"/>
+					<atom name="ATTR" type="FC32" value="RSRF"/>
+					<atom name="ATTR" type="FC32" value="RSDF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECGP"/>
+					<atom name="ATTR" type="FC32" value="ECOR"/>
+					<atom name="ATTR" type="FC32" value="RSCC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECBV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.108','Background Verification'}"/>
+					<atom name="ATTR" type="FC32" value="ECST"/>
+					<atom name="ATTR" type="FC32" value="ECNS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECGV"/>
+					<atom name="ATTR" type="FC32" value="ECVC"/>
+					<atom name="ATTR" type="FC32" value="ECBC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ECGC"/>
+					<atom name="ATTR" type="FC32" value="ECCD"/>
+					<atom name="ATTR" type="FC32" value="RSCD"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="REPL"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.31','Replication'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".REP"/>
+					<atom name="ATTR" type="FC32" value="RICR"/>
+					<atom name="ATTR" type="FC32" value="ROCR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIN"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.46','Inbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSIR"/>
+					<atom name="ATTR" type="FC32" value="IRSU"/>
+					<atom name="ATTR" type="FC32" value="RIRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIR"/>
+					<atom name="ATTR" type="FC32" value="RIQT"/>
+					<atom name="ATTR" type="FC32" value="RIRQ"/>
+					<atom name="ATTR" type="FC32" value="RIRS"/>
+					<atom name="ATTR" type="FC32" value="RIRA"/>
+					<atom name="ATTR" type="FC32" value="RIRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIC"/>
+					<atom name="ATTR" type="FC32" value="RIRC"/>
+					<atom name="ATTR" type="FC32" value="RIRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIV"/>
+					<atom name="ATTR" type="FC32" value="RITT"/>
+					<atom name="ATTR" type="FC32" value="RIBR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="RISC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.34','Inbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISS"/>
+					<atom name="ATTR" type="FC32" value="RIST"/>
+					<atom name="ATTR" type="FC32" value="RISP"/>
+					<atom name="ATTR" type="FC32" value="RISA"/>
+					<atom name="ATTR" type="FC32" value="RISR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOT"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.47','Outbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSOR"/>
+					<atom name="ATTR" type="FC32" value="ORSU"/>
+					<atom name="ATTR" type="FC32" value="RORR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOR"/>
+					<atom name="ATTR" type="FC32" value="ROQT"/>
+					<atom name="ATTR" type="FC32" value="RORQ"/>
+					<atom name="ATTR" type="FC32" value="RORS"/>
+					<atom name="ATTR" type="FC32" value="RORA"/>
+					<atom name="ATTR" type="FC32" value="RORT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOC"/>
+					<atom name="ATTR" type="FC32" value="RORC"/>
+					<atom name="ATTR" type="FC32" value="RORF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOS"/>
+					<atom name="ATTR" type="FC32" value="ROTT"/>
+					<atom name="ATTR" type="FC32" value="ROBS"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="ROSC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.35','Outbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSS"/>
+					<atom name="ATTR" type="FC32" value="ROST"/>
+					<atom name="ATTR" type="FC32" value="ROSP"/>
+					<atom name="ATTR" type="FC32" value="ROSA"/>
+					<atom name="ATTR" type="FC32" value="ROSR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="CDMI"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.47','CDMI'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".CDM"/>
+					<atom name="ATTR" type="FC32" value="CACR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="OPER"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.97','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="CRAT"/>
+					<atom name="ATTR" type="FC32" value="CSUC"/>
+					<atom name="ATTR" type="FC32" value="CFAL"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="DTTX"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.98','Data Transfers'}"/>
+					<atom name="ATTR" type="FC32" value="CIRT"/>
+					<atom name="ATTR" type="FC32" value="CRXB"/>
+					<atom name="ATTR" type="FC32" value="CRRT"/>
+					<atom name="ATTR" type="FC32" value="CTXB"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="S3AP"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.50','S3'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="S3OP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.100','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="SRAT"/>
+					<atom name="ATTR" type="FC32" value="SSUC"/>
+					<atom name="ATTR" type="FC32" value="SFAL"/>
+					<atom name="ATTR" type="FC32" value="SUAU"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="S3DX"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.101','Data Transfers'}"/>
+					<atom name="ATTR" type="FC32" value="SIRT"/>
+					<atom name="ATTR" type="FC32" value="SRXB"/>
+					<atom name="ATTR" type="FC32" value="SRRT"/>
+					<atom name="ATTR" type="FC32" value="STXB"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="SWAP"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.55','Swift'}"/>
+				<atom name="COID" type="UI32" value="550"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SWOP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.109','Operations'}"/>
+					<atom name="ATTR" type="FC32" value="WRAT"/>
+					<atom name="ATTR" type="FC32" value="WSUC"/>
+					<atom name="ATTR" type="FC32" value="WFAL"/>
+					<atom name="ATTR" type="FC32" value="WUAU"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SWDX"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.110','Data Transfers'}"/>
+					<atom name="ATTR" type="FC32" value="WIRT"/>
+					<atom name="ATTR" type="FC32" value="WRXB"/>
+					<atom name="ATTR" type="FC32" value="WRRT"/>
+					<atom name="ATTR" type="FC32" value="WTXB"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="HTTP"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.2','HTTP'}"/>
+				<atom name="COID" type="UI32" value="600"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".HTT"/>
+					<atom name="ATTR" type="FC32" value="LHAC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="HTSA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.5','HTTP Sessions'}"/>
+					<atom name="ATTR" type="FC32" value="HCCS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="HTSS"/>
+					<atom name="ATTR" type="FC32" value="HAIS"/>
+					<atom name="ATTR" type="FC32" value="HISC"/>
+					<atom name="ATTR" type="FC32" value="HEIS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="700"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="800"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MINF"/>
+					<atom name="ATTR" type="FC32" value="CMTO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BARC"/>
+			<atom name="DMVR" type="CSTR" value="30-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.9','ARC'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BAR"/>
+				<atom name="ATTR" type="FC32" value="ARCE"/>
+				<atom name="ATTR" type="FC32" value="ARCA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RPE"/>
+				<atom name="ATTR" type="FC32" value="IRSU"/>
+				<atom name="ATTR" type="FC32" value="ORSU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".AOT"/>
+				<atom name="ATTR" type="FC32" value="AOTE"/>
+				<atom name="ATTR" type="FC32" value="AOTU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".AIT"/>
+				<atom name="ATTR" type="FC32" value="AITE"/>
+				<atom name="ATTR" type="FC32" value="AITU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RDT"/>
+				<atom name="ATTR" type="FC32" value="RDTE"/>
+				<atom name="ATTR" type="FC32" value="RDTU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="REPL"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.31','Replication'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".REP"/>
+					<atom name="ATTR" type="FC32" value="RICR"/>
+					<atom name="ATTR" type="FC32" value="ROCR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIN"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.46','Inbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSIR"/>
+					<atom name="ATTR" type="FC32" value="IRSU"/>
+					<atom name="ATTR" type="FC32" value="RIRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIR"/>
+					<atom name="ATTR" type="FC32" value="RIQT"/>
+					<atom name="ATTR" type="FC32" value="RIRQ"/>
+					<atom name="ATTR" type="FC32" value="RIRS"/>
+					<atom name="ATTR" type="FC32" value="RIRA"/>
+					<atom name="ATTR" type="FC32" value="RIRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIC"/>
+					<atom name="ATTR" type="FC32" value="RIRC"/>
+					<atom name="ATTR" type="FC32" value="RIRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIV"/>
+					<atom name="ATTR" type="FC32" value="RITT"/>
+					<atom name="ATTR" type="FC32" value="RIBR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="RISC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.34','Inbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISS"/>
+					<atom name="ATTR" type="FC32" value="RIST"/>
+					<atom name="ATTR" type="FC32" value="RISP"/>
+					<atom name="ATTR" type="FC32" value="RISA"/>
+					<atom name="ATTR" type="FC32" value="RISR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOT"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.47','Outbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSOR"/>
+					<atom name="ATTR" type="FC32" value="ORSU"/>
+					<atom name="ATTR" type="FC32" value="RORR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOR"/>
+					<atom name="ATTR" type="FC32" value="ROQT"/>
+					<atom name="ATTR" type="FC32" value="RORQ"/>
+					<atom name="ATTR" type="FC32" value="RORS"/>
+					<atom name="ATTR" type="FC32" value="RORA"/>
+					<atom name="ATTR" type="FC32" value="RORT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOC"/>
+					<atom name="ATTR" type="FC32" value="RORC"/>
+					<atom name="ATTR" type="FC32" value="RORF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOS"/>
+					<atom name="ATTR" type="FC32" value="ROTT"/>
+					<atom name="ATTR" type="FC32" value="ROBS"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="ROSC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.35','Outbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSS"/>
+					<atom name="ATTR" type="FC32" value="ROST"/>
+					<atom name="ATTR" type="FC32" value="ROSP"/>
+					<atom name="ATTR" type="FC32" value="ROSA"/>
+					<atom name="ATTR" type="FC32" value="ROSR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ARCO"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.32','Store'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".ARC"/>
+					<atom name="ATTR" type="FC32" value="AOTE"/>
+					<atom name="ATTR" type="FC32" value="AOTU"/>
+					<atom name="ATTR" type="FC32" value="AORO"/>
+					<atom name="ATTR" type="FC32" value="ACRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.48','Archive Store Overview'}"/>
+					<atom name="ATTR" type="FC32" value="AROP"/>
+					<atom name="ATTR" type="FC32" value="AROT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAO"/>
+					<atom name="ATTR" type="FC32" value="AROA"/>
+					<atom name="ATTR" type="FC32" value="ARBA"/>
+					<atom name="ATTR" type="FC32" value="ARVF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAP"/>
+					<atom name="ATTR" type="FC32" value="ADOP"/>
+					<atom name="ATTR" type="FC32" value="ADBP"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ARCI"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.33','Retrieve'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".ARS"/>
+					<atom name="ATTR" type="FC32" value="AITE"/>
+					<atom name="ATTR" type="FC32" value="AITU"/>
+					<atom name="ATTR" type="FC32" value="ACRR"/>
+					<atom name="ATTR" type="FC32" value="ACRV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIRQ"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.50','Archive Retrieve Overview'}"/>
+					<atom name="ATTR" type="FC32" value="ARCR"/>
+					<atom name="ATTR" type="FC32" value="ARRR"/>
+					<atom name="ATTR" type="FC32" value="ARRQ"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIRT"/>
+					<atom name="ATTR" type="FC32" value="AROQ"/>
+					<atom name="ATTR" type="FC32" value="ARBQ"/>
+					<atom name="ATTR" type="FC32" value="ARAR"/>
+					<atom name="ATTR" type="FC32" value="ARRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIDV"/>
+					<atom name="ATTR" type="FC32" value="AROD"/>
+					<atom name="ATTR" type="FC32" value="ARBD"/>
+					<atom name="ATTR" type="FC32" value="ARRF"/>
+					<atom name="ATTR" type="FC32" value="ARRV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIST"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.51','Archive Retrieve Statistics'}"/>
+					<atom name="ATTR" type="FC32" value="ARQL"/>
+					<atom name="ATTR" type="FC32" value="ARRL"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSMD"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.34','Middleware'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".RSM"/>
+					<atom name="ATTR" type="FC32" value="RDTE"/>
+					<atom name="ATTR" type="FC32" value="RDTU"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSOV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.52','Tivoli Storage Manager Overview'}"/>
+					<atom name="ATTR" type="FC32" value="RDMT"/>
+					<atom name="ATTR" type="FC32" value="RDMV"/>
+					<atom name="ATTR" type="FC32" value="RDSV"/>
+					<atom name="ATTR" type="FC32" value="RDCV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSSC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.53','Tivoli Storage Manager Account'}"/>
+					<atom name="ATTR" type="FC32" value="RDSA"/>
+					<atom name="ATTR" type="FC32" value="RDSP"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSCC"/>
+					<atom name="ATTR" type="FC32" value="RDNN"/>
+					<atom name="ATTR" type="FC32" value="RDON"/>
+					<atom name="ATTR" type="FC32" value="RDUN"/>
+					<atom name="ATTR" type="FC32" value="RDPW"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSFC"/>
+					<atom name="ATTR" type="FC32" value="RDFN"/>
+					<atom name="ATTR" type="FC32" value="RDMC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSDC"/>
+					<atom name="ATTR" type="FC32" value="RDND"/>
+					<atom name="ATTR" type="FC32" value="RDMR"/>
+					<atom name="ATTR" type="FC32" value="RDMA"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="600"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MINF"/>
+					<atom name="ATTR" type="FC32" value="CMTO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BARC"/>
+			<atom name="DMVR" type="CSTR" value="31-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.9','ARC'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RST"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.106','Please choose a Middleware Type on the Middleware Configuration tab.'}"/>
+				<atom name="ATTR" type="FC32" value="RDUT"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="REPL"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.31','Replication'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOT"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.106','Please choose a Middleware Type on the Middleware Configuration tab.'}"/>
+					<atom name="ATTR" type="FC32" value="ORSU"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSMD"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.34','Middleware'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".RSM"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.106','Please choose a Middleware Type on the Middleware Configuration tab.'}"/>
+					<atom name="ATTR" type="FC32" value="RDUT"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BARC"/>
+			<atom name="DMVR" type="CSTR" value="31-cts"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.9','ARC'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BAR"/>
+				<atom name="ATTR" type="FC32" value="ARCE"/>
+				<atom name="ATTR" type="FC32" value="ARCA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RST"/>
+				<atom name="ATTR" type="FC32" value="ACTE"/>
+				<atom name="ATTR" type="FC32" value="ACTS"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RPE"/>
+				<atom name="ATTR" type="FC32" value="IRSU"/>
+				<atom name="ATTR" type="FC32" value="ORSU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".AOT"/>
+				<atom name="ATTR" type="FC32" value="AOTU"/>
+				<atom name="ATTR" type="FC32" value="AITU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="REPL"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.31','Replication'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".REP"/>
+					<atom name="ATTR" type="FC32" value="RICR"/>
+					<atom name="ATTR" type="FC32" value="ROCR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIN"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.46','Inbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSIR"/>
+					<atom name="ATTR" type="FC32" value="IRSU"/>
+					<atom name="ATTR" type="FC32" value="RIRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIR"/>
+					<atom name="ATTR" type="FC32" value="RIQT"/>
+					<atom name="ATTR" type="FC32" value="RIRQ"/>
+					<atom name="ATTR" type="FC32" value="RIRS"/>
+					<atom name="ATTR" type="FC32" value="RIRA"/>
+					<atom name="ATTR" type="FC32" value="RIRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIC"/>
+					<atom name="ATTR" type="FC32" value="RIRC"/>
+					<atom name="ATTR" type="FC32" value="RIRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIV"/>
+					<atom name="ATTR" type="FC32" value="RITT"/>
+					<atom name="ATTR" type="FC32" value="RIBR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="RISC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.34','Inbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISS"/>
+					<atom name="ATTR" type="FC32" value="RIST"/>
+					<atom name="ATTR" type="FC32" value="RISP"/>
+					<atom name="ATTR" type="FC32" value="RISA"/>
+					<atom name="ATTR" type="FC32" value="RISR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOT"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.47','Outbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSOR"/>
+					<atom name="ATTR" type="FC32" value="ORSU"/>
+					<atom name="ATTR" type="FC32" value="RORR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOR"/>
+					<atom name="ATTR" type="FC32" value="ROQT"/>
+					<atom name="ATTR" type="FC32" value="RORQ"/>
+					<atom name="ATTR" type="FC32" value="RORS"/>
+					<atom name="ATTR" type="FC32" value="RORA"/>
+					<atom name="ATTR" type="FC32" value="RORT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOC"/>
+					<atom name="ATTR" type="FC32" value="RORC"/>
+					<atom name="ATTR" type="FC32" value="RORF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOS"/>
+					<atom name="ATTR" type="FC32" value="ROTT"/>
+					<atom name="ATTR" type="FC32" value="ROBS"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="ROSC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.35','Outbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSS"/>
+					<atom name="ATTR" type="FC32" value="ROST"/>
+					<atom name="ATTR" type="FC32" value="ROSP"/>
+					<atom name="ATTR" type="FC32" value="ROSA"/>
+					<atom name="ATTR" type="FC32" value="ROSR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ARCO"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.32','Store'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".ARC"/>
+					<atom name="ATTR" type="FC32" value="AOTU"/>
+					<atom name="ATTR" type="FC32" value="ACRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.48','Archive Store Overview'}"/>
+					<atom name="ATTR" type="FC32" value="AROP"/>
+					<atom name="ATTR" type="FC32" value="ACAS"/>
+					<atom name="ATTR" type="FC32" value="AROT"/>
+					<atom name="ATTR" type="FC32" value="ASTR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAO"/>
+					<atom name="ATTR" type="FC32" value="AROA"/>
+					<atom name="ATTR" type="FC32" value="ARBA"/>
+					<atom name="ATTR" type="FC32" value="ARVF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAP"/>
+					<atom name="ATTR" type="FC32" value="ADOP"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ARCI"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.33','Retrieve'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".ARS"/>
+					<atom name="ATTR" type="FC32" value="AITU"/>
+					<atom name="ATTR" type="FC32" value="ACRR"/>
+					<atom name="ATTR" type="FC32" value="ACRV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIRQ"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.50','Archive Retrieve Overview'}"/>
+					<atom name="ATTR" type="FC32" value="ARCR"/>
+					<atom name="ATTR" type="FC32" value="ARRR"/>
+					<atom name="ATTR" type="FC32" value="ARRQ"/>
+					<atom name="ATTR" type="FC32" value="ACTR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIRT"/>
+					<atom name="ATTR" type="FC32" value="AROQ"/>
+					<atom name="ATTR" type="FC32" value="ARAR"/>
+					<atom name="ATTR" type="FC32" value="ARRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIDV"/>
+					<atom name="ATTR" type="FC32" value="AROD"/>
+					<atom name="ATTR" type="FC32" value="ARBD"/>
+					<atom name="ATTR" type="FC32" value="ARRF"/>
+					<atom name="ATTR" type="FC32" value="ARRV"/>
+					<atom name="ATTR" type="FC32" value="ARTC"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSMD"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.34','Middleware'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".RSM"/>
+					<atom name="ATTR" type="FC32" value="ACTE"/>
+					<atom name="ATTR" type="FC32" value="ACTS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSSC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.105','Cloud Tiering Service (S3) Overview'}"/>
+					<atom name="ATTR" type="FC32" value="SABU"/>
+					<atom name="ATTR" type="FC32" value="SUID"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".RTO"/>
+					<atom name="ATTR" type="FC32" value="ATAR"/>
+					<atom name="ATTR" type="FC32" value="ATRQ"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="600"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MINF"/>
+					<atom name="ATTR" type="FC32" value="CMTO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BARC"/>
+			<atom name="DMVR" type="CSTR" value="31-tsm"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.9','ARC'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BAR"/>
+				<atom name="ATTR" type="FC32" value="ARCE"/>
+				<atom name="ATTR" type="FC32" value="ARCA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RDT"/>
+				<atom name="ATTR" type="FC32" value="RDTE"/>
+				<atom name="ATTR" type="FC32" value="RDTU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".AOT"/>
+				<atom name="ATTR" type="FC32" value="AOTE"/>
+				<atom name="ATTR" type="FC32" value="AOTU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".AIT"/>
+				<atom name="ATTR" type="FC32" value="AITE"/>
+				<atom name="ATTR" type="FC32" value="AITU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".RPE"/>
+				<atom name="ATTR" type="FC32" value="IRSU"/>
+				<atom name="ATTR" type="FC32" value="ORSU"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="REPL"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.31','Replication'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".REP"/>
+					<atom name="ATTR" type="FC32" value="RICR"/>
+					<atom name="ATTR" type="FC32" value="ROCR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIN"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.46','Inbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSIR"/>
+					<atom name="ATTR" type="FC32" value="IRSU"/>
+					<atom name="ATTR" type="FC32" value="RIRR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIR"/>
+					<atom name="ATTR" type="FC32" value="RIQT"/>
+					<atom name="ATTR" type="FC32" value="RIRQ"/>
+					<atom name="ATTR" type="FC32" value="RIRS"/>
+					<atom name="ATTR" type="FC32" value="RIRA"/>
+					<atom name="ATTR" type="FC32" value="RIRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIC"/>
+					<atom name="ATTR" type="FC32" value="RIRC"/>
+					<atom name="ATTR" type="FC32" value="RIRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPIV"/>
+					<atom name="ATTR" type="FC32" value="RITT"/>
+					<atom name="ATTR" type="FC32" value="RIBR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="RISC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.34','Inbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISN"/>
+					<atom name="ATTR" type="FC32" value="RISS"/>
+					<atom name="ATTR" type="FC32" value="RIST"/>
+					<atom name="ATTR" type="FC32" value="RISP"/>
+					<atom name="ATTR" type="FC32" value="RISA"/>
+					<atom name="ATTR" type="FC32" value="RISR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOT"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.47','Outbound Replication'}"/>
+					<atom name="ATTR" type="FC32" value="DSOR"/>
+					<atom name="ATTR" type="FC32" value="ORSU"/>
+					<atom name="ATTR" type="FC32" value="RORR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOR"/>
+					<atom name="ATTR" type="FC32" value="ROQT"/>
+					<atom name="ATTR" type="FC32" value="RORQ"/>
+					<atom name="ATTR" type="FC32" value="RORS"/>
+					<atom name="ATTR" type="FC32" value="RORA"/>
+					<atom name="ATTR" type="FC32" value="RORT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOC"/>
+					<atom name="ATTR" type="FC32" value="RORC"/>
+					<atom name="ATTR" type="FC32" value="RORF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RPOS"/>
+					<atom name="ATTR" type="FC32" value="ROTT"/>
+					<atom name="ATTR" type="FC32" value="ROBS"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="ROSC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.35','Outbound Replication Summaries'}"/>
+					<atom name="AVKY" type="CSTR" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSN"/>
+					<atom name="ATTR" type="FC32" value="ROSS"/>
+					<atom name="ATTR" type="FC32" value="ROST"/>
+					<atom name="ATTR" type="FC32" value="ROSP"/>
+					<atom name="ATTR" type="FC32" value="ROSA"/>
+					<atom name="ATTR" type="FC32" value="ROSR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ARCO"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.32','Store'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".ARC"/>
+					<atom name="ATTR" type="FC32" value="AOTE"/>
+					<atom name="ATTR" type="FC32" value="AOTU"/>
+					<atom name="ATTR" type="FC32" value="AORO"/>
+					<atom name="ATTR" type="FC32" value="ACRF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.48','Archive Store Overview'}"/>
+					<atom name="ATTR" type="FC32" value="AROP"/>
+					<atom name="ATTR" type="FC32" value="AROT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAO"/>
+					<atom name="ATTR" type="FC32" value="AROA"/>
+					<atom name="ATTR" type="FC32" value="ARBA"/>
+					<atom name="ATTR" type="FC32" value="ARVF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AOAP"/>
+					<atom name="ATTR" type="FC32" value="ADOP"/>
+					<atom name="ATTR" type="FC32" value="ADBP"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ARCI"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.33','Retrieve'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".ARS"/>
+					<atom name="ATTR" type="FC32" value="AITE"/>
+					<atom name="ATTR" type="FC32" value="AITU"/>
+					<atom name="ATTR" type="FC32" value="ACRR"/>
+					<atom name="ATTR" type="FC32" value="ACRV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIRQ"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.50','Archive Retrieve Overview'}"/>
+					<atom name="ATTR" type="FC32" value="ARCR"/>
+					<atom name="ATTR" type="FC32" value="ARRR"/>
+					<atom name="ATTR" type="FC32" value="ARRQ"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIRT"/>
+					<atom name="ATTR" type="FC32" value="AROQ"/>
+					<atom name="ATTR" type="FC32" value="ARBQ"/>
+					<atom name="ATTR" type="FC32" value="ARAR"/>
+					<atom name="ATTR" type="FC32" value="ARRT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIDV"/>
+					<atom name="ATTR" type="FC32" value="AROD"/>
+					<atom name="ATTR" type="FC32" value="ARBD"/>
+					<atom name="ATTR" type="FC32" value="ARRF"/>
+					<atom name="ATTR" type="FC32" value="ARRV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AIST"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.51','Archive Retrieve Statistics'}"/>
+					<atom name="ATTR" type="FC32" value="ARQL"/>
+					<atom name="ATTR" type="FC32" value="ARRL"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSMD"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.34','Middleware'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".RSM"/>
+					<atom name="ATTR" type="FC32" value="RDTE"/>
+					<atom name="ATTR" type="FC32" value="RDTU"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSOV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.52','Tivoli Storage Manager Overview'}"/>
+					<atom name="ATTR" type="FC32" value="RDSV"/>
+					<atom name="ATTR" type="FC32" value="RDCV"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSSC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.53','Tivoli Storage Manager Account'}"/>
+					<atom name="ATTR" type="FC32" value="RDSA"/>
+					<atom name="ATTR" type="FC32" value="RDSP"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSCC"/>
+					<atom name="ATTR" type="FC32" value="RDNN"/>
+					<atom name="ATTR" type="FC32" value="RDON"/>
+					<atom name="ATTR" type="FC32" value="RDUN"/>
+					<atom name="ATTR" type="FC32" value="RDPW"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSFC"/>
+					<atom name="ATTR" type="FC32" value="RDFN"/>
+					<atom name="ATTR" type="FC32" value="RDMC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="RSDC"/>
+					<atom name="ATTR" type="FC32" value="RDND"/>
+					<atom name="ATTR" type="FC32" value="RDMR"/>
+					<atom name="ATTR" type="FC32" value="RDMA"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="600"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MINF"/>
+					<atom name="ATTR" type="FC32" value="CMTO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BCLB"/>
+			<atom name="DMVR" type="CSTR" value="39-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.7','CLB'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BCL"/>
+				<atom name="ATTR" type="FC32" value="CLBE"/>
+				<atom name="ATTR" type="FC32" value="CLBA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="HTTP"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.2','HTTP'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".HTT"/>
+					<atom name="ATTR" type="FC32" value="CHAC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="HDST"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.33','Destinations'}"/>
+					<atom name="ATTR" type="FC32" value="CAQH"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SSET"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.5','HTTP Sessions'}"/>
+					<atom name="ATTR" type="FC32" value="CCES"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SSIN"/>
+					<atom name="ATTR" type="FC32" value="CISA"/>
+					<atom name="ATTR" type="FC32" value="CISS"/>
+					<atom name="ATTR" type="FC32" value="CISF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SSFD"/>
+					<atom name="ATTR" type="FC32" value="CFSR"/>
+					<atom name="ATTR" type="FC32" value="CFSU"/>
+					<atom name="ATTR" type="FC32" value="CFSD"/>
+					<atom name="ATTR" type="FC32" value="CFSN"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BCMN"/>
+			<atom name="DMVR" type="CSTR" value="58-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.8','CMN'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BCM"/>
+				<atom name="ATTR" type="FC32" value="CMNE"/>
+				<atom name="ATTR" type="FC32" value="CMNA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="GRTK"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.15','Grid Tasks'}"/>
+				<atom name="COID" type="UI32" value="900"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".GRT"/>
+					<atom name="ATTR" type="FC32" value="SNPT"/>
+					<atom name="ATTR" type="FC32" value="SNAT"/>
+					<atom name="ATTR" type="FC32" value="SNBT"/>
+					<atom name="ATTR" type="FC32" value="SNFT"/>
+					<atom name="ATTR" type="FC32" value="SNCT"/>
+					<atom name="ATTR" type="FC32" value="SNST"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SNTK"/>
+					<atom name="ATTR" type="FC32" value="SCSN"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SPCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.15','Pending'}"/>
+					<atom name="ATTR" type="FC32" value="SCPI"/>
+					<atom name="ATTR" type="FC32" value="SCPT"/>
+					<atom name="ATTR" type="FC32" value="SCPD"/>
+					<atom name="ATTR" type="FC32" value="SOPF"/>
+					<atom name="ATTR" type="FC32" value="SOPT"/>
+					<atom name="ATTR" type="FC32" value="SCPA"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SACC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.16','Active'}"/>
+					<atom name="AVKY" type="CSTR" value="SCAI"/>
+					<atom name="AVSK" type="CSTR" value="SOAT"/>
+					<atom name="ATTR" type="FC32" value="SCAI"/>
+					<atom name="ATTR" type="FC32" value="SCAT"/>
+					<atom name="ATTR" type="FC32" value="SCAD"/>
+					<atom name="ATTR" type="FC32" value="SOAT"/>
+					<atom name="ATTR" type="FC32" value="SOAU"/>
+					<atom name="ATTR" type="FC32" value="SCAG"/>
+					<atom name="ATTR" type="FC32" value="SCAP"/>
+					<atom name="ATTR" type="FC32" value="SCAS"/>
+					<atom name="ATTR" type="FC32" value="SCAM"/>
+					<atom name="ATTR" type="FC32" value="SCAA"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SHCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.17','Historical'}"/>
+					<atom name="ATTR" type="FC32" value="SCHI"/>
+					<atom name="ATTR" type="FC32" value="SCHT"/>
+					<atom name="ATTR" type="FC32" value="SCHD"/>
+					<atom name="ATTR" type="FC32" value="SOHS"/>
+					<atom name="ATTR" type="FC32" value="SOHC"/>
+					<atom name="ATTR" type="FC32" value="SCHR"/>
+					<atom name="ATTR" type="FC32" value="SCHV"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="ATCD"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.37','Object Lookup'}"/>
+				<atom name="COID" type="UI32" value="1050"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".ATC"/>
+					<atom name="ATTR" type="FC32" value="OLAC"/>
+					<atom name="ATTR" type="FC32" value="OLID"/>
+					<atom name="ATTR" type="FC32" value="OLRT"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="CBBA"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.35','Identifiers'}"/>
+				<atom name="COID" type="UI32" value="1100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".CBB"/>
+					<atom name="ATTR" type="FC32" value="BASS"/>
+					<atom name="ATTR" type="FC32" value="BAST"/>
+					<atom name="ATTR" type="FC32" value="BASF"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="CHOM"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.42','Connect to Support'}"/>
+				<atom name="COID" type="UI32" value="1150"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".CHM"/>
+					<atom name="ATTR" type="FC32" value="CHSE"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CHCF"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.85','Configuration'}"/>
+					<atom name="ATTR" type="FC32" value="CHSV"/>
+					<atom name="ATTR" type="FC32" value="CHSP"/>
+					<atom name="ATTR" type="FC32" value="CHUS"/>
+					<atom name="ATTR" type="FC32" value="CHPW"/>
+					<atom name="ATTR" type="FC32" value="CHMI"/>
+					<atom name="ATTR" type="FC32" value="CHSH"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="1200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MTEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.76','Metadata Events'}"/>
+					<atom name="ATTR" type="FC32" value="ACMS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="1300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MINF"/>
+					<atom name="ATTR" type="FC32" value="CMTO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BNMS"/>
+			<atom name="DMVR" type="CSTR" value="23-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.4','NMS'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BNM"/>
+				<atom name="ATTR" type="FC32" value="NSCE"/>
+				<atom name="ATTR" type="FC32" value="NSCA"/>
+				<atom name="ATTR" type="FC32" value="MISS"/>
+				<atom name="ATTR" type="FC32" value="MINS"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="NCIF"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.84','Binding Information'}"/>
+				<atom name="ATTR" type="FC32" value="ARNM"/>
+				<atom name="ATTR" type="FC32" value="ARNT"/>
+				<atom name="ATTR" type="FC32" value="ARBN"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="NDBS"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.20','Database'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NDCF"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.28','Configuration'}"/>
+					<atom name="ATTR" type="FC32" value="NDBT"/>
+					<atom name="ATTR" type="FC32" value="NDBV"/>
+					<atom name="ATTR" type="FC32" value="NDBE"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NTBS"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.29','Tablespace'}"/>
+					<atom name="ATTR" type="FC32" value="NTBA"/>
+					<atom name="ATTR" type="FC32" value="NTBR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATIN"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.68','Attribute Repository'}"/>
+					<atom name="ATTR" type="FC32" value="ARIS"/>
+					<atom name="ATTR" type="FC32" value="ARTR"/>
+					<atom name="ATTR" type="FC32" value="ARVR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATOT"/>
+					<atom name="ATTR" type="FC32" value="ARAS"/>
+					<atom name="ATTR" type="FC32" value="ARSR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATST"/>
+					<atom name="ATTR" type="FC32" value="ARRS"/>
+					<atom name="ATTR" type="FC32" value="ARPS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATDC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.88','Data Connection Events'}"/>
+					<atom name="ATTR" type="FC32" value="LATA"/>
+					<atom name="ATTR" type="FC32" value="LATW"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="INEN"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.45','Interface Engine'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".INE"/>
+					<atom name="ATTR" type="FC32" value="MISS"/>
+					<atom name="ATTR" type="FC32" value="MICS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NFEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.86','Notification Events'}"/>
+					<atom name="ATTR" type="FC32" value="MINS"/>
+					<atom name="ATTR" type="FC32" value="MINQ"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CPOL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.87','Connection Pool'}"/>
+					<atom name="ATTR" type="FC32" value="CPMC"/>
+					<atom name="ATTR" type="FC32" value="CPRC"/>
+					<atom name="ATTR" type="FC32" value="CPAO"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BNMS"/>
+			<atom name="DMVR" type="CSTR" value="23-reporting"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.4','NMS'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BNM"/>
+				<atom name="ATTR" type="FC32" value="NSCE"/>
+				<atom name="ATTR" type="FC32" value="NSCA"/>
+				<atom name="ATTR" type="FC32" value="MISS"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="NCIF"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.84','Binding Information'}"/>
+				<atom name="ATTR" type="FC32" value="ARNM"/>
+				<atom name="ATTR" type="FC32" value="ARNT"/>
+				<atom name="ATTR" type="FC32" value="ARBN"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="NDBS"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.20','Database'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NDCF"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.28','Configuration'}"/>
+					<atom name="ATTR" type="FC32" value="NDBT"/>
+					<atom name="ATTR" type="FC32" value="NDBV"/>
+					<atom name="ATTR" type="FC32" value="NDBE"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NTBS"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.29','Tablespace'}"/>
+					<atom name="ATTR" type="FC32" value="NTBA"/>
+					<atom name="ATTR" type="FC32" value="NTBR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATIN"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.68','Attribute Repository'}"/>
+					<atom name="ATTR" type="FC32" value="ARIS"/>
+					<atom name="ATTR" type="FC32" value="ARTR"/>
+					<atom name="ATTR" type="FC32" value="ARVR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATOT"/>
+					<atom name="ATTR" type="FC32" value="ARAS"/>
+					<atom name="ATTR" type="FC32" value="ARSR"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATST"/>
+					<atom name="ATTR" type="FC32" value="ARRS"/>
+					<atom name="ATTR" type="FC32" value="ARPS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETA"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="NREC"/>
+					<atom name="ATTR" type="FC32" value="NTRA"/>
+					<atom name="ATTR" type="FC32" value="BREC"/>
+					<atom name="ATTR" type="FC32" value="BTRA"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="INEN"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.45','Interface Engine'}"/>
+				<atom name="COID" type="UI32" value="500"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value=".INE"/>
+					<atom name="ATTR" type="FC32" value="MISS"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BSSM"/>
+			<atom name="DMVR" type="CSTR" value="71-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.6','SSM'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BSS"/>
+				<atom name="ATTR" type="FC32" value="SSME"/>
+				<atom name="ATTR" type="FC32" value="SSMA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="SERV"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.22','Services'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="OSIN"/>
+					<atom name="ATTR" type="FC32" value="OSVR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SVCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.23','Services'}"/>
+					<atom name="AVKY" type="CSTR" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVER"/>
+					<atom name="ATTR" type="FC32" value="SVST"/>
+					<atom name="ATTR" type="FC32" value="SVTH"/>
+					<atom name="ATTR" type="FC32" value="SVLD"/>
+					<atom name="ATTR" type="FC32" value="SVME"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="PKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.24','Packages'}"/>
+					<atom name="ATTR" type="FC32" value="PKNM"/>
+					<atom name="ATTR" type="FC32" value="PKIS"/>
+					<atom name="ATTR" type="FC32" value="PKVR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.31','System Events'}"/>
+					<atom name="ATTR" type="FC32" value="SMST"/>
+					<atom name="ATTR" type="FC32" value="SMTT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYLL"/>
+					<atom name="ATTR" type="FC32" value="SLLE"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SLAC"/>
+					<atom name="AVKY" type="CSTR" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMCN"/>
+					<atom name="ATTR" type="FC32" value="SMRS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.56','Memory'}"/>
+					<atom name="ATTR" type="FC32" value="TMEM"/>
+					<atom name="ATTR" type="FC32" value="UMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="CPCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.21','Processors'}"/>
+					<atom name="ATTR" type="FC32" value="PNUM"/>
+					<atom name="ATTR" type="FC32" value="PVND"/>
+					<atom name="ATTR" type="FC32" value="PTYP"/>
+					<atom name="ATTR" type="FC32" value="PFRQ"/>
+					<atom name="ATTR" type="FC32" value="PCCH"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CPUI"/>
+					<atom name="ATTR" type="FC32" value="SLSY"/>
+					<atom name="ATTR" type="FC32" value="SLIO"/>
+					<atom name="ATTR" type="FC32" value="SLSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="VMCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.22','Volumes'}"/>
+					<atom name="AVKY" type="CSTR" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMDV"/>
+					<atom name="ATTR" type="FC32" value="VMST"/>
+					<atom name="ATTR" type="FC32" value="VMSZ"/>
+					<atom name="ATTR" type="FC32" value="VMFR"/>
+					<atom name="ATTR" type="FC32" value="VMTI"/>
+					<atom name="ATTR" type="FC32" value="VMFI"/>
+					<atom name="ATTR" type="FC32" value="VMWC"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="DKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.57','Disk Devices'}"/>
+					<atom name="AVKY" type="CSTR" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKVI"/>
+					<atom name="ATTR" type="FC32" value="DKRD"/>
+					<atom name="ATTR" type="FC32" value="DKWR"/>
+					<atom name="ATTR" type="FC32" value="DKIO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="TRBS"/>
+					<atom name="ATTR" type="FC32" value="TTBS"/>
+					<atom name="ATTR" type="FC32" value="TRXB"/>
+					<atom name="ATTR" type="FC32" value="TTXB"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETD"/>
+					<atom name="ATTR" type="FC32" value="DNST"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTIC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.25','Network Interfaces'}"/>
+					<atom name="AVKY" type="CSTR" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NHAD"/>
+					<atom name="ATTR" type="FC32" value="NSPD"/>
+					<atom name="ATTR" type="FC32" value="NDUP"/>
+					<atom name="ATTR" type="FC32" value="NANG"/>
+					<atom name="ATTR" type="FC32" value="NLNK"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTAC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.58','Network Addresses'}"/>
+					<atom name="ATTR" type="FC32" value="NANM"/>
+					<atom name="ATTR" type="FC32" value="NAIP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTRC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.26','Receive'}"/>
+					<atom name="AVKY" type="CSTR" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRXB"/>
+					<atom name="ATTR" type="FC32" value="NRXP"/>
+					<atom name="ATTR" type="FC32" value="NRXE"/>
+					<atom name="ATTR" type="FC32" value="NRXD"/>
+					<atom name="ATTR" type="FC32" value="NRXO"/>
+					<atom name="ATTR" type="FC32" value="NRXF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETR"/>
+					<atom name="ATTR" type="FC32" value="NRER"/>
+					<atom name="ATTR" type="FC32" value="CRER"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTTC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.27','Transmit'}"/>
+					<atom name="AVKY" type="CSTR" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTXB"/>
+					<atom name="ATTR" type="FC32" value="NTXP"/>
+					<atom name="ATTR" type="FC32" value="NTXE"/>
+					<atom name="ATTR" type="FC32" value="NTXD"/>
+					<atom name="ATTR" type="FC32" value="NTXC"/>
+					<atom name="ATTR" type="FC32" value="NTXA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETT"/>
+					<atom name="ATTR" type="FC32" value="NTER"/>
+					<atom name="ATTR" type="FC32" value="CTER"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="TIMG"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.23','Timing'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMLC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.60','Local Clock'}"/>
+					<atom name="ATTR" type="FC32" value="BTSE"/>
+					<atom name="ATTR" type="FC32" value="BTOF"/>
+					<atom name="ATTR" type="FC32" value="BTRT"/>
+					<atom name="ATTR" type="FC32" value="BTTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMNC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.61','Neighboring Clocks'}"/>
+					<atom name="ATTR" type="FC32" value="NUMN"/>
+					<atom name="ATTR" type="FC32" value="AVNO"/>
+					<atom name="ATTR" type="FC32" value="MXNO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.62','NTP Synchronization'}"/>
+					<atom name="ATTR" type="FC32" value="NTSU"/>
+					<atom name="ATTR" type="FC32" value="NTLK"/>
+					<atom name="ATTR" type="FC32" value="NTST"/>
+					<atom name="ATTR" type="FC32" value="NTSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTC"/>
+					<atom name="ATTR" type="FC32" value="NTIP"/>
+					<atom name="ATTR" type="FC32" value="NTSD"/>
+					<atom name="ATTR" type="FC32" value="NTSO"/>
+					<atom name="ATTR" type="FC32" value="NTSJ"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTO"/>
+					<atom name="ATTR" type="FC32" value="NTOF"/>
+					<atom name="ATTR" type="FC32" value="NTFQ"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BSSM"/>
+			<atom name="DMVR" type="CSTR" value="71-appliance"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.6','SSM'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BSS"/>
+				<atom name="ATTR" type="FC32" value="SSME"/>
+				<atom name="ATTR" type="FC32" value="SSMA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="SERV"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.22','Services'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="OSIN"/>
+					<atom name="ATTR" type="FC32" value="OSVR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SVCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.23','Services'}"/>
+					<atom name="AVKY" type="CSTR" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVER"/>
+					<atom name="ATTR" type="FC32" value="SVST"/>
+					<atom name="ATTR" type="FC32" value="SVTH"/>
+					<atom name="ATTR" type="FC32" value="SVLD"/>
+					<atom name="ATTR" type="FC32" value="SVME"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="PKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.24','Packages'}"/>
+					<atom name="ATTR" type="FC32" value="PKNM"/>
+					<atom name="ATTR" type="FC32" value="PKIS"/>
+					<atom name="ATTR" type="FC32" value="PKVR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.31','System Events'}"/>
+					<atom name="ATTR" type="FC32" value="SMST"/>
+					<atom name="ATTR" type="FC32" value="SMTT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYLL"/>
+					<atom name="ATTR" type="FC32" value="SLLE"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SLAC"/>
+					<atom name="AVKY" type="CSTR" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMCN"/>
+					<atom name="ATTR" type="FC32" value="SMRS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.56','Memory'}"/>
+					<atom name="ATTR" type="FC32" value="TMEM"/>
+					<atom name="ATTR" type="FC32" value="UMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="CPCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.21','Processors'}"/>
+					<atom name="ATTR" type="FC32" value="PNUM"/>
+					<atom name="ATTR" type="FC32" value="PVND"/>
+					<atom name="ATTR" type="FC32" value="PTYP"/>
+					<atom name="ATTR" type="FC32" value="PFRQ"/>
+					<atom name="ATTR" type="FC32" value="PCCH"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CPUI"/>
+					<atom name="ATTR" type="FC32" value="SLSY"/>
+					<atom name="ATTR" type="FC32" value="SLIO"/>
+					<atom name="ATTR" type="FC32" value="SLSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="VMCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.22','Volumes'}"/>
+					<atom name="AVKY" type="CSTR" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMDV"/>
+					<atom name="ATTR" type="FC32" value="VMST"/>
+					<atom name="ATTR" type="FC32" value="VMSZ"/>
+					<atom name="ATTR" type="FC32" value="VMFR"/>
+					<atom name="ATTR" type="FC32" value="VMTI"/>
+					<atom name="ATTR" type="FC32" value="VMFI"/>
+					<atom name="ATTR" type="FC32" value="VMWC"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="DKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.57','Disk Devices'}"/>
+					<atom name="AVKY" type="CSTR" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKVI"/>
+					<atom name="ATTR" type="FC32" value="DKRD"/>
+					<atom name="ATTR" type="FC32" value="DKWR"/>
+					<atom name="ATTR" type="FC32" value="DKIO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="APPL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.104','Storage Hardware'}"/>
+					<atom name="ATTR" type="FC32" value="SANM"/>
+					<atom name="ATTR" type="FC32" value="SAIP"/>
+					<atom name="ATTR" type="FC32" value="SAMD"/>
+					<atom name="ATTR" type="FC32" value="SAID"/>
+					<atom name="ATTR" type="FC32" value="APSN"/>
+					<atom name="ATTR" type="FC32" value="SWPF"/>
+					<atom name="ATTR" type="FC32" value="OPST"/>
+					<atom name="ATTR" type="FC32" value="PSAS"/>
+					<atom name="ATTR" type="FC32" value="PSBS"/>
+					<atom name="ATTR" type="FC32" value="CPUT"/>
+					<atom name="ATTR" type="FC32" value="BRDT"/>
+					<atom name="ATTR" type="FC32" value="APMS"/>
+					<atom name="ATTR" type="FC32" value="SOSS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="TRBS"/>
+					<atom name="ATTR" type="FC32" value="TTBS"/>
+					<atom name="ATTR" type="FC32" value="TRXB"/>
+					<atom name="ATTR" type="FC32" value="TTXB"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETD"/>
+					<atom name="ATTR" type="FC32" value="DNST"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTIC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.25','Network Interfaces'}"/>
+					<atom name="AVKY" type="CSTR" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NHAD"/>
+					<atom name="ATTR" type="FC32" value="NSPD"/>
+					<atom name="ATTR" type="FC32" value="NDUP"/>
+					<atom name="ATTR" type="FC32" value="NANG"/>
+					<atom name="ATTR" type="FC32" value="NLNK"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTAC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.58','Network Addresses'}"/>
+					<atom name="ATTR" type="FC32" value="NANM"/>
+					<atom name="ATTR" type="FC32" value="NAIP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTRC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.26','Receive'}"/>
+					<atom name="AVKY" type="CSTR" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRXB"/>
+					<atom name="ATTR" type="FC32" value="NRXP"/>
+					<atom name="ATTR" type="FC32" value="NRXE"/>
+					<atom name="ATTR" type="FC32" value="NRXD"/>
+					<atom name="ATTR" type="FC32" value="NRXO"/>
+					<atom name="ATTR" type="FC32" value="NRXF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETR"/>
+					<atom name="ATTR" type="FC32" value="NRER"/>
+					<atom name="ATTR" type="FC32" value="CRER"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTTC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.27','Transmit'}"/>
+					<atom name="AVKY" type="CSTR" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTXB"/>
+					<atom name="ATTR" type="FC32" value="NTXP"/>
+					<atom name="ATTR" type="FC32" value="NTXE"/>
+					<atom name="ATTR" type="FC32" value="NTXD"/>
+					<atom name="ATTR" type="FC32" value="NTXC"/>
+					<atom name="ATTR" type="FC32" value="NTXA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETT"/>
+					<atom name="ATTR" type="FC32" value="NTER"/>
+					<atom name="ATTR" type="FC32" value="CTER"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="TIMG"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.23','Timing'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMLC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.60','Local Clock'}"/>
+					<atom name="ATTR" type="FC32" value="BTSE"/>
+					<atom name="ATTR" type="FC32" value="BTOF"/>
+					<atom name="ATTR" type="FC32" value="BTRT"/>
+					<atom name="ATTR" type="FC32" value="BTTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMNC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.61','Neighboring Clocks'}"/>
+					<atom name="ATTR" type="FC32" value="NUMN"/>
+					<atom name="ATTR" type="FC32" value="AVNO"/>
+					<atom name="ATTR" type="FC32" value="MXNO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.62','NTP Synchronization'}"/>
+					<atom name="ATTR" type="FC32" value="NTSU"/>
+					<atom name="ATTR" type="FC32" value="NTLK"/>
+					<atom name="ATTR" type="FC32" value="NTST"/>
+					<atom name="ATTR" type="FC32" value="NTSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTC"/>
+					<atom name="ATTR" type="FC32" value="NTIP"/>
+					<atom name="ATTR" type="FC32" value="NTSD"/>
+					<atom name="ATTR" type="FC32" value="NTSO"/>
+					<atom name="ATTR" type="FC32" value="NTSJ"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTO"/>
+					<atom name="ATTR" type="FC32" value="NTOF"/>
+					<atom name="ATTR" type="FC32" value="NTFQ"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BSSM"/>
+			<atom name="DMVR" type="CSTR" value="72-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.6','SSM'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BSS"/>
+				<atom name="ATTR" type="FC32" value="SSME"/>
+				<atom name="ATTR" type="FC32" value="SSMA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="SERV"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.22','Services'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="OSIN"/>
+					<atom name="ATTR" type="FC32" value="OSVR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SVCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.23','Services'}"/>
+					<atom name="AVKY" type="CSTR" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVER"/>
+					<atom name="ATTR" type="FC32" value="SVST"/>
+					<atom name="ATTR" type="FC32" value="SVTH"/>
+					<atom name="ATTR" type="FC32" value="SVLD"/>
+					<atom name="ATTR" type="FC32" value="SVME"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="PKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.24','Packages'}"/>
+					<atom name="ATTR" type="FC32" value="PKNM"/>
+					<atom name="ATTR" type="FC32" value="PKIS"/>
+					<atom name="ATTR" type="FC32" value="PKVR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.31','System Events'}"/>
+					<atom name="ATTR" type="FC32" value="SMST"/>
+					<atom name="ATTR" type="FC32" value="SMTT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYLL"/>
+					<atom name="ATTR" type="FC32" value="SLLE"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SLAC"/>
+					<atom name="AVKY" type="CSTR" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMCN"/>
+					<atom name="ATTR" type="FC32" value="SMRS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.56','Memory'}"/>
+					<atom name="ATTR" type="FC32" value="TMEM"/>
+					<atom name="ATTR" type="FC32" value="UMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="CPCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.21','Processors'}"/>
+					<atom name="ATTR" type="FC32" value="PNUM"/>
+					<atom name="ATTR" type="FC32" value="PVND"/>
+					<atom name="ATTR" type="FC32" value="PTYP"/>
+					<atom name="ATTR" type="FC32" value="PCCH"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CPUI"/>
+					<atom name="ATTR" type="FC32" value="SLSY"/>
+					<atom name="ATTR" type="FC32" value="SLIO"/>
+					<atom name="ATTR" type="FC32" value="SLSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="VMCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.22','Volumes'}"/>
+					<atom name="AVKY" type="CSTR" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMDV"/>
+					<atom name="ATTR" type="FC32" value="VMST"/>
+					<atom name="ATTR" type="FC32" value="VMSZ"/>
+					<atom name="ATTR" type="FC32" value="VMFR"/>
+					<atom name="ATTR" type="FC32" value="VMTI"/>
+					<atom name="ATTR" type="FC32" value="VMFI"/>
+					<atom name="ATTR" type="FC32" value="VMWC"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="DKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.57','Disk Devices'}"/>
+					<atom name="AVKY" type="CSTR" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKVI"/>
+					<atom name="ATTR" type="FC32" value="DKRD"/>
+					<atom name="ATTR" type="FC32" value="DKWR"/>
+					<atom name="ATTR" type="FC32" value="DKIO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="TRBS"/>
+					<atom name="ATTR" type="FC32" value="TTBS"/>
+					<atom name="ATTR" type="FC32" value="TRXB"/>
+					<atom name="ATTR" type="FC32" value="TTXB"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETD"/>
+					<atom name="ATTR" type="FC32" value="DNST"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTIC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.25','Network Interfaces'}"/>
+					<atom name="AVKY" type="CSTR" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NHAD"/>
+					<atom name="ATTR" type="FC32" value="NSPD"/>
+					<atom name="ATTR" type="FC32" value="NDUP"/>
+					<atom name="ATTR" type="FC32" value="NANG"/>
+					<atom name="ATTR" type="FC32" value="NLNK"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTAC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.58','Network Addresses'}"/>
+					<atom name="ATTR" type="FC32" value="NANM"/>
+					<atom name="ATTR" type="FC32" value="NAIP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTRC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.26','Receive'}"/>
+					<atom name="AVKY" type="CSTR" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRXB"/>
+					<atom name="ATTR" type="FC32" value="NRXP"/>
+					<atom name="ATTR" type="FC32" value="NRXE"/>
+					<atom name="ATTR" type="FC32" value="NRXD"/>
+					<atom name="ATTR" type="FC32" value="NRXO"/>
+					<atom name="ATTR" type="FC32" value="NRXF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETR"/>
+					<atom name="ATTR" type="FC32" value="NRER"/>
+					<atom name="ATTR" type="FC32" value="CRER"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTTC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.27','Transmit'}"/>
+					<atom name="AVKY" type="CSTR" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTXB"/>
+					<atom name="ATTR" type="FC32" value="NTXP"/>
+					<atom name="ATTR" type="FC32" value="NTXE"/>
+					<atom name="ATTR" type="FC32" value="NTXD"/>
+					<atom name="ATTR" type="FC32" value="NTXC"/>
+					<atom name="ATTR" type="FC32" value="NTXA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETT"/>
+					<atom name="ATTR" type="FC32" value="NTER"/>
+					<atom name="ATTR" type="FC32" value="CTER"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="TIMG"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.23','Timing'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMLC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.60','Local Clock'}"/>
+					<atom name="ATTR" type="FC32" value="BTSE"/>
+					<atom name="ATTR" type="FC32" value="BTOF"/>
+					<atom name="ATTR" type="FC32" value="BTRT"/>
+					<atom name="ATTR" type="FC32" value="BTTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMNC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.61','Neighboring Clocks'}"/>
+					<atom name="ATTR" type="FC32" value="NUMN"/>
+					<atom name="ATTR" type="FC32" value="AVNO"/>
+					<atom name="ATTR" type="FC32" value="MXNO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.62','NTP Synchronization'}"/>
+					<atom name="ATTR" type="FC32" value="NTSU"/>
+					<atom name="ATTR" type="FC32" value="NTLK"/>
+					<atom name="ATTR" type="FC32" value="NTST"/>
+					<atom name="ATTR" type="FC32" value="NTSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTC"/>
+					<atom name="ATTR" type="FC32" value="NTIP"/>
+					<atom name="ATTR" type="FC32" value="NTSD"/>
+					<atom name="ATTR" type="FC32" value="NTSO"/>
+					<atom name="ATTR" type="FC32" value="NTSJ"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTO"/>
+					<atom name="ATTR" type="FC32" value="NTOF"/>
+					<atom name="ATTR" type="FC32" value="NTFQ"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BSSM"/>
+			<atom name="DMVR" type="CSTR" value="72-appliance"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.6','SSM'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value=".BSS"/>
+				<atom name="ATTR" type="FC32" value="SSME"/>
+				<atom name="ATTR" type="FC32" value="SSMA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="SUMM"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.1','Node Information'}"/>
+				<atom name="ATTR" type="FC32" value="DTNM"/>
+				<atom name="ATTR" type="FC32" value="DVER"/>
+				<atom name="ATTR" type="FC32" value="DBLD"/>
+				<atom name="ATTR" type="FC32" value="DNID"/>
+				<atom name="ATTR" type="FC32" value="DGID"/>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="SERV"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.22','Services'}"/>
+				<atom name="COID" type="UI32" value="100"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="OSIN"/>
+					<atom name="ATTR" type="FC32" value="OSVR"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SVCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.23','Services'}"/>
+					<atom name="AVKY" type="CSTR" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVNM"/>
+					<atom name="ATTR" type="FC32" value="SVER"/>
+					<atom name="ATTR" type="FC32" value="SVST"/>
+					<atom name="ATTR" type="FC32" value="SVTH"/>
+					<atom name="ATTR" type="FC32" value="SVLD"/>
+					<atom name="ATTR" type="FC32" value="SVME"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="PKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.24','Packages'}"/>
+					<atom name="ATTR" type="FC32" value="PKNM"/>
+					<atom name="ATTR" type="FC32" value="PKIS"/>
+					<atom name="ATTR" type="FC32" value="PKVR"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="EVNT"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.4','Events'}"/>
+				<atom name="COID" type="UI32" value="200"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.31','System Events'}"/>
+					<atom name="ATTR" type="FC32" value="SMST"/>
+					<atom name="ATTR" type="FC32" value="SMTT"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYLL"/>
+					<atom name="ATTR" type="FC32" value="SLLE"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="SLAC"/>
+					<atom name="AVKY" type="CSTR" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMDE"/>
+					<atom name="ATTR" type="FC32" value="SMCN"/>
+					<atom name="ATTR" type="FC32" value="SMRS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.71','Audit Events'}"/>
+					<atom name="ATTR" type="FC32" value="AMGC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUQU"/>
+					<atom name="ATTR" type="FC32" value="AMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="AUTX"/>
+					<atom name="ATTR" type="FC32" value="NRLY"/>
+					<atom name="ATTR" type="FC32" value="AMTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="ATEV"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.66','Attribute Events'}"/>
+					<atom name="ATTR" type="FC32" value="ABRL"/>
+					<atom name="ATTR" type="FC32" value="ABAS"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="RSRC"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.36','Resources'}"/>
+				<atom name="COID" type="UI32" value="300"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SYSI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.55','Computational Resources'}"/>
+					<atom name="ATTR" type="FC32" value="RSTS"/>
+					<atom name="ATTR" type="FC32" value="SVRT"/>
+					<atom name="ATTR" type="FC32" value="SVUT"/>
+					<atom name="ATTR" type="FC32" value="SUTM"/>
+					<atom name="ATTR" type="FC32" value="SLOD"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.56','Memory'}"/>
+					<atom name="ATTR" type="FC32" value="TMEM"/>
+					<atom name="ATTR" type="FC32" value="UMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="MEMP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="CPCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.21','Processors'}"/>
+					<atom name="ATTR" type="FC32" value="PNUM"/>
+					<atom name="ATTR" type="FC32" value="PVND"/>
+					<atom name="ATTR" type="FC32" value="PTYP"/>
+					<atom name="ATTR" type="FC32" value="PCCH"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="CPUI"/>
+					<atom name="ATTR" type="FC32" value="SLSY"/>
+					<atom name="ATTR" type="FC32" value="SLIO"/>
+					<atom name="ATTR" type="FC32" value="SLSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.57','Service Health'}"/>
+					<atom name="ATTR" type="FC32" value="AMEM"/>
+					<atom name="ATTR" type="FC32" value="SMEM"/>
+					<atom name="ATTR" type="FC32" value="PMEM"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="SVCP"/>
+					<atom name="ATTR" type="FC32" value="NTHR"/>
+					<atom name="ATTR" type="FC32" value="NPRC"/>
+					<atom name="ATTR" type="FC32" value="PRWT"/>
+					<atom name="ATTR" type="FC32" value="MSBA"/>
+					<atom name="ATTR" type="FC32" value="MSBX"/>
+					<atom name="ATTR" type="FC32" value="MMQS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="FINF"/>
+					<atom name="ATTR" type="FC32" value="FOPN"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="VMCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.22','Volumes'}"/>
+					<atom name="AVKY" type="CSTR" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMNT"/>
+					<atom name="ATTR" type="FC32" value="VMDV"/>
+					<atom name="ATTR" type="FC32" value="VMST"/>
+					<atom name="ATTR" type="FC32" value="VMSZ"/>
+					<atom name="ATTR" type="FC32" value="VMFR"/>
+					<atom name="ATTR" type="FC32" value="VMTI"/>
+					<atom name="ATTR" type="FC32" value="VMFI"/>
+					<atom name="ATTR" type="FC32" value="VMWC"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="DKCC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.57','Disk Devices'}"/>
+					<atom name="AVKY" type="CSTR" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKDV"/>
+					<atom name="ATTR" type="FC32" value="DKVI"/>
+					<atom name="ATTR" type="FC32" value="DKRD"/>
+					<atom name="ATTR" type="FC32" value="DKWR"/>
+					<atom name="ATTR" type="FC32" value="DKIO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="APPL"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.104','Storage Hardware'}"/>
+					<atom name="ATTR" type="FC32" value="SANM"/>
+					<atom name="ATTR" type="FC32" value="SAIP"/>
+					<atom name="ATTR" type="FC32" value="SAMD"/>
+					<atom name="ATTR" type="FC32" value="SAID"/>
+					<atom name="ATTR" type="FC32" value="APSN"/>
+					<atom name="ATTR" type="FC32" value="SWPF"/>
+					<atom name="ATTR" type="FC32" value="OPST"/>
+					<atom name="ATTR" type="FC32" value="PSAS"/>
+					<atom name="ATTR" type="FC32" value="PSBS"/>
+					<atom name="ATTR" type="FC32" value="CPUT"/>
+					<atom name="ATTR" type="FC32" value="BRDT"/>
+					<atom name="ATTR" type="FC32" value="APMS"/>
+					<atom name="ATTR" type="FC32" value="SOSS"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETI"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.59','Network Resources'}"/>
+					<atom name="ATTR" type="FC32" value="TRBS"/>
+					<atom name="ATTR" type="FC32" value="TTBS"/>
+					<atom name="ATTR" type="FC32" value="TRXB"/>
+					<atom name="ATTR" type="FC32" value="TTXB"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETD"/>
+					<atom name="ATTR" type="FC32" value="DNST"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTIC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.25','Network Interfaces'}"/>
+					<atom name="AVKY" type="CSTR" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NNAM"/>
+					<atom name="ATTR" type="FC32" value="NHAD"/>
+					<atom name="ATTR" type="FC32" value="NSPD"/>
+					<atom name="ATTR" type="FC32" value="NDUP"/>
+					<atom name="ATTR" type="FC32" value="NANG"/>
+					<atom name="ATTR" type="FC32" value="NLNK"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTAC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.58','Network Addresses'}"/>
+					<atom name="ATTR" type="FC32" value="NANM"/>
+					<atom name="ATTR" type="FC32" value="NAIP"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTRC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.26','Receive'}"/>
+					<atom name="AVKY" type="CSTR" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRNM"/>
+					<atom name="ATTR" type="FC32" value="NRXB"/>
+					<atom name="ATTR" type="FC32" value="NRXP"/>
+					<atom name="ATTR" type="FC32" value="NRXE"/>
+					<atom name="ATTR" type="FC32" value="NRXD"/>
+					<atom name="ATTR" type="FC32" value="NRXO"/>
+					<atom name="ATTR" type="FC32" value="NRXF"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETR"/>
+					<atom name="ATTR" type="FC32" value="NRER"/>
+					<atom name="ATTR" type="FC32" value="CRER"/>
+				</container>
+				<container name="AVAC">
+					<atom name="AVID" type="FC32" value="NTTC"/>
+					<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.4.27','Transmit'}"/>
+					<atom name="AVKY" type="CSTR" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTNM"/>
+					<atom name="ATTR" type="FC32" value="NTXB"/>
+					<atom name="ATTR" type="FC32" value="NTXP"/>
+					<atom name="ATTR" type="FC32" value="NTXE"/>
+					<atom name="ATTR" type="FC32" value="NTXD"/>
+					<atom name="ATTR" type="FC32" value="NTXC"/>
+					<atom name="ATTR" type="FC32" value="NTXA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="NETT"/>
+					<atom name="ATTR" type="FC32" value="NTER"/>
+					<atom name="ATTR" type="FC32" value="CTER"/>
+				</container>
+			</container>
+			<container name="COMP">
+				<atom name="CPID" type="FC32" value="TIMG"/>
+				<atom name="CPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.2.23','Timing'}"/>
+				<atom name="COID" type="UI32" value="400"/>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMLC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.60','Local Clock'}"/>
+					<atom name="ATTR" type="FC32" value="BTSE"/>
+					<atom name="ATTR" type="FC32" value="BTOF"/>
+					<atom name="ATTR" type="FC32" value="BTRT"/>
+					<atom name="ATTR" type="FC32" value="BTTC"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TMNC"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.61','Neighboring Clocks'}"/>
+					<atom name="ATTR" type="FC32" value="NUMN"/>
+					<atom name="ATTR" type="FC32" value="AVNO"/>
+					<atom name="ATTR" type="FC32" value="MXNO"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTP"/>
+					<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.62','NTP Synchronization'}"/>
+					<atom name="ATTR" type="FC32" value="NTSU"/>
+					<atom name="ATTR" type="FC32" value="NTLK"/>
+					<atom name="ATTR" type="FC32" value="NTST"/>
+					<atom name="ATTR" type="FC32" value="NTSA"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTC"/>
+					<atom name="ATTR" type="FC32" value="NTIP"/>
+					<atom name="ATTR" type="FC32" value="NTSD"/>
+					<atom name="ATTR" type="FC32" value="NTSO"/>
+					<atom name="ATTR" type="FC32" value="NTSJ"/>
+				</container>
+				<container name="GRUP">
+					<atom name="GPID" type="FC32" value="TNTO"/>
+					<atom name="ATTR" type="FC32" value="NTOF"/>
+					<atom name="ATTR" type="FC32" value="NTFQ"/>
+				</container>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BGRP"/>
+			<atom name="DMVR" type="CSTR" value="1-default"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.10','Summary'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XSNC"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.1','Storage Capacity'}"/>
+				<atom name="ATTR" type="FC32" value="XSNI"/>
+				<atom name="ATTR" type="FC32" value="XSNR"/>
+				<atom name="ATTR" type="FC32" value="XSNW"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XSCP"/>
+				<atom name="ATTR" type="FC32" value="XISC"/>
+				<atom name="ATTR" type="FC32" value="XUSC"/>
+				<atom name="ATTR" type="FC32" value="XUSD"/>
+				<atom name="ATTR" type="FC32" value="XUDC"/>
+				<atom name="ATTR" type="FC32" value="XASC"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="PCSC"/>
+				<atom name="ATTR" type="FC32" value="PSCU"/>
+				<atom name="ATTR" type="FC32" value="PSCA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XCOP"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.3','API Operations'}"/>
+				<atom name="ATTR" type="FC32" value="XCRA"/>
+				<atom name="ATTR" type="FC32" value="XCSU"/>
+				<atom name="ATTR" type="FC32" value="XCFA"/>
+				<atom name="ATTR" type="FC32" value="XCIR"/>
+				<atom name="ATTR" type="FC32" value="XCRX"/>
+				<atom name="ATTR" type="FC32" value="XCRR"/>
+				<atom name="ATTR" type="FC32" value="XCTX"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XSOP"/>
+				<atom name="ATTR" type="FC32" value="XSRA"/>
+				<atom name="ATTR" type="FC32" value="XSSU"/>
+				<atom name="ATTR" type="FC32" value="XSFA"/>
+				<atom name="ATTR" type="FC32" value="XSUA"/>
+				<atom name="ATTR" type="FC32" value="XSIR"/>
+				<atom name="ATTR" type="FC32" value="XSRX"/>
+				<atom name="ATTR" type="FC32" value="XSRR"/>
+				<atom name="ATTR" type="FC32" value="XSTX"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XWOP"/>
+				<atom name="ATTR" type="FC32" value="XWRA"/>
+				<atom name="ATTR" type="FC32" value="XWSU"/>
+				<atom name="ATTR" type="FC32" value="XWFA"/>
+				<atom name="ATTR" type="FC32" value="XWUA"/>
+				<atom name="ATTR" type="FC32" value="XWIR"/>
+				<atom name="ATTR" type="FC32" value="XWRX"/>
+				<atom name="ATTR" type="FC32" value="XWRR"/>
+				<atom name="ATTR" type="FC32" value="XWTX"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XANC"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.82','Archive Nodes'}"/>
+				<atom name="ATTR" type="FC32" value="XANI"/>
+				<atom name="ATTR" type="FC32" value="XANR"/>
+				<atom name="ATTR" type="FC32" value="XANW"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XAOC"/>
+				<atom name="ATTR" type="FC32" value="XANO"/>
+				<atom name="ATTR" type="FC32" value="XSAO"/>
+				<atom name="ATTR" type="FC32" value="XANP"/>
+				<atom name="ATTR" type="FC32" value="XSAP"/>
+			</container>
+		</container>
+		<container name="DVML">
+			<atom name="DMID" type="CSTR" value="BGRP"/>
+			<atom name="DMVR" type="CSTR" value="1-root"/>
+			<atom name="DVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.1.10','Summary'}"/>
+			<atom name="DEVI" type="UI32" value="1"/>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XSNC"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.1','Storage Capacity'}"/>
+				<atom name="ATTR" type="FC32" value="XSNI"/>
+				<atom name="ATTR" type="FC32" value="XSNR"/>
+				<atom name="ATTR" type="FC32" value="XSNW"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XSCP"/>
+				<atom name="ATTR" type="FC32" value="XISC"/>
+				<atom name="ATTR" type="FC32" value="XUSC"/>
+				<atom name="ATTR" type="FC32" value="XUSD"/>
+				<atom name="ATTR" type="FC32" value="XUDC"/>
+				<atom name="ATTR" type="FC32" value="XASC"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="PCSC"/>
+				<atom name="ATTR" type="FC32" value="PSCU"/>
+				<atom name="ATTR" type="FC32" value="PSCA"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XIMQ"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.7','ILM Activity'}"/>
+				<atom name="ATTR" type="FC32" value="XQUZ"/>
+				<atom name="ATTR" type="FC32" value="XCQZ"/>
+				<atom name="ATTR" type="FC32" value="XSCT"/>
+				<atom name="ATTR" type="FC32" value="XSCM"/>
+				<atom name="ATTR" type="FC32" value="XEVT"/>
+			</container>
+			<container name="AVAC">
+				<atom name="AVID" type="FC32" value="IQCS"/>
+				<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.4','Current ILM Activity - Legacy'}"/>
+				<atom name="AVKY" type="CSTR" value="CONI"/>
+				<atom name="ATTR" type="FC32" value="CONI"/>
+				<atom name="ATTR" type="FC32" value="IQSZ"/>
+				<atom name="ATTR" type="FC32" value="ILMR"/>
+			</container>
+			<container name="AVAC">
+				<atom name="AVID" type="FC32" value="IQFS"/>
+				<atom name="AVNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.5','Future ILM Activity - Legacy'}"/>
+				<atom name="ATTR" type="FC32" value="IQTP"/>
+				<atom name="ATTR" type="FC32" value="IQFC"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XCOP"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.3','API Operations'}"/>
+				<atom name="ATTR" type="FC32" value="XCRA"/>
+				<atom name="ATTR" type="FC32" value="XCSU"/>
+				<atom name="ATTR" type="FC32" value="XCFA"/>
+				<atom name="ATTR" type="FC32" value="XCIR"/>
+				<atom name="ATTR" type="FC32" value="XCRX"/>
+				<atom name="ATTR" type="FC32" value="XCRR"/>
+				<atom name="ATTR" type="FC32" value="XCTX"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XSOP"/>
+				<atom name="ATTR" type="FC32" value="XSRA"/>
+				<atom name="ATTR" type="FC32" value="XSSU"/>
+				<atom name="ATTR" type="FC32" value="XSFA"/>
+				<atom name="ATTR" type="FC32" value="XSUA"/>
+				<atom name="ATTR" type="FC32" value="XSIR"/>
+				<atom name="ATTR" type="FC32" value="XSRX"/>
+				<atom name="ATTR" type="FC32" value="XSRR"/>
+				<atom name="ATTR" type="FC32" value="XSTX"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XWOP"/>
+				<atom name="ATTR" type="FC32" value="XWRA"/>
+				<atom name="ATTR" type="FC32" value="XWSU"/>
+				<atom name="ATTR" type="FC32" value="XWFA"/>
+				<atom name="ATTR" type="FC32" value="XWUA"/>
+				<atom name="ATTR" type="FC32" value="XWIR"/>
+				<atom name="ATTR" type="FC32" value="XWRX"/>
+				<atom name="ATTR" type="FC32" value="XWRR"/>
+				<atom name="ATTR" type="FC32" value="XWTX"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XECO"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.69.6','Erasure Coded Operations'}"/>
+				<atom name="ATTR" type="FC32" value="XECT"/>
+				<atom name="ATTR" type="FC32" value="XEWC"/>
+				<atom name="ATTR" type="FC32" value="XEWF"/>
+				<atom name="ATTR" type="FC32" value="XERC"/>
+				<atom name="ATTR" type="FC32" value="XERF"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XANC"/>
+				<atom name="GPNM" type="CSTR" value="{OID='2.16.124.113590.3.0.2.3.82','Archive Nodes'}"/>
+				<atom name="ATTR" type="FC32" value="XANI"/>
+				<atom name="ATTR" type="FC32" value="XANR"/>
+				<atom name="ATTR" type="FC32" value="XANW"/>
+			</container>
+			<container name="GRUP">
+				<atom name="GPID" type="FC32" value="XAOC"/>
+				<atom name="ATTR" type="FC32" value="XANO"/>
+				<atom name="ATTR" type="FC32" value="XSAO"/>
+				<atom name="ATTR" type="FC32" value="XANP"/>
+				<atom name="ATTR" type="FC32" value="XSAP"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

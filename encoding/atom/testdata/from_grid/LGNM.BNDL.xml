@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="LGNM">
+		<atom name="BVER" type="UI32" value="1"/>
+		<atom name="BTIM" type="UI64" value="1484723580983650"/>
+		<container name="GRPS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI32"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="3"/>
+				<atom name="0x00000001" type="UI32" value="10"/>
+				<atom name="0x00000002" type="UI32" value="20"/>
+			</container>
+		</container>
+		<container name="GRNM">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="3"/>
+				<atom name="0x00000001" type="USTR" value="Data Center 1"/>
+				<atom name="0x00000002" type="USTR" value="Data Center 2"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

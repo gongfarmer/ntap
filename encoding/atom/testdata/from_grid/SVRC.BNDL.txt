@@ -1,0 +1,14 @@
+SVRC:CONT:
+	BVER:UI32:1
+	BTIM:UI64:1484723518138629
+	SRCX:CONT:
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:2
+			0x00000001:USTR:"<![CDATA[<rules><rule id=\"r2\" label=\"Make 2 Copies\" version=\"1.0\" schema-version=\"1.0\"><baseline><ingest/></baseline><filter label=\"Filter 1\" criteria-type=\"all\"></filter><epoch start=\"0\"><place pool=\"p1\">2</place></epoch></rule></rules>]]>"
+		END
+	END
+END

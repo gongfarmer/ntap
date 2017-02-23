@@ -11,14 +11,13 @@
 		0xFFFFFFFF:CSTR:"This CSTR is named '0xffffff' "
 		0xFF:CSTR:"This CSTR is named '0xFF' "
 		0xff:CSTR:"This CSTR is named '0xff' "
-		'::':CSTR:"This CSTR is named ''::'' "
+		0x273A3A27:CSTR:"This CSTR is named ''::'' "
 		~`!@:CSTR:"This CSTR is named '~`!@' "
 		$#%^:CSTR:"This CSTR is named '$#%^' "
 		&*():CSTR:"This CSTR is named '&*()' "
 		_-+=:CSTR:"This CSTR is named '_-+=' "
 		{}[]:CSTR:"This CSTR is named '{}[]' "
-		'<,>:CSTR:"This CSTR is named ''<,>' "
-		|:;":CSTR:"This CSTR is named '|:;\"' "
-		".?/:CSTR:"This CSTR is named '\".?/' "
+		0x273C2C3E:CSTR:"This CSTR is named ''<,>' "
+		0x7C3A3B22:CSTR:"This CSTR is named '|:;\"' "
 	END
 END

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="ECSC">
+		<atom name="BVER" type="UI32" value="2"/>
+		<atom name="BTIM" type="UI64" value="1484723564442969"/>
+		<container name="SCID">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI32"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="7"/>
+				<atom name="0x00000001" type="UI32" value="1"/>
+				<atom name="0x00000002" type="UI32" value="2"/>
+				<atom name="0x00000003" type="UI32" value="3"/>
+				<atom name="0x00000004" type="UI32" value="4"/>
+				<atom name="0x00000005" type="UI32" value="5"/>
+				<atom name="0x00000006" type="UI32" value="6"/>
+			</container>
+		</container>
+		<container name="ALGO">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI32"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="7"/>
+				<atom name="0x00000001" type="UI32" value="1"/>
+				<atom name="0x00000002" type="UI32" value="1"/>
+				<atom name="0x00000003" type="UI32" value="1"/>
+				<atom name="0x00000004" type="UI32" value="1"/>
+				<atom name="0x00000005" type="UI32" value="1"/>
+				<atom name="0x00000006" type="UI32" value="1"/>
+			</container>
+		</container>
+		<container name="INPU">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI32"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="7"/>
+				<atom name="0x00000001" type="UI32" value="6"/>
+				<atom name="0x00000002" type="UI32" value="8"/>
+				<atom name="0x00000003" type="UI32" value="9"/>
+				<atom name="0x00000004" type="UI32" value="2"/>
+				<atom name="0x00000005" type="UI32" value="4"/>
+				<atom name="0x00000006" type="UI32" value="6"/>
+			</container>
+		</container>
+		<container name="OUTP">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI32"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="7"/>
+				<atom name="0x00000001" type="UI32" value="9"/>
+				<atom name="0x00000002" type="UI32" value="10"/>
+				<atom name="0x00000003" type="UI32" value="12"/>
+				<atom name="0x00000004" type="UI32" value="3"/>
+				<atom name="0x00000005" type="UI32" value="6"/>
+				<atom name="0x00000006" type="UI32" value="8"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

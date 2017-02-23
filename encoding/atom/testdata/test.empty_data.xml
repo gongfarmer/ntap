@@ -1,47 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
-	<container name="EMPT">
-		<atom name="empt" type="DATA" value=""/>
-		<atom name="fc32" type="FC32" value="data"/>
-		<atom name="fc32" type="FC32" value="0xFFFFFFFF"/>
-		<atom name="null" type="NULL" value=""/>
-		<atom name="null" type="NULL" value=""/>
-		<atom name="cstr" type="CSTR" value=""/>
-		<atom name="cstr" type="CSTR" value=""/>
-		<atom name="cstr" type="CSTR" value=""/>
-		<atom name="cstr" type="CSTR" value="&quot;unmatched quote"/>
-		<atom name="cstr" type="CSTR" value="'unmatched quote"/>
-		<atom name="cstr" type="CSTR" value="dog"/>
-		<atom name="snum" type="CSTR" value="1"/>
-		<atom name="shex" type="CSTR" value="0xFFCC0011"/>
-		<atom name="ustr" type="USTR" value=""/>
-		<atom name="ustr" type="USTR" value=""/>
-		<atom name="ustr" type="USTR" value=""/>
-		<atom name="ustr" type="USTR" value="&quot;unmatched quote"/>
-		<atom name="ustr" type="USTR" value="'unmatched quote"/>
-		<atom name="ustr" type="USTR" value="dog"/>
-		<atom name="snum" type="USTR" value="1"/>
-		<atom name="shex" type="USTR" value="0xFFCC0011"/>
-		<atom name="ipad" type="USTR" value=""/>
-		<atom name="ipad" type="USTR" value=""/>
-		<atom name="ipad" type="IPAD" value="::"/>
-		<atom name="ipad" type="IPAD" value="::"/>
-		<atom name="empt" type="DATA" value=""/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont"/>
-		<container name="cont">
-			<atom name="empt" type="DATA" value=""/>
-			<atom name="empt" type="DATA" value=""/>
-			<atom name="empt" type="DATA" value=""/>
-			<atom name="empt" type="DATA" value=""/>
-		</container>
-	</container>
-</containerxml>
+EMPT:CONT:
+	empt:DATA:
+	fc32:FC32:0xFFFFFFFF
+	null:NULL:
+	null:NULL:
+	cstr:CSTR:""
+	cstr:CSTR:"dog"
+	ustr:USTR:""
+	ustr:USTR:"dog"
+	ipad:USTR:""
+	empt:DATA:
+	cont:CONT:
+	END
+	cont:CONT:
+		empt:DATA:
+		empt:DATA:
+		empt:DATA:
+		empt:DATA:
+	END
+END

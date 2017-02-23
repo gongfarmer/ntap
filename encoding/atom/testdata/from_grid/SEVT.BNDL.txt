@@ -1,0 +1,95 @@
+SEVT:CONT:
+	BVER:UI32:1
+	BTIM:UI64:1484723623888882
+	SLMM:CONT:
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.1','IDE Errors'}"
+			CONT:CSTR:": reset:"
+			CONT:CSTR:"status timeout"
+			CONT:CSTR:"DriveReady"
+			CONT:CSTR:"waiting for DMA"
+			CONT:CSTR:"DMA disabled"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.2','I/O Errors'}"
+			CONT:CSTR:"I/O error"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.3','SCSI Errors'}"
+			CONT:CSTR:"scsi: device set offline"
+			CONT:CSTR:"Attempting to queue an ABORT message"
+			CONT:CSTR:"has CHECK CONDITION, sense key ="
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.4','File System Errors'}"
+			CONT:CSTR:"EXT3-fs error"
+			CONT:CSTR:"EXT4-fs error"
+			CONT:CSTR:"XFS internal error"
+			CONT:CSTR:"xfs_"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.5','Network Receive Errors'}"
+			CONT:CSTR:"can't fill rx buffer"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.6','Network Transmit Errors'}"
+			CONT:CSTR:"Tx ring dump"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.7','Kernel Errors'}"
+			CONT:CSTR:"EIP"
+			CONT:CSTR:" BUG: "
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.8','Kernel Memory Allocation Failure'}"
+			CONT:CSTR:"-order allocation failed"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.10','Abnormal Software Events'}"
+			CONT:CSTR:"| CRITICAL"
+			CONT:CSTR:"segmentation fault (aborting)"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.11','System Time Events'}"
+			CONT:CSTR:"Losing some ticks..."
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.13','Out Of Memory Errors'}"
+			CONT:CSTR:"Out of memory: Kill process"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.19','Cassandra unhandled exceptions'}"
+			CONT:CSTR:"Exception in thread"
+			CONT:CSTR:"Cassandra QueryException"
+			CONT:CSTR:"Cassandra InvalidQueryException"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.20','Storage Hardware Events'}"
+			CONT:CSTR:"SGA Storage Hardware Alarm"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.21','Account Service Events'}"
+			CONT:CSTR:"acct["
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.22','Identity Service Events'}"
+			CONT:CSTR:"idnt["
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.23','Node Errors'}"
+			CONT:CSTR:"Node Error"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.24','Forced Termination Events'}"
+			CONT:CSTR:"Warning: KILL required to stop"
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.25','Keystone Service Events'}"
+			CONT:CSTR:"kstn["
+		END
+		PITM:CONT:
+			DESC:CSTR:"{OID='2.16.124.113590.3.0.3.2.26','Hotfix Installation Failure Events'}"
+			CONT:CSTR:"Error: Failed to install hotfix"
+		END
+	END
+END

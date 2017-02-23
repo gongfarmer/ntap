@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="SWIN">
+		<atom name="BVER" type="UI32" value="1"/>
+		<atom name="BTIM" type="UI64" value="1484723506413781"/>
+		<container name="MXFS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="5368709122"/>
+			</container>
+		</container>
+		<container name="ACLL">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="1000"/>
+			</container>
+		</container>
+		<container name="MXMC">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="90"/>
+			</container>
+		</container>
+		<container name="MXVL">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="256"/>
+			</container>
+		</container>
+		<container name="CTLL">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="1000"/>
+			</container>
+		</container>
+		<container name="MXMO">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="4096"/>
+			</container>
+		</container>
+		<container name="MXNL">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="128"/>
+			</container>
+		</container>
+		<container name="MXHS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="8192"/>
+			</container>
+		</container>
+		<container name="MXON">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="1024"/>
+			</container>
+		</container>
+		<container name="MXAN">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="256"/>
+			</container>
+		</container>
+		<container name="MXCN">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="255"/>
+			</container>
+		</container>
+		<container name="TKTO">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UI64"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UI64" value="86400"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

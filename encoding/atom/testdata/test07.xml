@@ -1,6 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
-	<container name="ROOT">
-		<atom name="xxxx" type="CSTR" value="tab\x09,space ,newline\n,cr\r,vt\x0B,ff\x0C,amp&amp;,lt&lt;,gt&gt;,quot\&quot;,bs\\,binary\xFF,control\x01"/>
-	</container>
-</containerxml>
+ROOT:CONT:
+	xxxx:CSTR:"tab\x09,space ,newline\n,cr\r,vt\x0B,ff\x0C,amp&,lt<,gt>,quot\",bs\\,binary\xFF,control\x01"
+END

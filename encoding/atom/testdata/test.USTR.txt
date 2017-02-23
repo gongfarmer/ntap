@@ -127,6 +127,5 @@ TEST:CONT:
 		text:USTR:"}"
 		text:USTR:"~"
 		text:USTR:"\x7F"
-    text:USTR:"|“\\イロハニホヘト\n\r”, “regular string”|"
 	END
 END

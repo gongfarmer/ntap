@@ -1,0 +1,14 @@
+ILMB:CONT:
+	BVER:UI32:1
+	BTIM:UI64:1484723614029749
+	ILMX:CONT:
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'USTR'
+		APER:FC32:'RDWR'
+		AVAL:CONT:
+			0x00000000:UI32:2
+			0x00000001:USTR:"<![CDATA[<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE ilm-specification SYSTEM \"bycast-ilm.dtd\"><ilm-specification name=\"Baseline 2 Copies Policy\" id=\"00000000-0000-0000-0000-000000000000\" version=\"1.0\"><topology><pool id=\"p1\" label=\"All Storage Nodes\"><disk/></pool></topology><rules><rule id=\"p1_r2\" label=\"Make 2 Copies\" default=\"yes\" version=\"1.0\" schema-version=\"1.0\"><baseline><ingest/></baseline><filter label=\"Filter 1\"/><epoch start=\"0\"><place pool=\"p1\">2</place></epoch></rule></rules></ilm-specification>]]>"
+		END
+	END
+END

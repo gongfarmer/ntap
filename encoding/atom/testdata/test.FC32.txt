@@ -95,7 +95,6 @@ TEST:CONT:
 		text:FC32:'|{zy'
 		text:FC32:'}|{z'
 		text:FC32:'~}|{'
-		text:FC32:0x09200741
 		text:FC32:0x00000000
 		text:FC32:0x00000001
 		text:FC32:0x00000002

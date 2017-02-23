@@ -1,27 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
-	<container name="::::">
-		<atom name="TEXT" type="CSTR" value="Container is named '::::'"/>
-		<container name="ACPN">
-			<atom name="NOTE" type="CSTR" value="All chars are valid in a name except for the escape char '\\'."/>
-			<atom name="NOTE" type="CSTR" value="Also, a name can't start with # or it's a comment!"/>
-			<atom name="A:E:" type="CSTR" value="This CSTR is named 'A:E:' "/>
-			<atom name="AT::" type="CSTR" value="This CSTR is named 'AT::' "/>
-			<atom name="::AL" type="CSTR" value="This CSTR is named '::AL' "/>
-			<atom name="0x::" type="CSTR" value="This CSTR is named '0x::' "/>
-			<atom name=":T:M" type="CSTR" value="This CSTR is named ':T:M' "/>
-			<atom name="0xFFFFFFFF" type="CSTR" value="This CSTR is named '0xffffff' "/>
-			<atom name="0xFF" type="CSTR" value="This CSTR is named '0xFF' "/>
-			<atom name="0xff" type="CSTR" value="This CSTR is named '0xff' "/>
-			<atom name="'::'" type="CSTR" value="This CSTR is named ''::'' "/>
-			<atom name="~`!@" type="CSTR" value="This CSTR is named '~`!@' "/>
-			<atom name="$#%^" type="CSTR" value="This CSTR is named '$#%^' "/>
-			<atom name="&amp;*()" type="CSTR" value="This CSTR is named '&amp;*()' "/>
-			<atom name="_-+=" type="CSTR" value="This CSTR is named '_-+=' "/>
-			<atom name="{}[]" type="CSTR" value="This CSTR is named '{}[]' "/>
-			<atom name="'&lt;,&gt;" type="CSTR" value="This CSTR is named ''&lt;,&gt;' "/>
-			<atom name="|:;&quot;" type="CSTR" value="This CSTR is named '|:;\&quot;' "/>
-			<atom name="&quot;.?/" type="CSTR" value="This CSTR is named '\&quot;.?/' "/>
-		</container>
-	</container>
-</containerxml>
+:::::CONT:
+	TEXT:CSTR:"Container is named '::::'"
+	ACPN:CONT:
+		NOTE:CSTR:"All chars are valid in a name except for the escape char '\\'."
+		NOTE:CSTR:"Also, a name can't start with # or it's a comment!"
+		A:E::CSTR:"This CSTR is named 'A:E:' "
+		AT:::CSTR:"This CSTR is named 'AT::' "
+		::AL:CSTR:"This CSTR is named '::AL' "
+		0x:::CSTR:"This CSTR is named '0x::' "
+		:T:M:CSTR:"This CSTR is named ':T:M' "
+		0xFFFFFFFF:CSTR:"This CSTR is named '0xffffff' "
+		0xFF:CSTR:"This CSTR is named '0xFF' "
+		0xff:CSTR:"This CSTR is named '0xff' "
+		0x273A3A27:CSTR:"This CSTR is named ''::'' "
+		~`!@:CSTR:"This CSTR is named '~`!@' "
+		$#%^:CSTR:"This CSTR is named '$#%^' "
+		&*():CSTR:"This CSTR is named '&*()' "
+		_-+=:CSTR:"This CSTR is named '_-+=' "
+		{}[]:CSTR:"This CSTR is named '{}[]' "
+		0x273C2C3E:CSTR:"This CSTR is named ''<,>' "
+		0x7C3A3B22:CSTR:"This CSTR is named '|:;\"' "
+	END
+END

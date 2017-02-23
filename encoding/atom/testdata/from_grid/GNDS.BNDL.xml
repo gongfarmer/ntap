@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="GNDS">
+		<atom name="BVER" type="UI32" value="1"/>
+		<atom name="BTIM" type="UI64" value="1484723993854833"/>
+		<container name="GNID">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1484723993854739"/>
+			<atom name="AVTP" type="FC32" value="UI32"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="42"/>
+				<atom name="0x00000001" type="UI32" value="18713642"/>
+				<atom name="0x00000002" type="UI32" value="13910727"/>
+				<atom name="0x00000003" type="UI32" value="13405854"/>
+				<atom name="0x00000004" type="UI32" value="13890231"/>
+				<atom name="0x00000005" type="UI32" value="11071966"/>
+				<atom name="0x00000006" type="UI32" value="11503471"/>
+				<atom name="0x00000007" type="UI32" value="11982188"/>
+				<atom name="0x00000008" type="UI32" value="11608534"/>
+				<atom name="0x00000009" type="UI32" value="14708370"/>
+				<atom name="0x0000000A" type="UI32" value="11639541"/>
+				<atom name="0x0000000B" type="UI32" value="16330857"/>
+				<atom name="0x0000000C" type="UI32" value="15409136"/>
+				<atom name="0x0000000D" type="UI32" value="16497490"/>
+				<atom name="0x0000000E" type="UI32" value="16314797"/>
+				<atom name="0x0000000F" type="UI32" value="12313309"/>
+				<atom name="0x00000010" type="UI32" value="12099315"/>
+				<atom name="0x00000011" type="UI32" value="12219476"/>
+				<atom name="0x00000012" type="UI32" value="21472422"/>
+				<atom name="0x00000013" type="UI32" value="21993866"/>
+				<atom name="0x00000014" type="UI32" value="16438013"/>
+				<atom name="0x00000015" type="UI32" value="16313786"/>
+				<atom name="0x00000016" type="UI32" value="16473918"/>
+				<atom name="0x00000017" type="UI32" value="15110766"/>
+				<atom name="0x00000018" type="UI32" value="16267314"/>
+				<atom name="0x00000019" type="UI32" value="21894698"/>
+				<atom name="0x0000001A" type="UI32" value="21432284"/>
+				<atom name="0x0000001B" type="UI32" value="12362767"/>
+				<atom name="0x0000001C" type="UI32" value="21799759"/>
+				<atom name="0x0000001D" type="UI32" value="12638490"/>
+				<atom name="0x0000001E" type="UI32" value="12204386"/>
+				<atom name="0x0000001F" type="UI32" value="11531454"/>
+				<atom name="0x00000020" type="UI32" value="21872394"/>
+				<atom name="0x00000021" type="UI32" value="13896311"/>
+				<atom name="0x00000022" type="UI32" value="13705899"/>
+				<atom name="0x00000023" type="UI32" value="13617379"/>
+				<atom name="0x00000024" type="UI32" value="14780990"/>
+				<atom name="0x00000025" type="UI32" value="16683813"/>
+				<atom name="0x00000026" type="UI32" value="16151365"/>
+				<atom name="0x00000027" type="UI32" value="19993970"/>
+				<atom name="0x00000028" type="UI32" value="16221295"/>
+				<atom name="0x00000029" type="UI32" value="17243397"/>
+			</container>
+		</container>
+		<container name="GNTP">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1484723993854758"/>
+			<atom name="AVTP" type="FC32" value="FC32"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="42"/>
+				<atom name="0x00000001" type="FC32" value="BCMN"/>
+				<atom name="0x00000002" type="FC32" value="BCMS"/>
+				<atom name="0x00000003" type="FC32" value="BCMS"/>
+				<atom name="0x00000004" type="FC32" value="BCMS"/>
+				<atom name="0x00000005" type="FC32" value="BADC"/>
+				<atom name="0x00000006" type="FC32" value="BADC"/>
+				<atom name="0x00000007" type="FC32" value="BADC"/>
+				<atom name="0x00000008" type="FC32" value="BADC"/>
+				<atom name="0x00000009" type="FC32" value="BNMS"/>
+				<atom name="0x0000000A" type="FC32" value="BADC"/>
+				<atom name="0x0000000B" type="FC32" value="BSSM"/>
+				<atom name="0x0000000C" type="FC32" value="BAMS"/>
+				<atom name="0x0000000D" type="FC32" value="BSSM"/>
+				<atom name="0x0000000E" type="FC32" value="BSSM"/>
+				<atom name="0x0000000F" type="FC32" value="BLDR"/>
+				<atom name="0x00000010" type="FC32" value="BLDR"/>
+				<atom name="0x00000011" type="FC32" value="BLDR"/>
+				<atom name="0x00000012" type="FC32" value="BDDS"/>
+				<atom name="0x00000013" type="FC32" value="BDDS"/>
+				<atom name="0x00000014" type="FC32" value="BSSM"/>
+				<atom name="0x00000015" type="FC32" value="BSSM"/>
+				<atom name="0x00000016" type="FC32" value="BSSM"/>
+				<atom name="0x00000017" type="FC32" value="BAMS"/>
+				<atom name="0x00000018" type="FC32" value="BSSM"/>
+				<atom name="0x00000019" type="FC32" value="BDDS"/>
+				<atom name="0x0000001A" type="FC32" value="BDDS"/>
+				<atom name="0x0000001B" type="FC32" value="BLDR"/>
+				<atom name="0x0000001C" type="FC32" value="BDDS"/>
+				<atom name="0x0000001D" type="FC32" value="BLDR"/>
+				<atom name="0x0000001E" type="FC32" value="BLDR"/>
+				<atom name="0x0000001F" type="FC32" value="BADC"/>
+				<atom name="0x00000020" type="FC32" value="BDDS"/>
+				<atom name="0x00000021" type="FC32" value="BCMS"/>
+				<atom name="0x00000022" type="FC32" value="BCMS"/>
+				<atom name="0x00000023" type="FC32" value="BCMS"/>
+				<atom name="0x00000024" type="FC32" value="BNMS"/>
+				<atom name="0x00000025" type="FC32" value="BSSM"/>
+				<atom name="0x00000026" type="FC32" value="BSSM"/>
+				<atom name="0x00000027" type="FC32" value="BARC"/>
+				<atom name="0x00000028" type="FC32" value="BSSM"/>
+				<atom name="0x00000029" type="FC32" value="BCLB"/>
+			</container>
+		</container>
+		<container name="GNDV">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1484723993854771"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="42"/>
+				<atom name="0x00000001" type="CSTR" value="58-default"/>
+				<atom name="0x00000002" type="CSTR" value="15-default"/>
+				<atom name="0x00000003" type="CSTR" value="15-default"/>
+				<atom name="0x00000004" type="CSTR" value="15-default"/>
+				<atom name="0x00000005" type="CSTR" value="49-default"/>
+				<atom name="0x00000006" type="CSTR" value="49-default"/>
+				<atom name="0x00000007" type="CSTR" value="49-default"/>
+				<atom name="0x00000008" type="CSTR" value="49-default"/>
+				<atom name="0x00000009" type="CSTR" value="23-default"/>
+				<atom name="0x0000000A" type="CSTR" value="49-default"/>
+				<atom name="0x0000000B" type="CSTR" value="72-default"/>
+				<atom name="0x0000000C" type="CSTR" value="43-default"/>
+				<atom name="0x0000000D" type="CSTR" value="72-default"/>
+				<atom name="0x0000000E" type="CSTR" value="72-default"/>
+				<atom name="0x0000000F" type="CSTR" value="113-default"/>
+				<atom name="0x00000010" type="CSTR" value="113-default"/>
+				<atom name="0x00000011" type="CSTR" value="113-default"/>
+				<atom name="0x00000012" type="CSTR" value="1-default"/>
+				<atom name="0x00000013" type="CSTR" value="1-default"/>
+				<atom name="0x00000014" type="CSTR" value="72-default"/>
+				<atom name="0x00000015" type="CSTR" value="72-default"/>
+				<atom name="0x00000016" type="CSTR" value="72-default"/>
+				<atom name="0x00000017" type="CSTR" value="43-default"/>
+				<atom name="0x00000018" type="CSTR" value="72-default"/>
+				<atom name="0x00000019" type="CSTR" value="1-default"/>
+				<atom name="0x0000001A" type="CSTR" value="1-default"/>
+				<atom name="0x0000001B" type="CSTR" value="113-default"/>
+				<atom name="0x0000001C" type="CSTR" value="1-default"/>
+				<atom name="0x0000001D" type="CSTR" value="113-default"/>
+				<atom name="0x0000001E" type="CSTR" value="113-default"/>
+				<atom name="0x0000001F" type="CSTR" value="49-default"/>
+				<atom name="0x00000020" type="CSTR" value="1-default"/>
+				<atom name="0x00000021" type="CSTR" value="15-default"/>
+				<atom name="0x00000022" type="CSTR" value="15-default"/>
+				<atom name="0x00000023" type="CSTR" value="15-default"/>
+				<atom name="0x00000024" type="CSTR" value="23-default"/>
+				<atom name="0x00000025" type="CSTR" value="72-default"/>
+				<atom name="0x00000026" type="CSTR" value="72-default"/>
+				<atom name="0x00000027" type="CSTR" value="31-default"/>
+				<atom name="0x00000028" type="CSTR" value="72-default"/>
+				<atom name="0x00000029" type="CSTR" value="39-default"/>
+			</container>
+		</container>
+		<container name="GNGP">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1484723993854782"/>
+			<atom name="AVTP" type="FC32" value="UI32"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="42"/>
+				<atom name="0x00000001" type="UI32" value="10"/>
+				<atom name="0x00000002" type="UI32" value="10"/>
+				<atom name="0x00000003" type="UI32" value="10"/>
+				<atom name="0x00000004" type="UI32" value="20"/>
+				<atom name="0x00000005" type="UI32" value="10"/>
+				<atom name="0x00000006" type="UI32" value="20"/>
+				<atom name="0x00000007" type="UI32" value="20"/>
+				<atom name="0x00000008" type="UI32" value="10"/>
+				<atom name="0x00000009" type="UI32" value="10"/>
+				<atom name="0x0000000A" type="UI32" value="20"/>
+				<atom name="0x0000000B" type="UI32" value="10"/>
+				<atom name="0x0000000C" type="UI32" value="20"/>
+				<atom name="0x0000000D" type="UI32" value="20"/>
+				<atom name="0x0000000E" type="UI32" value="10"/>
+				<atom name="0x0000000F" type="UI32" value="10"/>
+				<atom name="0x00000010" type="UI32" value="20"/>
+				<atom name="0x00000011" type="UI32" value="10"/>
+				<atom name="0x00000012" type="UI32" value="20"/>
+				<atom name="0x00000013" type="UI32" value="20"/>
+				<atom name="0x00000014" type="UI32" value="10"/>
+				<atom name="0x00000015" type="UI32" value="20"/>
+				<atom name="0x00000016" type="UI32" value="20"/>
+				<atom name="0x00000017" type="UI32" value="10"/>
+				<atom name="0x00000018" type="UI32" value="10"/>
+				<atom name="0x00000019" type="UI32" value="10"/>
+				<atom name="0x0000001A" type="UI32" value="20"/>
+				<atom name="0x0000001B" type="UI32" value="10"/>
+				<atom name="0x0000001C" type="UI32" value="10"/>
+				<atom name="0x0000001D" type="UI32" value="20"/>
+				<atom name="0x0000001E" type="UI32" value="20"/>
+				<atom name="0x0000001F" type="UI32" value="10"/>
+				<atom name="0x00000020" type="UI32" value="10"/>
+				<atom name="0x00000021" type="UI32" value="10"/>
+				<atom name="0x00000022" type="UI32" value="20"/>
+				<atom name="0x00000023" type="UI32" value="20"/>
+				<atom name="0x00000024" type="UI32" value="20"/>
+				<atom name="0x00000025" type="UI32" value="20"/>
+				<atom name="0x00000026" type="UI32" value="10"/>
+				<atom name="0x00000027" type="UI32" value="10"/>
+				<atom name="0x00000028" type="UI32" value="20"/>
+				<atom name="0x00000029" type="UI32" value="20"/>
+			</container>
+		</container>
+		<container name="GNIA">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1484723993854796"/>
+			<atom name="AVTP" type="FC32" value="IPAD"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="42"/>
+				<atom name="0x00000001" type="IPAD" value="192.168.4.126"/>
+				<atom name="0x00000002" type="IPAD" value="192.168.4.128"/>
+				<atom name="0x00000003" type="IPAD" value="192.168.4.129"/>
+				<atom name="0x00000004" type="IPAD" value="192.168.4.132"/>
+				<atom name="0x00000005" type="IPAD" value="192.168.4.128"/>
+				<atom name="0x00000006" type="IPAD" value="192.168.4.133"/>
+				<atom name="0x00000007" type="IPAD" value="192.168.4.134"/>
+				<atom name="0x00000008" type="IPAD" value="192.168.4.129"/>
+				<atom name="0x00000009" type="IPAD" value="192.168.4.126"/>
+				<atom name="0x0000000A" type="IPAD" value="192.168.4.132"/>
+				<atom name="0x0000000B" type="IPAD" value="192.168.4.126"/>
+				<atom name="0x0000000C" type="IPAD" value="192.168.4.131"/>
+				<atom name="0x0000000D" type="IPAD" value="192.168.4.134"/>
+				<atom name="0x0000000E" type="IPAD" value="192.168.4.127"/>
+				<atom name="0x0000000F" type="IPAD" value="192.168.4.129"/>
+				<atom name="0x00000010" type="IPAD" value="192.168.4.134"/>
+				<atom name="0x00000011" type="IPAD" value="192.168.4.127"/>
+				<atom name="0x00000012" type="IPAD" value="192.168.4.133"/>
+				<atom name="0x00000013" type="IPAD" value="192.168.4.134"/>
+				<atom name="0x00000014" type="IPAD" value="192.168.4.129"/>
+				<atom name="0x00000015" type="IPAD" value="192.168.4.133"/>
+				<atom name="0x00000016" type="IPAD" value="192.168.4.132"/>
+				<atom name="0x00000017" type="IPAD" value="192.168.4.126"/>
+				<atom name="0x00000018" type="IPAD" value="192.168.4.128"/>
+				<atom name="0x00000019" type="IPAD" value="192.168.4.127"/>
+				<atom name="0x0000001A" type="IPAD" value="192.168.4.132"/>
+				<atom name="0x0000001B" type="IPAD" value="192.168.4.128"/>
+				<atom name="0x0000001C" type="IPAD" value="192.168.4.129"/>
+				<atom name="0x0000001D" type="IPAD" value="192.168.4.132"/>
+				<atom name="0x0000001E" type="IPAD" value="192.168.4.133"/>
+				<atom name="0x0000001F" type="IPAD" value="192.168.4.127"/>
+				<atom name="0x00000020" type="IPAD" value="192.168.4.128"/>
+				<atom name="0x00000021" type="IPAD" value="192.168.4.127"/>
+				<atom name="0x00000022" type="IPAD" value="192.168.4.133"/>
+				<atom name="0x00000023" type="IPAD" value="192.168.4.134"/>
+				<atom name="0x00000024" type="IPAD" value="192.168.4.131"/>
+				<atom name="0x00000025" type="IPAD" value="192.168.4.131"/>
+				<atom name="0x00000026" type="IPAD" value="192.168.4.130"/>
+				<atom name="0x00000027" type="IPAD" value="192.168.4.130"/>
+				<atom name="0x00000028" type="IPAD" value="192.168.4.135"/>
+				<atom name="0x00000029" type="IPAD" value="192.168.4.135"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

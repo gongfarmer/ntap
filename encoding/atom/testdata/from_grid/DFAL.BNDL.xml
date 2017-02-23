@@ -1,0 +1,2262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="DFAL">
+		<atom name="BTIM" type="UI64" value="1484723509695594"/>
+		<atom name="BVER" type="UI32" value="1"/>
+		<container name="ABRL">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="None"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ACMS">
+			<container name="ALRM">
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="None"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ACTS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="11"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Archive node in read-only mode (writer services disabled)."/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="12"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Archive node read and write services disabled."/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="13"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Archive node cloud tier authentication failure."/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="14"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ADCA">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ADCE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AITE">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Waiting for Target..."/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="30"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Waiting for Storage..."/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Offline"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AITU">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Session lost"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Target Error"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ALIS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="100"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Over %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ALOS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="200"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Over %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ALUR">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Over %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AMQS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="100000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="500000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AOTE">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="29"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Waiting for Target..."/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Offline"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AOTU">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Insufficient Free Space"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Session Lost"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Target Error"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="APMS">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Simplex Mode"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ARCE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AROQ">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="3000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="6000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ARRF">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ARRS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="19"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="9"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Disconnected"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ARRV">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ARVF">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ASXP">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AUMA">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="DB Connectivity Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AUME">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="AUXS">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Disk Full"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="BASF">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="82416981860"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="68336981860"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="55110315193"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="42310315193"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="BASS">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Cannot Allocate Identifiers"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="BRDT">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Overtemp"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="BTOF">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least ABS(1M)"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="-1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least ABS(1M)"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="BTSE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Synchronizing"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CAHP">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="80"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CAIH">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Equal to %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="None"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CAQH">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Equal to 1"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="None"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CASA">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Data Store Down"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Data Store Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CASE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Data Store Joining"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CDLP">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="60"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="80"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CLBA">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CLBE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Offline"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CMNA">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="No Online CMN"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CMST">
+			<container name="ALRM">
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="30"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="ILM specification error (replication stopped)"/>
+						</container>
+					</container>
+				</container>
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="40"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="CMS is waiting to receive the ILM spec bundle"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CPRC">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Below %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="CPUT">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Overtemp"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="DNST">
+			<container name="ALRM">
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Not Configured"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ECCD">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="9"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ECST">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error encountered."/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="FOPN">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="32000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="HSTE">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0,10,40"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Offline"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="HSTU">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Not Started"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="HTAS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="No"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="IQSZ">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="150000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than 150,000"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than 1,000,000"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than 10,000,000"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="IRSU">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Disabled"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="LATA">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="60000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="LATW">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="120000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="LDRE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="LOST">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREA"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Over %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="MINQ">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="MINS">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Server Connection Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="MISS">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Disconnected"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="MMQS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="2500"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="5000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NANG">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unavailable"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unsupported"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NDUP">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Half"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unavailable"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unsupported"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NLNK">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unavailable"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unsupported"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Down"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NRER">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="50"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="100"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="500"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NRLY">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="No available relays."/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NSCA">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Database Connectivity Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NSCE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NSPD">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="10BaseT"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unavailable"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="5"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unsupported"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTBR">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="10737418239"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Database Capacity Low"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="1073741824"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Database Reaching Capacity"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="104857600"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Database Full"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTER">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="50"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="100"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="500"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTFQ">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="-2500"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0 ppm"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="2500"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0 ppm"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTLK">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Not Locked"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTOF">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="-1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTSA">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="No NTP sources available."/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTSD">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="150000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Greater than %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTSJ">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="-1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTSO">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="-1000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="NTSU">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Not running"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="OCOR">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="OPST">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Failed"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="OQRT">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="ORSU">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Disabled"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Storage Unavailable"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="PMEM">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="80"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="85"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="90"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="99"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="PSAS">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Failed"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="PSBS">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Failed"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="RDTE">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Connecting..."/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="30"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Authenticating..."/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="40"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Negotiating..."/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Offline"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="RDTU">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Configuration Error"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2,3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Connection Failure"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4,5"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Authentication Failure"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="6,7"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Session Failure"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="8"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="RIRF">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="50"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="RIRQ">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="5000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="RORF">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At Least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="50"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="RORQ">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="5000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SAVP">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SCAS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="5"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Paused"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="8"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Aborting"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Retrying"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="6"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="9"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Abort Paused"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SCHR">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Aborted"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Cancelled"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Expired"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Rollback Failed"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="5"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Invalid"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="6"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unauthorized"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="7"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Duplicate"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SHLH">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="30"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Read-only"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="40"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Offline"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SLSA">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="45"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="60"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="80"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SMST">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Initializing..."/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Bad Configuration"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unable to Connect"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SMTT">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SNST">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Checkpoint Error"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Quorum Not Reached"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SOSS">
+			<container name="ALRM">
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Needs Attention"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SSMA">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SSME">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="10"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Standby"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SSTS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Insufficient Free Space"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="30"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Volume(s) Unavailable"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="40"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Error"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="SVST">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Not Running"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="TPOP">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="100"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="250"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="At least %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="UMEM">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="100000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="50000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="10000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="VMFI">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="100000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="25000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="10000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="VMFR">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="2000000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="500000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="LESE"/>
+						<atom name="CVAL" type="CSTR" value="100000000"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Under %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="VMST">
+			<container name="ALRM">
+				<container name="MINR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="0"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="VPRI">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="20"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="High"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="VSTU">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Not Started"/>
+						</container>
+					</container>
+				</container>
+				<container name="MAJR">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="2"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Verify Failed"/>
+						</container>
+					</container>
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="4"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Unknown Error"/>
+						</container>
+					</container>
+				</container>
+				<container name="CRIT">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="3"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Max Failures Reached"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="XAMS">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="GREE"/>
+						<atom name="CVAL" type="CSTR" value="1"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Over %v0"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+		<container name="XCVP">
+			<container name="ALRM">
+				<container name="NOTC">
+					<container name="TRES">
+						<atom name="CMPT" type="FC32" value="EQUL"/>
+						<atom name="CVAL" type="CSTR" value="100"/>
+						<container name="ENUS">
+							<atom name="MGST" type="USTR" value="Foreground Verification Completed"/>
+						</container>
+					</container>
+				</container>
+			</container>
+		</container>
+	</container>
+</containerxml>

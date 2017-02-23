@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="CTSC">
+		<atom name="BVER" type="UI32" value="2"/>
+		<atom name="BTIM" type="UI64" value="1484723615664886"/>
+		<container name="SUID">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="UUID"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="UUID" value="00000000-0000-0000-0000-000000000000"/>
+			</container>
+		</container>
+		<container name="SVCT">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="ENUM" value="0"/>
+			</container>
+		</container>
+		<container name="AVLD">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="ENUM" value="0"/>
+			</container>
+		</container>
+		<container name="SABU">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value=""/>
+			</container>
+		</container>
+		<container name="SARG">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value="us-east-1"/>
+			</container>
+		</container>
+		<container name="SAEP">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value=""/>
+			</container>
+		</container>
+		<container name="SAPR">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value="https"/>
+			</container>
+		</container>
+		<container name="SAHN">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value=""/>
+			</container>
+		</container>
+		<container name="SAAK">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value=""/>
+			</container>
+		</container>
+		<container name="SASK">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value=""/>
+			</container>
+		</container>
+		<container name="SASC">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="CSTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="CSTR" value="STANDARD"/>
+			</container>
+		</container>
+		<container name="SAAT">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="ENUM" value="4"/>
+			</container>
+		</container>
+		<container name="SARS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="ENUM" value="0"/>
+			</container>
+		</container>
+		<container name="SCAU">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="2"/>
+				<atom name="0x00000001" type="ENUM" value="1"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

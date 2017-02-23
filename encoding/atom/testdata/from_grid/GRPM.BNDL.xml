@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="GRPM">
+		<atom name="BVER" type="UI32" value="6"/>
+		<atom name="BTIM" type="UI64" value="1484723569371228"/>
+		<container name="GRPN">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1098828608147732"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="1"/>
+			</container>
+		</container>
+		<container name="GRPD">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1098828608147732"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="1"/>
+			</container>
+		</container>
+		<container name="GDMA">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1098828608147732"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="1"/>
+			</container>
+		</container>
+		<container name="CNFA">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1098828608147732"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="1"/>
+			</container>
+		</container>
+		<container name="ACKA">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1098828608147732"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="1"/>
+			</container>
+		</container>
+		<container name="USRA">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1098828608147732"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="1"/>
+			</container>
+		</container>
+		<container name="GPDE">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1098828608147732"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="RDWR"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="1"/>
+			</container>
+		</container>
+	</container>
+</containerxml>

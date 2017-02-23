@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="MIND">
+		<atom name="BVER" type="UI32" value="2"/>
+		<atom name="BTIM" type="UI64" value="1484723589218111"/>
+		<container name="MNDN">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="FC32"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="25"/>
+				<atom name="0x00000001" type="FC32" value="MCLS"/>
+				<atom name="0x00000002" type="FC32" value="NUM0"/>
+				<atom name="0x00000003" type="FC32" value="NUM1"/>
+				<atom name="0x00000004" type="FC32" value="NUM2"/>
+				<atom name="0x00000005" type="FC32" value="NUM3"/>
+				<atom name="0x00000006" type="FC32" value="NUM4"/>
+				<atom name="0x00000007" type="FC32" value="NUM5"/>
+				<atom name="0x00000008" type="FC32" value="NUM6"/>
+				<atom name="0x00000009" type="FC32" value="NUM7"/>
+				<atom name="0x0000000A" type="FC32" value="NUM8"/>
+				<atom name="0x0000000B" type="FC32" value="NUM9"/>
+				<atom name="0x0000000C" type="FC32" value="STR0"/>
+				<atom name="0x0000000D" type="FC32" value="STR1"/>
+				<atom name="0x0000000E" type="FC32" value="STR2"/>
+				<atom name="0x0000000F" type="FC32" value="STR3"/>
+				<atom name="0x00000010" type="FC32" value="STR4"/>
+				<atom name="0x00000011" type="FC32" value="STR5"/>
+				<atom name="0x00000012" type="FC32" value="STR6"/>
+				<atom name="0x00000013" type="FC32" value="STR7"/>
+				<atom name="0x00000014" type="FC32" value="STR8"/>
+				<atom name="0x00000015" type="FC32" value="STR9"/>
+				<atom name="0x00000016" type="FC32" value="XAID"/>
+				<atom name="0x00000017" type="FC32" value="XTYP"/>
+				<atom name="0x00000018" type="FC32" value="XVER"/>
+			</container>
+		</container>
+		<container name="MNDS">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="USTR"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="25"/>
+				<atom name="0x00000001" type="USTR" value="TSM Management Class"/>
+				<atom name="0x00000002" type="USTR" value="User Number NUM0"/>
+				<atom name="0x00000003" type="USTR" value="User Number NUM1"/>
+				<atom name="0x00000004" type="USTR" value="User Number NUM2"/>
+				<atom name="0x00000005" type="USTR" value="User Number NUM3"/>
+				<atom name="0x00000006" type="USTR" value="User Number NUM4"/>
+				<atom name="0x00000007" type="USTR" value="User Number NUM5"/>
+				<atom name="0x00000008" type="USTR" value="User Number NUM6"/>
+				<atom name="0x00000009" type="USTR" value="User Number NUM7"/>
+				<atom name="0x0000000A" type="USTR" value="User Number NUM8"/>
+				<atom name="0x0000000B" type="USTR" value="User Number NUM9"/>
+				<atom name="0x0000000C" type="USTR" value="User String STR0"/>
+				<atom name="0x0000000D" type="USTR" value="User String STR1"/>
+				<atom name="0x0000000E" type="USTR" value="User String STR2"/>
+				<atom name="0x0000000F" type="USTR" value="User String STR3"/>
+				<atom name="0x00000010" type="USTR" value="User String STR4"/>
+				<atom name="0x00000011" type="USTR" value="User String STR5"/>
+				<atom name="0x00000012" type="USTR" value="User String STR6"/>
+				<atom name="0x00000013" type="USTR" value="User String STR7"/>
+				<atom name="0x00000014" type="USTR" value="User String STR8"/>
+				<atom name="0x00000015" type="USTR" value="User String STR9"/>
+				<atom name="0x00000016" type="USTR" value="External Application Identifier"/>
+				<atom name="0x00000017" type="USTR" value="External Object Type"/>
+				<atom name="0x00000018" type="USTR" value="External Object Version"/>
+			</container>
+		</container>
+		<container name="MNDT">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="FC32"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="25"/>
+				<atom name="0x00000001" type="FC32" value="CSTR"/>
+				<atom name="0x00000002" type="FC32" value="SI64"/>
+				<atom name="0x00000003" type="FC32" value="SI64"/>
+				<atom name="0x00000004" type="FC32" value="SI64"/>
+				<atom name="0x00000005" type="FC32" value="SI64"/>
+				<atom name="0x00000006" type="FC32" value="SI64"/>
+				<atom name="0x00000007" type="FC32" value="SI64"/>
+				<atom name="0x00000008" type="FC32" value="SI64"/>
+				<atom name="0x00000009" type="FC32" value="SI64"/>
+				<atom name="0x0000000A" type="FC32" value="SI64"/>
+				<atom name="0x0000000B" type="FC32" value="SI64"/>
+				<atom name="0x0000000C" type="FC32" value="CSTR"/>
+				<atom name="0x0000000D" type="FC32" value="CSTR"/>
+				<atom name="0x0000000E" type="FC32" value="CSTR"/>
+				<atom name="0x0000000F" type="FC32" value="CSTR"/>
+				<atom name="0x00000010" type="FC32" value="CSTR"/>
+				<atom name="0x00000011" type="FC32" value="CSTR"/>
+				<atom name="0x00000012" type="FC32" value="CSTR"/>
+				<atom name="0x00000013" type="FC32" value="CSTR"/>
+				<atom name="0x00000014" type="FC32" value="CSTR"/>
+				<atom name="0x00000015" type="FC32" value="CSTR"/>
+				<atom name="0x00000016" type="FC32" value="CSTR"/>
+				<atom name="0x00000017" type="FC32" value="CSTR"/>
+				<atom name="0x00000018" type="FC32" value="SI64"/>
+			</container>
+		</container>
+		<container name="MNDQ">
+			<atom name="AVER" type="UI32" value="2"/>
+			<atom name="ATIM" type="UI64" value="1"/>
+			<atom name="AVTP" type="FC32" value="ENUM"/>
+			<atom name="APER" type="FC32" value="READ"/>
+			<container name="AVAL">
+				<atom name="0x00000000" type="UI32" value="25"/>
+				<atom name="0x00000001" type="ENUM" value="0"/>
+				<atom name="0x00000002" type="ENUM" value="1"/>
+				<atom name="0x00000003" type="ENUM" value="1"/>
+				<atom name="0x00000004" type="ENUM" value="1"/>
+				<atom name="0x00000005" type="ENUM" value="1"/>
+				<atom name="0x00000006" type="ENUM" value="2"/>
+				<atom name="0x00000007" type="ENUM" value="2"/>
+				<atom name="0x00000008" type="ENUM" value="2"/>
+				<atom name="0x00000009" type="ENUM" value="0"/>
+				<atom name="0x0000000A" type="ENUM" value="0"/>
+				<atom name="0x0000000B" type="ENUM" value="0"/>
+				<atom name="0x0000000C" type="ENUM" value="1"/>
+				<atom name="0x0000000D" type="ENUM" value="1"/>
+				<atom name="0x0000000E" type="ENUM" value="1"/>
+				<atom name="0x0000000F" type="ENUM" value="1"/>
+				<atom name="0x00000010" type="ENUM" value="2"/>
+				<atom name="0x00000011" type="ENUM" value="2"/>
+				<atom name="0x00000012" type="ENUM" value="2"/>
+				<atom name="0x00000013" type="ENUM" value="0"/>
+				<atom name="0x00000014" type="ENUM" value="0"/>
+				<atom name="0x00000015" type="ENUM" value="0"/>
+				<atom name="0x00000016" type="ENUM" value="1"/>
+				<atom name="0x00000017" type="ENUM" value="1"/>
+				<atom name="0x00000018" type="ENUM" value="1"/>
+			</container>
+		</container>
+	</container>
+</containerxml>
