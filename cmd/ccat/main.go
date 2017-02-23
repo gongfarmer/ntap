@@ -25,7 +25,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	printAtoms(atoms)
+	PrintAtoms(atoms)
 	os.Exit(0)
 }
 
@@ -106,7 +106,7 @@ func MakeAtoms(files []string) (atoms []*atom.Atom, err error) {
 	return
 }
 
-func printAtoms(atoms []*atom.Atom) {
+func PrintAtoms(atoms []*atom.Atom) {
 	for _, a := range atoms {
 		if true == *FlagOutputDebug {
 			printDebug(a)
