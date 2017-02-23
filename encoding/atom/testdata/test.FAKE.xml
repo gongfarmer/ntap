@@ -1,40 +1,36 @@
-SQSB:CONT:
-	RPRF:CONT:
-		RTRV:CONT:
-			RANK:CONT:
-				DIST:CONT:
-				END
-				SCAS:CONT:
-				END
-			END
-			APST:CONT:
-				PSKY:FC32:'LINK'
-				SORT:FC32:'ASCE'
-				RWDS:UI64:0
-			END
-		END
-		STOR:CONT:
-			RANK:CONT:
-				DIST:CONT:
-				END
-				SCAS:CONT:
-				END
-				STAS:CONT:
-				END
-			END
-			APST:CONT:
-				PSKY:FC32:'LINK'
-				SORT:FC32:'ASCE'
-				RWDS:UI64:0
-			END
-		END
-		TPGY:CONT:
-			RANK:CONT:
-				DIST:CONT:
-				END
-				LINK:CONT:
-				END
-			END
-		END
-	END
-END
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="SQSB">
+		<container name="RPRF">
+			<container name="RTRV">
+				<container name="RANK">
+					<container name="DIST"/>
+					<container name="SCAS"/>
+				</container>
+				<container name="APST">
+					<atom name="PSKY" type="FC32" value="LINK"/>
+					<atom name="SORT" type="FC32" value="ASCE"/>
+					<atom name="RWDS" type="UI64" value="0"/>
+				</container>
+			</container>
+			<container name="STOR">
+				<container name="RANK">
+					<container name="DIST"/>
+					<container name="SCAS"/>
+					<container name="STAS"/>
+				</container>
+				<container name="APST">
+					<atom name="PSKY" type="FC32" value="LINK"/>
+					<atom name="SORT" type="FC32" value="ASCE"/>
+					<atom name="RWDS" type="UI64" value="0"/>
+				</container>
+			</container>
+			<container name="TPGY">
+				<container name="RANK">
+					<container name="DIST"/>
+					<container name="LINK"/>
+				</container>
+			</container>
+		</container>
+	</container>
+</containerxml>

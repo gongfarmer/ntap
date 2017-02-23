@@ -1,34 +1,37 @@
-TEST:CONT:
-	atom:CSTR:"    \x01\x02\x03"
-	atom:CSTR:"\x04\x05\x06\x07"
-	atom:CSTR:"\x08\x09\n\x0B"
-	atom:CSTR:"\x0C\r\x0E\x0F"
-	atom:CSTR:"\x10\x11\x12\x13"
-	atom:CSTR:"\x14\x15\x16\x17"
-	atom:CSTR:"\x18\x19\x1A\x1B"
-	atom:CSTR:"\x1C\x1D\x1E\x1F"
-	atom:CSTR:" !\"#"
-	atom:CSTR:"$%&'"
-	atom:CSTR:"()*+"
-	atom:CSTR:",-./"
-	atom:CSTR:"0123"
-	atom:CSTR:"4567"
-	atom:CSTR:"89:;"
-	atom:CSTR:"<=>?"
-	atom:CSTR:"@ABC"
-	atom:CSTR:"DEFG"
-	atom:CSTR:"HIJK"
-	atom:CSTR:"LMNO"
-	atom:CSTR:"PQRS"
-	atom:CSTR:"TUVW"
-	atom:CSTR:"XYZ["
-	atom:CSTR:"\\]^_"
-	atom:CSTR:"`abc"
-	atom:CSTR:"defg"
-	atom:CSTR:"hijk"
-	atom:CSTR:"lmno"
-	atom:CSTR:"pqrs"
-	atom:CSTR:"tuvw"
-	atom:CSTR:"xyz{"
-	atom:CSTR:"|}~\x7F"
-END
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="TEST">
+		<atom name="atom" type="CSTR" value="    "/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value="&#9;&#10;"/>
+		<atom name="atom" type="CSTR" value="&#13;"/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=""/>
+		<atom name="atom" type="CSTR" value=" !&quot;#"/>
+		<atom name="atom" type="CSTR" value="$%&amp;'"/>
+		<atom name="atom" type="CSTR" value="()*+"/>
+		<atom name="atom" type="CSTR" value=",-./"/>
+		<atom name="atom" type="CSTR" value="0123"/>
+		<atom name="atom" type="CSTR" value="4567"/>
+		<atom name="atom" type="CSTR" value="89:;"/>
+		<atom name="atom" type="CSTR" value="&lt;=&gt;?"/>
+		<atom name="atom" type="CSTR" value="@ABC"/>
+		<atom name="atom" type="CSTR" value="DEFG"/>
+		<atom name="atom" type="CSTR" value="HIJK"/>
+		<atom name="atom" type="CSTR" value="LMNO"/>
+		<atom name="atom" type="CSTR" value="PQRS"/>
+		<atom name="atom" type="CSTR" value="TUVW"/>
+		<atom name="atom" type="CSTR" value="XYZ["/>
+		<atom name="atom" type="CSTR" value="\]^_"/>
+		<atom name="atom" type="CSTR" value="`abc"/>
+		<atom name="atom" type="CSTR" value="defg"/>
+		<atom name="atom" type="CSTR" value="hijk"/>
+		<atom name="atom" type="CSTR" value="lmno"/>
+		<atom name="atom" type="CSTR" value="pqrs"/>
+		<atom name="atom" type="CSTR" value="tuvw"/>
+		<atom name="atom" type="CSTR" value="xyz{"/>
+		<atom name="atom" type="CSTR" value="|}~"/>
+	</container>
+</containerxml>

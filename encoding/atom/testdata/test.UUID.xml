@@ -1,7 +1,10 @@
-UUID:CONT:
-	uuid:UUID:64881431-B6DC-478E-B7EE-ED306619C797
-	uuid:UUID:A3BFFF54-F474-42E9-AB53-01D913D118B1
-	uuid:UUID:A3BFFF54-F474-42E9-AB53-01D913D118B1
-	uuid:UUID:64881431-B6DC-478E-B7EE-ED306619C797
-	uuid:UUID:A3BFFF54-F474-42E9-AB53-01D913D118B1
-END
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="UUID">
+		<atom name="uuid" type="UUID" value="64881431-B6DC-478E-B7EE-ED306619C797"/>
+		<atom name="uuid" type="UUID" value="A3BFFF54-F474-42E9-AB53-01D913D118B1"/>
+		<atom name="uuid" type="UUID" value="A3BFFF54-F474-42E9-AB53-01D913D118B1"/>
+		<atom name="uuid" type="UUID" value="64881431-B6DC-478E-B7EE-ED306619C797"/>
+		<atom name="uuid" type="UUID" value="A3BFFF54-F474-42E9-AB53-01D913D118B1"/>
+	</container>
+</containerxml>

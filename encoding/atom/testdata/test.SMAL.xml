@@ -1,2 +1,4 @@
-SMAL:CONT:
-END
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="SMAL"/>
+</containerxml>

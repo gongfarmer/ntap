@@ -1,90 +1,87 @@
-mods:CONT:
-	CERT:CONT:
-		CETB:CONT:
-		END
-	END
-	PATM:CONT:
-		vers:UI32:67633152
-	END
-	CONM:CONT:
-		SPRT:UI32:1410
-		SLIP:IP32:127.0.0.1
-		SIPA:CONT:
-			ipad:IP32:0x7F0000017F000001
-		END
-	END
-	TLS2:CONT:
-		prof:CONT:
-			NCON:CONT:
-				CSET:CSTR:"AES128-SHA"
-				CCRT:CONT:
-				END
-				usec:CONT:
-				END
-			END
-		END
-	END
-	RAUT:CONT:
-		autf:UI32:0
-	END
-	MFWD:CONT:
-		INIT:CONT:
-			DMDA:CSTR:"BFSGDeviceModel.xml"
-			DTNA:CSTR:"{OID='2.16.124.113590.3.0.3.4.10','File System Gateway'}"
-		END
-	END
-	ARNI:CONT:
-		URLY:UI32:1
-		PATH:CSTR:"/var/local/audit/fsg"
-	END
-	CMNC:CONT:
-		conf:CONT:
-			SDIS:CONT:
-			END
-			NIPR:CONT:
-			END
-			FSGR:CONT:
-			END
-		END
-	END
-	FSGC:CONT:
-		MODE:FC32:'RDWR'
-		DPTH:CSTR:"/fsg"
-		LPTH:CSTR:"/var/local/fsg"
-		STPL:UI32:3
-	END
-	SWPO:CONT:
-		FSWM:UI64:50000000000
-		NCWM:UI64:10000000000
-	END
-	NEWF:CONT:
-		MXIM:UI32:20
-		MNIM:UI32:15
-		IDLY:UI32:10
-	END
-	FRPM:CONT:
-		WINS:UI32:1140
-		WINL:UI32:0
-		WDYM:UI32:127
-		MDYM:UI32:2147483647
-	END
-	SCON:CONT:
-		svrs:CONT:
-			CIFS:CONT:
-				SNAM:CSTR:"{OID='2.16.124.113590.3.0.3.12.1','CIFS Filesharing'}"
-				SCTL:CSTR:"/etc/init.d/samba"
-				SPRG:CSTR:"smbd"
-				SPRG:CSTR:"nmbd"
-				SSRT:DATA:0x5374617274696E672053616D6261206461656D6F6E733A206E6D626420736D62642E0A
-				SSTP:DATA:0x53746F7070696E672053616D6261206461656D6F6E733A206E6D626420736D62642E0A
-			END
-			NFSD:CONT:
-				SNAM:CSTR:"{OID='2.16.124.113590.3.0.3.12.2','NFS Filesharing'}"
-				SCTL:CSTR:"/etc/init.d/nfs-kernel-server"
-				SPRG:CSTR:"nfsd"
-				SSRT:DATA:0x4578706F7274696E67206469726563746F7269657320666F72204E4653206B65726E656C206461656D6F6E2E2E2E646F6E652E0A5374617274696E67204E4653206B65726E656C206461656D6F6E3A206E667364206D6F756E74642E0A
-				SSTP:DATA:0x53746F7070696E67204E4653206B65726E656C206461656D6F6E3A206D6F756E7464206E6673642E0A556E6578706F7274696E67206469726563746F7269657320666F72204E4653206B65726E656C206461656D6F6E2E2E2E646F6E652E0A
-			END
-		END
-	END
-END
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="mods">
+		<container name="CERT">
+			<container name="CETB"/>
+		</container>
+		<container name="PATM">
+			<atom name="vers" type="UI32" value="67633152"/>
+		</container>
+		<container name="CONM">
+			<atom name="SPRT" type="UI32" value="1410"/>
+			<atom name="SLIP" type="IP32" value="127.0.0.1"/>
+			<container name="SIPA">
+				<atom name="ipad" type="IP32" value="0x7F0000017F000001"/>
+			</container>
+		</container>
+		<container name="TLS2">
+			<container name="prof">
+				<container name="NCON">
+					<atom name="CSET" type="CSTR" value="AES128-SHA"/>
+					<container name="CCRT"/>
+					<container name="usec"/>
+				</container>
+			</container>
+		</container>
+		<container name="RAUT">
+			<atom name="autf" type="UI32" value="0"/>
+		</container>
+		<container name="MFWD">
+			<container name="INIT">
+				<atom name="DMDA" type="CSTR" value="BFSGDeviceModel.xml"/>
+				<atom name="DTNA" type="CSTR" value="{OID='2.16.124.113590.3.0.3.4.10','File System Gateway'}"/>
+			</container>
+		</container>
+		<container name="ARNI">
+			<atom name="URLY" type="UI32" value="1"/>
+			<atom name="PATH" type="CSTR" value="/var/local/audit/fsg"/>
+		</container>
+		<container name="CMNC">
+			<container name="conf">
+				<container name="SDIS"/>
+				<container name="NIPR"/>
+				<container name="FSGR"/>
+			</container>
+		</container>
+		<container name="FSGC">
+			<atom name="MODE" type="FC32" value="RDWR"/>
+			<atom name="DPTH" type="CSTR" value="/fsg"/>
+			<atom name="LPTH" type="CSTR" value="/var/local/fsg"/>
+			<atom name="STPL" type="UI32" value="3"/>
+		</container>
+		<container name="SWPO">
+			<atom name="FSWM" type="UI64" value="50000000000"/>
+			<atom name="NCWM" type="UI64" value="10000000000"/>
+		</container>
+		<container name="NEWF">
+			<atom name="MXIM" type="UI32" value="20"/>
+			<atom name="MNIM" type="UI32" value="15"/>
+			<atom name="IDLY" type="UI32" value="10"/>
+		</container>
+		<container name="FRPM">
+			<atom name="WINS" type="UI32" value="1140"/>
+			<atom name="WINL" type="UI32" value="0"/>
+			<atom name="WDYM" type="UI32" value="127"/>
+			<atom name="MDYM" type="UI32" value="2147483647"/>
+		</container>
+		<container name="SCON">
+			<container name="svrs">
+				<container name="CIFS">
+					<atom name="SNAM" type="CSTR" value="{OID='2.16.124.113590.3.0.3.12.1','CIFS Filesharing'}"/>
+					<atom name="SCTL" type="CSTR" value="/etc/init.d/samba"/>
+					<atom name="SPRG" type="CSTR" value="smbd"/>
+					<atom name="SPRG" type="CSTR" value="nmbd"/>
+					<atom name="SSRT" type="DATA" value="0x5374617274696E672053616D6261206461656D6F6E733A206E6D626420736D62642E0A"/>
+					<atom name="SSTP" type="DATA" value="0x53746F7070696E672053616D6261206461656D6F6E733A206E6D626420736D62642E0A"/>
+				</container>
+				<container name="NFSD">
+					<atom name="SNAM" type="CSTR" value="{OID='2.16.124.113590.3.0.3.12.2','NFS Filesharing'}"/>
+					<atom name="SCTL" type="CSTR" value="/etc/init.d/nfs-kernel-server"/>
+					<atom name="SPRG" type="CSTR" value="nfsd"/>
+					<atom name="SSRT" type="DATA" value="0x4578706F7274696E67206469726563746F7269657320666F72204E4653206B65726E656C206461656D6F6E2E2E2E646F6E652E0A5374617274696E67204E4653206B65726E656C206461656D6F6E3A206E667364206D6F756E74642E0A"/>
+					<atom name="SSTP" type="DATA" value="0x53746F7070696E67204E4653206B65726E656C206461656D6F6E3A206D6F756E7464206E6673642E0A556E6578706F7274696E67206469726563746F7269657320666F72204E4653206B65726E656C206461656D6F6E2E2E2E646F6E652E0A"/>
+				</container>
+			</container>
+		</container>
+	</container>
+</containerxml>
