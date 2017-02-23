@@ -16,7 +16,7 @@ import (
 	"unicode"
 )
 
-// Verify that type Atom satisifies these encoding interfaces at compile time
+// Verify that type Atom satisfies these encoding interfaces at compile time
 var _ encoding.BinaryUnmarshaler = &Atom{}
 var _ encoding.BinaryMarshaler = &Atom{}
 var _ encoding.TextUnmarshaler = &Atom{}

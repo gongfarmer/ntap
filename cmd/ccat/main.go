@@ -2,28 +2,34 @@ package main
 
 import (
 	"bytes"
-	"encoding/binary"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
 
-var FlagDebug = flag.Bool("d", false, "print atoms in detailed debug format")
+var FlagOutputHex = flag.Bool("X", false, "print atom as hex string")
+var FlagOutputXml = flag.Bool("x", false, "print atom as xml")
+var FlagOutputDebug = flag.Bool("d", false, "print atoms in verbose debug format")
 
-func printAtom(a atom.Atom) {
-	if true == *FlagDebug {
-		printDebug(a)
-	} else {
-		printString(a)
+func main() {
+	flag.Parse()
+
+	// Read atom data from files
+	var files = os.Args[1:]
+	atoms, err := MakeAtoms(files)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
+	printAtoms(atoms)
+	os.Exit(0)
 }
 
-func printDebug(a atom.Atom) {
+func printDebug(a *atom.Atom) {
 	atoms := a.AtomList()
 	for _, a := range atoms {
 		fmt.Printf("name: \"%s\"\n", a.Name)
@@ -44,7 +50,7 @@ func printDebug(a atom.Atom) {
 	}
 }
 
-func printString(a atom.Atom) {
+func printString(a *atom.Atom) {
 	buf, err := a.MarshalText()
 	if err != nil {
 		fmt.Printf("failed to print AtomContainer: %s\n", err)
@@ -58,73 +64,54 @@ func stdinIsEmpty() bool {
 	return (stat.Mode() & os.ModeCharDevice) != 0
 }
 
-func readContainerFromFile(path string) (a atom.Atom, err error) {
-	var e error
-	if a, e = atom.FromFile(path); e != nil {
-		err = fmt.Errorf("Failed to read AtomContainer: %s", e)
-	}
-	return
-}
-
-func readAtomsFromHexStream(r io.Reader) (atoms []*atom.Atom, err error) {
-	var buf []byte
-	err = binary.Read(r, binary.BigEndian, &buf)
-
-	fmt.Println(buf)
-	return
-}
-
-func main() {
-	flag.Parse()
-
-	rc := 0
-
-	// Read from files
-	var files = os.Args[1:]
-	for _, path := range files {
-		if strings.HasPrefix(path, "-") {
-			continue
-		}
-		a, err := readContainerFromFile(path)
-		if err != nil {
-			fmt.Printf("failed to read from %s: %s\n", path, err)
-			rc = 1
-			continue
-		}
-		printAtom(a)
+// Read file contents and return Atom instances.
+// If no files are provided, read STDIN.
+func MakeAtoms(files []string) (atoms []*atom.Atom, err error) {
+	if len(files) == 0 && stdinIsEmpty() {
+		return
 	}
 
-	if stdinIsEmpty() {
-		os.Exit(rc)
-	}
-
-	// Read entire STDIN
 	var buffer []byte
-	buffer, err := ioutil.ReadAll(os.Stdin)
-	if err != nil && err != io.EOF {
-		fmt.Println(err)
-		os.Exit(1)
+	var someAtoms []*atom.Atom
+
+	if len(files) == 0 { // Read STDIN
+		buffer, err = ioutil.ReadAll(os.Stdin)
+		if err != nil && err != io.EOF {
+			return
+		}
+
+		// Convert input to atoms
+		someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+		if err != nil {
+			return
+		}
+		atoms = append(atoms, someAtoms...)
 	}
 
-	// Parse input as binary stream
-	atoms, err := atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	// Read each file, expecting ADE binary data
+	for _, path := range files {
+		buffer, err = ioutil.ReadFile(path)
+		if err != nil && err != io.EOF {
+			return atoms, fmt.Errorf("failed to read file %s: %s\n", path, err)
+		}
 
-	// Parse input as hex stream
-	moreAtoms, err := atom.ReadAtomsFromHex(bytes.NewReader(buffer))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	atoms = append(atoms, moreAtoms...)
+		// convert to atoms
+		someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+		if err != nil {
+			return atoms, fmt.Errorf("failed to read atoms from %s: %s\n", path, err)
+		}
 
-	// Print atoms collected from STDIN
+		atoms = append(atoms, someAtoms...)
+	}
+	return
+}
+
+func printAtoms(atoms []*atom.Atom) {
 	for _, a := range atoms {
-		printAtom(*a)
+		if true == *FlagOutputDebug {
+			printDebug(a)
+		} else {
+			printString(a)
+		}
 	}
-
-	os.Exit(rc)
 }
