@@ -1,0 +1,4 @@
+# CSTR has unquoted hex
+TEST:CONT:
+		shex:CSTR:0xFFCC0011
+END 

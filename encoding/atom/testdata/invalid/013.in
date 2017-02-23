@@ -12,10 +12,30 @@ EMPT:CONT:
 		ustr:USTR:""
 		ustr:USTR:"dog"
 		ipad:USTR:""
+		ipad:IPAD:
+		ipad:IPAD:""
 		empt:DATA:
-	  cont:CONT:
+	  cont:CONT:'aour char code'
+		END
+	  cont:CONT:             'spaces before data'
+		END
+	  cont:CONT: 'unmatched quote
+		END
+	  cont:CONT: "unmatched quote
+		END
+	  cont:CONT:"the quick brown fox"
+		END
+	  cont:CONT:0xFFCC0011
+		END
+	  cont:CONT:0x
+		END
+	  cont:CONT:hello
+		END
+	  cont:CONT:""
 		END
 	  cont:CONT:
+		END
+	  cont:CONT:""
 		    empt:DATA:
 		    empt:DATA:
 		    empt:DATA:

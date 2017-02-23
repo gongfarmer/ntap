@@ -1,0 +1,4 @@
+# unquoted USTR data
+TEST:CONT:
+		ustr:USTR:0xFFCC0011
+END

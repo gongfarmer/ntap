@@ -1,0 +1,4 @@
+# empty IPAD data
+TEST:CONT:
+		ipad:IPAD:
+END

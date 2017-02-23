@@ -154,8 +154,7 @@ ROOT:CONT:
 	
 			CSTR:CSTR:"abc"
 			CSTR:CSTR:"A very exciting test\nstring!"
-			CSTR:CSTR:"""""A very exciting test\nstring!"""
-			USTR:USTR:""\\イロハニホヘト ホヘト ホヘ\n\r""""
+			USTR:USTR:"\\イロハニホヘト ホヘト ホヘ\n\r"
 			EMPT:CSTR:""
 			EMPT:USTR:""
 			AVAL:CONT:

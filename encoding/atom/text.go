@@ -140,12 +140,12 @@ type (
 
 	// lexer holds the state of the scanner
 	lexer struct {
-		input string    // the string being scanned
-		start uint32    // start position of this item
-		width int       // width of last rune read from input
-		items chan item // channel of scanned items
-		pos   uint32    // current string offset
-		line  uint32    // 1+number of newlines seen
+		input      string    // the string being scanned
+		start      uint32    // start position of this item
+		width      int       // width of last rune read from input
+		items      chan item // channel of scanned items
+		pos        uint32    // current string offset
+		lineNumber uint32    // 1+number of newlines seen
 	}
 )
 
@@ -163,9 +163,9 @@ func (i item) String() string {
 
 func lex(input string) *lexer {
 	l := &lexer{
-		input: input,
-		items: make(chan item),
-		line:  1,
+		input:      input,
+		items:      make(chan item),
+		lineNumber: 1,
 	}
 	go l.run() // Concurrently run state machine
 	return l
@@ -188,7 +188,7 @@ func (l *lexer) next() (r rune) {
 	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
 	l.pos += uint32(l.width)
 	if r == '\n' {
-		l.line++
+		l.lineNumber++
 	}
 	return
 }
@@ -203,7 +203,7 @@ func (l *lexer) ignore() {
 func (l *lexer) backup() {
 	l.pos -= uint32(l.width)
 	if l.input[l.pos] == '\n' {
-		l.line--
+		l.lineNumber--
 	}
 }
 
@@ -241,7 +241,7 @@ func (l *lexer) acceptRun(valid string) int {
 
 // token emitter
 func (l *lexer) emit(t itemEnum) {
-	l.items <- item{t, l.input[l.start:l.pos], l.line}
+	l.items <- item{t, l.input[l.start:l.pos], l.lineNumber}
 	l.start = l.pos
 }
 
@@ -253,6 +253,27 @@ func (l *lexer) bufferSize() int {
 // Return the characters seen so far in the current value
 func (l *lexer) buffer() string {
 	return l.input[l.start:l.pos]
+}
+
+// Return the entire current line as a string
+func (l *lexer) line() string {
+	var i_start, i_end uint32
+
+	// find line end
+	if l.input[l.pos] == '\n' {
+		i_end = l.pos
+		l.backup() // at line end, take preceding line
+	} else {
+		for i_end = l.pos; l.input[i_end] != '\n'; i_end++ {
+		}
+	}
+
+	// find line start
+	for i_start = l.pos; l.input[i_start] != '\n' && i_start != 0; i_start-- {
+	}
+	i_start++
+
+	return l.input[i_start:i_end]
 }
 
 // first returns the first rune in the value
@@ -270,10 +291,9 @@ func (l *lexer) errorf(format string, args ...interface{}) stateFn {
 	l.items <- item{
 		itemError,
 		strings.Join([]string{
-			fmt.Sprintf("error while lexing line %d: ", l.line),
 			fmt.Sprintf(format, args...),
 		}, ""),
-		l.line,
+		l.lineNumber,
 	}
 	return nil
 }
@@ -299,7 +319,7 @@ func lexLine(l *lexer) stateFn {
 			l.backup()
 			return lexAtomName
 		default:
-			return l.errorf("bad line start char: %q", l.buffer())
+			return l.errorf("invalid line: %s", l.line())
 		}
 	}
 	// Correctly reached EOF.
@@ -324,7 +344,7 @@ func lexAtomName(l *lexer) stateFn {
 		case 2, 3: // < 2 is not possible in here
 			// incomplete short atom name starts with 0x.  Weird, but OK.
 		default:
-			return l.errorf("badly formed atom name: %q", l.buffer())
+			return l.errorf("invalid atom name: %s", l.line())
 		}
 	}
 
@@ -342,13 +362,12 @@ func lexAtomName(l *lexer) stateFn {
 	}
 
 	// Next char is not printable.
-	l.next()
-	return l.errorf("badly formed atom name: %q", l.buffer())
+	return l.errorf("invalid atom name: %s", l.line())
 }
 
 func lexAtomType(l *lexer) stateFn {
-	if l.next() != ':' {
-		return l.errorf("expected `:' after atom name, got `%q'", l.buffer())
+	if !l.accept(":") {
+		return l.errorf("atom name should be followed by a colon: %s", l.line())
 	}
 	l.ignore()
 
@@ -364,7 +383,7 @@ func lexAtomType(l *lexer) stateFn {
 
 		switch atyp {
 		case "CONT":
-			// NOTE: ade ccat accepts arbitrary chars until end of line.
+			// NOTE: ade ccat accepts arbitrary chars until end of line. This won't.
 			return lexNullValue
 		case "NULL":
 			return lexNullValue
@@ -387,7 +406,17 @@ func lexAtomType(l *lexer) stateFn {
 		}
 	}
 
-	return l.errorf("badly formed atom type: '%q'", l.buffer())
+	// Accept type CONT even without trailing :
+	if l.buffer() == "CONT" {
+		l.emit(itemAtomType)
+		return lexNullValue
+	}
+
+	if l.bufferSize() == 4 {
+		return l.errorf("atom type should be followed by a colon: %s", l.line())
+	}
+
+	return l.errorf("invalid atom type: %s", l.line())
 }
 
 // example: uuid:UUID:64881431-B6DC-478E-B7EE-ED306619C797
@@ -405,7 +434,7 @@ func lexUUID(l *lexer) stateFn {
 		l.emit(itemUUID)
 		return lexEndOfLine
 	}
-	return l.errorf("badly formed UUID value: `%q'", l.buffer())
+	return l.errorf("invalid UUID value: %s", l.line())
 }
 
 // may be in hex
@@ -413,7 +442,7 @@ func lexIP32(l *lexer) stateFn {
 	if l.accept("0") && l.accept("xX") { // Is it hex?
 		l.acceptRun(hexDigits)
 		if l.bufferSize() < 3 {
-			return l.errorf("badly formed IPv4 value: `%q'", l.buffer())
+			return l.errorf("invalid IPv4 value: %s", l.line())
 		}
 		l.emit(itemIP32)
 		return lexEndOfLine
@@ -427,7 +456,7 @@ func lexIP32(l *lexer) stateFn {
 	l.accept(".")
 	l.acceptRun(digits)
 	if l.bufferSize() > 15 || l.bufferSize() < 7 { // min/max IPv4 string length
-		return l.errorf("badly formed IPv4 value: `%q'", l.buffer())
+		return l.errorf("invalid IPv4 value: %s", l.line())
 	}
 	l.emit(itemIP32)
 	return lexEndOfLine
@@ -436,7 +465,7 @@ func lexIP32(l *lexer) stateFn {
 func lexFraction(l *lexer) stateFn {
 	lexNumber(l)
 	if !l.accept("/") {
-		return l.errorf("fractional type missing / divider: %s", l.buffer())
+		return l.errorf("fractional type is missing seperator: %s", l.line())
 	}
 	l.emit(itemVinculum)
 	return lexNumber(l)
@@ -444,12 +473,12 @@ func lexFraction(l *lexer) stateFn {
 
 func lexIPAD(l *lexer) stateFn {
 	if !l.accept("\"") {
-		return l.errorf("IPAD type should start with double quote")
+		return l.errorf("IPAD type should start with double quote: %s", l.line())
 	}
 	ipadChars := strings.Join([]string{hexDigits, ".:"}, "")
 	l.acceptRun(ipadChars)
 	if !l.accept("\"") {
-		return l.errorf("invalid data for IPAD type: %s", l.buffer())
+		return l.errorf("invalid IPAD value: %s", l.line())
 	}
 	l.emit(itemString)
 	return lexEndOfLine
@@ -460,7 +489,7 @@ func lexHexData(l *lexer) stateFn {
 		l.next()
 		l.next()
 		if l.buffer() != "0x" {
-			return l.errorf("hex data type should start with 0x, got %s", l.buffer())
+			return l.errorf("hex data should start with 0x, got %s", l.line())
 		}
 		l.acceptRun(hexDigits)
 	}
@@ -469,7 +498,11 @@ func lexHexData(l *lexer) stateFn {
 }
 
 func lexNumber(l *lexer) stateFn {
-	l.accept("+-") // Optional leading sign.
+	if l.accept("+-") { // Optional leading sign.
+		if l.buffer() == "+" { // discard leading +, keep leading -
+			l.ignore()
+		}
+	}
 
 	digits := "0123456789"
 	if l.accept("0") && l.accept("xX") { // Is it hex?
@@ -486,7 +519,7 @@ func lexNumber(l *lexer) stateFn {
 
 	// Next thing mustn't be alphanumeric.
 	if l.accept(alphaNumericChars) {
-		return l.errorf("bad number syntax: %q", l.buffer())
+		return l.errorf("invalid numeric value: %s", l.line())
 	}
 	l.emit(itemNumber)
 	return lexEndOfLine
@@ -503,7 +536,7 @@ func lexFourCharCode(l *lexer) stateFn {
 		itemType = itemFC32Hex
 		err = acceptFCHR32AsHex(l)
 	default:
-		return l.errorf("invalid data value for FC32: `%s'", l.buffer())
+		return l.errorf("invalid four-char code value: %s", l.line())
 	}
 
 	if err != nil {
@@ -522,12 +555,14 @@ func acceptFCHR32AsHex(l *lexer) error {
 	l.next()
 	l.next()
 	if l.buffer() != "0x" {
-		return fmt.Errorf("expected 0x to start hexadecimal four-char code value, got `%s'", l.buffer())
+		l.backup()
+		l.backup()
+		return fmt.Errorf("hexadecimal four-char code value should start with 0x: %s", l.line())
 	}
 
 	l.acceptRun("0123456789ABCDEFabcdef")
 	if l.bufferSize() != 10 { // 0x and 8 hex digits
-		return fmt.Errorf("Invalid hex data value for FC32: %s", l.buffer())
+		return fmt.Errorf("invalid four-char code value: %s", l.line())
 	}
 	return nil
 }
@@ -538,7 +573,7 @@ func acceptFCHR32AsHex(l *lexer) error {
 func acceptFCHR32AsSingleQuotedString(l *lexer) error {
 	// Read initial single quote
 	if l.next() != '\'' {
-		return fmt.Errorf("expected single quote to start four-char code value, got `%s'", l.buffer())
+		return fmt.Errorf("four-char code data should start with single-quote: %s", l.line())
 	}
 
 	// Read in chars
@@ -546,16 +581,15 @@ func acceptFCHR32AsSingleQuotedString(l *lexer) error {
 		l.next()
 	}
 	if l.bufferSize() < 4 {
-		return fmt.Errorf("insufficient chars for four-char code value, got %q", l.buffer())
+		return fmt.Errorf("four-char code data is too short: %s", l.line())
 	}
 	if !isPrintableString(l.buffer()) {
-		msg := "invalid chars for four-char code value, got these (shown in hex:) %X"
-		return fmt.Errorf(msg, l.buffer())
+		return fmt.Errorf("four-char code data has invalid characters: %s", l.line())
 	}
 
 	// Check for single quote
 	if l.next() != '\'' {
-		return fmt.Errorf("expected single quote to end four-char code value, got: %s", l.buffer())
+		return fmt.Errorf("four-char code value should end with single-quote: %s", l.line())
 	}
 	return nil
 }
@@ -566,16 +600,14 @@ func lexEndOfLine(l *lexer) stateFn {
 		l.ignore()
 		return lexLine
 	}
-
-	fmt := "trailing characters at end of line: %q"
-	return l.errorf(fmt, l.buffer())
+	return l.errorf("trailing characters at end of line: %s", l.line())
 }
 
 func lexString(l *lexer) stateFn {
 	// Read double quote
 	if l.next() != '"' {
-		fmt := "expected double quote to start string value, got `%c'"
-		return l.errorf(fmt, l.first())
+		l.backup()
+		return l.errorf("string data should start with double-quote: %s", l.line())
 	}
 
 	// Read in chars
@@ -587,17 +619,19 @@ func lexString(l *lexer) stateFn {
 		case '\\':
 			r = l.next()
 			if !strings.ContainsRune("\\\"nrx", r) {
-				return l.errorf("string has invalid escape: %s", l.buffer())
+				l.backup()
+				return l.errorf("invalid escape in string data: %-", l.line())
 			}
 		case '"':
 			done = true
 		case '\n':
-			return l.errorf("unterminated string, got %q", l.buffer())
+			l.backup()
+			return l.errorf("unterminated string data: %s", l.line())
 		}
 	}
 
 	if r != '"' {
-		return l.errorf("unterminated string data, got %q", l.buffer())
+		return l.errorf("unterminated string data: %s", l.line())
 	}
 
 	l.emit(itemString)
@@ -800,8 +834,7 @@ func parseAtomName(p *parser) parseFunc {
 	case itemContainerEnd:
 		return parseContainerEnd(p)
 	default:
-		p.err = fmt.Errorf("line %d: expecting atom name, got %s", it.line, it.typ)
-		panic(p.err)
+		return p.errorf("line %d: expecting atom name, got %s", it.line, it.typ)
 	}
 	return parseAtomType
 }
@@ -918,9 +951,7 @@ func parseFC32Value(p *parser) parseFunc {
 	default:
 		return p.errorf("expected atom data with type FC32, got type %s", it.typ)
 	}
-
-	err := p.theAtom.Value.SetString(it.value)
-	if err != nil {
+	if err := p.theAtom.Value.SetString(it.value); err != nil {
 		return p.errorf("failed to set FC32 atom data (%s): %s", it.value, err.Error())
 	}
 	return parseAtomName

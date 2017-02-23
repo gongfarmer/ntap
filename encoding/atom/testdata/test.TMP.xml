@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
-	<container name="SMAL">
-		<atom name="TEST" type="FC32" value="0x0D0D0D0D"/>
-	</container>
-</containerxml>

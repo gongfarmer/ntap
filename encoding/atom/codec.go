@@ -1086,9 +1086,9 @@ func SetUI01FromString(a *Atom, v string) (e error) {
 		a.data = make([]byte, 4)
 	}
 	switch v {
-	case "false", "0":
+	case "false", "0", "+0", "-0":
 		binary.BigEndian.PutUint32(a.data, uint32(0))
-	case "true", "1":
+	case "true", "1", "+1":
 		binary.BigEndian.PutUint32(a.data, uint32(1))
 	default:
 		e = errStrInvalid("UI01", v)

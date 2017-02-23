@@ -20,7 +20,5 @@
 		{}[]:CSTR:"This CSTR is named '{}[]' "
 		'<,>:CSTR:"This CSTR is named ''<,>' "
 		|:;":CSTR:"This CSTR is named '|:;\"' "
-		".?/:CSTR:"This CSTR is named '".?/' "
-		
 	END
 END

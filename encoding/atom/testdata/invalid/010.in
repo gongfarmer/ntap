@@ -1,0 +1,4 @@
+# CSTR has unquoted integer value
+TEST:CONT:
+		snum:CSTR:1
+END 

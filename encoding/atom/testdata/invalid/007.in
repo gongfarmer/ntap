@@ -1,0 +1,4 @@
+# Empty FC32 value
+TEST:CONT:
+	 TEST:FC32:''
+END 
