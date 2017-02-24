@@ -209,16 +209,19 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 		panic(err)
 	}
 
-	// Strip all newlines
-	buffer = bytes.Replace(buffer, []byte("\n"), nil, -1)
-	buffer = bytes.Replace(buffer, []byte("\r"), nil, -1)
-
-	// Strip all spaces
-	buffer = bytes.Replace(buffer, []byte(" "), nil, -1)
+	// Strip newlines, spaces
+	var clean = make([]byte, 0, len(buffer))
+	for _, b := range buffer {
+		if b != '\n' && b != '\r' && b != ' ' {
+			clean = append(clean, b)
+		}
+	}
 
 	// Strip leading 0x
-	if string(buffer[0:2]) == "0x" {
-		buffer = buffer[2:]
+	if string(clean[0:2]) == "0x" {
+		buffer = clean[2:]
+	} else {
+		buffer = clean
 	}
 
 	// Convert pairs of hex values to single bytes
