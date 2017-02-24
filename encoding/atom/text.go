@@ -620,7 +620,7 @@ func lexString(l *lexer) stateFn {
 			r = l.next()
 			if !strings.ContainsRune("\\\"nrx", r) {
 				l.backup()
-				return l.errorf("invalid escape in string data: %-", l.line())
+				return l.errorf("invalid escape in string data: %s", l.line())
 			}
 		case '"':
 			done = true

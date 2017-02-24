@@ -1,3 +1,4 @@
+// ccat converts binary AtomContainer data into text.
 package main
 
 import (
@@ -6,57 +7,120 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
+	"strings"
 
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
 
-var FlagOutputHex = flag.Bool("X", false, "print atom as hex string")
-var FlagOutputXml = flag.Bool("x", false, "print atom as xml")
-var FlagOutputDebug = flag.Bool("d", false, "print atoms in verbose debug format")
+var (
+	FlagFilename    = flag.String("o", "", "write output to file")
+	FlagOutputXml   = flag.Bool("x", false, "print atom as xml")
+	FlagOutputHex   = flag.Bool("X", false, "print atom as hex string")
+	FlagOutputDebug = flag.Bool("d", false, "print atoms in verbose debug format")
+)
+
+func usage() {
+	fmt.Fprintln(os.Stderr, "Usage: ccat [options] [<file> ...]")
+	fmt.Fprintln(os.Stderr, "       cat <file> | ccat [options]")
+	fmt.Fprintln(os.Stderr, "Purpose:")
+	fmt.Fprintln(os.Stderr, "       Read atoms from ADE binary container format, write them as various text formats.")
+	fmt.Fprintln(os.Stderr, "       Reads input from STDIN if no filenames given.")
+	fmt.Fprintln(os.Stderr, "       Input may also be a hex representation of the binary format.")
+	fmt.Fprintln(os.Stderr, "Options:")
+	flag.PrintDefaults()
+	os.Exit(2)
+}
+
+type formatWriter func(io.Writer, *atom.Atom)
+
+func (f formatWriter) formatter(w io.Writer) func(*atom.Atom) {
+	return func(a *atom.Atom) { f(w, a) }
+}
 
 func main() {
+	flag.Usage = usage
 	flag.Parse()
-
-	// Read atom data from files
-	var files = os.Args[1:]
-	atoms, err := MakeAtoms(files)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	log.SetFlags(0)
+	log.SetPrefix("ccat: ")
+	if flag.NArg() == 0 {
+		usage()
 	}
-	PrintAtoms(atoms)
+
+	// Read atom data
+	var files = filter(os.Args[1:],
+		func(s string) bool { return !strings.HasPrefix(s, "-") && !(s == *FlagFilename) })
+	atoms, err := ReadAtomsFromInput(files)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
+	// Make Writer for output stream
+	var output io.Writer
+	if "" == *FlagFilename {
+		output = os.Stdout
+	} else {
+		output, err = os.OpenFile(*FlagFilename, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+
+	// Choose output format, pair with output stream
+	var atomPrinterFunc func(*atom.Atom)
+	if true == *FlagOutputDebug {
+		atomPrinterFunc = formatWriter(printAtomDebug).formatter(output)
+	} else if true == *FlagOutputHex {
+		atomPrinterFunc = formatWriter(printAtomHex).formatter(output)
+	} else if true == *FlagOutputXml {
+		panic("XML output not implemented yet")
+	} else {
+		atomPrinterFunc = formatWriter(printAtomText).formatter(output)
+	}
+
+	WriteAtoms(atoms, atomPrinterFunc)
 	os.Exit(0)
 }
 
-func printDebug(a *atom.Atom) {
+// print atoms in grossly verbose format showing atom data in hex
+func printAtomDebug(w io.Writer, a *atom.Atom) {
 	atoms := a.AtomList()
 	for _, a := range atoms {
-		fmt.Printf("name: \"%s\"\n", a.Name)
-		fmt.Printf("type: \"%s\"\n", a.Type())
+		fmt.Fprintf(w, "name: \"%s\"\n", a.Name)
+		fmt.Fprintf(w, "type: \"%s\"\n", a.Type())
 		strData, err := a.Value.String()
 		if err != nil {
-			fmt.Printf(err.Error())
-			os.Exit(1)
+			log.Fatalf(err.Error())
 		}
 		bytesData, err := a.Value.SliceOfByte()
 		if err != nil {
-			fmt.Printf(err.Error())
-			os.Exit(1)
+			log.Fatalf(err.Error())
 		}
-		fmt.Printf("data: \"%s\"\n", strData) // value as string
-		fmt.Printf("      % x\n", bytesData)  // value as bytes
-		fmt.Println("--")
+		fmt.Fprintf(w, "data: \"%s\"\n", strData) // value as string
+		fmt.Fprintf(w, "      % x\n", bytesData)  // value as bytes
+		fmt.Fprintln(w, "--")
 	}
 }
 
-func printString(a *atom.Atom) {
+// Print atom as ADE Container Text
+func printAtomText(w io.Writer, a *atom.Atom) {
 	buf, err := a.MarshalText()
 	if err != nil {
-		fmt.Printf("failed to print AtomContainer: %s\n", err)
+		log.Printf("failed to print AtomContainer: %s\n", err)
 		return
 	}
-	fmt.Print(string(buf))
+	fmt.Fprint(w, string(buf))
+}
+
+// Print atom as hex representation of binary-form bytes
+func printAtomHex(w io.Writer, a *atom.Atom) {
+	buf, err := a.MarshalBinary()
+	if err != nil {
+		log.Printf("failed to print AtomContainer: %s\n", err)
+		return
+	}
+	fmt.Fprintf(w, "0x%X\n", buf)
 }
 
 func stdinIsEmpty() bool {
@@ -64,9 +128,9 @@ func stdinIsEmpty() bool {
 	return (stat.Mode() & os.ModeCharDevice) != 0
 }
 
-// Read file contents and return Atom instances.
-// If no files are provided, read STDIN.
-func MakeAtoms(files []string) (atoms []*atom.Atom, err error) {
+// Read input and return Atoms.
+// If no files are provided, read from STDIN.
+func ReadAtomsFromInput(files []string) (atoms []*atom.Atom, err error) {
 	if len(files) == 0 && stdinIsEmpty() {
 		return
 	}
@@ -74,7 +138,7 @@ func MakeAtoms(files []string) (atoms []*atom.Atom, err error) {
 	var buffer []byte
 	var someAtoms []*atom.Atom
 
-	if len(files) == 0 { // Read STDIN
+	if len(files) == 0 { // Read STDIN only if no files provided
 		buffer, err = ioutil.ReadAll(os.Stdin)
 		if err != nil && err != io.EOF {
 			return
@@ -106,12 +170,23 @@ func MakeAtoms(files []string) (atoms []*atom.Atom, err error) {
 	return
 }
 
-func PrintAtoms(atoms []*atom.Atom) {
-	for _, a := range atoms {
-		if true == *FlagOutputDebug {
-			printDebug(a)
-		} else {
-			printString(a)
+// Filter array items based on test function
+func filter(ss []string, testFunc func(string) bool) (out []string) {
+	for _, s := range ss {
+		if testFunc(s) {
+			out = append(out, s)
 		}
+	}
+	return out
+}
+
+// WriteAtoms writes each atom using the given print function, which includes
+// an output stream writer and an output format.
+//
+// This bit of code is a separate function so it can be a target for test and
+// benchmark code.  See main_test.go.
+func WriteAtoms(atoms []*atom.Atom, printFunc func(*atom.Atom)) {
+	for _, a := range atoms {
+		printFunc(a)
 	}
 }

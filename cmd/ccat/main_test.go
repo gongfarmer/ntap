@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -10,6 +11,7 @@ import (
 
 var TestFiles []string
 var TestAtoms []*atom.Atom
+var atomPrinterFunc = formatWriter(printAtomText).formatter(ioutil.Discard)
 
 func init() {
 	TestFiles = findTestFiles()
@@ -22,13 +24,14 @@ func findTestFiles() []string {
 	return files
 }
 
-func BenchmarkMakeAtoms(b *testing.B) {
+func BenchmarkReadAtomsFromInput(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		TestAtoms, _ = MakeAtoms(TestFiles)
+		TestAtoms, _ = ReadAtomsFromInput(TestFiles)
 	}
 }
-func BenchmarkPrintAtoms(b *testing.B) {
+func BenchmarkWriteAtoms(b *testing.B) {
+
 	for n := 0; n < b.N; n++ {
-		PrintAtoms(TestAtoms)
+		WriteAtoms(TestAtoms, atomPrinterFunc)
 	}
 }

@@ -9,10 +9,10 @@ import (
 	"testing"
 )
 
-// implement function currying for err funcs so that I can specify the type and
+// implement function curryErrFuncing for err funcs so that I can specify the type and
 // expected bytes at the top of the test func, and the amount of bytes provided
 // in each test separately.
-func (f errFunc) curry(strAdeType string, want int) func(int) error {
+func (f errFunc) curryErrFunc(strAdeType string, want int) func(int) error {
 	return func(got int) error {
 		return f(strAdeType, want, got)
 	}
@@ -70,7 +70,7 @@ func runDecoderTests(t *testing.T, tests []decoderTest, f decodeFunc) {
 // *** unit tests
 
 func TestUI08ToUint64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI08", 1)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI08", 1)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00"), uint64(0), nil},
 		decoderTest{[]byte("\x01"), uint64(1), nil},
@@ -88,7 +88,7 @@ func TestUI08ToUint64(t *testing.T) {
 }
 
 func TestUI16ToUint64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI16", 2)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI16", 2)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00"), uint64(0), nil},
 		decoderTest{[]byte("\x00\xFF"), uint64(255), nil},
@@ -105,7 +105,7 @@ func TestUI16ToUint64(t *testing.T) {
 }
 
 func TestUI32ToUint64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI32", 4)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), uint64(0), nil},
 		decoderTest{[]byte("\x00\x00\x00\xFF"), uint64(0xFF), nil},
@@ -127,7 +127,7 @@ func TestUI32ToUint64(t *testing.T) {
 }
 
 func TestUI64ToUint64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI64", 8)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), uint64(0), nil},
 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), uint64(0xFF), nil},
@@ -157,7 +157,7 @@ func TestUI64ToUint64(t *testing.T) {
 }
 
 func TestUI01ToBool(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI01", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI01", 4)
 	zero := false
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), false, nil},
@@ -180,7 +180,7 @@ func TestUI01ToBool(t *testing.T) {
 }
 
 func funcUI32ToUint32(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI32", 4)
 	zero := uint32(0)
 	tests := []decoderTest{
 		decoderTest{[]byte{}, zero, byteCountErr(0)},
@@ -197,7 +197,7 @@ func funcUI32ToUint32(t *testing.T) {
 }
 
 func TestUI08ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI08", 1)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI08", 1)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00"), "0", nil},
@@ -216,7 +216,7 @@ func TestUI08ToString(t *testing.T) {
 }
 
 func TestUI16ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI16", 2)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI16", 2)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00"), "0", nil},
@@ -235,7 +235,7 @@ func TestUI16ToString(t *testing.T) {
 }
 
 func TestUI32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), "0", nil},
@@ -256,7 +256,7 @@ func TestUI32ToString(t *testing.T) {
 }
 
 func TestUI64ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UI64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI64", 8)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
@@ -281,7 +281,7 @@ func TestUI64ToString(t *testing.T) {
 }
 
 func TestSI08ToInt64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI08", 1)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI08", 1)
 	zero := int64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00"), int64(0), nil},
@@ -299,7 +299,7 @@ func TestSI08ToInt64(t *testing.T) {
 }
 
 func TestSI16ToInt64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI16", 2)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI16", 2)
 	zero := int64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00"), int64(0), nil},
@@ -317,7 +317,7 @@ func TestSI16ToInt64(t *testing.T) {
 }
 
 func TestSI32ToInt32(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI32", 4)
 	zero := int32(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), int32(0), nil},
@@ -340,7 +340,7 @@ func TestSI32ToInt32(t *testing.T) {
 }
 
 func TestSI32ToInt64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI32", 4)
 	zero := int64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), int64(0), nil},
@@ -363,7 +363,7 @@ func TestSI32ToInt64(t *testing.T) {
 }
 
 func TestSI64ToInt64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI64", 8)
 	zero := int64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), nil},
@@ -390,7 +390,7 @@ func TestSI64ToInt64(t *testing.T) {
 }
 
 func TestSI08ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI08", 1)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI08", 1)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00"), "0", nil},
@@ -408,7 +408,7 @@ func TestSI08ToString(t *testing.T) {
 }
 
 func TestSI16ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI16", 2)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI16", 2)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00"), "0", nil},
@@ -426,7 +426,7 @@ func TestSI16ToString(t *testing.T) {
 }
 
 func TestSI32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), "0", nil},
@@ -449,7 +449,7 @@ func TestSI32ToString(t *testing.T) {
 }
 
 func TestSI64ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SI64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI64", 8)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "0", nil},
@@ -478,7 +478,7 @@ func TestSI64ToString(t *testing.T) {
 // FP32 has a range magnitude minimum of 1.1754E-38 and a range magnitude
 // maximum of 3.4028E+38 (either can be positive or negative).
 func TestFP32ToFloat32(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FP32", 4)
 	zero := float32(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), float32(0.0), nil},
@@ -507,7 +507,7 @@ func TestFP32ToFloat32(t *testing.T) {
 }
 
 func TestFP32ToFloat64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FP32", 4)
 	zero := float64(0)
 	tests := []decoderTest{
 		// must cast expected result to float32 first, otherwise the float64 has
@@ -538,7 +538,7 @@ func TestFP32ToFloat64(t *testing.T) {
 }
 
 func TestFP64ToFloat64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FP64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FP64", 8)
 	zero := float64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), float64(-1.23456789012345672E+09), nil},
@@ -566,7 +566,7 @@ func TestFP64ToFloat64(t *testing.T) {
 }
 
 func TestFP32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FP32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FP32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), "0", nil},
@@ -595,7 +595,7 @@ func TestFP32ToString(t *testing.T) {
 }
 
 func TestFP64ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FP64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FP64", 8)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), "-1.23456789012345672E+09", nil},
@@ -624,7 +624,7 @@ func TestFP64ToString(t *testing.T) {
 
 // // FIXME
 // func TestUF32ToFloat64(t *testing.T) {
-// 	byteCountErr := errFunc(errByteCount).curry("UF32", 4)
+// 	byteCountErr := errFunc(errByteCount).curryErrFunc("UF32", 4)
 // 	tests := []decoderTest{
 // 		decoderTest{[]byte("\x00\x00\x00\x00"), float64(float32(0.0000), nil},
 // 		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
@@ -640,7 +640,7 @@ func TestFP64ToString(t *testing.T) {
 // }
 
 func TestUF64ToFloat64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UF64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UF64", 8)
 	zero := float64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), float64(4294967295.999999999), nil},
@@ -853,7 +853,7 @@ func TestUF64ToFloat64(t *testing.T) {
 //func SF64ToString(buf []byte) (v string, e error) {
 
 func TestUR32ToSliceOfUint(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UR32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UR32", 4)
 	zero := []uint64(nil)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x01\x00\x01"), []uint64{1, 1}, nil},
@@ -876,7 +876,7 @@ func TestUR32ToSliceOfUint(t *testing.T) {
 }
 
 func TestUR64ToSliceOfUint(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UR64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UR64", 8)
 	zero := []uint64(nil)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []uint64{1, 1}, nil},
@@ -898,7 +898,7 @@ func TestUR64ToSliceOfUint(t *testing.T) {
 }
 
 func TestUR32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UR32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UR32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
@@ -921,7 +921,7 @@ func TestUR32ToString(t *testing.T) {
 }
 
 func TestUR64ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UR64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UR64", 8)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
@@ -942,7 +942,7 @@ func TestUR64ToString(t *testing.T) {
 	})
 }
 func TestSR32ToSliceOfInt(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SR32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SR32", 4)
 	zero := []int64(nil)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x01\x00\x01"), []int64{1, 1}, nil},
@@ -970,7 +970,7 @@ func TestSR32ToSliceOfInt(t *testing.T) {
 	})
 }
 func TestSR64ToSliceOfInt(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SR64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SR64", 8)
 	zero := []int64(nil)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), []int64{1, 1}, nil},
@@ -1000,7 +1000,7 @@ func TestSR64ToSliceOfInt(t *testing.T) {
 }
 
 func TestSR32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SR32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SR32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x01\x00\x01"), "1/1", nil},
@@ -1029,7 +1029,7 @@ func TestSR32ToString(t *testing.T) {
 	})
 }
 func TestSR64ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("SR64", 8)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SR64", 8)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x01"), "1/1", nil},
@@ -1059,7 +1059,7 @@ func TestSR64ToString(t *testing.T) {
 }
 
 func funcFC32ToUint32(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FC32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FC32", 4)
 	zero := 0
 	tests := []decoderTest{
 		decoderTest{[]byte("\x20\x7e\x7d\x7c"), uint32(0x207e7d7c), nil},
@@ -1137,7 +1137,7 @@ func funcFC32ToUint32(t *testing.T) {
 }
 
 func TestFC32ToStringDelimited(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FC32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FC32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
@@ -1214,7 +1214,7 @@ func TestFC32ToStringDelimited(t *testing.T) {
 	})
 }
 func TestFC32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("FC32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FC32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
@@ -1270,7 +1270,7 @@ func TestFC32ToString(t *testing.T) {
 }
 
 func TestUUIDToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("UUID", 16)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UUID", 16)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), "64881431-B6DC-478E-B7EE-ED306619C797", nil},
@@ -1291,7 +1291,7 @@ func TestUUIDToString(t *testing.T) {
 }
 
 func TestIP32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("IP32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("IP32", 4)
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), "0.0.0.0", nil},
@@ -1310,7 +1310,7 @@ func TestIP32ToString(t *testing.T) {
 }
 
 func TestIP32ToUint64(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curry("IP32", 4)
+	byteCountErr := errFunc(errByteCount).curryErrFunc("IP32", 4)
 	zero := uint64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00"), uint64(0), nil},
