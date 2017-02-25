@@ -43,6 +43,7 @@ func BenchmarkMarshalBinary(b *testing.B) {
 			}
 		}
 	}
+	b.ReportAllocs()
 }
 func BenchmarkUnmarshalBinary(b *testing.B) {
 	var a = new(Atom)
@@ -53,6 +54,7 @@ func BenchmarkUnmarshalBinary(b *testing.B) {
 			}
 		}
 	}
+	b.ReportAllocs()
 }
 func BenchmarkMarshalText(b *testing.B) {
 	for n := 0; n < b.N; n++ {
@@ -62,6 +64,7 @@ func BenchmarkMarshalText(b *testing.B) {
 			}
 		}
 	}
+	b.ReportAllocs()
 }
 func BenchmarkUnmarshalText(b *testing.B) {
 	var a = new(Atom)
@@ -72,6 +75,7 @@ func BenchmarkUnmarshalText(b *testing.B) {
 			}
 		}
 	}
+	b.ReportAllocs()
 }
 
 func txtTestFiles() (files []string) {

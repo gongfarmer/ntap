@@ -33,7 +33,7 @@ type containerStack []cont
 // removing the element. Second return value is false if stack is empty.
 func (s *containerStack) Peek() (value *cont, ok bool) {
 	if len(*s) == 0 {
-		value, ok = &(cont{}), false
+		value, ok = nil, false
 	} else {
 		value, ok = &((*s)[len(*s)-1]), true
 	}
@@ -126,7 +126,7 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	return err
 }
 
-// ReadAtomsFromBinary reads bytes from a reader. It expectst he byte stream to
+// ReadAtomsFromBinary reads bytes from a reader. It expects the byte stream to
 // describe 0 or more ADE binary AtomContainers.
 // It reconstructs all the AtomContainers found and returns them in an array of Atom objects.
 // Returns an error if the byte stream contains invalid binary container data.
@@ -257,9 +257,9 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 // MarshalBinary serializes an Atom to a byte slice in ADE binary format.
 //
 // It implements the encoding.BinaryMarshaler interface.
-func (a *Atom) MarshalBinary() (data []byte, err error) {
+func (a *Atom) MarshalBinary() ([]byte, error) {
 	buf := new(bytes.Buffer)
-	err = a.BinaryWrite(buf)
+	err := a.BinaryWrite(buf)
 	return buf.Bytes(), err
 }
 
