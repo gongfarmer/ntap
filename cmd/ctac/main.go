@@ -1,61 +1,110 @@
+// ctac converts ADE ContainerText into binary.
 package main
 
 import (
+	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"log"
 	"os"
+	"strings"
 
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
 
-const helpText = `
-Usage: ctac <filename> <outfilename>
-Purpose: This program reads a text file containing ADE ContainerText and writes
-a binary file containing the same data in the ADE binary container format.
-`
+func usage() {
+	fmt.Fprintf(os.Stderr, "Usage: ctac <filename> <outfilename>\n")
+	fmt.Fprintf(os.Stderr, "       cat <filename> | ctac <outfilename>\n")
+	fmt.Fprintf(os.Stderr, "Purpose: Read atoms from ADE Container Text format, write them as binary containers.\n")
+	fmt.Fprintf(os.Stderr, "         <outfilename> may be \"-\" to print binary chars as output.\n")
+	//	fmt.Fprintln(os.Stderr, "Options:")
+	//	flag.PrintDefaults()
+	os.Exit(2)
+}
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Please provide input filename.\n")
-		fmt.Println("The input should be a text file in ADE ContainerText format.\n")
-		os.Exit(1)
+	flag.Usage = usage
+	flag.Parse()
+	log.SetFlags(0)
+	log.SetPrefix("ctac: ")
+	if flag.NArg() == 0 {
+		usage()
 	}
-	inFile := os.Args[1]
 
-	if len(os.Args) < 3 {
-		fmt.Println("Please provide output filename.\n")
-		os.Exit(1)
+	// Set up input, output
+	var args = os.Args[1:]
+	var input io.Reader
+	var output io.Writer
+	input, args = setInput(args)
+	output, args = setOutput(args)
+	if len(args) != 0 {
+		log.Fatalf("unused arguments: %s", strings.Join(args, " "))
 	}
-	outFile := os.Args[2]
 
-	var a atom.Atom
+	// Read text frominput
 	var buf []byte
-	var err error
-
-	if buf, err = ioutil.ReadFile(inFile); err != nil {
-		fmt.Println("ctac: Unable to read input file: ", err)
-		os.Exit(1)
+	_, err := input.Read(buf)
+	if err != nil {
+		log.Fatalf("unable to read input: ", err)
 	}
 
-	// FIXME strip out comments
-
-	// Read input file
+	// Convert text to atom
+	var a atom.Atom
 	if err = a.UnmarshalText(buf); err != nil {
-		fmt.Println("ctac: Invalid input container: ", err)
-		os.Exit(1)
+		log.Fatalf("Invalid input container: ", err)
 	}
 
-	// Convert to binary
+	// Convert atom to binary
 	buf, err = a.MarshalBinary()
 	if err != nil {
-		fmt.Println("ctac: Unable to convert container to binary: ", err)
-		os.Exit(1)
+		log.Fatalf("Unable to convert container to binary: ", err)
 	}
 
 	// Write binary to file
-	err = ioutil.WriteFile(outFile, buf, 0777)
+	_, err = output.Write(buf)
 	if err != nil {
-		fmt.Println("ctac: Unable to write to file: ", err)
-		os.Exit(1)
+		log.Fatalf("Unable to write to file: ", err)
 	}
+}
+
+// stdinIsEmpty returns true if there is nothing to read on STDIN
+func stdinIsEmpty() bool {
+	stat, _ := os.Stdin.Stat()
+	return (stat.Mode() & os.ModeCharDevice) != 0
+}
+
+// Define how to get input text, based on command line arguments
+func setInput(argv []string) (input io.Reader, args []string) {
+	var err error
+	if !stdinIsEmpty() {
+		input = os.Stdin
+	} else if len(argv) == 0 {
+		fmt.Fprintln(os.Stderr, "Please provide input filename, or pipe in some text.")
+		usage()
+	} else {
+		if input, err = os.Open(argv[0]); err != nil {
+			log.Fatalf(err.Error())
+		}
+		args = argv[1:]
+	}
+	return
+}
+
+// Define where to send output, based on command line arguments
+func setOutput(argv []string) (output io.Writer, args []string) {
+	var err error
+	if len(argv) == 0 {
+		log.Fatalf("Please provide output filename, or - to get binary on STDOUT")
+	} else {
+		if argv[0] == "-" {
+			output = os.Stdout
+		} else {
+			output, err = os.OpenFile(args[0], os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+			if err != nil {
+				log.Fatalf(err.Error())
+			}
+			args = args[1:]
+		}
+	}
+	return
 }

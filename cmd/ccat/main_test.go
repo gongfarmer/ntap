@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -9,12 +10,18 @@ import (
 	"github.com/gongfarmer/ntap/encoding/atom"
 )
 
-var TestFiles []string
 var TestAtoms []*atom.Atom
+var TestBytes [][]byte
 var atomPrinterFunc = formatWriter(printAtomText).formatter(ioutil.Discard)
 
 func init() {
-	TestFiles = findTestFiles()
+	for _, f := range findTestFiles() {
+		buf, err := ioutil.ReadFile(f)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+		TestBytes = append(TestBytes, buf)
+	}
 }
 
 func findTestFiles() []string {
@@ -24,14 +31,34 @@ func findTestFiles() []string {
 	return files
 }
 
-func BenchmarkReadAtomsFromInput(b *testing.B) {
+func BenchmarkUnmarshalBinary(b *testing.B) {
+	var a = new(atom.Atom)
 	for n := 0; n < b.N; n++ {
-		TestAtoms, _ = ReadAtomsFromInput(TestFiles)
+		for _, buf := range TestBytes {
+			if err := a.UnmarshalBinary(buf); err != nil {
+				panic(err)
+			}
+		}
 	}
 }
-func BenchmarkWriteAtoms(b *testing.B) {
 
+func BenchmarkMarshalText(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		WriteAtoms(TestAtoms, atomPrinterFunc)
+		for _, a := range TestAtoms {
+			if _, err := a.MarshalText(); err != nil {
+				panic(err)
+			}
+		}
 	}
+}
+
+func ReadAtoms(atomBytes [][]byte) (atoms []*atom.Atom) {
+	for _, buf := range atomBytes {
+		a := new(atom.Atom)
+		if err := a.UnmarshalBinary(buf); err != nil {
+			panic(err)
+		}
+		atoms = append(atoms, a)
+	}
+	return
 }

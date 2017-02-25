@@ -7,12 +7,10 @@ Each test has four files associated with it. For example, the SQSB test file has
 	SQSB.txt : Expected TXT output from running ccat on SQSB.bin
 
 The binary (*.bin) container files used in these tests were all generated from
-the original *.in files, which are included here (but not actually used in the
-testing process.)
+the original *.in files, which are included here.
 
 The numbered testXX.in files were designed to exercise all parts of the library
-and reproduce bugs.  All other *.in test files are real-world samples taken
-from the source tree.
+and reproduce bugs.  
 
 test01.in : - Lots of weird, tricky container names, most with colons
 test02.in : - Containers with and without a trailing colon
@@ -26,6 +24,9 @@ test04.in : - tests negative values in ENUMs
 test05.in : - tests IP32 Arrays
 test06.in : - Uses hex in node names
 
+The files in from_grid/ were taken from a live grid running StorageGrid Webscale 10.4.0 (pre-release.)
+
+The files in invalid/ are supposed to be unparseable.  Some of them are actually parsed by ADE ccat though.
 
 Tests are run on the binary files (*.bin), which are generated from their
 corresponding text files (*.in).  The xml files are known good versions of the

@@ -3,6 +3,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"flag"
 	"fmt"
 	"io"
@@ -44,13 +45,13 @@ func main() {
 	flag.Parse()
 	log.SetFlags(0)
 	log.SetPrefix("ccat: ")
-	if flag.NArg() == 0 {
+	if flag.NArg() == 0 && stdinIsEmpty() {
 		usage()
 	}
 
 	// Read atom data
-	var files = filter(os.Args[1:],
-		func(s string) bool { return !strings.HasPrefix(s, "-") && !(s == *FlagFilename) })
+	var files = filter(os.Args[1:], func(s string) bool { return !strings.HasPrefix(s, "-") && s != *FlagFilename })
+
 	atoms, err := ReadAtomsFromInput(files)
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -138,16 +139,23 @@ func ReadAtomsFromInput(files []string) (atoms []*atom.Atom, err error) {
 	var buffer []byte
 	var someAtoms []*atom.Atom
 
-	if len(files) == 0 { // Read STDIN only if no files provided
+	if len(files) == 0 {
+		// Read STDIN if no files provided
 		buffer, err = ioutil.ReadAll(os.Stdin)
 		if err != nil && err != io.EOF {
 			return
 		}
 
 		// Convert input to atoms
-		someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+		if uint32(len(buffer)) == binary.BigEndian.Uint32(buffer[0:4]) {
+			someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+		} else if string(buffer[0:2]) == "0x" {
+			someAtoms, err = atom.ReadAtomsFromHex(bytes.NewReader(buffer))
+		} else {
+			log.Fatalf("STDIN length (%d) does not match encoded size(%d) , not a binary atom container.", len(buffer), binary.BigEndian.Uint32(buffer[0:4]))
+		}
 		if err != nil {
-			return
+			log.Fatalf("failed to parse STDIN as atom container: %s", err.Error())
 		}
 		atoms = append(atoms, someAtoms...)
 	}
@@ -156,13 +164,19 @@ func ReadAtomsFromInput(files []string) (atoms []*atom.Atom, err error) {
 	for _, path := range files {
 		buffer, err = ioutil.ReadFile(path)
 		if err != nil && err != io.EOF {
-			return atoms, fmt.Errorf("failed to read file %s: %s\n", path, err)
+			return atoms, err // no need to add filepath, it's in the error
 		}
 
-		// convert to atoms
-		someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+		// convert to atoms.
+		if uint32(len(buffer)) == binary.BigEndian.Uint32(buffer[0:4]) {
+			someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+		} else if string(buffer[0:1]) == "0x" {
+			someAtoms, err = atom.ReadAtomsFromHex(bytes.NewReader(buffer))
+		} else {
+			log.Fatalf("file size (%d) does not match encoded size(%d), this is not a binary atom container: %s", len(buffer), binary.BigEndian.Uint32(buffer[0:4]), path)
+		}
 		if err != nil {
-			return atoms, fmt.Errorf("failed to read atoms from %s: %s\n", path, err)
+			log.Fatalf("unable to parse file '%s' as a binary atom container: %s", path, err.Error())
 		}
 
 		atoms = append(atoms, someAtoms...)
