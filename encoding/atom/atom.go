@@ -29,64 +29,68 @@ type Atom struct {
 	typ      ADEType
 	data     []byte
 }
-type ADEType string
-type GoType string
 
-// Return true if string is printable, false otherwise
-func isPrintableString(s string) bool {
-	for _, r := range s {
-		if !unicode.IsPrint(r) {
-			return false
-		}
-	}
-	return true
-}
-
-// unicode.IsPrint does not work for this, it returns true for large swathes of
-// ascii 127-255.
-func isPrintableBytes(buf []byte) bool {
-	for _, b := range buf {
-		if !strings.ContainsRune(printableChars, rune(b)) {
-			return false
-		}
-	}
-	return true
-}
-
-// Read-only access to ADE data type
+// Type returns a copy of the atoms's ADE data type.
 func (a *Atom) Type() ADEType {
 	return a.typ
 }
 
-// Set atom type.
-// Get a codec that can write/read this ADE type.
-// Allocate proper amount of backing memory for non-String types.
+// Zero sets the atom to the type Atom's zero value.
+// It sets the atom data to a zero-length slice, releasing any
+// previous memory allocated for data.
+// It also empties the list of child atoms.
+func (a *Atom) Zero() {
+	a.Name = ""
+	a.SetType(NULL)
+	a.Children = []*Atom{}
+}
+
+// SetType sets the type of an Atom object, and handles updating the codec and
+// data fields to match.
 func (a *Atom) SetType(newType ADEType) {
 	a.typ = newType
 	a.Value = NewCodec(a)
 	a.ZeroData()
 }
 
-// Set atom data to zero value of its ADE type.
-// Allocate the correct amount of backing memory.
+// ZeroData sets an atom's data to the zero value of its ADE type.
+// For fixed-size types, the byte slice capacity remains the same so that a new
+// value can be set without needing memory allocation.
+// For variable-sized types, data is set to nil and all memory released for
+// garbage collection.
 func (a *Atom) ZeroData() {
 	switch a.typ {
 	case UI08, SI08:
-		a.data = make([]byte, 1)
+		zeroOrAllocateByteSlice(&a.data, 1)
 	case UI16, SI16:
-		a.data = make([]byte, 2)
+		zeroOrAllocateByteSlice(&a.data, 2)
 	case UI01, UI32, SI32, FP32, UF32, SF32, SR32, UR32, FC32, IP32, ENUM:
-		a.data = make([]byte, 4)
+		zeroOrAllocateByteSlice(&a.data, 4)
 	case UI64, SI64, FP64, UF64, SF64, UR64, SR64:
-		a.data = make([]byte, 8)
+		zeroOrAllocateByteSlice(&a.data, 8)
 	case UUID:
-		a.data = make([]byte, 36)
+		zeroOrAllocateByteSlice(&a.data, 36)
 	case IPAD, CSTR, USTR, DATA, CNCT, Cnct:
-		a.data = make([]byte, 0)
+		a.data = nil
 	case CONT, NULL:
-		a.data = make([]byte, 0)
+		a.data = nil
 	default:
 		panic(fmt.Sprintf("Unknown ADE type: %s", string(a.typ)))
+	}
+}
+
+// zeroOrAllocateByteSlice verifies that the give byte slice has
+// the specified capacity, and zeroes it out.
+// It avoids memory allocation when possible.
+func zeroOrAllocateByteSlice(buf *[]byte, size int) {
+	if cap(*buf) == size {
+		// zero out the buffer
+		for i, _ := range *buf {
+			(*buf)[i] = 0
+		}
+	} else {
+		// newly allocated mem is already zeroed
+		*buf = make([]byte, size)
 	}
 }
 
@@ -162,12 +166,23 @@ func checkError(err error) error {
 	panic(err)
 }
 
-// Sets this atom object to the zero value of an Atom.
-// Updates the atom data ptr to point to zero-length slice, releasing any
-// previous memory allocated for data.
-// Updates the list of children to an empty slice.
-func (a *Atom) Zero() {
-	a.Name = ""
-	a.SetType(NULL)
-	a.Children = []*Atom{}
+// Return true if string is printable, false otherwise
+func isPrintableString(s string) bool {
+	for _, r := range s {
+		if !unicode.IsPrint(r) {
+			return false
+		}
+	}
+	return true
+}
+
+// unicode.IsPrint does not work for this, it returns true for large swathes of
+// ascii 127-255.
+func isPrintableBytes(buf []byte) bool {
+	for _, b := range buf {
+		if !strings.ContainsRune(printableChars, rune(b)) {
+			return false
+		}
+	}
+	return true
 }

@@ -58,7 +58,15 @@ const (
 /**********************************************************/
 
 type (
-	// FIXME: switch these to interfaces?
+	ADEType string
+	GoType  string
+
+	codec struct {
+		Atom    *Atom
+		Decoder decoder
+		Encoder encoder
+		Writer  io.Writer // writes bytes directly to Atom.data
+	}
 	decoder struct {
 		String        func(buf []byte) (string, error)
 		StringEscaped func(buf []byte) (string, error)
@@ -81,12 +89,7 @@ type (
 		SetSliceOfInt    func(*Atom, []int64) error
 		SetSliceOfByte   func(*Atom, []byte) error
 	}
-	codec struct {
-		Atom    *Atom
-		Decoder decoder
-		Encoder encoder
-		Writer  io.Writer // writes bytes directly to Atom.data
-	}
+
 	uuidType struct {
 		TimeLow          uint32
 		TimeMid          uint16
@@ -95,10 +98,11 @@ type (
 		ClkSeqLow        uint8
 		Node             [6]byte
 	}
+
+	errFunc (func(string, int, int) error)
 )
 
-// error constructor functions
-type errFunc (func(string, int, int) error)
+// error construction functions
 
 func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
 	return fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", t, bytesWant, bytesGot)
