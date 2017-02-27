@@ -24,10 +24,10 @@ var _ encoding.TextMarshaler = &Atom{}
 
 type Atom struct {
 	Name     string
-	Value    *codec
-	Children []*Atom
 	typ      ADEType
 	data     []byte
+	Value    *codec
+	Children []*Atom
 }
 
 // Type returns a copy of the atoms's ADE data type.
@@ -84,7 +84,7 @@ func (a *Atom) ZeroData() {
 // It avoids memory allocation when possible.
 func zeroOrAllocateByteSlice(buf *[]byte, size int) {
 	if cap(*buf) == size {
-		// zero out the buffer
+		// zero out the buffer, O(1)
 		for i, _ := range *buf {
 			(*buf)[i] = 0
 		}
@@ -105,31 +105,31 @@ func (a Atom) String() string {
 
 // AddChild makes the Atom pointed to by the argument a child of this Atom.
 // Returns false when called on non-container Atoms.
-func (c *Atom) AddChild(a *Atom) bool {
-	if c.typ != CONT {
+func (a *Atom) AddChild(child *Atom) bool {
+	if a.typ != CONT {
 		return false
 	}
-	c.Children = append(c.Children, a)
+	a.Children = append(a.Children, child)
 	return true
 }
 
 // NumChildren returns a count of the number of children of this Atom.
 // Returns -1 for non-container Atoms.
-func (c *Atom) NumChildren() int {
-	if c.typ != CONT {
+func (a *Atom) NumChildren() int {
+	if a.typ != CONT {
 		return -1
 	}
-	return len(c.Children)
+	return len(a.Children)
 }
 
 // AtomList returns a list of pointers to every Atom in hierarchical order.
-func (c *Atom) AtomList() []*Atom {
-	return c.getAtomList(new([]*Atom))
+func (a *Atom) AtomList() []*Atom {
+	return a.getAtomList(new([]*Atom))
 }
-func (c *Atom) getAtomList(list *([]*Atom)) []*Atom {
-	*list = append(*list, c)
-	for _, a := range c.Children {
-		a.getAtomList(list)
+func (a *Atom) getAtomList(list *([]*Atom)) []*Atom {
+	*list = append(*list, a)
+	for _, child := range a.Children {
+		child.getAtomList(list)
 	}
 	return *list
 }

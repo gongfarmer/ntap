@@ -57,7 +57,6 @@ func (s *containerStack) Pop() cont {
 
 // Pop fully-read containers off the container stack based on the given byte
 // position.
-// FIXME: handle corrupt container case where cont length is incorrect
 func (s *containerStack) PopCompleted(pos uint32) []*Atom {
 	var closedConts []*Atom
 	// Pop until the given byte offset precedes the top object's end position.
@@ -110,7 +109,7 @@ func (a *Atom) UnmarshalBinary(data []byte) error {
 func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	atoms, err := ReadAtomsFromBinary(r)
 	if err != nil {
-		panic(fmt.Errorf("Failed to parse binary stream: %s", err))
+		return fmt.Errorf("Failed to parse binary stream: %s", err.Error())
 	}
 
 	// Set receiver to the sole top-level AtomContainer
@@ -119,9 +118,9 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 		a.Zero()
 		*a = *atoms[0]
 	case 0:
-		panic(fmt.Errorf("Binary stream contained no atoms"))
+		err = fmt.Errorf("Binary stream contained no atoms")
 	default:
-		panic(fmt.Errorf("Binary stream contained multiple atoms, but Atom.Unmarshal can only handle 1 atom."))
+		err = fmt.Errorf("Binary stream contained multiple atoms, but Atom.Unmarshal can only handle 1 atom.")
 	}
 	return err
 }
@@ -266,11 +265,19 @@ func (a *Atom) MarshalBinary() ([]byte, error) {
 // Serialize this atom and its children to bytes.
 // Write byte stream to the given io.Writer.
 func (a *Atom) BinaryWrite(w io.Writer) (err error) {
+	// create members for atom header
+	var name, typ [4]byte
+	var buf []byte
+	if err = FC32StringToBytes(a.Name, &buf); err != nil {
+		return
+	}
+	copy(name[:], buf)
+	if err = FC32StringToBytes(string(a.typ), &buf); err != nil {
+		return
+	}
+	copy(typ[:], buf)
+
 	// write atom header
-	var name [4]byte
-	var typ [4]byte
-	copy(name[:], a.Name)
-	copy(typ[:], a.Type())
 	err = binary.Write(w, binary.BigEndian, atomHeader{a.Len(), name, typ})
 	if err != nil {
 		return

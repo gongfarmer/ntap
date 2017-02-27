@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -42,20 +43,23 @@ func main() {
 	}
 
 	// Read text frominput
-	var buf []byte
-	_, err := input.Read(buf)
+	var bb bytes.Buffer
+	bytesRead, err := bb.ReadFrom(input)
 	if err != nil {
-		log.Fatalf("unable to read input: ", err)
+		log.Fatalf("unable to read input", err.Error())
+	}
+	if bytesRead == 0 {
+		log.Fatalf("empty input")
 	}
 
 	// Convert text to atom
 	var a atom.Atom
-	if err = a.UnmarshalText(buf); err != nil {
+	if err = a.UnmarshalText(bb.Bytes()); err != nil {
 		log.Fatalf("Invalid input container: ", err)
 	}
 
 	// Convert atom to binary
-	buf, err = a.MarshalBinary()
+	buf, err := a.MarshalBinary()
 	if err != nil {
 		log.Fatalf("Unable to convert container to binary: ", err)
 	}
@@ -99,12 +103,12 @@ func setOutput(argv []string) (output io.Writer, args []string) {
 		if argv[0] == "-" {
 			output = os.Stdout
 		} else {
-			output, err = os.OpenFile(args[0], os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+			output, err = os.OpenFile(argv[0], os.O_WRONLY|os.O_CREATE, 0644)
 			if err != nil {
 				log.Fatalf(err.Error())
 			}
-			args = args[1:]
 		}
+		args = argv[1:]
 	}
 	return
 }

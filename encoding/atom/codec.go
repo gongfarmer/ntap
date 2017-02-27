@@ -1593,22 +1593,28 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 	if len(a.data) != 4 {
 		a.data = make([]byte, 4)
 	}
-	var buf = make([]byte, 0, 4)
+	return FC32StringToBytes(v, &(a.data))
+}
+
+// FC32StringToBytes writes the given 4-char string into the given byte slice.
+// This is separated out from SetFC32FromString so this part can also be used
+// to set Atom names.
+func FC32StringToBytes(v string, buf *[]byte) (e error) {
 	var extra string
 
-	// nonprintable chars are allowed if the name is hex-encoded
-	// this is because hex-encoded FCHR32 values may be generated
+	// nonprintable chars are allowed in input string if they are hex-encoded.
+	// raw unprintable chars must return error.
 	switch len(v) {
 	case 10: // 8 hex digits plus leading 0x
 		if !strings.HasPrefix(v, "0x") {
 			return fmt.Errorf("FC32 value is too long: (%s)", v)
 		}
-		matched, e := fmt.Sscanf(v, "0x%x%s", &buf, &extra)
+		matched, e := fmt.Sscanf(v, "0x%x%s", buf, &extra)
 		if e != io.EOF || matched != 1 {
 			return errStrInvalid("FC32", v)
 		}
 	case 8: // 8 hex digits
-		matched, e := fmt.Sscanf(v, "%x%s", &buf, &extra)
+		matched, e := fmt.Sscanf(v, "%x%s", buf, &extra)
 		if e != io.EOF || matched != 1 {
 			return errStrInvalid("FC32", v)
 		}
@@ -1619,19 +1625,11 @@ func SetFC32FromString(a *Atom, v string) (e error) {
 		if v[0] != '\'' || v[5] != '\'' {
 			return fmt.Errorf("FC32 value is too long: (%s)", v)
 		}
-		buf = []byte(v)[1:5]
-	case 4:
-		buf = []byte(v)
+		*buf = []byte(v)[1:5]
+	case 4: // 4 printable chars, no delimiters
+		*buf = []byte(v)
 	default:
 		return errStrInvalid("FC32", v)
-	}
-
-	if len(buf) != 4 {
-		return errStrInvalid("FC32", v)
-	}
-	copied := copy(a.data, buf)
-	if copied != 4 {
-		return fmt.Errorf("expected 4 chars copied for FC32 value(%s), got %d: e", v, copied)
 	}
 	return nil
 }
