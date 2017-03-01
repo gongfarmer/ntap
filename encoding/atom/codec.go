@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // ADE Data types are defined in 112-0002_r4.0B_StorageGRID_Data_Types.
@@ -68,26 +69,26 @@ type (
 		Writer  io.Writer // writes bytes directly to Atom.data
 	}
 	decoder struct {
-		String        func(buf []byte) (string, error)
-		StringEscaped func(buf []byte) (string, error)
-		Bool          func(buf []byte) (bool, error)
-		Uint          func(buf []byte) (uint64, error)
-		Int           func(buf []byte) (int64, error)
-		Float         func(buf []byte) (float64, error)
-		SliceOfUint   func(buf []byte) ([]uint64, error)
-		SliceOfInt    func(buf []byte) ([]int64, error)
-		SliceOfByte   func(buf []byte) ([]byte, error)
+		String          func(buf []byte) (string, error)
+		StringDelimited func(buf []byte) (string, error)
+		Bool            func(buf []byte) (bool, error)
+		Uint            func(buf []byte) (uint64, error)
+		Int             func(buf []byte) (int64, error)
+		Float           func(buf []byte) (float64, error)
+		SliceOfUint     func(buf []byte) ([]uint64, error)
+		SliceOfInt      func(buf []byte) ([]int64, error)
+		SliceOfByte     func(buf []byte) ([]byte, error)
 	}
 	encoder struct {
-		SetString        func(*Atom, string) error
-		SetStringEscaped func(*Atom, string) error
-		SetBool          func(*Atom, bool) error
-		SetUint          func(*Atom, uint64) error
-		SetInt           func(*Atom, int64) error
-		SetFloat         func(*Atom, float64) error
-		SetSliceOfUint   func(*Atom, []uint64) error
-		SetSliceOfInt    func(*Atom, []int64) error
-		SetSliceOfByte   func(*Atom, []byte) error
+		SetString          func(*Atom, string) error
+		SetStringDelimited func(*Atom, string) error
+		SetBool            func(*Atom, bool) error
+		SetUint            func(*Atom, uint64) error
+		SetInt             func(*Atom, int64) error
+		SetFloat           func(*Atom, float64) error
+		SetSliceOfUint     func(*Atom, []uint64) error
+		SetSliceOfInt      func(*Atom, []int64) error
+		SetSliceOfByte     func(*Atom, []byte) error
 	}
 
 	uuidType struct {
@@ -147,15 +148,15 @@ func NewCodec(a *Atom) *codec {
 // the ADE data type's codec.
 func NewEncoder(i interface{}) encoder {
 	return encoder{
-		SetString:        func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
-		SetStringEscaped: func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
-		SetBool:          func(a *Atom, v bool) (e error) { return noEncoder(a, "bool") },
-		SetUint:          func(a *Atom, v uint64) (e error) { return noEncoder(a, "uint64") },
-		SetInt:           func(a *Atom, v int64) (e error) { return noEncoder(a, "int64") },
-		SetFloat:         func(a *Atom, v float64) (e error) { return noEncoder(a, "float64") },
-		SetSliceOfUint:   func(a *Atom, v []uint64) (e error) { return noEncoder(a, "[]uint64") },
-		SetSliceOfInt:    func(a *Atom, v []int64) (e error) { return noEncoder(a, "[]int64") },
-		SetSliceOfByte:   func(a *Atom, v []byte) (e error) { return noEncoder(a, "[]byte") },
+		SetString:          func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
+		SetStringDelimited: func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
+		SetBool:            func(a *Atom, v bool) (e error) { return noEncoder(a, "bool") },
+		SetUint:            func(a *Atom, v uint64) (e error) { return noEncoder(a, "uint64") },
+		SetInt:             func(a *Atom, v int64) (e error) { return noEncoder(a, "int64") },
+		SetFloat:           func(a *Atom, v float64) (e error) { return noEncoder(a, "float64") },
+		SetSliceOfUint:     func(a *Atom, v []uint64) (e error) { return noEncoder(a, "[]uint64") },
+		SetSliceOfInt:      func(a *Atom, v []int64) (e error) { return noEncoder(a, "[]int64") },
+		SetSliceOfByte:     func(a *Atom, v []byte) (e error) { return noEncoder(a, "[]byte") },
 	}
 }
 
@@ -167,15 +168,15 @@ func NewEncoder(i interface{}) encoder {
 // the ADE data type's codec.
 func NewDecoder(from ADEType) decoder {
 	return decoder{
-		String:        func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
-		StringEscaped: func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
-		Bool:          func([]byte) (v bool, e error) { return v, noDecoder(from, "bool") },
-		Uint:          func([]byte) (v uint64, e error) { return v, noDecoder(from, "uint64") },
-		Int:           func([]byte) (v int64, e error) { return v, noDecoder(from, "int64") },
-		Float:         func([]byte) (v float64, e error) { return v, noDecoder(from, "float64") },
-		SliceOfUint:   func([]byte) (v []uint64, e error) { return v, noDecoder(from, "[]uint64") },
-		SliceOfInt:    func([]byte) (v []int64, e error) { return v, noDecoder(from, "[]int64") },
-		SliceOfByte:   func(data []byte) (v []byte, e error) { return data, nil },
+		String:          func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
+		StringDelimited: func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
+		Bool:            func([]byte) (v bool, e error) { return v, noDecoder(from, "bool") },
+		Uint:            func([]byte) (v uint64, e error) { return v, noDecoder(from, "uint64") },
+		Int:             func([]byte) (v int64, e error) { return v, noDecoder(from, "int64") },
+		Float:           func([]byte) (v float64, e error) { return v, noDecoder(from, "float64") },
+		SliceOfUint:     func([]byte) (v []uint64, e error) { return v, noDecoder(from, "[]uint64") },
+		SliceOfInt:      func([]byte) (v []int64, e error) { return v, noDecoder(from, "[]int64") },
+		SliceOfByte:     func(data []byte) (v []byte, e error) { return data, nil },
 	}
 }
 
@@ -190,26 +191,26 @@ func noDecoder(from ADEType, to GoType) error {
 }
 
 // Decoder methods: pass atom data to the decoder for type conversion to go type
-func (c codec) String() (string, error)        { return c.Decoder.String(c.Atom.data) }
-func (c codec) StringEscaped() (string, error) { return c.Decoder.StringEscaped(c.Atom.data) }
-func (c codec) Bool() (bool, error)            { return c.Decoder.Bool(c.Atom.data) }
-func (c codec) Uint() (uint64, error)          { return c.Decoder.Uint(c.Atom.data) }
-func (c codec) Int() (int64, error)            { return c.Decoder.Int(c.Atom.data) }
-func (c codec) Float() (float64, error)        { return c.Decoder.Float(c.Atom.data) }
-func (c codec) SliceOfUint() ([]uint64, error) { return c.Decoder.SliceOfUint(c.Atom.data) }
-func (c codec) SliceOfInt() ([]int64, error)   { return c.Decoder.SliceOfInt(c.Atom.data) }
-func (c codec) SliceOfByte() ([]byte, error)   { return c.Atom.data, nil }
+func (c codec) String() (string, error)          { return c.Decoder.String(c.Atom.data) }
+func (c codec) StringDelimited() (string, error) { return c.Decoder.StringDelimited(c.Atom.data) }
+func (c codec) Bool() (bool, error)              { return c.Decoder.Bool(c.Atom.data) }
+func (c codec) Uint() (uint64, error)            { return c.Decoder.Uint(c.Atom.data) }
+func (c codec) Int() (int64, error)              { return c.Decoder.Int(c.Atom.data) }
+func (c codec) Float() (float64, error)          { return c.Decoder.Float(c.Atom.data) }
+func (c codec) SliceOfUint() ([]uint64, error)   { return c.Decoder.SliceOfUint(c.Atom.data) }
+func (c codec) SliceOfInt() ([]int64, error)     { return c.Decoder.SliceOfInt(c.Atom.data) }
+func (c codec) SliceOfByte() ([]byte, error)     { return c.Atom.data, nil }
 
 // Encoder methods: convert given data type to []byte and store in ATom
-func (c codec) SetString(v string) error        { return c.Encoder.SetString(c.Atom, v) }
-func (c codec) SetStringEscaped(v string) error { return c.Encoder.SetStringEscaped(c.Atom, v) }
-func (c codec) SetBool(v bool) error            { return c.Encoder.SetBool(c.Atom, v) }
-func (c codec) SetUint(v uint64) error          { return c.Encoder.SetUint(c.Atom, v) }
-func (c codec) SetInt(v int64) error            { return c.Encoder.SetInt(c.Atom, v) }
-func (c codec) SetFloat(v float64) error        { return c.Encoder.SetFloat(c.Atom, v) }
-func (c codec) SetSliceOfUint(v []uint64) error { return c.Encoder.SetSliceOfUint(c.Atom, v) }
-func (c codec) SetSliceOfInt(v []int64) error   { return c.Encoder.SetSliceOfInt(c.Atom, v) }
-func (c codec) SetSliceOfByte(v []byte) error   { return c.Encoder.SetSliceOfByte(c.Atom, v) }
+func (c codec) SetString(v string) error          { return c.Encoder.SetString(c.Atom, v) }
+func (c codec) SetStringDelimited(v string) error { return c.Encoder.SetStringDelimited(c.Atom, v) }
+func (c codec) SetBool(v bool) error              { return c.Encoder.SetBool(c.Atom, v) }
+func (c codec) SetUint(v uint64) error            { return c.Encoder.SetUint(c.Atom, v) }
+func (c codec) SetInt(v int64) error              { return c.Encoder.SetInt(c.Atom, v) }
+func (c codec) SetFloat(v float64) error          { return c.Encoder.SetFloat(c.Atom, v) }
+func (c codec) SetSliceOfUint(v []uint64) error   { return c.Encoder.SetSliceOfUint(c.Atom, v) }
+func (c codec) SetSliceOfInt(v []int64) error     { return c.Encoder.SetSliceOfInt(c.Atom, v) }
+func (c codec) SetSliceOfByte(v []byte) error     { return c.Encoder.SetSliceOfByte(c.Atom, v) }
 
 // Initialize decoder table, which makes decoders accessible by ADE type.
 // Variable 'd' is used for assignment, because Go disallows assigning directly
@@ -220,80 +221,95 @@ func init() {
 	// ADE unsigned int types
 	dec := NewDecoder(UI01)
 	dec.String = UI32ToString
+	dec.StringDelimited = dec.String
 	dec.Bool = UI01ToBool
 	dec.Uint = UI32ToUint64
 	decoderByType[UI01] = dec
 
 	dec = NewDecoder(UI08)
 	dec.String = UI08ToString
+	dec.StringDelimited = dec.String
 	dec.Uint = UI08ToUint64
 	decoderByType[UI08] = dec
 
 	dec = NewDecoder(UI16)
 	dec.String = UI16ToString
+	dec.StringDelimited = dec.String
 	dec.Uint = UI16ToUint64
 	decoderByType[UI16] = dec
 
 	dec = NewDecoder(UI32)
 	dec.String = UI32ToString
+	dec.StringDelimited = dec.String
 	dec.Uint = UI32ToUint64
 	decoderByType[UI32] = dec
 
 	dec = NewDecoder(UI64)
 	dec.String = UI64ToString
+	dec.StringDelimited = dec.String
 	dec.Uint = UI64ToUint64
 	decoderByType[UI64] = dec
 
 	// ADE signed int types
 	dec = NewDecoder(SI08)
 	dec.String = SI08ToString
+	dec.StringDelimited = dec.String
 	dec.Int = SI08ToInt64
 	decoderByType[SI08] = dec
 
 	dec = NewDecoder(SI16)
 	dec.String = SI16ToString
+	dec.StringDelimited = dec.String
 	dec.Int = SI16ToInt64
 	decoderByType[SI16] = dec
 
 	dec = NewDecoder(SI32)
 	dec.String = SI32ToString
+	dec.StringDelimited = dec.String
 	dec.Int = SI32ToInt64
 	decoderByType[SI32] = dec
 
 	dec = NewDecoder(SI64)
 	dec.String = SI64ToString
+	dec.StringDelimited = dec.String
 	dec.Int = SI64ToInt64
 	decoderByType[SI64] = dec
 
 	// ADE floating point types
 	dec = NewDecoder(FP32)
 	dec.String = FP32ToString
+	dec.StringDelimited = dec.String
 	dec.Float = FP32ToFloat64
 	decoderByType[FP32] = dec
 
 	dec = NewDecoder(FP64)
 	dec.String = FP64ToString
+	dec.StringDelimited = dec.String
 	dec.Float = FP64ToFloat64
 	decoderByType[FP64] = dec
 
 	// ADE fixed point types
 	dec = NewDecoder(UF32)
 	dec.String = UF32ToString
+	dec.StringDelimited = dec.String
 	dec.Float = UF32ToFloat64
 	decoderByType[UF32] = dec
 
 	dec = NewDecoder(UF64)
 	dec.String = UF64ToString
+	dec.StringDelimited = dec.String
 	dec.Float = UF64ToFloat64
 	decoderByType[UF64] = dec
 
 	dec = NewDecoder(SF32)
 	dec.String = SF32ToString
+	dec.StringDelimited = dec.String
 	dec.Float = SF32ToFloat64
 	decoderByType[SF32] = dec
 
 	dec = NewDecoder(SF64)
 	dec.String = SF64ToString
+	dec.StringDelimited = dec.String
 	dec.Float = SF64ToFloat64
 	decoderByType[SF64] = dec
 
@@ -301,64 +317,74 @@ func init() {
 
 	dec = NewDecoder(UR32)
 	dec.String = UR32ToString
+	dec.StringDelimited = dec.String
 	dec.SliceOfUint = UR32ToSliceOfUint
 	decoderByType[UR32] = dec
 
 	dec = NewDecoder(UR64)
 	dec.String = UR64ToString
+	dec.StringDelimited = dec.String
 	dec.SliceOfUint = UR64ToSliceOfUint
 	decoderByType[UR64] = dec
 
 	dec = NewDecoder(SR32)
 	dec.String = SR32ToString
+	dec.StringDelimited = dec.String
 	dec.SliceOfInt = SR32ToSliceOfInt
 	decoderByType[SR32] = dec
 
 	dec = NewDecoder(SR64)
 	dec.String = SR64ToString
+	dec.StringDelimited = dec.String
 	dec.SliceOfInt = SR64ToSliceOfInt
 	decoderByType[SR64] = dec
 
 	// ADE Four char code
 	dec = NewDecoder(FC32)
 	dec.String = FC32ToStringDelimited
+	dec.StringDelimited = dec.String
 	decoderByType[FC32] = dec
 
 	// ADE ENUM type
 	dec = NewDecoder(ENUM)
 	dec.String = SI32ToString
+	dec.StringDelimited = dec.String
 	dec.Int = SI32ToInt64
 	decoderByType[ENUM] = dec
 
 	// ADE UUID type
 	dec = NewDecoder(UUID)
 	dec.String = UUIDToString
+	dec.StringDelimited = dec.String
 	decoderByType[UUID] = dec
 
 	// IP Address types
 	dec = NewDecoder(IP32)
 	dec.String = IP32ToString
+	dec.StringDelimited = dec.String
 	dec.Uint = IP32ToUint64
 	decoderByType[IP32] = dec
 
 	dec = NewDecoder(IPAD)
 	dec.String = IPADToString
+	dec.StringDelimited = dec.String
 	decoderByType[IPAD] = dec
 
 	// ADE String types
 	dec = NewDecoder(CSTR)
 	dec.String = CSTRToString
-	dec.StringEscaped = CSTRToStringEscaped
+	dec.StringDelimited = CSTRToStringDelimited
 	decoderByType[CSTR] = dec
 
 	dec = NewDecoder(USTR)
 	dec.String = USTRToString
-	dec.StringEscaped = USTRToStringEscaped
+	dec.StringDelimited = USTRToStringDelimited
 	decoderByType[USTR] = dec
 
 	// DATA type, and aliases
 	dec = NewDecoder(DATA)
 	dec.String = BytesToHexString
+	dec.StringDelimited = dec.String
 	decoderByType[DATA] = dec
 	decoderByType[CNCT] = dec
 	decoderByType[Cnct] = dec
@@ -366,11 +392,13 @@ func init() {
 	// NULL type
 	dec = NewDecoder(NULL)
 	dec.String = func([]byte) (s string, e error) { return }
+	dec.StringDelimited = dec.String
 	decoderByType[NULL] = dec
 
 	// ADE container
 	dec = NewDecoder(CONT)
 	dec.String = func([]byte) (s string, e error) { return }
+	dec.StringDelimited = dec.String
 	decoderByType[CONT] = dec
 }
 
@@ -838,44 +866,68 @@ func IPADToString(buf []byte) (v string, e error) {
 // String types
 
 func CSTRToString(buf []byte) (v string, e error) {
-	if len(buf) == 0 {
-		return v, fmt.Errorf("Illegal CSTR data lacks null byte terminator")
+	if bytes.IndexByte(buf, '\x00') != len(buf)-1 || len(buf) == 0 {
+		pos := bytes.IndexByte(buf, '\x00')
+		if pos == -1 {
+			e = fmt.Errorf("CSTR data lacks null byte terminator")
+		} else {
+			e = fmt.Errorf("CSTR data contains illegal embedded null byte")
+		}
+		return
 	}
-	v = string(buf[0 : len(buf)-1]) // trim null terminator
+	v = adeEscapeBytes(buf[:len(buf)-1]) // discard null terminator
 	return v, nil
 }
 
-func CSTRToStringEscaped(buf []byte) (v string, e error) {
-	v, e = CSTRToString(buf)
-	if e == nil {
-		v = fmt.Sprintf("\"%s\"", adeStringEscape(v))
+func CSTRToStringDelimited(buf []byte) (v string, e error) {
+	if v, e = CSTRToString(buf); e != nil {
+		return
 	}
-	return
+	return fmt.Sprintf(`"%s"`, v), e
 }
 
+// These values are stored as UTF32 Big Endian: each char is a uint32 that
+// represents the integer value of the codepoint.
+// Example: Unlike in UTF-8, 0xFF ==  0x000000FF == `ÿ`.
+// These values are not stored as UTF-8 with extra padding, it's actual UTF32,
+// which uses different byte values than UTF-8.  Review the unicode tables for a
+// refresher if necessary.
 func USTRToString(buf []byte) (v string, e error) {
-	var runes = make([]rune, len(buf)/4)
-	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &runes)
-	if e == nil {
-		v = string(runes)
+	var output bytes.Buffer
+	var codepoint rune
+	for i := 0; i < len(buf); i += 4 {
+		codepoint = rune(binary.BigEndian.Uint32(buf[i : i+4]))
+		// Apply ADE string escaping rules
+		switch codepoint {
+		case '\n':
+			output.WriteRune('\\')
+			output.WriteRune('n')
+		case '\r':
+			output.WriteRune('\\')
+			output.WriteRune('r')
+		case '\\':
+			output.WriteRune('\\')
+			output.WriteRune('\\')
+		case '"':
+			output.WriteRune('\\')
+			output.WriteRune('"')
+		default:
+			if unicode.IsControl(codepoint) {
+				output.WriteString(fmt.Sprintf("\\x%02X", codepoint))
+			} else {
+				output.WriteRune(codepoint)
+			}
+		}
 	}
-	return
+	return output.String(), nil
 }
 
-func USTRToStringEscaped(buf []byte) (v string, e error) {
+func USTRToStringDelimited(buf []byte) (v string, e error) {
 	v, e = USTRToString(buf)
 	if e != nil {
 		return
 	}
-
-	// ADE escaping
-	v = fmt.Sprintf("\"%s\"", adeStringEscape(v))
-
-	// FIXME: need escaping on decode / encode to be guaranteed inverse operations
-
-	// Go/unicode escaping
-	//v = strconv.Quote(v)
-	return
+	return fmt.Sprintf("\"%s\"", v), e
 }
 
 func BytesToHexString(buf []byte) (v string, e error) {
@@ -890,30 +942,33 @@ func BytesToHexString(buf []byte) (v string, e error) {
 /**********************************************************/
 
 // ade: libs/osl/OSL_Types.cc CStr_Escape()
-func adeStringEscape(s string) string {
-	output := make([]rune, 0, len(s))
-	for _, r := range s {
-		charsToEscape := "\\\"\x7f"
-		if r == '\n' {
+// Escaping must be performed on raw byte slice, not on same data casted to
+// string. This is because casting a string containing high ascii (128-255)
+// will convert invalid  codepoint representations (eg. 0xFF for U+00FF) to the
+// Unicode replacement character.
+// The tricky part is that valid unicode must not be altered.
+// This method should always return valid UTF-8.
+func adeEscapeBytes(input []byte) string {
+	output := make([]rune, 0, len(input))
+	for i := 0; i < len(input); i++ {
+		b := input[i]
+		if b == '\n' {
 			output = append(output, '\\', 'n')
-			continue
-		} else if r == '\r' {
+		} else if b == '\r' {
 			output = append(output, '\\', 'r')
-			continue
-		} else if r == '\\' {
+		} else if b == '\\' {
 			output = append(output, '\\', '\\')
-			continue
-		} else if r == '"' {
+		} else if b == '"' {
 			output = append(output, '\\', '"')
-			continue
-		} else if strings.ContainsRune(charsToEscape, r) || r <= rune(0x1f) {
-			output = append(output, []rune(fmt.Sprintf("\\x%02X", r))...)
-			continue
-		} else if !unicode.IsPrint(r) {
-			output = append(output, []rune(fmt.Sprintf("%q", r))...)
-			continue
+		} else if b <= 0x1f || b == 0x7f {
+			output = append(output, []rune(fmt.Sprintf(`\x%02X`, b))...)
+		} else if r, width := utf8.DecodeRune(input[i:]); r == utf8.RuneError {
+			// invalid unicode sequence, consumed 1 byte only
+			output = append(output, []rune(fmt.Sprintf(`\x%02X`, b))...)
+		} else {
+			output = append(output, r) // valid unicode sequence, consumed 1-4 bytes
+			i += width - 1             // -1 because will ++ before next loop iter
 		}
-		output = append(output, r)
 	}
 	return string(output)
 }
@@ -1049,12 +1104,12 @@ func init() {
 	// ADE String types
 	enc = NewEncoder(CSTR)
 	enc.SetString = SetCSTRFromString
-	enc.SetStringEscaped = SetCSTRFromQuotedEscapedString
+	enc.SetStringDelimited = SetCSTRFromQuotedEscapedString
 	encoderByType[CSTR] = enc
 
 	enc = NewEncoder(USTR)
 	enc.SetString = SetUSTRFromString
-	enc.SetStringEscaped = SetUSTRFromQuotedEscapedString
+	enc.SetStringDelimited = SetUSTRFromQuotedEscapedString
 	encoderByType[USTR] = enc
 
 	// DATA type, and aliases

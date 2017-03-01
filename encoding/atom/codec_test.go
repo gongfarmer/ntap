@@ -60,9 +60,9 @@ func runDecoderTests(t *testing.T, tests []decoderTest, f decodeFunc) {
 			return
 		}
 
-		// value compare with DeepEqual instead of == so we can compare slice types like UR32
+		// compare with DeepEqual instead of == so slice types like UR32 can be compared
 		if !reflect.DeepEqual(gotValue, test.WantValue) {
-			t.Errorf("%v(%x): got %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, gotValue, test.WantValue)
+			t.Errorf("%v(%x): got %T \"%[3]v\" (% [3]x), want %[4]T \"%[4]v\" (% [4]x)", funcName, test.Input, gotValue, test.WantValue)
 		}
 	}
 }
@@ -1360,41 +1360,74 @@ func TestIPADToString(t *testing.T) {
 		return IPADToString(input)
 	})
 }
+
+// NOTE: CSTRs and Unicode
+// From a careful reading of the spec 112-002 section "3.3.2 String Printing In Containers"
+//  * CSTR may contain invalid UTF-8 (eg. 0xFF is an invalid UTF-8 representation of codepoint U+00FF)
+//  * CSTR should represent these by escaping them with \xHH
+//  * CSTR may contain valid UTF-8 (eg. \xC3\xBF is the valid UTF-8 representation of codepoint U+00FF.)
+//  * Invalid UTF-8 sequences need no escaping
+//  * Since the spec says explicitly that CSTR may contain invalid UTF08, do not
+//    "improve" the input by replacing invalid codepoint representations with
+//    valid UTF-8.  This is not UTF-8.
+//  The return value should always be valid UTF-8: this is because all invalid
+//  UTF-8 sequences must be escaped.
 func TestCSTRToString(t *testing.T) {
+	errUnterminated := fmt.Errorf("CSTR data lacks null byte terminator")
+	errNullByte := fmt.Errorf("CSTR data contains illegal embedded null byte")
+
 	tests := []decoderTest{
-		decoderTest{[]byte(""), "", fmt.Errorf("Illegal CSTR data lacks null byte terminator")},
-		decoderTest{[]byte("\x20\x20\x20\x20\x01\x02\x03\x00"), "    \x01\x02\x03", nil},
-		decoderTest{[]byte("\x04\x05\x06\x07\x00"), "\x04\x05\x06\x07", nil},
-		decoderTest{[]byte("\x08\x09\x0a\x0b\x00"), "\x08\x09\n\x0B", nil},
-		decoderTest{[]byte("\x0c\x0d\x0e\x0f\x00"), "\x0C\r\x0E\x0F", nil},
-		decoderTest{[]byte("\x10\x11\x12\x13\x00"), "\x10\x11\x12\x13", nil},
-		decoderTest{[]byte("\x14\x15\x16\x17\x00"), "\x14\x15\x16\x17", nil},
-		decoderTest{[]byte("\x18\x19\x1a\x1b\x00"), "\x18\x19\x1A\x1B", nil},
-		decoderTest{[]byte("\x1c\x1d\x1e\x1f\x00"), "\x1C\x1D\x1E\x1F", nil},
-		decoderTest{[]byte("\x20\x21\x22\x23\x00"), ` !"#`, nil},
-		decoderTest{[]byte("\x24\x25\x26\x27\x00"), "$%&'", nil},
-		decoderTest{[]byte("\x28\x29\x2a\x2b\x00"), "()*+", nil},
-		decoderTest{[]byte("\x2c\x2d\x2e\x2f\x00"), ",-./", nil},
-		decoderTest{[]byte("\x30\x31\x32\x33\x00"), "0123", nil},
-		decoderTest{[]byte("\x34\x35\x36\x37\x00"), "4567", nil},
-		decoderTest{[]byte("\x38\x39\x3a\x3b\x00"), "89:;", nil},
-		decoderTest{[]byte("\x3c\x3d\x3e\x3f\x00"), "<=>?", nil},
-		decoderTest{[]byte("\x40\x41\x42\x43\x00"), "@ABC", nil},
-		decoderTest{[]byte("\x44\x45\x46\x47\x00"), "DEFG", nil},
-		decoderTest{[]byte("\x48\x49\x4a\x4b\x00"), "HIJK", nil},
-		decoderTest{[]byte("\x4c\x4d\x4e\x4f\x00"), "LMNO", nil},
-		decoderTest{[]byte("\x50\x51\x52\x53\x00"), "PQRS", nil},
-		decoderTest{[]byte("\x54\x55\x56\x57\x00"), "TUVW", nil},
-		decoderTest{[]byte("\x58\x59\x5a\x5b\x00"), "XYZ[", nil},
-		decoderTest{[]byte("\x5c\x5d\x5e\x5f\x00"), `\]^_`, nil},
+		decoderTest{[]byte("abcd"), "", errUnterminated},
+		decoderTest{[]byte("ab\x00d"), "", errNullByte},
+		decoderTest{[]byte(""), "", errUnterminated},
+		decoderTest{[]byte("\x00"), "", nil},
+		decoderTest{[]byte("\x00\x00"), "", errNullByte},
+		decoderTest{[]byte("\x00\x00\x00"), "", errNullByte},
+		decoderTest{[]byte("\x00\x01\x02\x03\x00"), ``, errNullByte},
+		decoderTest{[]byte("\x01\x01\x02\x03\x00"), `\x01\x01\x02\x03`, nil},
+		decoderTest{[]byte("\x04\x05\x06\x07\x00"), `\x04\x05\x06\x07`, nil},
+		decoderTest{[]byte("\x08\x09\x0a\x0b\x00"), `\x08\x09\n\x0B`, nil},
+		decoderTest{[]byte("\x0c\x0d\x0e\x0f\x00"), `\x0C\r\x0E\x0F`, nil},
+		decoderTest{[]byte("\x10\x11\x12\x13\x00"), `\x10\x11\x12\x13`, nil},
+		decoderTest{[]byte("\x14\x15\x16\x17\x00"), `\x14\x15\x16\x17`, nil},
+		decoderTest{[]byte("\x18\x19\x1a\x1b\x00"), `\x18\x19\x1A\x1B`, nil},
+		decoderTest{[]byte("\x1c\x1d\x1e\x1f\x00"), `\x1C\x1D\x1E\x1F`, nil},
+		decoderTest{[]byte("\x20\x21\x22\x23\x00"), ` !\"#`, nil},
+		decoderTest{[]byte("\x24\x25\x26\x27\x00"), `$%&'`, nil},
+		decoderTest{[]byte("\x28\x29\x2a\x2b\x00"), `()*+`, nil},
+		decoderTest{[]byte("\x2c\x2d\x2e\x2f\x00"), `,-./`, nil},
+		decoderTest{[]byte("\x30\x31\x32\x33\x00"), `0123`, nil},
+		decoderTest{[]byte("\x34\x35\x36\x37\x00"), `4567`, nil},
+		decoderTest{[]byte("\x38\x39\x3a\x3b\x00"), `89:;`, nil},
+		decoderTest{[]byte("\x3c\x3d\x3e\x3f\x00"), `<=>?`, nil},
+		decoderTest{[]byte("\x40\x41\x42\x43\x00"), `@ABC`, nil},
+		decoderTest{[]byte("\x44\x45\x46\x47\x00"), `DEFG`, nil},
+		decoderTest{[]byte("\x48\x49\x4a\x4b\x00"), `HIJK`, nil},
+		decoderTest{[]byte("\x4c\x4d\x4e\x4f\x00"), `LMNO`, nil},
+		decoderTest{[]byte("\x50\x51\x52\x53\x00"), `PQRS`, nil},
+		decoderTest{[]byte("\x54\x55\x56\x57\x00"), `TUVW`, nil},
+		decoderTest{[]byte("\x58\x59\x5a\x5b\x00"), `XYZ[`, nil},
+		decoderTest{[]byte("\x5c\x5d\x5e\x5f\x00"), `\\]^_`, nil},
 		decoderTest{[]byte("\x60\x61\x62\x63\x00"), "`abc", nil},
-		decoderTest{[]byte("\x64\x65\x66\x67\x00"), "defg", nil},
-		decoderTest{[]byte("\x68\x69\x6a\x6b\x00"), "hijk", nil},
-		decoderTest{[]byte("\x6c\x6d\x6e\x6f\x00"), "lmno", nil},
-		decoderTest{[]byte("\x70\x71\x72\x73\x00"), "pqrs", nil},
-		decoderTest{[]byte("\x74\x75\x76\x77\x00"), "tuvw", nil},
-		decoderTest{[]byte("\x78\x79\x7a\x7b\x00"), "xyz{", nil},
-		decoderTest{[]byte("\x7c\x7d\x7e\x7f\x00"), "|}~\x7F", nil},
+		decoderTest{[]byte("\x64\x65\x66\x67\x00"), `defg`, nil},
+		decoderTest{[]byte("\x68\x69\x6a\x6b\x00"), `hijk`, nil},
+		decoderTest{[]byte("\x6c\x6d\x6e\x6f\x00"), `lmno`, nil},
+		decoderTest{[]byte("\x70\x71\x72\x73\x00"), `pqrs`, nil},
+		decoderTest{[]byte("\x74\x75\x76\x77\x00"), `tuvw`, nil},
+		decoderTest{[]byte("\x78\x79\x7a\x7b\x00"), `xyz{`, nil},
+		decoderTest{[]byte("\x7c\x7d\x7e\x7f\x00"), `|}~\x7F`, nil},
+		decoderTest{[]byte("\x0a\x00"), `\n`, nil},
+		decoderTest{[]byte("\x0d\x00"), `\r`, nil},
+		decoderTest{[]byte("\x5c\x00"), `\\`, nil},
+		decoderTest{[]byte("\x22\x00"), `\"`, nil},
+		decoderTest{[]byte("\x7f\x00"), `\x7F`, nil},          // valid utf-8
+		decoderTest{[]byte("\x80\x00"), `\x80`, nil},          // invalid utf-8
+		decoderTest{[]byte("\xfd\x00"), `\xFD`, nil},          // invalid utf-8
+		decoderTest{[]byte("\xff\x00"), `\xFF`, nil},          // invalid utf-8 != codepoint U+00FF
+		decoderTest{[]byte("\xc3\xbf\x00"), `ÿ`, nil},         // codepoint U+00FF
+		decoderTest{[]byte("\xd7\x90\x00"), `א`, nil},         // 2-byte width utf-8
+		decoderTest{[]byte("\xe6\x97\xa5\x00"), `日`, nil},     // 3-byte width utf-8
+		decoderTest{[]byte("\xf0\x9f\xa4\x93\x00"), `🤓`, nil}, // 4-byte width utf-8
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return CSTRToString(input)
@@ -1403,104 +1436,222 @@ func TestCSTRToString(t *testing.T) {
 func TestUSTRToString(t *testing.T) {
 	tests := []decoderTest{
 		decoderTest{[]byte(""), ``, nil},
-		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x40"), "\x00@", nil},
-		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x41"), "\x01A", nil},
-		decoderTest{[]byte("\x00\x00\x00\x02\x00\x00\x00\x42"), "\x02B", nil},
-		decoderTest{[]byte("\x00\x00\x00\x03\x00\x00\x00\x43"), "\x03C", nil},
-		decoderTest{[]byte("\x00\x00\x00\x04\x00\x00\x00\x44"), "\x04D", nil},
-		decoderTest{[]byte("\x00\x00\x00\x05\x00\x00\x00\x45"), "\x05E", nil},
-		decoderTest{[]byte("\x00\x00\x00\x06\x00\x00\x00\x46"), "\x06F", nil},
-		decoderTest{[]byte("\x00\x00\x00\x07\x00\x00\x00\x47"), "\x07G", nil},
-		decoderTest{[]byte("\x00\x00\x00\x08\x00\x00\x00\x48"), "\x08H", nil},
-		decoderTest{[]byte("\x00\x00\x00\x09\x00\x00\x00\x49"), "\x09I", nil},
-		decoderTest{[]byte("\x00\x00\x00\x0A\x00\x00\x00\x4A"), "\x0AJ", nil},
-		decoderTest{[]byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), "\x0BK", nil},
-		decoderTest{[]byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), "\x0CL", nil},
-		decoderTest{[]byte("\x00\x00\x00\x0D\x00\x00\x00\x4D"), "\x0DM", nil},
-		decoderTest{[]byte("\x00\x00\x00\x0E\x00\x00\x00\x4E"), "\x0EN", nil},
-		decoderTest{[]byte("\x00\x00\x00\x0F\x00\x00\x00\x4F"), "\x0FO", nil},
-		decoderTest{[]byte("\x00\x00\x00\x10\x00\x00\x00\x50"), "\x10P", nil},
-		decoderTest{[]byte("\x00\x00\x00\x11\x00\x00\x00\x51"), "\x11Q", nil},
-		decoderTest{[]byte("\x00\x00\x00\x12\x00\x00\x00\x52"), "\x12R", nil},
-		decoderTest{[]byte("\x00\x00\x00\x13\x00\x00\x00\x53"), "\x13S", nil},
-		decoderTest{[]byte("\x00\x00\x00\x14\x00\x00\x00\x54"), "\x14T", nil},
-		decoderTest{[]byte("\x00\x00\x00\x15\x00\x00\x00\x55"), "\x15U", nil},
-		decoderTest{[]byte("\x00\x00\x00\x16\x00\x00\x00\x56"), "\x16V", nil},
-		decoderTest{[]byte("\x00\x00\x00\x17\x00\x00\x00\x57"), "\x17W", nil},
-		decoderTest{[]byte("\x00\x00\x00\x18\x00\x00\x00\x58"), "\x18X", nil},
-		decoderTest{[]byte("\x00\x00\x00\x19\x00\x00\x00\x59"), "\x19Y", nil},
-		decoderTest{[]byte("\x00\x00\x00\x1A\x00\x00\x00\x5A"), "\x1AZ", nil},
-		decoderTest{[]byte("\x00\x00\x00\x1B\x00\x00\x00\x5B"), "\x1B[", nil},
-		decoderTest{[]byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), "\x1C\\", nil},
-		decoderTest{[]byte("\x00\x00\x00\x1D\x00\x00\x00\x5D"), "\x1D]", nil},
-		decoderTest{[]byte("\x00\x00\x00\x1E\x00\x00\x00\x5E"), "\x1E^", nil},
-		decoderTest{[]byte("\x00\x00\x00\x1F\x00\x00\x00\x5F"), "\x1F_", nil},
-		decoderTest{[]byte("\x00\x00\x00\x20\x00\x00\x00\x60"), "\x20`", nil},
-		decoderTest{[]byte("\x00\x00\x00\x21\x00\x00\x00\x61"), "\x21a", nil},
-		decoderTest{[]byte("\x00\x00\x00\x22\x00\x00\x00\x62"), "\x22b", nil},
-		decoderTest{[]byte("\x00\x00\x00\x23\x00\x00\x00\x63"), "#c", nil},
-		decoderTest{[]byte("\x00\x00\x00\x24\x00\x00\x00\x64"), "$d", nil},
-		decoderTest{[]byte("\x00\x00\x00\x25\x00\x00\x00\x65"), "%e", nil},
-		decoderTest{[]byte("\x00\x00\x00\x26\x00\x00\x00\x66"), "&f", nil},
-		decoderTest{[]byte("\x00\x00\x00\x27\x00\x00\x00\x67"), "'g", nil},
-		decoderTest{[]byte("\x00\x00\x00\x28\x00\x00\x00\x68"), "(h", nil},
-		decoderTest{[]byte("\x00\x00\x00\x29\x00\x00\x00\x69"), ")i", nil},
-		decoderTest{[]byte("\x00\x00\x00\x2A\x00\x00\x00\x6A"), "*j", nil},
-		decoderTest{[]byte("\x00\x00\x00\x2B\x00\x00\x00\x6B"), "+k", nil},
-		decoderTest{[]byte("\x00\x00\x00\x2C\x00\x00\x00\x6C"), ",l", nil},
-		decoderTest{[]byte("\x00\x00\x00\x2D\x00\x00\x00\x6D"), "-m", nil},
-		decoderTest{[]byte("\x00\x00\x00\x2E\x00\x00\x00\x6E"), ".n", nil},
-		decoderTest{[]byte("\x00\x00\x00\x2F\x00\x00\x00\x6F"), "/o", nil},
-		decoderTest{[]byte("\x00\x00\x00\x30\x00\x00\x00\x70"), "0p", nil},
-		decoderTest{[]byte("\x00\x00\x00\x31\x00\x00\x00\x71"), "1q", nil},
-		decoderTest{[]byte("\x00\x00\x00\x32\x00\x00\x00\x72"), "2r", nil},
-		decoderTest{[]byte("\x00\x00\x00\x33\x00\x00\x00\x73"), "3s", nil},
-		decoderTest{[]byte("\x00\x00\x00\x34\x00\x00\x00\x74"), "4t", nil},
-		decoderTest{[]byte("\x00\x00\x00\x35\x00\x00\x00\x75"), "5u", nil},
-		decoderTest{[]byte("\x00\x00\x00\x36\x00\x00\x00\x76"), "6v", nil},
-		decoderTest{[]byte("\x00\x00\x00\x37\x00\x00\x00\x77"), "7w", nil},
-		decoderTest{[]byte("\x00\x00\x00\x38\x00\x00\x00\x78"), "8x", nil},
-		decoderTest{[]byte("\x00\x00\x00\x39\x00\x00\x00\x79"), "9y", nil},
-		decoderTest{[]byte("\x00\x00\x00\x3A\x00\x00\x00\x7A"), ":z", nil},
-		decoderTest{[]byte("\x00\x00\x00\x3B\x00\x00\x00\x7B"), ";{", nil},
-		decoderTest{[]byte("\x00\x00\x00\x3C\x00\x00\x00\x7C"), "<|", nil},
-		decoderTest{[]byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), "=}", nil},
-		decoderTest{[]byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), ">~", nil},
-		decoderTest{[]byte("\x00\x00\x00\x3F\x00\x00\x00\x7F"), "?\x7F", nil},
-		// FIXME
-		//    decoderTest{[]byte("\x00\x02\xf8\x00\x00\x02\xf8\x01"), "丽丸", nil},
-		//		decoderTest{[]byte("\x00\x02\xf8\x02\x00\x02\xf8\x03"), "乁𠄢", nil},
-		//		decoderTest{[]byte("\x00\x02\xf8\x04\x00\x02\xf8\x05"), "你侮", nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x40"), `\x00@`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x41"), `\x01A`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x02\x00\x00\x00\x42"), `\x02B`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x03\x00\x00\x00\x43"), `\x03C`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x04\x00\x00\x00\x44"), `\x04D`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x05\x00\x00\x00\x45"), `\x05E`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x06\x00\x00\x00\x46"), `\x06F`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x07\x00\x00\x00\x47"), `\x07G`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x08\x00\x00\x00\x48"), `\x08H`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x09\x00\x00\x00\x49"), `\x09I`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0A\x00\x00\x00\x4A"), `\nJ`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), `\x0BK`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), `\x0CL`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0D\x00\x00\x00\x4D"), `\rM`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0E\x00\x00\x00\x4E"), `\x0EN`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0F\x00\x00\x00\x4F"), `\x0FO`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x10\x00\x00\x00\x50"), `\x10P`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x11\x00\x00\x00\x51"), `\x11Q`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x12\x00\x00\x00\x52"), `\x12R`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x13\x00\x00\x00\x53"), `\x13S`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x14\x00\x00\x00\x54"), `\x14T`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x15\x00\x00\x00\x55"), `\x15U`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x16\x00\x00\x00\x56"), `\x16V`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x17\x00\x00\x00\x57"), `\x17W`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x18\x00\x00\x00\x58"), `\x18X`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x19\x00\x00\x00\x59"), `\x19Y`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1A\x00\x00\x00\x5A"), `\x1AZ`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1B\x00\x00\x00\x5B"), `\x1B[`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), `\x1C\\`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1D\x00\x00\x00\x5D"), `\x1D]`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1E\x00\x00\x00\x5E"), `\x1E^`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1F\x00\x00\x00\x5F"), `\x1F_`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x20\x00\x00\x00\x60"), " `", nil},
+		decoderTest{[]byte("\x00\x00\x00\x21\x00\x00\x00\x61"), `!a`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x22\x00\x00\x00\x62"), `\"b`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x23\x00\x00\x00\x63"), `#c`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x24\x00\x00\x00\x64"), `$d`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x25\x00\x00\x00\x65"), `%e`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x26\x00\x00\x00\x66"), `&f`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x27\x00\x00\x00\x67"), `'g`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x28\x00\x00\x00\x68"), `(h`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x29\x00\x00\x00\x69"), `)i`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2A\x00\x00\x00\x6A"), `*j`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2B\x00\x00\x00\x6B"), `+k`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2C\x00\x00\x00\x6C"), `,l`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2D\x00\x00\x00\x6D"), `-m`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2E\x00\x00\x00\x6E"), `.n`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2F\x00\x00\x00\x6F"), `/o`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x30\x00\x00\x00\x70"), `0p`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x31\x00\x00\x00\x71"), `1q`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x32\x00\x00\x00\x72"), `2r`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x33\x00\x00\x00\x73"), `3s`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x34\x00\x00\x00\x74"), `4t`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x35\x00\x00\x00\x75"), `5u`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x36\x00\x00\x00\x76"), `6v`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x37\x00\x00\x00\x77"), `7w`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x38\x00\x00\x00\x78"), `8x`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x39\x00\x00\x00\x79"), `9y`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3A\x00\x00\x00\x7A"), `:z`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3B\x00\x00\x00\x7B"), `;{`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3C\x00\x00\x00\x7C"), `<|`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), `=}`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), `>~`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x7F\x00\x00\x00\x80"), `\x7F\x80`, nil},
+		decoderTest{[]byte("\x00\x00\x00\xff"), `ÿ`, nil}, // 2-byte width utf-8
+		decoderTest{[]byte("\x00\x00\x05\xd0"), `א`, nil}, // 2-byte width utf-8
+		decoderTest{[]byte("\x00\x00\x65\xe5"), `日`, nil}, // 3-byte width utf-8
+		decoderTest{[]byte("\x00\x01\xF9\x13"), `🤓`, nil}, // 4-byte width utf-8
+		decoderTest{[]byte("\x00\x00\x4e\x3d\x00\x00\x4e\x38"), "丽丸", nil},
+		decoderTest{[]byte("\x00\x00\x4e\x41\x00\x02\x01\x22"), "乁𠄢", nil},
+		decoderTest{[]byte("\x00\x00\x4f\x60\x00\x00\x4f\xae"), "你侮", nil},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return USTRToString(input)
 	})
 }
 
-func TestCSTRToStringEscaped(t *testing.T) {
+func TestCSTRToStringDelimited(t *testing.T) {
+	errUnterminated := fmt.Errorf("CSTR data lacks null byte terminator")
+	errNullByte := fmt.Errorf("CSTR data contains illegal embedded null byte")
+
 	tests := []decoderTest{
-		decoderTest{[]byte(""), "", fmt.Errorf("Illegal CSTR data lacks null byte terminator")},
-		decoderTest{[]byte("\x61\x62\x63\x0a\x64\x65\x66\x00"), `"abc\ndef"`, nil},
-		decoderTest{[]byte("\x61\x62\x63\x0d\x64\x65\x66\x00"), `"abc\rdef"`, nil},
-		decoderTest{[]byte("\x61\x62\x63\x5c\x64\x65\x66\x00"), `"abc\\def"`, nil},
-		decoderTest{[]byte("\x61\x62\x63\x22\x64\x65\x66\x00"), `"abc\"def"`, nil},
-		decoderTest{[]byte("\x61\x62\x63\x7f\x64\x65\x66\x00"), `"abc\x7Fdef"`, nil},
+		decoderTest{[]byte("abcd"), "", errUnterminated},
+		decoderTest{[]byte("ab\x00d"), "", errNullByte},
+		decoderTest{[]byte(""), "", errUnterminated},
+		decoderTest{[]byte("\x00"), `""`, nil},
+		decoderTest{[]byte("\x00\x00"), "", errNullByte},
+		decoderTest{[]byte("\x00\x00\x00"), "", errNullByte},
+		decoderTest{[]byte("\x00\x01\x02\x03\x00"), ``, errNullByte},
+		decoderTest{[]byte("\x01\x01\x02\x03\x00"), `"\x01\x01\x02\x03"`, nil},
+		decoderTest{[]byte("\x04\x05\x06\x07\x00"), `"\x04\x05\x06\x07"`, nil},
+		decoderTest{[]byte("\x08\x09\x0a\x0b\x00"), `"\x08\x09\n\x0B"`, nil},
+		decoderTest{[]byte("\x0c\x0d\x0e\x0f\x00"), `"\x0C\r\x0E\x0F"`, nil},
+		decoderTest{[]byte("\x10\x11\x12\x13\x00"), `"\x10\x11\x12\x13"`, nil},
+		decoderTest{[]byte("\x14\x15\x16\x17\x00"), `"\x14\x15\x16\x17"`, nil},
+		decoderTest{[]byte("\x18\x19\x1a\x1b\x00"), `"\x18\x19\x1A\x1B"`, nil},
+		decoderTest{[]byte("\x1c\x1d\x1e\x1f\x00"), `"\x1C\x1D\x1E\x1F"`, nil},
+		decoderTest{[]byte("\x20\x21\x22\x23\x00"), `" !\"#"`, nil},
+		decoderTest{[]byte("\x24\x25\x26\x27\x00"), `"$%&'"`, nil},
+		decoderTest{[]byte("\x28\x29\x2a\x2b\x00"), `"()*+"`, nil},
+		decoderTest{[]byte("\x2c\x2d\x2e\x2f\x00"), `",-./"`, nil},
+		decoderTest{[]byte("\x30\x31\x32\x33\x00"), `"0123"`, nil},
+		decoderTest{[]byte("\x34\x35\x36\x37\x00"), `"4567"`, nil},
+		decoderTest{[]byte("\x38\x39\x3a\x3b\x00"), `"89:;"`, nil},
+		decoderTest{[]byte("\x3c\x3d\x3e\x3f\x00"), `"<=>?"`, nil},
+		decoderTest{[]byte("\x40\x41\x42\x43\x00"), `"@ABC"`, nil},
+		decoderTest{[]byte("\x44\x45\x46\x47\x00"), `"DEFG"`, nil},
+		decoderTest{[]byte("\x48\x49\x4a\x4b\x00"), `"HIJK"`, nil},
+		decoderTest{[]byte("\x4c\x4d\x4e\x4f\x00"), `"LMNO"`, nil},
+		decoderTest{[]byte("\x50\x51\x52\x53\x00"), `"PQRS"`, nil},
+		decoderTest{[]byte("\x54\x55\x56\x57\x00"), `"TUVW"`, nil},
+		decoderTest{[]byte("\x58\x59\x5a\x5b\x00"), `"XYZ["`, nil},
+		decoderTest{[]byte("\x5c\x5d\x5e\x5f\x00"), `"\\]^_"`, nil},
+		decoderTest{[]byte("\x60\x61\x62\x63\x00"), "\"`abc\"", nil},
+		decoderTest{[]byte("\x64\x65\x66\x67\x00"), `"defg"`, nil},
+		decoderTest{[]byte("\x68\x69\x6a\x6b\x00"), `"hijk"`, nil},
+		decoderTest{[]byte("\x6c\x6d\x6e\x6f\x00"), `"lmno"`, nil},
+		decoderTest{[]byte("\x70\x71\x72\x73\x00"), `"pqrs"`, nil},
+		decoderTest{[]byte("\x74\x75\x76\x77\x00"), `"tuvw"`, nil},
+		decoderTest{[]byte("\x78\x79\x7a\x7b\x00"), `"xyz{"`, nil},
+		decoderTest{[]byte("\x7c\x7d\x7e\x7f\x00"), `"|}~\x7F"`, nil},
+		decoderTest{[]byte("\x0a\x00"), `"\n"`, nil},
+		decoderTest{[]byte("\x0d\x00"), `"\r"`, nil},
+		decoderTest{[]byte("\x5c\x00"), `"\\"`, nil},
+		decoderTest{[]byte("\x22\x00"), `"\""`, nil},
+		decoderTest{[]byte("\x7f\x00"), `"\x7F"`, nil},          // valid utf-8
+		decoderTest{[]byte("\x80\x00"), `"\x80"`, nil},          // invalid utf-8
+		decoderTest{[]byte("\xfd\x00"), `"\xFD"`, nil},          // invalid utf-8
+		decoderTest{[]byte("\xff\x00"), `"\xFF"`, nil},          // invalid utf-8 != codepoint U+00FF
+		decoderTest{[]byte("\xc3\xbf\x00"), `"ÿ"`, nil},         // codepoint U+00FF
+		decoderTest{[]byte("\xd7\x90\x00"), `"א"`, nil},         // 2-byte width utf-8
+		decoderTest{[]byte("\xe6\x97\xa5\x00"), `"日"`, nil},     // 3-byte width utf-8
+		decoderTest{[]byte("\xf0\x9f\xa4\x93\x00"), `"🤓"`, nil}, // 4-byte width utf-8
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
-		return CSTRToStringEscaped(input)
+		return CSTRToStringDelimited(input)
 	})
 }
 
-func TestUSTRToStringEscaped(t *testing.T) {
+func TestUSTRToStringDelimited(t *testing.T) {
 	tests := []decoderTest{
-		decoderTest{[]byte("\x00\x00\x00\x0a"), `"\n"`, nil},
-		decoderTest{[]byte("\x00\x00\x00\x0d"), `"\r"`, nil},
-		decoderTest{[]byte("\x00\x00\x00\x5c"), `"\\"`, nil},
-		decoderTest{[]byte("\x00\x00\x00\x22"), `"\""`, nil},
-		decoderTest{[]byte("\x00\x00\x00\x7f"), `"\x7F"`, nil},
+		decoderTest{[]byte(""), `""`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x40"), `"\x00@"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x41"), `"\x01A"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x02\x00\x00\x00\x42"), `"\x02B"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x03\x00\x00\x00\x43"), `"\x03C"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x04\x00\x00\x00\x44"), `"\x04D"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x05\x00\x00\x00\x45"), `"\x05E"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x06\x00\x00\x00\x46"), `"\x06F"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x07\x00\x00\x00\x47"), `"\x07G"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x08\x00\x00\x00\x48"), `"\x08H"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x09\x00\x00\x00\x49"), `"\x09I"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0A\x00\x00\x00\x4A"), `"\nJ"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), `"\x0BK"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), `"\x0CL"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0D\x00\x00\x00\x4D"), `"\rM"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0E\x00\x00\x00\x4E"), `"\x0EN"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x0F\x00\x00\x00\x4F"), `"\x0FO"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x10\x00\x00\x00\x50"), `"\x10P"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x11\x00\x00\x00\x51"), `"\x11Q"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x12\x00\x00\x00\x52"), `"\x12R"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x13\x00\x00\x00\x53"), `"\x13S"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x14\x00\x00\x00\x54"), `"\x14T"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x15\x00\x00\x00\x55"), `"\x15U"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x16\x00\x00\x00\x56"), `"\x16V"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x17\x00\x00\x00\x57"), `"\x17W"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x18\x00\x00\x00\x58"), `"\x18X"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x19\x00\x00\x00\x59"), `"\x19Y"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1A\x00\x00\x00\x5A"), `"\x1AZ"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1B\x00\x00\x00\x5B"), `"\x1B["`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), `"\x1C\\"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1D\x00\x00\x00\x5D"), `"\x1D]"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1E\x00\x00\x00\x5E"), `"\x1E^"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x1F\x00\x00\x00\x5F"), `"\x1F_"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x20\x00\x00\x00\x60"), "\" `\"", nil},
+		decoderTest{[]byte("\x00\x00\x00\x21\x00\x00\x00\x61"), `"!a"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x22\x00\x00\x00\x62"), `"\"b"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x23\x00\x00\x00\x63"), `"#c"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x24\x00\x00\x00\x64"), `"$d"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x25\x00\x00\x00\x65"), `"%e"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x26\x00\x00\x00\x66"), `"&f"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x27\x00\x00\x00\x67"), `"'g"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x28\x00\x00\x00\x68"), `"(h"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x29\x00\x00\x00\x69"), `")i"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2A\x00\x00\x00\x6A"), `"*j"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2B\x00\x00\x00\x6B"), `"+k"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2C\x00\x00\x00\x6C"), `",l"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2D\x00\x00\x00\x6D"), `"-m"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2E\x00\x00\x00\x6E"), `".n"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x2F\x00\x00\x00\x6F"), `"/o"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x30\x00\x00\x00\x70"), `"0p"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x31\x00\x00\x00\x71"), `"1q"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x32\x00\x00\x00\x72"), `"2r"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x33\x00\x00\x00\x73"), `"3s"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x34\x00\x00\x00\x74"), `"4t"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x35\x00\x00\x00\x75"), `"5u"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x36\x00\x00\x00\x76"), `"6v"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x37\x00\x00\x00\x77"), `"7w"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x38\x00\x00\x00\x78"), `"8x"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x39\x00\x00\x00\x79"), `"9y"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3A\x00\x00\x00\x7A"), `":z"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3B\x00\x00\x00\x7B"), `";{"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3C\x00\x00\x00\x7C"), `"<|"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), `"=}"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), `">~"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\x7F\x00\x00\x00\x80"), `"\x7F\x80"`, nil},
+		decoderTest{[]byte("\x00\x00\x00\xff"), `"ÿ"`, nil}, // 2-byte width utf-8
+		decoderTest{[]byte("\x00\x00\x05\xd0"), `"א"`, nil}, // 2-byte width utf-8
+		decoderTest{[]byte("\x00\x00\x65\xe5"), `"日"`, nil}, // 3-byte width utf-8
+		decoderTest{[]byte("\x00\x01\xF9\x13"), `"🤓"`, nil}, // 4-byte width utf-8
+		decoderTest{[]byte("\x00\x00\x4e\x3d\x00\x00\x4e\x38"), `"丽丸"`, nil},
+		decoderTest{[]byte("\x00\x00\x4e\x41\x00\x02\x01\x22"), `"乁𠄢"`, nil},
+		decoderTest{[]byte("\x00\x00\x4f\x60\x00\x00\x4f\xae"), `"你侮"`, nil},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
-		return USTRToStringEscaped(input)
+		return USTRToStringDelimited(input)
 	})
 }
 
@@ -1520,7 +1671,7 @@ func TestBytesToHexString(t *testing.T) {
 		return BytesToHexString(input)
 	})
 }
-func TestAdeStringEscape(t *testing.T) {
+func TestAdeEscapeBytes(t *testing.T) {
 	tests := []decoderTest{
 		decoderTest{[]byte(""), "", nil},
 		decoderTest{[]byte("\x61\x62\x63\x0a\x64\x65\x66\x00"), `abc\ndef\x00`, nil},
@@ -1530,7 +1681,7 @@ func TestAdeStringEscape(t *testing.T) {
 		decoderTest{[]byte("\x61\x62\x63\x7f\x64\x65\x66"), `abc\x7Fdef`, nil},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
-		return adeStringEscape(string(input)), nil
+		return adeEscapeBytes(input), nil
 	})
 }
 

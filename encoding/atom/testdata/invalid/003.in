@@ -1,4 +1,4 @@
-# ADE ccat cannot parse this
+# ADE ctac cannot parse this
 TEST:CONT:
 	CNCT:CNCT:0x0000000C0000000000000000
 END

@@ -44,21 +44,31 @@ func (a *Atom) MarshalText() (text []byte, err error) {
 func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	var output bytes.Buffer
 
+	// write indentation
+	for i := 0; i < depth; i++ {
+		fmt.Fprintf(&output, "\t")
+	}
+
 	// write atom name,type,data
-	fmt.Fprintf(&output, "% *s%s:%s:", depth*4, "", a.Name, a.Type())
-	s, err := a.Value.String()
+	fmt.Fprintf(&output, "%s:%s:", a.Name, a.Type())
+	s, err := a.Value.StringDelimited()
 	if err != nil {
-		panic(fmt.Errorf("conversion of atom to text failed: %s", err))
+		panic(fmt.Errorf("conversion of atom to text failed for atom '%s:%s': %s", a.Name, a.Type(), err))
 	}
 	fmt.Fprintln(&output, s)
 
-	// write children
 	if a.Type() == CONT {
+		// write children
 		for _, childPtr := range a.Children {
 			buf := atomToTextBuffer(childPtr, depth+1)
 			output.Write(buf.Bytes())
 		}
-		fmt.Fprintf(&output, "% *sEND\n", depth*4, "")
+
+		// write END, with indentation
+		for i := 0; i < depth; i++ {
+			fmt.Fprintf(&output, "\t")
+		}
+		fmt.Fprintf(&output, "END\n")
 	}
 	return output
 }

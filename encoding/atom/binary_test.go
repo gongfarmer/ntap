@@ -38,7 +38,7 @@ func TestUnmarshalBinary(t *testing.T) {
 }
 
 // NOTE: marshaled output is not guaranteed to always match its input, as
-// odd inputs may be normalized.  However, they do match for these tests.
+// odd but valid inputs may be normalized. However, they do match for these tests.
 func TestMarshalBinary(t *testing.T) {
 	var a Atom
 	var got, want []byte

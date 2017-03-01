@@ -1,4 +1,4 @@
-# Empty FC32 value
+# Empty FC32 value.  ADE ctac cannot parse this.
 TEST:CONT:
 	 TEST:FC32:''
 END 
