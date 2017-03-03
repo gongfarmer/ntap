@@ -1,6 +1,6 @@
 # All of these strings cause ADE ctac to fail with ERR_CXD_BAD_DATA.
-# That's a bug, these characters are explicitly allowed in doc 112-0002, as
-# long as they're escaped in this way.
+# That's a bug, these characters are explicitly allowed by doc 112-0002, as long as they're escaped in this way.
+# The *.bin and *.txt files accompanying this input were produced by go ccat since ADE ccat cannot do it.
 TEST:CONT:
     0x00:USTR:"\x00"
     0x80:USTR:"\x80"
