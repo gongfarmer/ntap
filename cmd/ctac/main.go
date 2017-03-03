@@ -105,7 +105,7 @@ func setOutput(argv []string) (output io.Writer, args []string) {
 		if argv[0] == "-" {
 			output = os.Stdout
 		} else {
-			output, err = os.OpenFile(argv[0], os.O_WRONLY|os.O_CREATE, 0644)
+			output, err = os.OpenFile(argv[0], os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 			if err != nil {
 				log.Fatalf(err.Error())
 			}
