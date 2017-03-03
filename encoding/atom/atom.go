@@ -79,21 +79,6 @@ func (a *Atom) ZeroData() {
 	}
 }
 
-// zeroOrAllocateByteSlice verifies that the give byte slice has
-// the specified capacity, and zeroes it out.
-// It avoids memory allocation when possible.
-func zeroOrAllocateByteSlice(buf *[]byte, size int) {
-	if cap(*buf) == size {
-		// zero out the buffer, O(1)
-		for i, _ := range *buf {
-			(*buf)[i] = 0
-		}
-	} else {
-		// newly allocated mem is already zeroed
-		*buf = make([]byte, size)
-	}
-}
-
 // String returns the atom's text description in ADE ContainerText format.
 func (a Atom) String() string {
 	buf, err := a.MarshalText()
@@ -185,4 +170,19 @@ func isPrintableBytes(buf []byte) bool {
 		}
 	}
 	return true
+}
+
+// zeroOrAllocateByteSlice verifies that the give byte slice has
+// the specified capacity, and zeroes it out.
+// It avoids memory allocation when possible.
+func zeroOrAllocateByteSlice(buf *[]byte, size int) {
+	if cap(*buf) == size {
+		// zero out the buffer, O(1)
+		for i, _ := range *buf {
+			(*buf)[i] = 0
+		}
+	} else {
+		// newly allocated mem is already zeroed
+		*buf = make([]byte, size)
+	}
 }

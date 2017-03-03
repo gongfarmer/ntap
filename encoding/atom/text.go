@@ -752,12 +752,12 @@ func init() {
 	parseType[SR32] = parseFraction
 	parseType[SR64] = parseFraction
 	parseType[FC32] = parseFC32Value
-	parseType[IP32] = parseIP32
+	parseType[IP32] = parseIP32Value
 	parseType[IPAD] = parseString
-	parseType[CSTR] = parseString
-	parseType[USTR] = parseString
-	parseType[DATA] = parseString
+	parseType[CSTR] = parseStringDelimited
+	parseType[USTR] = parseStringDelimited
 	parseType[UUID] = parseString
+	parseType[DATA] = parseString
 	parseType[CNCT] = parseString
 	parseType[Cnct] = parseString
 	parseType[ENUM] = parseNumber
@@ -967,7 +967,7 @@ func parseFC32Value(p *parser) parseFunc {
 	return parseAtomName
 }
 
-func parseIP32(p *parser) parseFunc {
+func parseIP32Value(p *parser) parseFunc {
 	it := readItem(p)
 
 	if it.typ != itemIP32 {
@@ -988,6 +988,19 @@ func parseString(p *parser) parseFunc {
 	}
 
 	err := p.theAtom.Value.SetString(it.value)
+	if err != nil {
+		return p.errorf(err.Error())
+	}
+	return parseAtomName
+}
+
+func parseStringDelimited(p *parser) parseFunc {
+	it := readItem(p)
+	if it.typ == itemError {
+		return p.errorf(it.value)
+	}
+
+	err := p.theAtom.Value.SetStringDelimited(it.value)
 	if err != nil {
 		return p.errorf(err.Error())
 	}

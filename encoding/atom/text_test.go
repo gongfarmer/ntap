@@ -69,6 +69,16 @@ func TestMarshalText(t *testing.T) {
 			if len(got) < 500 {
 				fmt.Println("got: ", string(got))
 				fmt.Println("wnt: ", string(want))
+				f, err := ioutil.TempFile("/tmp", "got.txt")
+				if err != nil {
+					fmt.Println(err)
+				}
+				f.Write(got)
+				f.Close()
+				f, _ = ioutil.TempFile("/tmp", "want.txt")
+				f.Write(want)
+				f.Close()
+
 				os.Exit(1)
 			}
 		}

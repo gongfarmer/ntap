@@ -1671,7 +1671,7 @@ func TestBytesToHexString(t *testing.T) {
 		return BytesToHexString(input)
 	})
 }
-func TestAdeEscapeBytes(t *testing.T) {
+func TestCSTRBytesToEscapedString(t *testing.T) {
 	tests := []decoderTest{
 		decoderTest{[]byte(""), "", nil},
 		decoderTest{[]byte("\x61\x62\x63\x0a\x64\x65\x66\x00"), `abc\ndef\x00`, nil},
@@ -1681,7 +1681,7 @@ func TestAdeEscapeBytes(t *testing.T) {
 		decoderTest{[]byte("\x61\x62\x63\x7f\x64\x65\x66"), `abc\x7Fdef`, nil},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
-		return adeEscapeBytes(input), nil
+		return CSTRBytesToEscapedString(input), nil
 	})
 }
 
@@ -1725,7 +1725,7 @@ func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 
 		// Instead of ==, compare with DeepEqual because it can compare slices of bytes
 		if !reflect.DeepEqual(gotValue, test.WantValue) {
-			t.Errorf("%v(Atom, %v): got %T(%[3]v), want %[4]T(%[4]v)", funcName, test.Input, gotValue, test.WantValue)
+			t.Errorf("%v(Atom, %v): got %T (% [3]x), want %[4]T (% [4]x)", funcName, test.Input, gotValue, test.WantValue)
 		}
 	}
 }
@@ -2717,86 +2717,118 @@ func TestSetUUIDFromString(t *testing.T) {
 }
 
 func TestSetUSTRFromString(t *testing.T) {
+	typ := "USTR"
 	tests := []encoderTest{
 		encoderTest{"", []byte(""), nil},
-		encoderTest{"\x00@", []byte("\x00\x00\x00\x00\x00\x00\x00\x40"), nil},
-		encoderTest{"\x01A", []byte("\x00\x00\x00\x01\x00\x00\x00\x41"), nil},
-		encoderTest{"\x02B", []byte("\x00\x00\x00\x02\x00\x00\x00\x42"), nil},
-		encoderTest{"\x03C", []byte("\x00\x00\x00\x03\x00\x00\x00\x43"), nil},
-		encoderTest{"\x04D", []byte("\x00\x00\x00\x04\x00\x00\x00\x44"), nil},
-		encoderTest{"\x05E", []byte("\x00\x00\x00\x05\x00\x00\x00\x45"), nil},
-		encoderTest{"\x06F", []byte("\x00\x00\x00\x06\x00\x00\x00\x46"), nil},
-		encoderTest{"\x07G", []byte("\x00\x00\x00\x07\x00\x00\x00\x47"), nil},
-		encoderTest{"\x08H", []byte("\x00\x00\x00\x08\x00\x00\x00\x48"), nil},
-		encoderTest{"\x09I", []byte("\x00\x00\x00\x09\x00\x00\x00\x49"), nil},
-		encoderTest{"\x0AJ", []byte("\x00\x00\x00\x0A\x00\x00\x00\x4A"), nil},
-		encoderTest{"\x0BK", []byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), nil},
-		encoderTest{"\x0CL", []byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), nil},
-		encoderTest{"\x0DM", []byte("\x00\x00\x00\x0D\x00\x00\x00\x4D"), nil},
-		encoderTest{"\x0EN", []byte("\x00\x00\x00\x0E\x00\x00\x00\x4E"), nil},
-		encoderTest{"\x0FO", []byte("\x00\x00\x00\x0F\x00\x00\x00\x4F"), nil},
-		encoderTest{"\x10P", []byte("\x00\x00\x00\x10\x00\x00\x00\x50"), nil},
-		encoderTest{"\x11Q", []byte("\x00\x00\x00\x11\x00\x00\x00\x51"), nil},
-		encoderTest{"\x12R", []byte("\x00\x00\x00\x12\x00\x00\x00\x52"), nil},
-		encoderTest{"\x13S", []byte("\x00\x00\x00\x13\x00\x00\x00\x53"), nil},
-		encoderTest{"\x14T", []byte("\x00\x00\x00\x14\x00\x00\x00\x54"), nil},
-		encoderTest{"\x15U", []byte("\x00\x00\x00\x15\x00\x00\x00\x55"), nil},
-		encoderTest{"\x16V", []byte("\x00\x00\x00\x16\x00\x00\x00\x56"), nil},
-		encoderTest{"\x17W", []byte("\x00\x00\x00\x17\x00\x00\x00\x57"), nil},
-		encoderTest{"\x18X", []byte("\x00\x00\x00\x18\x00\x00\x00\x58"), nil},
-		encoderTest{"\x19Y", []byte("\x00\x00\x00\x19\x00\x00\x00\x59"), nil},
-		encoderTest{"\x1AZ", []byte("\x00\x00\x00\x1A\x00\x00\x00\x5A"), nil},
-		encoderTest{"\x1B[", []byte("\x00\x00\x00\x1B\x00\x00\x00\x5B"), nil},
-		encoderTest{"\x1C\\", []byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), nil},
-		encoderTest{"\x1D]", []byte("\x00\x00\x00\x1D\x00\x00\x00\x5D"), nil},
-		encoderTest{"\x1E^", []byte("\x00\x00\x00\x1E\x00\x00\x00\x5E"), nil},
-		encoderTest{"\x1F_", []byte("\x00\x00\x00\x1F\x00\x00\x00\x5F"), nil},
-		encoderTest{"\x20`", []byte("\x00\x00\x00\x20\x00\x00\x00\x60"), nil},
-		encoderTest{"\x21a", []byte("\x00\x00\x00\x21\x00\x00\x00\x61"), nil},
-		encoderTest{"\x22b", []byte("\x00\x00\x00\x22\x00\x00\x00\x62"), nil},
-		encoderTest{"#c", []byte("\x00\x00\x00\x23\x00\x00\x00\x63"), nil},
-		encoderTest{"$d", []byte("\x00\x00\x00\x24\x00\x00\x00\x64"), nil},
-		encoderTest{"%e", []byte("\x00\x00\x00\x25\x00\x00\x00\x65"), nil},
-		encoderTest{"&f", []byte("\x00\x00\x00\x26\x00\x00\x00\x66"), nil},
-		encoderTest{"'g", []byte("\x00\x00\x00\x27\x00\x00\x00\x67"), nil},
-		encoderTest{"(h", []byte("\x00\x00\x00\x28\x00\x00\x00\x68"), nil},
-		encoderTest{")i", []byte("\x00\x00\x00\x29\x00\x00\x00\x69"), nil},
-		encoderTest{"*j", []byte("\x00\x00\x00\x2A\x00\x00\x00\x6A"), nil},
-		encoderTest{"+k", []byte("\x00\x00\x00\x2B\x00\x00\x00\x6B"), nil},
-		encoderTest{",l", []byte("\x00\x00\x00\x2C\x00\x00\x00\x6C"), nil},
-		encoderTest{"-m", []byte("\x00\x00\x00\x2D\x00\x00\x00\x6D"), nil},
-		encoderTest{".n", []byte("\x00\x00\x00\x2E\x00\x00\x00\x6E"), nil},
-		encoderTest{"/o", []byte("\x00\x00\x00\x2F\x00\x00\x00\x6F"), nil},
-		encoderTest{"0p", []byte("\x00\x00\x00\x30\x00\x00\x00\x70"), nil},
-		encoderTest{"1q", []byte("\x00\x00\x00\x31\x00\x00\x00\x71"), nil},
-		encoderTest{"2r", []byte("\x00\x00\x00\x32\x00\x00\x00\x72"), nil},
-		encoderTest{"3s", []byte("\x00\x00\x00\x33\x00\x00\x00\x73"), nil},
-		encoderTest{"4t", []byte("\x00\x00\x00\x34\x00\x00\x00\x74"), nil},
-		encoderTest{"5u", []byte("\x00\x00\x00\x35\x00\x00\x00\x75"), nil},
-		encoderTest{"6v", []byte("\x00\x00\x00\x36\x00\x00\x00\x76"), nil},
-		encoderTest{"7w", []byte("\x00\x00\x00\x37\x00\x00\x00\x77"), nil},
-		encoderTest{"8x", []byte("\x00\x00\x00\x38\x00\x00\x00\x78"), nil},
-		encoderTest{"9y", []byte("\x00\x00\x00\x39\x00\x00\x00\x79"), nil},
-		encoderTest{":z", []byte("\x00\x00\x00\x3A\x00\x00\x00\x7A"), nil},
-		encoderTest{";{", []byte("\x00\x00\x00\x3B\x00\x00\x00\x7B"), nil},
-		encoderTest{"<|", []byte("\x00\x00\x00\x3C\x00\x00\x00\x7C"), nil},
-		encoderTest{"=}", []byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), nil},
-		encoderTest{">~", []byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), nil},
-		encoderTest{"?\x7F", []byte("\x00\x00\x00\x3F\x00\x00\x00\x7F"), nil},
+		// handle escaped chars
+		encoderTest{`\x00\x01`, []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{`\x02\x03`, []byte("\x00\x00\x00\x02\x00\x00\x00\x03"), nil},
+		encoderTest{`\x04\x05`, []byte("\x00\x00\x00\x04\x00\x00\x00\x05"), nil},
+		encoderTest{`\x06\x07`, []byte("\x00\x00\x00\x06\x00\x00\x00\x07"), nil},
+		encoderTest{`\x08\x09`, []byte("\x00\x00\x00\x08\x00\x00\x00\x09"), nil},
+		encoderTest{`\x10\x11`, []byte("\x00\x00\x00\x10\x00\x00\x00\x11"), nil},
+		encoderTest{`\x12\x13`, []byte("\x00\x00\x00\x12\x00\x00\x00\x13"), nil},
+		encoderTest{`\x14\x15`, []byte("\x00\x00\x00\x14\x00\x00\x00\x15"), nil},
+		encoderTest{`\x16\x17`, []byte("\x00\x00\x00\x16\x00\x00\x00\x17"), nil},
+		encoderTest{`\x18\x19`, []byte("\x00\x00\x00\x18\x00\x00\x00\x19"), nil},
+		encoderTest{`\x20\x21`, []byte("\x00\x00\x00\x20\x00\x00\x00\x21"), nil},
+		encoderTest{` !\"#`, []byte("\x00\x00\x00\x20\x00\x00\x00\x21\x00\x00\x00\x22\x00\x00\x00\x23"), nil},
+		encoderTest{"$%&'", []byte("\x00\x00\x00\x24\x00\x00\x00\x25\x00\x00\x00\x26\x00\x00\x00\x27"), nil},
+		encoderTest{"()*+", []byte("\x00\x00\x00\x28\x00\x00\x00\x29\x00\x00\x00\x2a\x00\x00\x00\x2b"), nil},
+		encoderTest{",-./", []byte("\x00\x00\x00\x2c\x00\x00\x00\x2d\x00\x00\x00\x2e\x00\x00\x00\x2f"), nil},
+		encoderTest{"0123", []byte("\x00\x00\x00\x30\x00\x00\x00\x31\x00\x00\x00\x32\x00\x00\x00\x33"), nil},
+		encoderTest{"4567", []byte("\x00\x00\x00\x34\x00\x00\x00\x35\x00\x00\x00\x36\x00\x00\x00\x37"), nil},
+		encoderTest{"89:;", []byte("\x00\x00\x00\x38\x00\x00\x00\x39\x00\x00\x00\x3a\x00\x00\x00\x3b"), nil},
+		encoderTest{"<=>?", []byte("\x00\x00\x00\x3c\x00\x00\x00\x3d\x00\x00\x00\x3e\x00\x00\x00\x3f"), nil},
+		encoderTest{"@ABC", []byte("\x00\x00\x00\x40\x00\x00\x00\x41\x00\x00\x00\x42\x00\x00\x00\x43"), nil},
+		encoderTest{"DEFG", []byte("\x00\x00\x00\x44\x00\x00\x00\x45\x00\x00\x00\x46\x00\x00\x00\x47"), nil},
+		encoderTest{"HIJK", []byte("\x00\x00\x00\x48\x00\x00\x00\x49\x00\x00\x00\x4a\x00\x00\x00\x4b"), nil},
+		encoderTest{"LMNO", []byte("\x00\x00\x00\x4c\x00\x00\x00\x4d\x00\x00\x00\x4e\x00\x00\x00\x4f"), nil},
+		encoderTest{"PQRS", []byte("\x00\x00\x00\x50\x00\x00\x00\x51\x00\x00\x00\x52\x00\x00\x00\x53"), nil},
+		encoderTest{"TUVW", []byte("\x00\x00\x00\x54\x00\x00\x00\x55\x00\x00\x00\x56\x00\x00\x00\x57"), nil},
+		encoderTest{"XYZ[", []byte("\x00\x00\x00\x58\x00\x00\x00\x59\x00\x00\x00\x5a\x00\x00\x00\x5b"), nil},
+		encoderTest{`\\]^_`, []byte("\x00\x00\x00\x5c\x00\x00\x00\x5d\x00\x00\x00\x5e\x00\x00\x00\x5f"), nil},
+		encoderTest{"`abc", []byte("\x00\x00\x00\x60\x00\x00\x00\x61\x00\x00\x00\x62\x00\x00\x00\x63"), nil},
+		encoderTest{"defg", []byte("\x00\x00\x00\x64\x00\x00\x00\x65\x00\x00\x00\x66\x00\x00\x00\x67"), nil},
+		encoderTest{"hijk", []byte("\x00\x00\x00\x68\x00\x00\x00\x69\x00\x00\x00\x6a\x00\x00\x00\x6b"), nil},
+		encoderTest{"lmno", []byte("\x00\x00\x00\x6c\x00\x00\x00\x6d\x00\x00\x00\x6e\x00\x00\x00\x6f"), nil},
+		encoderTest{"pqrs", []byte("\x00\x00\x00\x70\x00\x00\x00\x71\x00\x00\x00\x72\x00\x00\x00\x73"), nil},
+		encoderTest{"tuvw", []byte("\x00\x00\x00\x74\x00\x00\x00\x75\x00\x00\x00\x76\x00\x00\x00\x77"), nil},
+		encoderTest{"xyz{", []byte("\x00\x00\x00\x78\x00\x00\x00\x79\x00\x00\x00\x7a\x00\x00\x00\x7b"), nil},
+		encoderTest{"|}~\\x7F", []byte("\x00\x00\x00\x7c\x00\x00\x00\x7d\x00\x00\x00\x7e\x00\x00\x00\x7f"), nil},
+
+		encoderTest{`\"\x22`, []byte("\x00\x00\x00\x22\x00\x00\x00\x22"), nil},
+		encoderTest{"\x20 ", []byte("\x00\x00\x00\x20\x00\x00\x00\x20"), nil},
+
+		// high ascii and multibyte
+		encoderTest{`\x80`, []byte("\x00\x00\x00\x80"), nil},
+		encoderTest{`ÿ`, []byte("\x00\x00\x00\xff"), nil},
+		encoderTest{`א`, []byte("\x00\x00\x05\xd0"), nil},
+		encoderTest{`日`, []byte("\x00\x00\x65\xe5"), nil},
+		encoderTest{`🤓`, []byte("\x00\x01\xF9\x13"), nil},
+		encoderTest{"丽丸", []byte("\x00\x00\x4e\x3d\x00\x00\x4e\x38"), nil},
+		encoderTest{"乁𠄢", []byte("\x00\x00\x4e\x41\x00\x02\x01\x22"), nil},
+		encoderTest{"你侮", []byte("\x00\x00\x4f\x60\x00\x00\x4f\xae"), nil},
+
+		// invalid escape sequence
+		encoderTest{"\\x", nil, errInvalidEscape(typ, "\\x", "EOF during hex encoded character")},
+		encoderTest{"\\x2", nil, errInvalidEscape(typ, "\\x2", "EOF during hex encoded character")},
+		encoderTest{"\\x0M", nil, errInvalidEscape(typ, "\\x0M", "encoding/hex: invalid byte: U+004D 'M'")},
+		encoderTest{"\\xM0", nil, errInvalidEscape(typ, "\\xM0", "encoding/hex: invalid byte: U+004D 'M'")},
+		encoderTest{"\\x-1", nil, errInvalidEscape(typ, "\\x-1", "encoding/hex: invalid byte: U+002D '-'")},
+		encoderTest{"\\0F", nil, errInvalidEscape(typ, "\\0", "")},
+
+		// don't accept unescaped control characters
+		encoderTest{"\"", nil, errUnescaped(typ, '"')},
+		encoderTest{"\n", nil, errUnescaped(typ, '\n')},
+		encoderTest{"\r", nil, errUnescaped(typ, '\r')},
+		encoderTest{"\\", nil, errInvalidEscape(typ, "\\", "EOF during escaped character")},
+		encoderTest{"\x00", nil, errUnescaped(typ, '\x00')},
+		encoderTest{"\x01", nil, errUnescaped(typ, '\x01')},
+		encoderTest{"\x02", nil, errUnescaped(typ, '\x02')},
+		encoderTest{"\x03", nil, errUnescaped(typ, '\x03')},
+		encoderTest{"\x04", nil, errUnescaped(typ, '\x04')},
+		encoderTest{"\x05", nil, errUnescaped(typ, '\x05')},
+		encoderTest{"\x06", nil, errUnescaped(typ, '\x06')},
+		encoderTest{"\x07", nil, errUnescaped(typ, '\x07')},
+		encoderTest{"\x08", nil, errUnescaped(typ, '\x08')},
+		encoderTest{"\x09", nil, errUnescaped(typ, '\x09')},
+		encoderTest{"\x0a", nil, errUnescaped(typ, '\n')},
+		encoderTest{"\x0b", nil, errUnescaped(typ, '\x0b')},
+		encoderTest{"\x0c", nil, errUnescaped(typ, '\x0c')},
+		encoderTest{"\x0d", nil, errUnescaped(typ, '\r')},
+		encoderTest{"\x0e", nil, errUnescaped(typ, '\x0e')},
+		encoderTest{"\x0f", nil, errUnescaped(typ, '\x0f')},
+		encoderTest{"\x10", nil, errUnescaped(typ, '\x10')},
+		encoderTest{"\x11", nil, errUnescaped(typ, '\x11')},
+		encoderTest{"\x12", nil, errUnescaped(typ, '\x12')},
+		encoderTest{"\x13", nil, errUnescaped(typ, '\x13')},
+		encoderTest{"\x14", nil, errUnescaped(typ, '\x14')},
+		encoderTest{"\x15", nil, errUnescaped(typ, '\x15')},
+		encoderTest{"\x16", nil, errUnescaped(typ, '\x16')},
+		encoderTest{"\x17", nil, errUnescaped(typ, '\x17')},
+		encoderTest{"\x18", nil, errUnescaped(typ, '\x18')},
+		encoderTest{"\x19", nil, errUnescaped(typ, '\x19')},
+		encoderTest{"\x1a", nil, errUnescaped(typ, '\x1a')},
+		encoderTest{"\x1b", nil, errUnescaped(typ, '\x1b')},
+		encoderTest{"\x1c", nil, errUnescaped(typ, '\x1c')},
+		encoderTest{"\x1d", nil, errUnescaped(typ, '\x1d')},
+		encoderTest{"\x1e", nil, errUnescaped(typ, '\x1e')},
+		encoderTest{"\x1f", nil, errUnescaped(typ, '\x1f')},
+		encoderTest{"\x7f", nil, errUnescaped(typ, '\x7f')},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetUSTRFromString(atom, input.(string))
 	})
 }
 
-// func USTRFromQuotedEscapedString will unescape anything that is escaped
+// func USTRFromDelimitedString will unescape anything that is escaped
 // before storing, but it handles special chars the same even if they're not
 // escaped. For example:  \n, \x0A, \\x0A, all get stored the same.
 // While not intentional, I'm considering it a harmeless quirk instead of a bug
 // for now.
-func TestSetUSTRFromQuotedEscapedString(t *testing.T) {
+func TestSetUSTRFromDelimitedString(t *testing.T) {
 	typ := "USTR"
-	zero := []byte(nil)
 	tests := []encoderTest{
 		encoderTest{"\"\"", []byte(""), nil},
 		encoderTest{"\"\\x00@\"", []byte("\x00\x00\x00\x00\x00\x00\x00\x40"), nil},
@@ -2810,8 +2842,8 @@ func TestSetUSTRFromQuotedEscapedString(t *testing.T) {
 		encoderTest{"\"\\x08H\"", []byte("\x00\x00\x00\x08\x00\x00\x00\x48"), nil},
 		encoderTest{"\"\\x09I\"", []byte("\x00\x00\x00\x09\x00\x00\x00\x49"), nil},
 		encoderTest{"\"\\nJ\"", []byte("\x00\x00\x00\x0A\x00\x00\x00\x4A"), nil},
-		encoderTest{"\"\x0BK\"", []byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), nil},
-		encoderTest{"\"\x0CL\"", []byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), nil},
+		encoderTest{"\"\\x0BK\"", []byte("\x00\x00\x00\x0B\x00\x00\x00\x4B"), nil},
+		encoderTest{"\"\\x0CL\"", []byte("\x00\x00\x00\x0C\x00\x00\x00\x4C"), nil},
 		encoderTest{"\"\\rM\"", []byte("\x00\x00\x00\x0D\x00\x00\x00\x4D"), nil},
 		encoderTest{"\"\\x0EN\"", []byte("\x00\x00\x00\x0E\x00\x00\x00\x4E"), nil},
 		encoderTest{"\"\\x0FO\"", []byte("\x00\x00\x00\x0F\x00\x00\x00\x4F"), nil},
@@ -2833,7 +2865,7 @@ func TestSetUSTRFromQuotedEscapedString(t *testing.T) {
 		encoderTest{"\"\\x20`\"", []byte("\x00\x00\x00\x20\x00\x00\x00\x60"), nil},
 		encoderTest{"\"\\x21a\"", []byte("\x00\x00\x00\x21\x00\x00\x00\x61"), nil},
 		encoderTest{"\"\\\"b\"", []byte("\x00\x00\x00\x22\x00\x00\x00\x62"), nil},
-		encoderTest{"\"\\x1C\\\\\"", []byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), nil},
+		encoderTest{`"\x1C\\"`, []byte("\x00\x00\x00\x1C\x00\x00\x00\x5C"), nil},
 		encoderTest{"\"#c\"", []byte("\x00\x00\x00\x23\x00\x00\x00\x63"), nil},
 		encoderTest{"\"$d\"", []byte("\x00\x00\x00\x24\x00\x00\x00\x64"), nil},
 		encoderTest{"\"%e\"", []byte("\x00\x00\x00\x25\x00\x00\x00\x65"), nil},
@@ -2862,36 +2894,28 @@ func TestSetUSTRFromQuotedEscapedString(t *testing.T) {
 		encoderTest{"\"<|\"", []byte("\x00\x00\x00\x3C\x00\x00\x00\x7C"), nil},
 		encoderTest{"\"=}\"", []byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), nil},
 		encoderTest{"\">~\"", []byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), nil},
-		encoderTest{"\"?\x7F\"", []byte("\x00\x00\x00\x3F\x00\x00\x00\x7F"), nil},
-	}
-	var arrInvalid = []string{"dog", "0-0-0-0-0", ".", " ", ""}
-	for _, str := range arrInvalid {
-		err := fmt.Errorf("USTR input string must be double-quoted: (%s)", str)
-		tests = append(tests, encoderTest{str, zero, err})
-	}
-	arrInvalid = []string{
-		`"\"`, // should be escaped as \\
-	}
-	for _, str := range arrInvalid {
-		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+		encoderTest{"\"?\\x7F\"", []byte("\x00\x00\x00\x3F\x00\x00\x00\x7F"), nil},
+		encoderTest{`"\"`, nil, errInvalidEscape(typ, `\`, "EOF during escaped character")},
+		encoderTest{`"""`, nil, errUnescaped(typ, '"')},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUSTRFromQuotedEscapedString(atom, input.(string))
+		return SetUSTRFromDelimitedString(atom, input.(string))
 	})
 }
 
 func TestSetCSTRFromString(t *testing.T) {
+	typ := "CSTR"
 	tests := []encoderTest{
 		encoderTest{"", []byte("\x00"), nil},
-		encoderTest{"    \x01\x02\x03", []byte("\x20\x20\x20\x20\x01\x02\x03\x00"), nil},
-		encoderTest{"\x04\x05\x06\x07", []byte("\x04\x05\x06\x07\x00"), nil},
-		encoderTest{"\x08\x09\n\x0B", []byte("\x08\x09\x0a\x0b\x00"), nil},
-		encoderTest{"\x0C\r\x0E\x0F", []byte("\x0c\x0d\x0e\x0f\x00"), nil},
-		encoderTest{"\x10\x11\x12\x13", []byte("\x10\x11\x12\x13\x00"), nil},
-		encoderTest{"\x14\x15\x16\x17", []byte("\x14\x15\x16\x17\x00"), nil},
-		encoderTest{"\x18\x19\x1A\x1B", []byte("\x18\x19\x1a\x1b\x00"), nil},
-		encoderTest{"\x1C\x1D\x1E\x1F", []byte("\x1c\x1d\x1e\x1f\x00"), nil},
-		encoderTest{` !"#`, []byte("\x20\x21\x22\x23\x00"), nil},
+		encoderTest{`\x20\x01\x02\x03`, []byte("\x20\x01\x02\x03\x00"), nil},
+		encoderTest{`\x04\x05\x06\x07`, []byte("\x04\x05\x06\x07\x00"), nil},
+		encoderTest{`\x08\x09\x0A\x0B`, []byte("\x08\x09\x0a\x0b\x00"), nil},
+		encoderTest{`\x0C\x0D\x0E\x0F`, []byte("\x0c\x0d\x0e\x0f\x00"), nil},
+		encoderTest{`\x10\x11\x12\x13`, []byte("\x10\x11\x12\x13\x00"), nil},
+		encoderTest{`\x14\x15\x16\x17`, []byte("\x14\x15\x16\x17\x00"), nil},
+		encoderTest{`\x18\x19\x1A\x1B`, []byte("\x18\x19\x1a\x1b\x00"), nil},
+		encoderTest{`\x1C\x1D\x1E\x1F`, []byte("\x1c\x1d\x1e\x1f\x00"), nil},
+		encoderTest{` !\"#`, []byte("\x20\x21\x22\x23\x00"), nil},
 		encoderTest{"$%&'", []byte("\x24\x25\x26\x27\x00"), nil},
 		encoderTest{"()*+", []byte("\x28\x29\x2a\x2b\x00"), nil},
 		encoderTest{",-./", []byte("\x2c\x2d\x2e\x2f\x00"), nil},
@@ -2906,7 +2930,7 @@ func TestSetCSTRFromString(t *testing.T) {
 		encoderTest{"PQRS", []byte("\x50\x51\x52\x53\x00"), nil},
 		encoderTest{"TUVW", []byte("\x54\x55\x56\x57\x00"), nil},
 		encoderTest{"XYZ[", []byte("\x58\x59\x5a\x5b\x00"), nil},
-		encoderTest{`\]^_`, []byte("\x5c\x5d\x5e\x5f\x00"), nil},
+		encoderTest{`\\]^_`, []byte("\x5c\x5d\x5e\x5f\x00"), nil},
 		encoderTest{"`abc", []byte("\x60\x61\x62\x63\x00"), nil},
 		encoderTest{"defg", []byte("\x64\x65\x66\x67\x00"), nil},
 		encoderTest{"hijk", []byte("\x68\x69\x6a\x6b\x00"), nil},
@@ -2914,22 +2938,60 @@ func TestSetCSTRFromString(t *testing.T) {
 		encoderTest{"pqrs", []byte("\x70\x71\x72\x73\x00"), nil},
 		encoderTest{"tuvw", []byte("\x74\x75\x76\x77\x00"), nil},
 		encoderTest{"xyz{", []byte("\x78\x79\x7a\x7b\x00"), nil},
-		encoderTest{"|}~\x7F", []byte("\x7c\x7d\x7e\x7f\x00"), nil},
-		encoderTest{"\\x00", []byte("\x5c\x78\x30\x30\x00"), nil},
+		encoderTest{"|}~\\x7F", []byte("\x7c\x7d\x7e\x7f\x00"), nil},
+		encoderTest{`\x00`, []byte("\x5c\x78\x30\x30\x00"), nil},
+
+		// don't accept unescaped control characters
+		encoderTest{"\"", nil, errUnescaped(typ, '"')},
+		encoderTest{"\n", nil, errUnescaped(typ, '\n')},
+		encoderTest{"\r", nil, errUnescaped(typ, '\r')},
+		encoderTest{"\\", nil, errInvalidEscape(typ, "\\", "EOF during escaped character")},
+		encoderTest{"\x00", nil, errUnescaped(typ, '\x00')},
+		encoderTest{"\x01", nil, errUnescaped(typ, '\x01')},
+		encoderTest{"\x02", nil, errUnescaped(typ, '\x02')},
+		encoderTest{"\x03", nil, errUnescaped(typ, '\x03')},
+		encoderTest{"\x04", nil, errUnescaped(typ, '\x04')},
+		encoderTest{"\x05", nil, errUnescaped(typ, '\x05')},
+		encoderTest{"\x06", nil, errUnescaped(typ, '\x06')},
+		encoderTest{"\x07", nil, errUnescaped(typ, '\x07')},
+		encoderTest{"\x08", nil, errUnescaped(typ, '\x08')},
+		encoderTest{"\x09", nil, errUnescaped(typ, '\x09')},
+		encoderTest{"\x0a", nil, errUnescaped(typ, '\n')},
+		encoderTest{"\x0b", nil, errUnescaped(typ, '\x0b')},
+		encoderTest{"\x0c", nil, errUnescaped(typ, '\x0c')},
+		encoderTest{"\x0d", nil, errUnescaped(typ, '\r')},
+		encoderTest{"\x0e", nil, errUnescaped(typ, '\x0e')},
+		encoderTest{"\x0f", nil, errUnescaped(typ, '\x0f')},
+		encoderTest{"\x10", nil, errUnescaped(typ, '\x10')},
+		encoderTest{"\x11", nil, errUnescaped(typ, '\x11')},
+		encoderTest{"\x12", nil, errUnescaped(typ, '\x12')},
+		encoderTest{"\x13", nil, errUnescaped(typ, '\x13')},
+		encoderTest{"\x14", nil, errUnescaped(typ, '\x14')},
+		encoderTest{"\x15", nil, errUnescaped(typ, '\x15')},
+		encoderTest{"\x16", nil, errUnescaped(typ, '\x16')},
+		encoderTest{"\x17", nil, errUnescaped(typ, '\x17')},
+		encoderTest{"\x18", nil, errUnescaped(typ, '\x18')},
+		encoderTest{"\x19", nil, errUnescaped(typ, '\x19')},
+		encoderTest{"\x1a", nil, errUnescaped(typ, '\x1a')},
+		encoderTest{"\x1b", nil, errUnescaped(typ, '\x1b')},
+		encoderTest{"\x1c", nil, errUnescaped(typ, '\x1c')},
+		encoderTest{"\x1d", nil, errUnescaped(typ, '\x1d')},
+		encoderTest{"\x1e", nil, errUnescaped(typ, '\x1e')},
+		encoderTest{"\x1f", nil, errUnescaped(typ, '\x1f')},
+		encoderTest{"\x7f", nil, errUnescaped(typ, '\x7f')},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetCSTRFromString(atom, input.(string))
 	})
 }
-func TestSetCSTRFromQuotedEscapedString(t *testing.T) {
-	typ := "CSTR"
+func TestSetCSTRFromDelimitedString(t *testing.T) {
 	zero := []byte(nil)
 	tests := []encoderTest{
 		encoderTest{`""`, []byte("\x00"), nil},
-		encoderTest{`"    \x01\x02\x03"`, []byte("\x20\x20\x20\x20\x01\x02\x03\x00"), nil},
+		encoderTest{`"\x01\x02\x03"`, []byte("\x01\x02\x03\x00"), nil},
 		encoderTest{`"\x04\x05\x06\x07"`, []byte("\x04\x05\x06\x07\x00"), nil},
-		encoderTest{`"\x08\x09\n\x0B"`, []byte("\x08\x09\x0a\x0b\x00"), nil},
-		encoderTest{`"\x0C\r\x0E\x0F"`, []byte("\x0c\x0d\x0e\x0f\x00"), nil},
+		encoderTest{`"\x08\x09\x0A\x0B"`, []byte("\x08\x09\x0a\x0b\x00"), nil},
+		encoderTest{`"\x0C\x0D\x0E\x0F"`, []byte("\x0c\x0d\x0e\x0f\x00"), nil},
 		encoderTest{`"\x10\x11\x12\x13"`, []byte("\x10\x11\x12\x13\x00"), nil},
 		encoderTest{`"\x14\x15\x16\x17"`, []byte("\x14\x15\x16\x17\x00"), nil},
 		encoderTest{`"\x18\x19\x1A\x1B"`, []byte("\x18\x19\x1a\x1b\x00"), nil},
@@ -2959,18 +3021,20 @@ func TestSetCSTRFromQuotedEscapedString(t *testing.T) {
 		encoderTest{`"xyz{"`, []byte("\x78\x79\x7a\x7b\x00"), nil},
 		encoderTest{`"|}~\x7F"`, []byte("\x7c\x7d\x7e\x7f\x00"), nil},
 		encoderTest{`"\\x00"`, []byte("\x5c\x78\x30\x30\x00"), nil},
+		encoderTest{`"\n\r\"\\"`, []byte("\x0a\x0d\x22\x5c\x00"), nil},
+
+		encoderTest{`"\"`, nil, errInvalidEscape("CSTR", `\`, "EOF during escaped character")},
+		encoderTest{`"""`, nil, errUnescaped("CSTR", '"')},
+		encoderTest{"\"\n\"", nil, errUnescaped("CSTR", '\n')},
+		encoderTest{"\"\r\"", nil, errUnescaped("CSTR", '\r')},
 	}
 	var arrInvalid = []string{"dog", "0-0-0-0-0", ".", " ", ""}
 	for _, str := range arrInvalid {
 		err := fmt.Errorf("CSTR input string must be double-quoted: (%s)", str)
 		tests = append(tests, encoderTest{str, zero, err})
 	}
-	arrInvalid = []string{`"\"`, `"""`}
-	for _, str := range arrInvalid {
-		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
-	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetCSTRFromQuotedEscapedString(atom, input.(string))
+		return SetCSTRFromDelimitedString(atom, input.(string))
 	})
 }
 

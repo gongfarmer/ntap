@@ -109,7 +109,7 @@ func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
 	return fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", t, bytesWant, bytesGot)
 }
 func errStrInvalid(t string, v string) error {
-	return fmt.Errorf("invalid string value for ADE type %s: \"%s\"", t, v)
+	return fmt.Errorf("invalid string value for ADE type %s: \"%s\"", t, strconv.Quote(v))
 }
 func errRange(t string, v interface{}) (e error) {
 	switch v := v.(type) {
@@ -125,6 +125,17 @@ func errRange(t string, v interface{}) (e error) {
 		panic(fmt.Errorf("cannot handle type %T", v))
 	}
 	return
+}
+func errInvalidEscape(t, v, note string) (e error) {
+	if note == "" {
+		e = fmt.Errorf("invalid escape sequence in %s value: %s", t, v)
+	} else {
+		e = fmt.Errorf("invalid escape sequence in %s value \"%s\": %s", t, v, note)
+	}
+	return
+}
+func errUnescaped(typ string, r rune) error {
+	return fmt.Errorf("Character %s must be escaped in %s value", strconv.QuoteRune(r), typ)
 }
 
 // NewCodec returns a codec that performs type conversion for atom data.
@@ -762,8 +773,8 @@ func SR64ToString(buf []byte) (v string, e error) {
 // The string may be either 4 printable characters, or 0x followed by 8 hex
 // digits.
 //
-// This code includes a fix for Mantis #27726: ccat/ctac can't parse container
-// names starting with "#" or " ".
+// This code avoids Mantis #27726: ccat/ctac can't parse container names
+// starting with "#" or " ".
 func FC32ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 4, "FC32"); e != nil {
 		return
@@ -785,6 +796,9 @@ func FC32ToString(buf []byte) (v string, e error) {
 // single-quote delimiters.
 func FC32ToStringDelimited(buf []byte) (v string, e error) {
 	v, e = FC32ToString(buf)
+	if e != nil {
+		return
+	}
 	if len(v) == 4 {
 		v = fmt.Sprintf("'%s'", v)
 	}
@@ -875,7 +889,7 @@ func CSTRToString(buf []byte) (v string, e error) {
 		}
 		return
 	}
-	v = adeEscapeBytes(buf[:len(buf)-1]) // discard null terminator
+	v = CSTRBytesToEscapedString(buf[:len(buf)-1]) // discard null terminator
 	return v, nil
 }
 
@@ -897,20 +911,15 @@ func USTRToString(buf []byte) (v string, e error) {
 	var codepoint rune
 	for i := 0; i < len(buf); i += 4 {
 		codepoint = rune(binary.BigEndian.Uint32(buf[i : i+4]))
-		// Apply ADE string escaping rules
-		switch codepoint {
+		switch codepoint { // Apply ADE string escaping rules
 		case '\n':
-			output.WriteRune('\\')
-			output.WriteRune('n')
+			output.WriteString(`\n`)
 		case '\r':
-			output.WriteRune('\\')
-			output.WriteRune('r')
+			output.WriteString(`\r`)
 		case '\\':
-			output.WriteRune('\\')
-			output.WriteRune('\\')
+			output.WriteString(`\\`)
 		case '"':
-			output.WriteRune('\\')
-			output.WriteRune('"')
+			output.WriteString(`\"`)
 		default:
 			if unicode.IsControl(codepoint) {
 				output.WriteString(fmt.Sprintf("\\x%02X", codepoint))
@@ -943,12 +952,13 @@ func BytesToHexString(buf []byte) (v string, e error) {
 
 // ade: libs/osl/OSL_Types.cc CStr_Escape()
 // Escaping must be performed on raw byte slice, not on same data casted to
-// string. This is because casting a string containing high ascii (128-255)
-// will convert invalid  codepoint representations (eg. 0xFF for U+00FF) to the
-// Unicode replacement character.
-// The tricky part is that valid unicode must not be altered.
-// This method should always return valid UTF-8.
-func adeEscapeBytes(input []byte) string {
+// string. This is because casting a byte slice containing high ascii (128-255)
+// to string will convert invalid codepoint representations (eg. 0xFF for
+// U+00FF) to the Unicode replacement character.
+// The trickiest part here is that valid unicode must not be altered.
+// This method should always return valid UTF-8, because invalid UTF-8 must be
+// detected and escaped.
+func CSTRBytesToEscapedString(input []byte) string {
 	output := make([]rune, 0, len(input))
 	for i := 0; i < len(input); i++ {
 		b := input[i]
@@ -971,6 +981,88 @@ func adeEscapeBytes(input []byte) string {
 		}
 	}
 	return string(output)
+}
+
+func CSTRBytesFromEscapedString(input string) (output []byte, e error) {
+	buf := bytes.NewBuffer(make([]byte, 0, len(input)+1))
+
+	var isEscaped, isHexEncode bool
+	var hexRunes = make([]rune, 0, 2)
+	var hexBytes []byte
+	for _, r := range input {
+		if isHexEncode {
+			hexRunes = append(hexRunes, r)
+			if len(hexRunes) < 2 {
+				continue
+			}
+			if hexBytes, e = hex.DecodeString(string(hexRunes)); e != nil {
+				e = errInvalidEscape("CSTR", fmt.Sprintf("\\x%s", string(hexRunes)), e.Error())
+				return
+			}
+			if len(hexBytes) == 2 {
+				r = rune(binary.BigEndian.Uint16(hexBytes))
+			} else {
+				r = rune(hexBytes[0])
+			}
+			hexRunes = hexRunes[:0] // clear buffer without altering capacity
+			isHexEncode = false
+
+			if r == 0 {
+				buf.WriteString(`\x00`) // can't encode null terminator within CSTR
+				continue
+			}
+
+		} else if isEscaped {
+			switch r {
+			case 'n':
+				r = '\n'
+			case 'r':
+				r = '\r'
+			case '\\', '"':
+			case 'x':
+				isEscaped = false
+				isHexEncode = true
+				continue
+			default:
+				e = errInvalidEscape("CSTR", fmt.Sprintf("\\%c", r), "")
+				return
+			}
+			isEscaped = false
+		} else if r == '\\' {
+			isEscaped = true
+			continue
+		} else if adeMustEscapeRune(r) {
+			e = errUnescaped("CSTR", r)
+			return
+		} else if r == rune(0) {
+			e = errStrInvalid("CSTR", input)
+			return
+		}
+		_, e = buf.WriteRune(r)
+		if e != nil {
+			return
+		}
+	}
+	if isHexEncode {
+		strInput := fmt.Sprint("\\x", string(hexRunes)) // drop [] delimiters
+		e = errInvalidEscape("CSTR", strInput, "EOF during hex encoded character")
+		return
+	} else if isEscaped {
+		e = errInvalidEscape("CSTR", "\\", "EOF during escaped character")
+		return
+	}
+	e = buf.WriteByte('\x00') // add null terminator
+	return buf.Bytes(), e
+}
+
+func adeMustEscapeRune(r rune) bool {
+	if r == '\n' || r == '\r' || r == '"' || r == '\\' {
+		return true
+	}
+	if r < 0x20 || r == 0x7f {
+		return true
+	}
+	return false
 }
 
 /**********************************************************
@@ -1104,17 +1196,18 @@ func init() {
 	// ADE String types
 	enc = NewEncoder(CSTR)
 	enc.SetString = SetCSTRFromString
-	enc.SetStringDelimited = SetCSTRFromQuotedEscapedString
+	enc.SetStringDelimited = SetCSTRFromDelimitedString
 	encoderByType[CSTR] = enc
 
 	enc = NewEncoder(USTR)
 	enc.SetString = SetUSTRFromString
-	enc.SetStringDelimited = SetUSTRFromQuotedEscapedString
+	enc.SetStringDelimited = SetUSTRFromDelimitedString
 	encoderByType[USTR] = enc
 
 	// DATA type, and aliases
 	enc = NewEncoder(DATA)
 	enc.SetString = SetDATAFromHexString
+	enc.SetStringDelimited = SetDATAFromHexString
 	encoderByType[DATA] = enc
 	encoderByType[CNCT] = enc
 	encoderByType[Cnct] = enc
@@ -1737,11 +1830,13 @@ func SetIP32FromHexString(a *Atom, v string) (e error) {
 		return errStrInvalid("IP32", v)
 	}
 
-	// allocate enough space
+	// require 8 hex digits
 	size := len(v[2:])
 	if 0 != size%8 || size == 0 {
 		return errStrInvalid("IP32", v)
 	}
+
+	// allocate enough space
 	if len(a.data) != size {
 		a.data = make([]byte, size/2)
 	}
@@ -1826,64 +1921,26 @@ func SetUUIDFromString(a *Atom, v string) (e error) {
 	return
 }
 
-// Uses NULL terminator
-func SetCSTRFromQuotedEscapedString(a *Atom, v string) (e error) {
-
-	// verify delimiters (required for strconv.Unquote() )
-	size := len(v)
-	if size < 2 || v[0] != '"' || v[size-1] != '"' {
+func SetCSTRFromDelimitedString(a *Atom, v string) (e error) {
+	L := len(v)
+	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
 		return fmt.Errorf("CSTR input string must be double-quoted: (%s)", v)
 	}
-
-	// unescape the string
-	var s string
-	s, e = strconv.Unquote(v)
-	if e != nil {
-		return errStrInvalid("CSTR", v)
-	}
-
-	// allocate space
-	size = len(s)
-	buf := make([]byte, size+1)
-	copy(buf[:], s)
-
-	buf[size] = '\x00'
-	a.data = buf
-	return
+	return SetCSTRFromString(a, v[1:L-1])
 }
 
 // Uses NULL terminator
 func SetCSTRFromString(a *Atom, v string) (e error) {
-	size := len(v)
-	buf := make([]byte, size+1)
-	copy(buf[:], v)
-	buf[size] = '\x00'
-	a.data = buf
-	return
+	a.data, e = CSTRBytesFromEscapedString(v)
+	return e
 }
 
-// SetUSTRFromQuotedEscapedString sets the atom data to the byte representation
-// of the input string, which must conform to the following rules:
-//     1) must start and end with double quotes. These are stripped before encoding.
-//     2) special chars must be escaped with a backslash, including '"\
-//     3) carriage return (\n) and line feed (\r) must be expressed as 2 literal chars: \n and \r respectively
-//     4)  nonprintable chars are expressed with 4 literal characters \xXX, where the XX part is the hex value.
-//
-func SetUSTRFromQuotedEscapedString(a *Atom, v string) (e error) {
-
-	// verify delimiters (required for strconv.Unquote() )
-	if len(v) < 2 || (v[0] != '"' || v[len(v)-1] != '"') {
+func SetUSTRFromDelimitedString(a *Atom, v string) (e error) {
+	L := len(v)
+	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
 		return fmt.Errorf("USTR input string must be double-quoted: (%s)", v)
 	}
-
-	// unescape the string
-	var s string
-	s, e = strconv.Unquote(v)
-	if e != nil {
-		return errStrInvalid("USTR", v)
-	}
-
-	return SetUSTRFromString(a, s)
+	return SetUSTRFromString(a, v[1:L-1])
 }
 
 // SetUSTRFromString sets the atom data to the byte representation of the
@@ -1894,13 +1951,62 @@ func SetUSTRFromQuotedEscapedString(a *Atom, v string) (e error) {
 //
 // No NULL terminator is used for this type, unlike CSTR.
 func SetUSTRFromString(a *Atom, v string) (e error) {
-	// write each rune as 4 bytes.
 	buf := bytes.NewBuffer(make([]byte, 0, 4*len(v)))
-	for _, r := range v { // iterate by rune, not byte
-		// cast rune to uint32 to prevent implicit UTF-8 encoding
+
+	// iterate by rune:  The rune value is the unicode codepoint value, which is
+	// useful because that's the same as the UTF32 encoding.
+	var isEscaped, isHexEncode bool
+	var hexRunes = make([]rune, 0, 2)
+	var hexBytes []byte
+	for _, r := range v {
+		if isHexEncode {
+			hexRunes = append(hexRunes, r)
+			if len(hexRunes) < 2 {
+				continue
+			}
+			if hexBytes, e = hex.DecodeString(string(hexRunes)); e != nil {
+				return errInvalidEscape("USTR", fmt.Sprintf("\\x%s", string(hexRunes)), e.Error())
+			}
+			if len(hexBytes) == 2 {
+				r = rune(binary.BigEndian.Uint16(hexBytes))
+			} else {
+				r = rune(hexBytes[0])
+			}
+			hexRunes = hexRunes[:0] // clear buffer without altering capacity
+			isHexEncode = false
+		} else if isEscaped {
+			switch r {
+			case 'n':
+				r = '\n'
+			case 'r':
+				r = '\r'
+			case '\\', '"':
+			case 'x':
+				isEscaped = false
+				isHexEncode = true
+				continue
+			default:
+				return errInvalidEscape("USTR", fmt.Sprintf("\\%c", r), "")
+			}
+			isEscaped = false
+		} else if r == '\\' {
+			isEscaped = true
+			continue
+		} else if adeMustEscapeRune(r) {
+			e = errUnescaped("USTR", r)
+			return
+		}
 		e := binary.Write(buf, binary.BigEndian, uint32(r))
 		if e != nil {
 			return e
+		}
+	}
+	if isEscaped || isHexEncode {
+		if isHexEncode {
+			strInput := fmt.Sprint("\\x", string(hexRunes)) // drop [] delimiters
+			return errInvalidEscape("USTR", strInput, "EOF during hex encoded character")
+		} else {
+			return errInvalidEscape("USTR", "\\", "EOF during escaped character")
 		}
 	}
 	a.data = buf.Bytes()
