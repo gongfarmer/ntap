@@ -778,8 +778,7 @@ func FC32ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 4, "FC32"); e != nil {
 		return
 	}
-	var badStartChars = `# "'`
-	if isPrintableBytes(buf) && !strings.ContainsRune(badStartChars, rune(buf[0])) && !bytes.ContainsRune(buf, '\'') {
+	if isPrintableBytes(buf) && !bytes.ContainsAny(buf, `"' `) && buf[0] != '#' {
 		v = string(buf)
 	} else {
 		v = fmt.Sprintf("0x%08X", buf)

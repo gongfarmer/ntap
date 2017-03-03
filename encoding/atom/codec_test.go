@@ -1143,8 +1143,8 @@ func TestFC32ToString(t *testing.T) {
 		decoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
 		decoderTest{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
 		decoderTest{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
-		decoderTest{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
-		decoderTest{[]byte("\x24\x23\x5c\x21"), `$#\!`, nil},
+		decoderTest{[]byte("\x23\x22\x21\x20"), "0x23222120", nil},
+		decoderTest{[]byte("\x24\x23\x22\x21"), "0x24232221", nil},
 		decoderTest{[]byte("\x25\x24\x23\x5c"), `%$#\`, nil},
 		decoderTest{[]byte("\x26\x25\x24\x23"), "&%$#", nil},
 		decoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
@@ -1199,8 +1199,8 @@ func TestFC32ToStringDelimited(t *testing.T) {
 		decoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
 		decoderTest{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
 		decoderTest{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
-		decoderTest{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
-		decoderTest{[]byte("\x24\x23\x5c\x21"), `'$#\!'`, nil},
+		decoderTest{[]byte("\x23\x22\x21\x20"), "0x23222120", nil},
+		decoderTest{[]byte("\x24\x23\x22\x21"), "0x24232221", nil},
 		decoderTest{[]byte("\x25\x24\x23\x5c"), `'%$#\'`, nil},
 		decoderTest{[]byte("\x26\x25\x24\x23"), `'&%$#'`, nil},
 		decoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
