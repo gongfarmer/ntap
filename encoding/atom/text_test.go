@@ -14,8 +14,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
+
+const txtWriteDebugFiles = true
+const failedOutputDir = "/tmp/test-atom/"
 
 func TestUnmarshalText(t *testing.T) {
 	var buf []byte
@@ -49,6 +53,11 @@ func TestMarshalText(t *testing.T) {
 	var a Atom
 	var got, want []byte
 	var err error
+	if txtWriteDebugFiles {
+		os.RemoveAll(failedOutputDir)
+		os.Mkdir(failedOutputDir, 0766)
+		fmt.Println("failed test results are available for inspection here: ", failedOutputDir)
+	}
 
 	// Assumes testfiles and TestAtoms have matching order
 	for _, f := range txtTestFiles() {
@@ -64,33 +73,47 @@ func TestMarshalText(t *testing.T) {
 			log.Fatalf("Unable to read test file: %s", err.Error())
 		}
 
+		// write files
 		if len(got) != len(want) {
 			t.Errorf("MarshalText: Text size differs from original.  Got %d, want %d:  %s", len(got), len(want), filepath.Base(f))
-			if len(got) < 500 {
-				fmt.Println("got: ", string(got))
-				fmt.Println("wnt: ", string(want))
-				f, err := ioutil.TempFile("/tmp", "got.txt")
-				if err != nil {
-					fmt.Println(err)
-				}
-				f.Write(got)
-				f.Close()
-				f, _ = ioutil.TempFile("/tmp", "want.txt")
-				f.Write(want)
-				f.Close()
 
-				os.Exit(1)
+			if txtWriteDebugFiles {
+				writeDebugFiles(got, want, f, failedOutputDir)
 			}
-		}
 
-		fnm := filepath.Join("/tmp/test", filepath.Base(f))
-		ioutil.WriteFile(fnm, got, 644)
+		}
 
 		// Verify that original matches marshaled text
 		gotSum := sha1.Sum(got)
 		wantSum := sha1.Sum(want)
 		if gotSum != wantSum {
 			t.Errorf("MarshalText: Text output differs from original: %s", filepath.Base(f))
+
+			if txtWriteDebugFiles {
+				writeDebugFiles(got, want, f, failedOutputDir)
+			}
 		}
+	}
+}
+
+// writeDebugFiles is for when a test has failed and the output must be made
+// available for inspection.
+// Arguments are byte slices containing wanted and actual output, and a filename to base output names on.
+// Write the wanted and actual outputs to files in the output  dir.
+func writeDebugFiles(got, want []byte, filename, outputDir string) {
+
+	base := filepath.Base(filename)
+	base = filepath.Join(outputDir, base[:strings.LastIndex(base, ".")])
+	gotPath := strings.Join([]string{base, "-got.txt"}, "")
+	wantPath := strings.Join([]string{base, "-want.txt"}, "")
+
+	err := ioutil.WriteFile(gotPath, got, 0666)
+	if err != nil {
+		fmt.Println("Failed to write output for inspection: ", err)
+	}
+
+	err = ioutil.WriteFile(wantPath, want, 0666)
+	if err != nil {
+		fmt.Println("Failed to write output for inspection: ", err)
 	}
 }
