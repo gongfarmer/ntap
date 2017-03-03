@@ -1136,6 +1136,62 @@ func funcFC32ToUint32(t *testing.T) {
 	})
 }
 
+func TestFC32ToString(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curryErrFunc("FC32", 4)
+	zero := ""
+	tests := []decoderTest{
+		decoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
+		decoderTest{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
+		decoderTest{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
+		decoderTest{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
+		decoderTest{[]byte("\x24\x23\x5c\x21"), `$#\!`, nil},
+		decoderTest{[]byte("\x25\x24\x23\x5c"), `%$#\`, nil},
+		decoderTest{[]byte("\x26\x25\x24\x23"), "&%$#", nil},
+		decoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
+		decoderTest{[]byte("\x28\x27\x26\x25"), "0x28272625", nil},
+		decoderTest{[]byte("\x29\x28\x27\x26"), "0x29282726", nil},
+		decoderTest{[]byte("\x2a\x29\x28\x27"), "0x2A292827", nil},
+		decoderTest{[]byte("\x2b\x2a\x29\x28"), "+*)(", nil},
+		decoderTest{[]byte("\x2c\x2b\x2a\x29"), ",+*)", nil},
+		decoderTest{[]byte("\x2d\x2c\x2b\x2a"), "-,+*", nil},
+		decoderTest{[]byte("\x2e\x2d\x2c\x2b"), ".-,+", nil},
+		decoderTest{[]byte("\x2f\x2e\x2d\x2c"), "/.-,", nil},
+		decoderTest{[]byte("\x30\x2f\x2e\x2d"), "0/.-", nil},
+		decoderTest{[]byte("\x31\x30\x2f\x2e"), "10/.", nil},
+		decoderTest{[]byte("\x32\x31\x30\x2f"), "210/", nil},
+		decoderTest{[]byte("\x5b\x5a\x59\x58"), "[ZYX", nil},
+		decoderTest{[]byte("\x5c\x5b\x5a\x59"), `\[ZY`, nil},
+		decoderTest{[]byte("\x5d\x5c\x5b\x5a"), `]\[Z`, nil},
+		decoderTest{[]byte("\x5e\x5d\x5c\x5b"), `^]\[`, nil},
+		decoderTest{[]byte("\x5f\x5e\x5d\x5c"), `_^]\`, nil},
+		decoderTest{[]byte("\x60\x5f\x5e\x5d"), "`_^]", nil},
+		decoderTest{[]byte("\x61\x60\x5f\x5e"), "a`_^", nil},
+		decoderTest{[]byte("\x62\x61\x60\x5f"), "ba`_", nil},
+		decoderTest{[]byte("\x63\x62\x61\x60"), "cba`", nil},
+		decoderTest{[]byte("\x7b\x7a\x79\x78"), "{zyx", nil},
+		decoderTest{[]byte("\x7c\x7b\x7a\x79"), "|{zy", nil},
+		decoderTest{[]byte("\x7d\x7c\x7b\x7a"), "}|{z", nil},
+		decoderTest{[]byte("\x7e\x7d\x7c\x7b"), "~}|{", nil},
+		decoderTest{[]byte("\x20\x20\x20\x20"), "0x20202020", nil},
+		decoderTest{[]byte("\x00\x00\x00\x00"), "0x00000000", nil},
+		decoderTest{[]byte("\x00\x00\x00\x01"), "0x00000001", nil},
+		decoderTest{[]byte("\x00\x00\x00\x02"), "0x00000002", nil},
+		decoderTest{[]byte("\x0a\x00\x00\x00"), "0x0A000000", nil},
+		decoderTest{[]byte("\x0b\x00\x00\x00"), "0x0B000000", nil},
+		decoderTest{[]byte("\x0c\x00\x00\x00"), "0x0C000000", nil},
+		decoderTest{[]byte("\x0d\x00\x00\x00"), "0x0D000000", nil},
+		decoderTest{[]byte("\x0e\x00\x00\x00"), "0x0E000000", nil},
+		decoderTest{[]byte("\x0f\x00\x00\x00"), "0x0F000000", nil},
+		decoderTest{[]byte(""), zero, byteCountErr(0)},
+		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return FC32ToString(input)
+	})
+}
+
 func TestFC32ToStringDelimited(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("FC32", 4)
 	zero := ""
@@ -1148,9 +1204,9 @@ func TestFC32ToStringDelimited(t *testing.T) {
 		decoderTest{[]byte("\x25\x24\x23\x5c"), `'%$#\'`, nil},
 		decoderTest{[]byte("\x26\x25\x24\x23"), `'&%$#'`, nil},
 		decoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
-		decoderTest{[]byte("\x28\x27\x26\x25"), `'('&%'`, nil},
-		decoderTest{[]byte("\x29\x28\x27\x26"), `')('&'`, nil},
-		decoderTest{[]byte("\x2a\x29\x28\x27"), `'*)(''`, nil},
+		decoderTest{[]byte("\x28\x27\x26\x25"), "0x28272625", nil},
+		decoderTest{[]byte("\x29\x28\x27\x26"), "0x29282726", nil},
+		decoderTest{[]byte("\x2a\x29\x28\x27"), "0x2A292827", nil},
 		decoderTest{[]byte("\x2b\x2a\x29\x28"), `'+*)('`, nil},
 		decoderTest{[]byte("\x2c\x2b\x2a\x29"), `',+*)'`, nil},
 		decoderTest{[]byte("\x2d\x2c\x2b\x2a"), `'-,+*'`, nil},
@@ -1211,61 +1267,6 @@ func TestFC32ToStringDelimited(t *testing.T) {
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return FC32ToStringDelimited(input)
-	})
-}
-func TestFC32ToString(t *testing.T) {
-	byteCountErr := errFunc(errByteCount).curryErrFunc("FC32", 4)
-	zero := ""
-	tests := []decoderTest{
-		decoderTest{[]byte("\x20\x7e\x7d\x7c"), "0x207E7D7C", nil},
-		decoderTest{[]byte("\x21\x20\x7e\x7d"), "0x21207E7D", nil},
-		decoderTest{[]byte("\x5c\x21\x20\x7e"), "0x5C21207E", nil},
-		decoderTest{[]byte("\x23\x5c\x21\x20"), "0x235C2120", nil},
-		decoderTest{[]byte("\x24\x23\x5c\x21"), `$#\!`, nil},
-		decoderTest{[]byte("\x25\x24\x23\x5c"), `%$#\`, nil},
-		decoderTest{[]byte("\x26\x25\x24\x23"), "&%$#", nil},
-		decoderTest{[]byte("\x27\x26\x25\x24"), "0x27262524", nil}, // starts with '
-		decoderTest{[]byte("\x28\x27\x26\x25"), "('&%", nil},
-		decoderTest{[]byte("\x29\x28\x27\x26"), ")('&", nil},
-		decoderTest{[]byte("\x2a\x29\x28\x27"), "*)('", nil},
-		decoderTest{[]byte("\x2b\x2a\x29\x28"), "+*)(", nil},
-		decoderTest{[]byte("\x2c\x2b\x2a\x29"), ",+*)", nil},
-		decoderTest{[]byte("\x2d\x2c\x2b\x2a"), "-,+*", nil},
-		decoderTest{[]byte("\x2e\x2d\x2c\x2b"), ".-,+", nil},
-		decoderTest{[]byte("\x2f\x2e\x2d\x2c"), "/.-,", nil},
-		decoderTest{[]byte("\x30\x2f\x2e\x2d"), "0/.-", nil},
-		decoderTest{[]byte("\x31\x30\x2f\x2e"), "10/.", nil},
-		decoderTest{[]byte("\x32\x31\x30\x2f"), "210/", nil},
-		decoderTest{[]byte("\x5b\x5a\x59\x58"), "[ZYX", nil},
-		decoderTest{[]byte("\x5c\x5b\x5a\x59"), `\[ZY`, nil},
-		decoderTest{[]byte("\x5d\x5c\x5b\x5a"), `]\[Z`, nil},
-		decoderTest{[]byte("\x5e\x5d\x5c\x5b"), `^]\[`, nil},
-		decoderTest{[]byte("\x5f\x5e\x5d\x5c"), `_^]\`, nil},
-		decoderTest{[]byte("\x60\x5f\x5e\x5d"), "`_^]", nil},
-		decoderTest{[]byte("\x61\x60\x5f\x5e"), "a`_^", nil},
-		decoderTest{[]byte("\x62\x61\x60\x5f"), "ba`_", nil},
-		decoderTest{[]byte("\x63\x62\x61\x60"), "cba`", nil},
-		decoderTest{[]byte("\x7b\x7a\x79\x78"), "{zyx", nil},
-		decoderTest{[]byte("\x7c\x7b\x7a\x79"), "|{zy", nil},
-		decoderTest{[]byte("\x7d\x7c\x7b\x7a"), "}|{z", nil},
-		decoderTest{[]byte("\x7e\x7d\x7c\x7b"), "~}|{", nil},
-		decoderTest{[]byte("\x20\x20\x20\x20"), "0x20202020", nil},
-		decoderTest{[]byte("\x00\x00\x00\x00"), "0x00000000", nil},
-		decoderTest{[]byte("\x00\x00\x00\x01"), "0x00000001", nil},
-		decoderTest{[]byte("\x00\x00\x00\x02"), "0x00000002", nil},
-		decoderTest{[]byte("\x0a\x00\x00\x00"), "0x0A000000", nil},
-		decoderTest{[]byte("\x0b\x00\x00\x00"), "0x0B000000", nil},
-		decoderTest{[]byte("\x0c\x00\x00\x00"), "0x0C000000", nil},
-		decoderTest{[]byte("\x0d\x00\x00\x00"), "0x0D000000", nil},
-		decoderTest{[]byte("\x0e\x00\x00\x00"), "0x0E000000", nil},
-		decoderTest{[]byte("\x0f\x00\x00\x00"), "0x0F000000", nil},
-		decoderTest{[]byte(""), zero, byteCountErr(0)},
-		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
-		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
-		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
-	}
-	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
-		return FC32ToString(input)
 	})
 }
 
