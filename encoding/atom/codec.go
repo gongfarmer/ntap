@@ -591,7 +591,7 @@ func FP32ToString(buf []byte) (v string, e error) {
 	var f float64
 	f, e = FP32ToFloat64(buf)
 	if e == nil {
-		v = fmt.Sprintf("%0.8G", f)
+		v = fmt.Sprintf("%0.8E", f)
 	}
 	return
 }
