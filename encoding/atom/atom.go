@@ -22,6 +22,7 @@ var _ encoding.BinaryMarshaler = &Atom{}
 var _ encoding.TextUnmarshaler = &Atom{}
 var _ encoding.TextMarshaler = &Atom{}
 
+// Atom represents a single ADE atom, which may be a container containing other atoms.
 type Atom struct {
 	Name     string
 	typ      ADEType
@@ -130,11 +131,11 @@ func FromFile(path string) (a Atom, err error) {
 	if err != nil {
 		return
 	}
-	var encoded_size = int64(binary.BigEndian.Uint32(buf[0:4]))
-	if encoded_size != fstat.Size() {
+	var encodedSize = int64(binary.BigEndian.Uint32(buf[0:4]))
+	if encodedSize != fstat.Size() {
 		err = fmt.Errorf(
-			"Invalid AtomContainer file, encoded size %d does not match file size %d.",
-			encoded_size, fstat.Size())
+			"invalid AtomContainer file, encoded size %d does not match file size %d",
+			encodedSize, fstat.Size())
 		return
 	}
 
@@ -178,7 +179,7 @@ func isPrintableBytes(buf []byte) bool {
 func zeroOrAllocateByteSlice(buf *[]byte, size int) {
 	if cap(*buf) == size {
 		// zero out the buffer, O(1)
-		for i, _ := range *buf {
+		for i := range *buf {
 			(*buf)[i] = 0
 		}
 	} else {

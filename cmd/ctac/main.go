@@ -80,11 +80,13 @@ func stdinIsEmpty() bool {
 // Define how to get input text, based on command line arguments
 func setInput(argv []string) (input io.Reader, args []string) {
 	var err error
-	if !stdinIsEmpty() {
-		input = os.Stdin
-	} else if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, "Please provide input filename, or pipe in some text.")
-		usage()
+	if len(argv) == 0 {
+		if stdinIsEmpty() {
+			fmt.Fprintln(os.Stderr, "Please provide input filename, or pipe in some text.")
+			usage()
+		} else {
+			input = os.Stdin
+		}
 	} else {
 		if input, err = os.Open(argv[0]); err != nil {
 			log.Fatalf(err.Error())

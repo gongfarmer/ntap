@@ -17,7 +17,7 @@ import (
 
 var (
 	FlagFilename    = flag.String("o", "", "write output to file")
-	FlagOutputXml   = flag.Bool("x", false, "print atom as xml")
+	FlagOutputXML   = flag.Bool("x", false, "print atom as xml")
 	FlagOutputHex   = flag.Bool("X", false, "print atom as hex string")
 	FlagOutputDebug = flag.Bool("d", false, "print atoms in verbose debug format")
 )
@@ -74,7 +74,7 @@ func main() {
 		atomPrinterFunc = formatWriter(printAtomDebug).formatter(output)
 	} else if true == *FlagOutputHex {
 		atomPrinterFunc = formatWriter(printAtomHex).formatter(output)
-	} else if true == *FlagOutputXml {
+	} else if true == *FlagOutputXML {
 		panic("XML output not implemented yet")
 	} else {
 		atomPrinterFunc = formatWriter(printAtomText).formatter(output)
@@ -129,8 +129,12 @@ func stdinIsEmpty() bool {
 	return (stat.Mode() & os.ModeCharDevice) != 0
 }
 
-// Read input and return Atoms.
-// If no files are provided, read from STDIN.
+// ReadAtomsFromInput takes in a possibly empty list of files.
+// If files are provided, read each file as an ADE binary atom, returning the
+// results as a slice of atomPtrs.
+// If no files are provided, then attempt to read a single binary atom from STDIN.
+// An empty array and nil error are returned if no input is found.
+// A non-nil error is returned if invalid input is encountered.
 func ReadAtomsFromInput(files []string) (atoms []*atom.Atom, err error) {
 	if len(files) == 0 && stdinIsEmpty() {
 		return

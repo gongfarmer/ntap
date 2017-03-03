@@ -109,7 +109,7 @@ func (a *Atom) UnmarshalBinary(data []byte) error {
 func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 	atoms, err := ReadAtomsFromBinary(r)
 	if err != nil {
-		return fmt.Errorf("Failed to parse binary stream: %s", err.Error())
+		return fmt.Errorf("failed to parse binary stream: %s", err.Error())
 	}
 
 	// Set receiver to the sole top-level AtomContainer
@@ -118,9 +118,9 @@ func (a *Atom) UnmarshalFromReader(r io.Reader) error {
 		a.Zero()
 		*a = *atoms[0]
 	case 0:
-		err = fmt.Errorf("Binary stream contained no atoms")
+		err = fmt.Errorf("binary stream contained no atoms")
 	default:
-		err = fmt.Errorf("Binary stream contained multiple atoms, but Atom.Unmarshal can only handle 1 atom.")
+		err = fmt.Errorf("binary stream contained multiple atoms, but Atom.Unmarshal can only handle 1 atom")
 	}
 	return err
 }
@@ -200,6 +200,10 @@ func readAtomData(r io.Reader, length uint32, bytesRead *uint32) (data []byte, e
 	return
 }
 
+// ReadAtomsFromHex reads a stream of hex characters that represent the binary
+// encodings of a series of Atoms.  It returns a slice of Atom pointers.
+// If no atoms are found on input, an empty slice is returned and the error code is nil.
+// If invalid input is encountered, a non-nil error is returned.
 func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 	var buffer []byte
 
@@ -262,8 +266,9 @@ func (a *Atom) MarshalBinary() ([]byte, error) {
 	return buf.Bytes(), err
 }
 
-// Serialize this atom and its children to bytes.
-// Write byte stream to the given io.Writer.
+// BinaryWrite serializes the receiver atom and its children to binary format.
+// The result is written as a byte stream into the given Writer argument.
+// If the Writer returns an error, processing stops and the error is returned.
 func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	// create members for atom header
 	var name, typ [4]byte
@@ -300,7 +305,7 @@ func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	return
 }
 
-// Return length of this atom when encoded as binary bytes.
+// Len returns the length this atom would have when encoded as binary bytes.
 func (a *Atom) Len() (length uint32) {
 	length = uint32(headerSize + len(a.data))
 	for _, child := range a.Children {

@@ -105,6 +105,12 @@ type (
 
 // error construction functions
 
+func errNoEncoder(a *Atom, from interface{}) error {
+	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'", from, a.typ)
+}
+func errNoDecoder(from ADEType, to GoType) error {
+	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'", from, to)
+}
 func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
 	return fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", t, bytesWant, bytesGot)
 }
@@ -159,15 +165,15 @@ func NewCodec(a *Atom) *codec {
 // the ADE data type's codec.
 func NewEncoder(i interface{}) encoder {
 	return encoder{
-		SetString:          func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
-		SetStringDelimited: func(a *Atom, v string) (e error) { return noEncoder(a, "string") },
-		SetBool:            func(a *Atom, v bool) (e error) { return noEncoder(a, "bool") },
-		SetUint:            func(a *Atom, v uint64) (e error) { return noEncoder(a, "uint64") },
-		SetInt:             func(a *Atom, v int64) (e error) { return noEncoder(a, "int64") },
-		SetFloat:           func(a *Atom, v float64) (e error) { return noEncoder(a, "float64") },
-		SetSliceOfUint:     func(a *Atom, v []uint64) (e error) { return noEncoder(a, "[]uint64") },
-		SetSliceOfInt:      func(a *Atom, v []int64) (e error) { return noEncoder(a, "[]int64") },
-		SetSliceOfByte:     func(a *Atom, v []byte) (e error) { return noEncoder(a, "[]byte") },
+		SetString:          func(a *Atom, v string) (e error) { return errNoEncoder(a, "string") },
+		SetStringDelimited: func(a *Atom, v string) (e error) { return errNoEncoder(a, "string(delimited)") },
+		SetBool:            func(a *Atom, v bool) (e error) { return errNoEncoder(a, "bool") },
+		SetUint:            func(a *Atom, v uint64) (e error) { return errNoEncoder(a, "uint64") },
+		SetInt:             func(a *Atom, v int64) (e error) { return errNoEncoder(a, "int64") },
+		SetFloat:           func(a *Atom, v float64) (e error) { return errNoEncoder(a, "float64") },
+		SetSliceOfUint:     func(a *Atom, v []uint64) (e error) { return errNoEncoder(a, "[]uint64") },
+		SetSliceOfInt:      func(a *Atom, v []int64) (e error) { return errNoEncoder(a, "[]int64") },
+		SetSliceOfByte:     func(a *Atom, v []byte) (e error) { return errNoEncoder(a, "[]byte") },
 	}
 }
 
@@ -179,27 +185,20 @@ func NewEncoder(i interface{}) encoder {
 // the ADE data type's codec.
 func NewDecoder(from ADEType) decoder {
 	return decoder{
-		String:          func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
-		StringDelimited: func([]byte) (v string, e error) { return v, noDecoder(from, "string") },
-		Bool:            func([]byte) (v bool, e error) { return v, noDecoder(from, "bool") },
-		Uint:            func([]byte) (v uint64, e error) { return v, noDecoder(from, "uint64") },
-		Int:             func([]byte) (v int64, e error) { return v, noDecoder(from, "int64") },
-		Float:           func([]byte) (v float64, e error) { return v, noDecoder(from, "float64") },
-		SliceOfUint:     func([]byte) (v []uint64, e error) { return v, noDecoder(from, "[]uint64") },
-		SliceOfInt:      func([]byte) (v []int64, e error) { return v, noDecoder(from, "[]int64") },
+		String:          func([]byte) (v string, e error) { return v, errNoDecoder(from, "string") },
+		StringDelimited: func([]byte) (v string, e error) { return v, errNoDecoder(from, "string(delimited)") },
+		Bool:            func([]byte) (v bool, e error) { return v, errNoDecoder(from, "bool") },
+		Uint:            func([]byte) (v uint64, e error) { return v, errNoDecoder(from, "uint64") },
+		Int:             func([]byte) (v int64, e error) { return v, errNoDecoder(from, "int64") },
+		Float:           func([]byte) (v float64, e error) { return v, errNoDecoder(from, "float64") },
+		SliceOfUint:     func([]byte) (v []uint64, e error) { return v, errNoDecoder(from, "[]uint64") },
+		SliceOfInt:      func([]byte) (v []int64, e error) { return v, errNoDecoder(from, "[]int64") },
 		SliceOfByte:     func(data []byte) (v []byte, e error) { return data, nil },
 	}
 }
 
 var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
-
-func noEncoder(a *Atom, from interface{}) error {
-	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'.", from, a.typ)
-}
-func noDecoder(from ADEType, to GoType) error {
-	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'.", from, to)
-}
 
 // Decoder methods: pass atom data to the decoder for type conversion to go type
 func (c codec) String() (string, error)          { return c.Decoder.String(c.Atom.data) }
@@ -1630,7 +1629,7 @@ func SetFP64FromFloat64(a *Atom, v float64) (e error) {
 		a.data = make([]byte, 8)
 	}
 	binary.BigEndian.PutUint64(a.data, uint64(v))
-	var bits uint64 = math.Float64bits(v)
+	var bits = math.Float64bits(v)
 	binary.BigEndian.PutUint64(a.data, bits)
 	return
 }
@@ -2005,9 +2004,8 @@ func SetUSTRFromString(a *Atom, v string) (e error) {
 		if isHexEncode {
 			strInput := fmt.Sprint("\\x", string(hexRunes)) // drop [] delimiters
 			return errInvalidEscape("USTR", strInput, "EOF during hex encoded character")
-		} else {
-			return errInvalidEscape("USTR", "\\", "EOF during escaped character")
 		}
+		return errInvalidEscape("USTR", "\\", "EOF during escaped character")
 	}
 	a.data = buf.Bytes()
 	return

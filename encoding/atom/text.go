@@ -83,8 +83,8 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 func (a *Atom) UnmarshalText(input []byte) (err error) {
 	// Convert text into Atom values
 	var atoms []*Atom
-	var l *lexer = lex(string(input))
-	atoms, err = parse(l.items)
+	var lexr = lex(string(input))
+	atoms, err = parse(lexr.items)
 	if err != nil {
 		return
 	}
@@ -267,23 +267,23 @@ func (l *lexer) buffer() string {
 
 // Return the entire current line as a string
 func (l *lexer) line() string {
-	var i_start, i_end uint32
+	var iStart, iEnd uint32
 
 	// find line end
 	if l.input[l.pos] == '\n' {
-		i_end = l.pos
+		iEnd = l.pos
 		l.backup() // at line end, take preceding line
 	} else {
-		for i_end = l.pos; l.input[i_end] != '\n'; i_end++ {
+		for iEnd = l.pos; l.input[iEnd] != '\n'; iEnd++ {
 		}
 	}
 
 	// find line start
-	for i_start = l.pos; l.input[i_start] != '\n' && i_start != 0; i_start-- {
+	for iStart = l.pos; l.input[iStart] != '\n' && iStart != 0; iStart-- {
 	}
-	i_start++
+	iStart++
 
-	return l.input[i_start:i_end]
+	return l.input[iStart:iEnd]
 }
 
 // first returns the first rune in the value
@@ -622,7 +622,7 @@ func lexString(l *lexer) stateFn {
 
 	// Read in chars
 	var r rune
-	var done bool = false
+	var done = false
 	for !done {
 		r = l.next()
 		switch r {
@@ -689,7 +689,7 @@ func isPrintableRune(r rune) bool {
 
 // returns string of all printable chars < ascii 127, excludes whitespace
 func strPrintableChars() string {
-	var b []byte = make([]byte, 0, 0x7f-0x21) // ascii char values
+	var b = make([]byte, 0, 0x7f-0x21) // ascii char values
 	for c := byte(0x21); c < 0x7f; c++ {
 		b = append(b, c)
 	}
@@ -698,7 +698,7 @@ func strPrintableChars() string {
 
 // returns string of all alphanumeric chars < ascii 127
 func strAlphaNumeric() string {
-	var b []byte = make([]byte, 62)
+	var b = make([]byte, 62)
 	for c := '0'; c < '9'; c++ {
 		b = append(b, byte(c))
 	}
@@ -806,13 +806,13 @@ func (ptr *atomStack) push(a *Atom) {
 	*ptr = append(*ptr, a)
 }
 func (ptr *atomStack) pop() *Atom {
-	var s atomStack = *ptr
-	size := len(s)
+	var stack = *ptr
+	size := len(stack)
 	if size == 0 {
 		panic("attempt to pop from empty stack")
 	}
-	lastAtom := s[size-1]
-	*ptr = s[:size-1]
+	lastAtom := stack[size-1]
+	*ptr = stack[:size-1]
 	return lastAtom
 }
 func (ptr *atomStack) empty() bool {
@@ -879,7 +879,7 @@ func parseAtomType(p *parser) parseFunc {
 
 	// Add atom to children of parent, if any
 	if p.containers.empty() { // No open containers = no parent. Add atom to output.
-		if it.value != "CONT" { // Containers are added to output when they close
+		if it.value != "CONT" { // Containers get added to output when they close
 			p.atoms = append(p.atoms, p.theAtom)
 		}
 	} else {
