@@ -1,10 +1,10 @@
 package atom
 
 //
-// Test that UnmarshalText successfully reads all text test files.
+// Verify that UnmarshalText successfully reads all text test files.
 //
-// Test that MarshalText successfully writes atoms to text, and that the
-// serialized atoms match the original files.
+// Verify that MarshalText successfully writes atoms to text, and that the
+// text matches the original files.
 //
 
 import (
@@ -37,9 +37,6 @@ func TestUnmarshalText(t *testing.T) {
 		if err := a.UnmarshalText(buf); err != nil {
 			t.Errorf("UnmarshalText(%s): expect no error, got %s", f, err.Error())
 		}
-
-		// save for testing MarshalText
-		TestAtoms = append(TestAtoms, a)
 	}
 }
 

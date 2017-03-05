@@ -2,10 +2,13 @@
 package atom
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 	"runtime"
+	"sort"
+	"strings"
 	"testing"
 )
 
@@ -13,15 +16,43 @@ var TestAtoms []*Atom
 var TestBytes [][]byte
 var TestTexts [][]byte
 
+type fileList []string
+
 func init() {
-	for _, f := range binTestFiles() {
+	arrBinFiles := binTestFiles()
+	arrTxtFiles := txtTestFiles()
+	baseNames := make(map[string]bool, len(arrBinFiles)+len(arrTxtFiles))
+
+	// verify that arrTxtFiles, arrBinFiles reference the same atoms in the same order
+	for _, f := range arrTxtFiles {
+		baseNames[strings.TrimSuffix(f, ".txt")] = true
+	}
+	for _, f := range arrBinFiles {
+		baseNames[strings.TrimSuffix(f, ".bin")] = true
+	}
+	for b := range baseNames {
+		binFile := strings.Join([]string{b, "bin"}, ".")
+		if !arrBinFiles.includes(binFile) {
+			log.Fatalf(fmt.Sprint("unit test missing binary representation, expected to find file ", binFile))
+
+		}
+		txtFile := strings.Join([]string{b, "txt"}, ".")
+		if !arrTxtFiles.includes(txtFile) {
+			log.Fatalf(fmt.Sprint("unit test missing text representation, expected to find file ", txtFile))
+		}
+	}
+
+	// read contents of each binary file
+	for _, f := range arrBinFiles {
 		buf, err := ioutil.ReadFile(f)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
 		TestBytes = append(TestBytes, buf)
 	}
-	for _, f := range txtTestFiles() {
+
+	// read contents of each text file
+	for _, f := range arrTxtFiles {
 		buf, err := ioutil.ReadFile(f)
 		if err != nil {
 			log.Fatalf(err.Error())
@@ -33,6 +64,15 @@ func init() {
 	if len(TestAtoms) == 0 {
 		log.Fatalf("No test atoms available")
 	}
+}
+
+func (list fileList) includes(target string) bool {
+	for _, s := range list {
+		if s == target {
+			return true
+		}
+	}
+	return false
 }
 
 func BenchmarkMarshalBinary(b *testing.B) {
@@ -78,8 +118,8 @@ func BenchmarkUnmarshalText(b *testing.B) {
 	b.ReportAllocs()
 }
 
-func txtTestFiles() (files []string) {
-	_, path, _, _ := runtime.Caller(1)
+func txtTestFiles() (files fileList) {
+	_, path, _, _ := runtime.Caller(1) // path to this source file
 	testdir := filepath.Join(filepath.Dir(path), "testdata")
 
 	moreFiles, _ := filepath.Glob(filepath.Join(testdir, "*.txt"))
@@ -90,10 +130,11 @@ func txtTestFiles() (files []string) {
 	if len(files) == 0 {
 		log.Fatalf("Found no text test files")
 	}
-	return files
+	sort.Slice(files, func(i, j int) bool { return strings.Compare(files[i], files[j]) == -1 })
+	return
 }
 
-func binTestFiles() (files []string) {
+func binTestFiles() (files fileList) {
 	_, path, _, _ := runtime.Caller(1)
 	testdir := filepath.Join(filepath.Dir(path), "testdata")
 
@@ -105,6 +146,7 @@ func binTestFiles() (files []string) {
 	if len(files) == 0 {
 		log.Fatalf("Found no binary test files")
 	}
+	sort.Slice(files, func(i, j int) bool { return strings.Compare(files[i], files[j]) == -1 })
 	return
 }
 
