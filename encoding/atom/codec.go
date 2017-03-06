@@ -691,6 +691,9 @@ func SF32ToString(buf []byte) (v string, e error) {
 	return
 }
 func SF64ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 8, "SF64"); e != nil {
+		return
+	}
 	var f float64
 	f, e = SF64ToFloat64(buf)
 	if e == nil {
