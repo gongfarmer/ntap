@@ -4,7 +4,7 @@ package atom
 // Verify that UnmarshalText successfully reads all text test files.
 //
 // Verify that MarshalText successfully writes atoms to text, and that the
-// text matches the original files.
+// text matches the canonical text files.
 //
 
 import (

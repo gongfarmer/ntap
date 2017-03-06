@@ -621,17 +621,18 @@ func TestFP64ToString(t *testing.T) {
 	})
 }
 
-// FIXME
+// only the first 4 decimal digits matter
 func TestUF32ToFloat64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("UF32", 4)
+	zero := float64(0)
 	tests := []decoderTest{
-		decoderTest{[]byte("\x00\x00\x00\x00"), float64(float32(0.0000)), nil},
-		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999)), nil},
-		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999)), nil},
-		decoderTest{[]byte(""), "", byteCountErr(0)},
-		decoderTest{[]byte("\x00"), "", byteCountErr(1)},
-		decoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
-		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+		decoderTest{[]byte("\x00\x00\x00\x00"), 0.0000, nil},
+		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(65535.99989318848), nil},
+		decoderTest{[]byte("\xff\xff\xff\xff"), float64(65535.99998474121), nil},
+		decoderTest{[]byte(""), zero, byteCountErr(0)},
+		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), zero, byteCountErr(8)},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UF32ToFloat64(input)

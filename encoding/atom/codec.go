@@ -420,6 +420,12 @@ func UI08ToUint64(buf []byte) (v uint64, e error) {
 	}
 	return uint64(buf[0]), e
 }
+func UI16ToUint16(buf []byte) (v uint16, e error) {
+	if e = checkByteCount(buf, 2, "UI16"); e != nil {
+		return
+	}
+	return binary.BigEndian.Uint16(buf), e
+}
 func UI16ToUint64(buf []byte) (v uint64, e error) {
 	if e = checkByteCount(buf, 2, "UI16"); e != nil {
 		return
@@ -607,12 +613,16 @@ func FP64ToString(buf []byte) (v string, e error) {
 // ADE fixed point types, unsigned
 
 func UF32ToFloat64(buf []byte) (v float64, e error) {
+	if e = checkByteCount(buf, 4, "UF32"); e != nil {
+		return
+	}
 	var i uint64
 	i, e = UI32ToUint64(buf)
 	if e != nil {
 		return
 	}
 	v = float64(i) / 65536.0
+
 	return
 }
 func UF64ToFloat64(buf []byte) (v float64, e error) {

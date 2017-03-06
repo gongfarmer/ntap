@@ -1,10 +1,10 @@
 package atom
 
 //
-// Test that UnmarshalBinary successfully reads all binary test files.
+// Verify that UnmarshalBinary successfully reads all binary test files.
 //
-// Test that MarshalBinary successfully writes atoms to binary, and that the
-// serialized atoms match the original files.
+// Verify that MarshalBinary successfully writes atoms to binary, and that the
+// serialized atoms match the original binary files.
 //
 
 import (
