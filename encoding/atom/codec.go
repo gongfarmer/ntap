@@ -621,7 +621,7 @@ func UF32ToFloat64(buf []byte) (v float64, e error) {
 	if e != nil {
 		return
 	}
-	v = float64(i) / 65536.0
+	v = float64(i) / (1 + math.MaxUint16)
 
 	return
 }
@@ -634,7 +634,7 @@ func UF64ToFloat64(buf []byte) (v float64, e error) {
 	if e != nil {
 		return
 	}
-	v = float64(i) / 4294967296.0
+	v = float64(i) / (1 + math.MaxUint32) // + 0.0000000002
 	return
 }
 func UF32ToString(buf []byte) (v string, e error) {
@@ -649,11 +649,14 @@ func UF32ToString(buf []byte) (v string, e error) {
 // ade: CXD_String.cc CXD_String_from_UFIX64(...)
 // isolate whole and fractional parts, then combine within the string
 func UF64ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 8, "UF64"); e != nil {
+		return
+	}
 	var i uint64
 	i, e = UI64ToUint64(buf)
 	if e == nil {
 		iFract := i & 0x00000000FFFFFFFF
-		fFract := float64(iFract) / 4294967296.0 * math.Pow(10, 9)
+		fFract := float64(iFract) / (1 + math.MaxUint32) * math.Pow(10, 9)
 		v = fmt.Sprintf("%d.%09.0f", i>>32, fFract)
 	}
 	return
@@ -1652,7 +1655,7 @@ func SetUF32FromString(a *Atom, v string) (e error) {
 }
 
 func SetUF32FromFloat64(a *Atom, v float64) (e error) {
-	binary.BigEndian.PutUint32(a.data, uint32(v*65536.0))
+	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
 	return
 }
 
@@ -1677,8 +1680,8 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 	if e != nil {
 		return
 	}
-	if 0.0 <= fract && fract < 4294967296.0 {
-		fract *= (4294967296.0 / math.Pow(10, 9))
+	if 0.0 <= fract && fract < (1+math.MaxUint32) {
+		fract *= ((1 + math.MaxUint32) / math.Pow(10, 9))
 	}
 
 	binary.BigEndian.PutUint64(a.data, whole+uint64(fract))
@@ -1686,7 +1689,7 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 }
 
 func SetUF64FromFloat64(a *Atom, v float64) (e error) {
-	var i = uint64(v * 4294967296.0)
+	var i = uint64(v * (1 + math.MaxUint32))
 	binary.BigEndian.PutUint64(a.data, i)
 	return
 }
@@ -1701,7 +1704,7 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 	if -32768.0 > v || v >= 32768.0 {
 		return errRange("SF32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(v*65536.0))
+	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
 	return
 }
 
@@ -1726,8 +1729,8 @@ func SetSF64FromString(a *Atom, v string) (e error) {
 	if e != nil {
 		return
 	}
-	if 0.0 <= fract && fract < 4294967296.0 {
-		fract *= (4294967296.0 / math.Pow(10, 9))
+	if 0.0 <= fract && fract < (1+math.MaxUint32) {
+		fract *= ((1 + math.MaxUint32) / math.Pow(10, 9))
 	}
 
 	// invert the bits in the fractional value, if negative number
@@ -1741,7 +1744,7 @@ func SetSF64FromString(a *Atom, v string) (e error) {
 }
 
 func SetSF64FromFloat64(a *Atom, v float64) (e error) {
-	binary.BigEndian.PutUint64(a.data, uint64(v*4294967296.0))
+	binary.BigEndian.PutUint64(a.data, uint64(v*(1+math.MaxUint32)))
 	return
 }
 

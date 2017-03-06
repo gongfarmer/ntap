@@ -1,0 +1,4 @@
+# out of range
+UF64:CONT:
+	   uf64:UF64:4294967296.0
+END

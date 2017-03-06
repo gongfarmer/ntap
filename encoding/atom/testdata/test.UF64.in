@@ -10,8 +10,6 @@
 # |      |     |        |              |the same level encountered|               
 # |      |     |        |              |with smaller floating     |               
 # |      |     |        |              |point numbers.            
-# THIS FIELD IS INVALID: (out of range I expect)
-#	   uf64:UF64:4294967296.0
 UF64:CONT:
 	uf64:UF64:4294967295.999999999
 	uf64:UF64:4294967295.0
