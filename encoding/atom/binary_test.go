@@ -9,65 +9,41 @@ package atom
 
 import (
 	"crypto/sha1"
-	"io/ioutil"
-	"log"
-	"path/filepath"
 	"testing"
 )
 
 func TestUnmarshalBinary(t *testing.T) {
-	var buf []byte
-	var err error
-
-	for _, f := range binTestFiles() {
-
-		// read file contents
-		if buf, err = ioutil.ReadFile(f); err != nil {
-			log.Fatalf("Unable to read test file: %s", err.Error())
-		}
-
-		// test unmarshal
+	for _, test := range Tests {
 		a := new(Atom)
-		if err := a.UnmarshalBinary(buf); err != nil {
-			t.Errorf("UnmarshalBinary(%s): expect no error, got %s", f, err.Error())
+		if err := a.UnmarshalBinary(test.binBytes); err != nil {
+			t.Errorf("UnmarshalBinary(%s): expect no error, got %s", test.Name(), err.Error())
 		}
-
-		// save for testing MarshalBinary
-		TestAtoms = append(TestAtoms, a)
 	}
 }
 
 // NOTE: marshaled output is not guaranteed to always match its input, as
 // odd but valid inputs may be normalized. However, they do match for these tests.
 func TestMarshalBinary(t *testing.T) {
-	var a Atom
-	var got, want []byte
+	var got []byte
 	var err error
 
-	// Assumes testfiles and TestAtoms have matching order
-	for _, f := range binTestFiles() {
-		a, TestAtoms = *TestAtoms[0], TestAtoms[1:] // shift first elt off
+	for _, test := range Tests {
 
 		// Test that MarshalBinary succeeds
-		if got, err = a.MarshalBinary(); err != nil {
-			t.Errorf("MarshalBinary(%s): expect no error, got %s", f, err.Error())
+		if got, err = test.atom.MarshalBinary(); err != nil {
+			t.Errorf("MarshalBinary(%s): expect no error, got %s", test.Name(), err.Error())
 		}
 
-		// Read original file
-		if want, err = ioutil.ReadFile(f); err != nil {
-			log.Fatalf("Unable to read test file: %s", err.Error())
+		// Verify that resulting bytes match original length
+		if len(got) != len(test.binBytes) {
+			t.Errorf("MarshalBinary: want %d bytes, got %d bytes for %s", len(test.binBytes), len(got), test.Name())
 		}
 
-		// Verify that they match in length
-		if len(got) != len(want) {
-			t.Errorf("MarshalBinary: want %d bytes, got %d bytes for %s", len(want), len(got), filepath.Base(f))
-		}
-
-		// Verify that they are binary-identicatl
+		// Verify that resulting bytes are binary-identical
 		gotSum := sha1.Sum(got)
-		wantSum := sha1.Sum(want)
+		wantSum := sha1.Sum(test.binBytes)
 		if gotSum != wantSum {
-			t.Errorf("MarshalBinary: binary output checksum differs from original: %s", filepath.Base(f))
+			t.Errorf("MarshalBinary: binary output differs from original: %s", test.Name())
 		}
 	}
 }

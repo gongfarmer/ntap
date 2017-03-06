@@ -621,22 +621,22 @@ func TestFP64ToString(t *testing.T) {
 	})
 }
 
-// // FIXME
-// func TestUF32ToFloat64(t *testing.T) {
-// 	byteCountErr := errFunc(errByteCount).curryErrFunc("UF32", 4)
-// 	tests := []decoderTest{
-// 		decoderTest{[]byte("\x00\x00\x00\x00"), float64(float32(0.0000), nil},
-// 		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
-// 		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999), nil},
-// 		decoderTest{[]byte(""), "", byteCountErr(0)},
-// 		decoderTest{[]byte("\x00"), "", byteCountErr(1)},
-// 		decoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
-// 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
-// 	}
-// 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
-// 		return UF32ToFloat64(input)
-// 	})
-// }
+// FIXME
+func TestUF32ToFloat64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UF32", 4)
+	tests := []decoderTest{
+		decoderTest{[]byte("\x00\x00\x00\x00"), float64(float32(0.0000)), nil},
+		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999)), nil},
+		decoderTest{[]byte("\xff\xff\xff\xf9"), float64(float32(65535.9999)), nil},
+		decoderTest{[]byte(""), "", byteCountErr(0)},
+		decoderTest{[]byte("\x00"), "", byteCountErr(1)},
+		decoderTest{[]byte("\x00\x00"), "", byteCountErr(2)},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), "", byteCountErr(8)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return UF32ToFloat64(input)
+	})
+}
 
 func TestUF64ToFloat64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("UF64", 8)

@@ -4,70 +4,156 @@ package atom
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
+	"os"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strings"
 	"testing"
 )
 
-var TestAtoms []*Atom
-var TestBytes [][]byte
-var TestTexts [][]byte
+var Tests []Test
 
-type fileList []string
+// Test represents test data containing different representations of the
+// same Atom.  Test data is from the test input files in the testdata/ directory.
+// The test files all have the same name but different extension:
+//  .in:  text file containing valid but non-canonical representations
+//  .txt: text file containing valid, canonical, round-trippable representation
+//  .bin: binary file representation
+//  .xml: xml file representation
+// These are all read at init() time and kept in memory to avoid disk reads
+// during benchmarking.
+type Test struct {
+	atom     *Atom  // Atom object
+	inBytes  []byte // bytes from in file
+	binBytes []byte // bytes from bin file
+	txtBytes []byte // bytes from txt file
+	xmlBytes []byte // bytes from xml file
+	inPath   string // path to *.in file
+	binPath  string // path to *.bin file
+	txtPath  string // path to *.txt file
+	xmlPath  string // path to *.xml file
+}
 
-func init() {
-	arrBinFiles := binTestFiles()
-	arrTxtFiles := txtTestFiles()
-	baseNames := make(map[string]bool, len(arrBinFiles)+len(arrTxtFiles))
+type list []string
 
-	// verify that arrTxtFiles, arrBinFiles reference the same atoms in the same order
-	for _, f := range arrTxtFiles {
-		baseNames[strings.TrimSuffix(f, ".txt")] = true
+// NewTest creates a new Test object from a given base path.
+// It assumes that all 4 related test files would share the same base pathname, differing only in file extensions.
+// It verifies that all 4 expected files exist, if not it returns a nil
+// Test and a non-nil error.
+func NewTest(basePath string) (t Test, err error) {
+	t = Test{
+		inPath:  strings.Join([]string{basePath, "in"}, "."),
+		binPath: strings.Join([]string{basePath, "bin"}, "."),
+		txtPath: strings.Join([]string{basePath, "txt"}, "."),
+		xmlPath: strings.Join([]string{basePath, "xml"}, "."),
 	}
-	for _, f := range arrBinFiles {
-		baseNames[strings.TrimSuffix(f, ".bin")] = true
-	}
-	for b := range baseNames {
-		binFile := strings.Join([]string{b, "bin"}, ".")
-		if !arrBinFiles.includes(binFile) {
-			log.Fatalf(fmt.Sprint("unit test missing binary representation, expected to find file ", binFile))
 
+	// verify that required files exist
+	missing := []string{}
+	for _, f := range t.Files() {
+		if _, err = os.Stat(f); os.IsNotExist(err) {
+			if strings.HasSuffix(f, ".in") { // *.in file is optional
+				t.inPath = "" // hint to clients to ignore .in for this test
+			} else {
+				missing = append(missing, filepath.Ext(f))
+			}
 		}
-		txtFile := strings.Join([]string{b, "txt"}, ".")
-		if !arrTxtFiles.includes(txtFile) {
-			log.Fatalf(fmt.Sprint("unit test missing text representation, expected to find file ", txtFile))
+		if len(missing) > 0 {
+			msg := fmt.Sprintf("incomplete Test \"%s\" is missing", t.Name())
+			err = fmt.Errorf("%s %s representations", msg, strings.Join(missing, ","))
+			return Test{}, err
 		}
 	}
 
-	// read contents of each binary file
-	for _, f := range arrBinFiles {
-		buf, err := ioutil.ReadFile(f)
+	// Read in test data and create Atom object
+
+	// read *.in bytes
+	if t.inPath != "" {
+		t.inBytes, err = ioutil.ReadFile(t.inPath)
 		if err != nil {
-			log.Fatalf(err.Error())
+			panic(err.Error())
 		}
-		TestBytes = append(TestBytes, buf)
+	}
+	// read text bytes
+	t.txtBytes, err = ioutil.ReadFile(t.txtPath)
+	if err != nil {
+		panic(err.Error())
+	}
+	// read xml bytes
+	t.xmlBytes, err = ioutil.ReadFile(t.xmlPath)
+	if err != nil {
+		panic(err.Error())
+	}
+	// read binary bytes
+	t.binBytes, err = ioutil.ReadFile(t.binPath)
+	if err != nil {
+		panic(err.Error())
+	}
+	// make atom object
+	t.atom = new(Atom)
+	if err := t.atom.UnmarshalBinary(t.binBytes); err != nil {
+		panic(err.Error())
 	}
 
-	// read contents of each text file
-	for _, f := range arrTxtFiles {
-		buf, err := ioutil.ReadFile(f)
-		if err != nil {
-			log.Fatalf(err.Error())
-		}
-		TestTexts = append(TestTexts, buf)
-	}
+	return
+}
 
-	TestAtoms = ReadAtomsFromBinaryFiles(TestBytes)
-	if len(TestAtoms) == 0 {
-		log.Fatalf("No test atoms available")
+// Files returns a list of files in this test file set as a slice.
+func (t Test) Files() []string {
+	return []string{
+		t.inPath,
+		t.binPath,
+		t.txtPath,
+		t.xmlPath,
 	}
 }
 
-func (list fileList) includes(target string) bool {
-	for _, s := range list {
+// Name returns the base name that is common to all files in the test.
+// The basename is shorted by stripping everything in the absolute path that
+// precedes "testdata".
+func (t Test) Name() string {
+	iTestdata := strings.LastIndex(t.binPath, "testdata/")
+	iDot := strings.LastIndex(t.binPath, ".")
+	return t.binPath[iTestdata:iDot]
+}
+
+// Create slice of Test objects from testdata dir contents
+func init() {
+	// Find all test files under the test root
+	_, path, _, _ := runtime.Caller(1)
+	testroot := filepath.Join(filepath.Dir(path), "testdata")
+	testFileExt := map[string]bool{
+		".in":  true,
+		".bin": true,
+		".txt": true,
+		".xml": true,
+	}
+	testNames := make(map[string]bool) // map prevents duplicate test names
+	filepath.Walk(testroot,
+		func(path string, info os.FileInfo, _ error) error {
+			if info.IsDir() && filepath.Base(path) == "invalid" {
+				return filepath.SkipDir
+			}
+			if info.IsDir() || !testFileExt[filepath.Ext(path)] {
+				return nil
+			}
+			testNames[strings.TrimSuffix(path, filepath.Ext(path))] = true
+			return nil
+		})
+
+	// Build master test list from path list
+	Tests = make([]Test, 0, len(testNames))
+	for basepath := range testNames {
+		t, err := NewTest(basepath)
+		if err != nil {
+			panic(err.Error())
+		}
+		Tests = append(Tests, t)
+	}
+}
+
+func (l list) includes(target string) bool {
+	for _, s := range l {
 		if s == target {
 			return true
 		}
@@ -77,8 +163,8 @@ func (list fileList) includes(target string) bool {
 
 func BenchmarkMarshalBinary(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		for _, a := range TestAtoms {
-			if _, err := a.MarshalBinary(); err != nil {
+		for _, t := range Tests {
+			if _, err := t.atom.MarshalBinary(); err != nil {
 				panic(err)
 			}
 		}
@@ -86,10 +172,10 @@ func BenchmarkMarshalBinary(b *testing.B) {
 	b.ReportAllocs()
 }
 func BenchmarkUnmarshalBinary(b *testing.B) {
-	var a = new(Atom)
 	for n := 0; n < b.N; n++ {
-		for _, buf := range TestBytes {
-			if err := a.UnmarshalBinary(buf); err != nil {
+		for _, t := range Tests {
+			a := new(Atom)
+			if err := a.UnmarshalBinary(t.binBytes); err != nil {
 				panic(err)
 			}
 		}
@@ -98,8 +184,8 @@ func BenchmarkUnmarshalBinary(b *testing.B) {
 }
 func BenchmarkMarshalText(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		for _, a := range TestAtoms {
-			if _, err := a.MarshalText(); err != nil {
+		for _, t := range Tests {
+			if _, err := t.atom.MarshalText(); err != nil {
 				panic(err)
 			}
 		}
@@ -107,66 +193,13 @@ func BenchmarkMarshalText(b *testing.B) {
 	b.ReportAllocs()
 }
 func BenchmarkUnmarshalText(b *testing.B) {
-	var a = new(Atom)
 	for n := 0; n < b.N; n++ {
-		for _, buf := range TestTexts {
-			if err := a.UnmarshalText(buf); err != nil {
+		for _, t := range Tests {
+			a := new(Atom)
+			if err := a.UnmarshalText(t.txtBytes); err != nil {
 				panic(err)
 			}
 		}
 	}
 	b.ReportAllocs()
-}
-
-func txtTestFiles() (files fileList) {
-	_, path, _, _ := runtime.Caller(1) // path to this source file
-	testdir := filepath.Join(filepath.Dir(path), "testdata")
-
-	moreFiles, _ := filepath.Glob(filepath.Join(testdir, "*.txt"))
-	files = append(files, moreFiles...)
-	moreFiles, _ = filepath.Glob(filepath.Join(testdir, "from_grid/*.txt"))
-	files = append(files, moreFiles...)
-
-	if len(files) == 0 {
-		log.Fatalf("Found no text test files")
-	}
-	sort.Slice(files, func(i, j int) bool { return strings.Compare(files[i], files[j]) == -1 })
-	return
-}
-
-func binTestFiles() (files fileList) {
-	_, path, _, _ := runtime.Caller(1)
-	testdir := filepath.Join(filepath.Dir(path), "testdata")
-
-	moreFiles, _ := filepath.Glob(filepath.Join(testdir, "*.bin"))
-	files = append(files, moreFiles...)
-	moreFiles, _ = filepath.Glob(filepath.Join(testdir, "from_grid/*.bin"))
-	files = append(files, moreFiles...)
-
-	if len(files) == 0 {
-		log.Fatalf("Found no binary test files")
-	}
-	sort.Slice(files, func(i, j int) bool { return strings.Compare(files[i], files[j]) == -1 })
-	return
-}
-
-func ReadAtomsFromBinaryFiles(atomBytes [][]byte) (atoms []*Atom) {
-	for _, buf := range atomBytes {
-		a := new(Atom)
-		if err := a.UnmarshalBinary(buf); err != nil {
-			panic(err)
-		}
-		atoms = append(atoms, a)
-	}
-	return
-}
-func ReadAtomsFromTextFiles(texts [][]byte) (atoms []*Atom) {
-	for _, buf := range texts {
-		a := new(Atom)
-		if err := a.UnmarshalText(buf); err != nil {
-			panic(err)
-		}
-		atoms = append(atoms, a)
-	}
-	return
 }

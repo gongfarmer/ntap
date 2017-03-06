@@ -11,7 +11,6 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,33 +21,27 @@ const txtWriteDebugFiles = true
 const failedOutputDir = "/tmp/test-atom/"
 
 func TestUnmarshalText(t *testing.T) {
-	var buf []byte
 	var err error
 
-	for _, f := range txtTestFiles() {
-
-		// read file contents
-		if buf, err = ioutil.ReadFile(f); err != nil {
-			log.Fatalf("Unable to read test file: %s", err.Error())
-		}
-
+	for _, test := range Tests {
 		// test unmarshal
 		a := new(Atom)
-		if err := a.UnmarshalText(buf); err != nil {
-			t.Errorf("UnmarshalText(%s): expect no error, got %s", f, err.Error())
+		if err = a.UnmarshalText(test.txtBytes); err != nil {
+			t.Errorf("UnmarshalText(%s): [.txt] expect no error, got %s", test.Name(), err.Error())
+		}
+		if test.inPath == "" {
+			continue // test lacks the optional *.in file
+		}
+		if err = a.UnmarshalText(test.inBytes); err != nil {
+			t.Errorf("UnmarshalText(%s): [.in] expect no error, got %s", test.Name(), err.Error())
 		}
 	}
 }
 
 // NOTE: marshaled text output is not guaranteed to always match its input, as
 // odd but valid inputs may be normalized.
-// The test files use the file extension *.txt for files that can round-trip
-// from text->binary->text without being altered.
-// The extension *.in represents a file that is valid but will be altered
-// during marshaling.
 func TestMarshalText(t *testing.T) {
-	var a Atom
-	var got, want []byte
+	var got []byte
 	var err error
 	if txtWriteDebugFiles {
 		os.RemoveAll(failedOutputDir)
@@ -57,37 +50,28 @@ func TestMarshalText(t *testing.T) {
 	}
 
 	// Assumes testfiles and TestAtoms have matching order
-	for _, f := range txtTestFiles() {
-		a, TestAtoms = *TestAtoms[0], TestAtoms[1:] // shift first elt from slice
-
+	for _, test := range Tests {
 		// Test that MarshalText succeeds
-		if got, err = a.MarshalText(); err != nil {
-			t.Errorf("MarshalText(%s): expect no error, got %s", f, err.Error())
-		}
-
-		// Read original file
-		if want, err = ioutil.ReadFile(f); err != nil {
-			log.Fatalf("Unable to read test file: %s", err.Error())
+		if got, err = test.atom.MarshalText(); err != nil {
+			t.Errorf("MarshalText(%s): expect no error, got %s", test.Name(), err.Error())
 		}
 
 		// write files
-		if len(got) != len(want) {
-			t.Errorf("MarshalText: Text size differs from original.  Got %d, want %d:  %s", len(got), len(want), filepath.Base(f))
-
+		if len(got) != len(test.txtBytes) {
+			t.Errorf("MarshalText: Text size differs from original.  Got %d, want %d:  %s", len(got), len(test.txtBytes), test.Name())
 			if txtWriteDebugFiles {
-				writeDebugFiles(got, want, f, failedOutputDir)
+				writeDebugFiles(got, test.txtBytes, test.Name(), failedOutputDir)
 			}
-
 		}
 
 		// Verify that original matches marshaled text
 		gotSum := sha1.Sum(got)
-		wantSum := sha1.Sum(want)
+		wantSum := sha1.Sum(test.txtBytes)
 		if gotSum != wantSum {
-			t.Errorf("MarshalText: Text output differs from original: %s", filepath.Base(f))
+			t.Errorf("MarshalText: Text output differs from original: %s", test.Name())
 
 			if txtWriteDebugFiles {
-				writeDebugFiles(got, want, f, failedOutputDir)
+				writeDebugFiles(got, test.txtBytes, test.Name(), failedOutputDir)
 			}
 		}
 	}
@@ -95,15 +79,15 @@ func TestMarshalText(t *testing.T) {
 
 // writeDebugFiles is for when a test has failed and the output must be made
 // available for inspection.
-// Arguments are byte slices containing wanted and actual output, and a filename to base output names on.
+// Arguments are byte slices containing wanted and actual output, and a
+// filename on which to base output names.
 // Write the wanted and actual outputs to files in the output  dir.
-func writeDebugFiles(got, want []byte, filename, outputDir string) {
+func writeDebugFiles(got, want []byte, testName, outputDir string) {
+	path := filepath.Join(outputDir, strings.TrimPrefix(testName, "testdata"))
+	gotPath := strings.Join([]string{path, "-got.txt"}, "")
+	wantPath := strings.Join([]string{path, "-want.txt"}, "")
 
-	base := filepath.Base(filename)
-	base = filepath.Join(outputDir, base[:strings.LastIndex(base, ".")])
-	gotPath := strings.Join([]string{base, "-got.txt"}, "")
-	wantPath := strings.Join([]string{base, "-want.txt"}, "")
-
+	os.Mkdir(filepath.Dir(gotPath), 0766)
 	err := ioutil.WriteFile(gotPath, got, 0666)
 	if err != nil {
 		fmt.Println("Failed to write output for inspection: ", err)
