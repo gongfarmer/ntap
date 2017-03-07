@@ -86,21 +86,40 @@ func main() {
 
 // print atoms in grossly verbose format showing atom data in hex
 func printAtomDebug(w io.Writer, a *atom.Atom) {
+	var lines [][]string
+	depth, maxLen := 0, 0
 	atoms := a.AtomList()
 	for _, a := range atoms {
-		fmt.Fprintf(w, "name: \"%s\"\n", a.Name)
-		fmt.Fprintf(w, "type: \"%s\"\n", a.Type())
-		strData, err := a.Value.String()
-		if err != nil {
-			log.Fatalf(err.Error())
+		col1 := bytes.NewBuffer([]byte{})
+		col2 := bytes.NewBuffer([]byte{})
+		fmt.Fprintf(col1, "%*s", depth, "")
+		fmt.Fprintf(col1, "%s:%s:", a.Name, a.Type())
+
+		if string(a.Type()) == "CONT" {
+			fmt.Fprintf(col2, "")
+		} else {
+			strData, err := a.Value.StringDelimited()
+			fmt.Fprintf(col1, "%s", strData)
+			if err != nil {
+				panic(err)
+			}
+			bytesData, err := a.Value.SliceOfByte()
+			if err != nil {
+				panic(err)
+			}
+			fmt.Fprintf(col2, "% x", bytesData)
+
 		}
-		bytesData, err := a.Value.SliceOfByte()
-		if err != nil {
-			log.Fatalf(err.Error())
+		lines = append(lines, []string{col1.String(), col2.String()})
+		if col1.Len() > maxLen {
+			maxLen = col1.Len()
 		}
-		fmt.Fprintf(w, "data: \"%s\"\n", strData) // value as string
-		fmt.Fprintf(w, "      % x\n", bytesData)  // value as bytes
-		fmt.Fprintln(w, "--")
+	}
+
+	maxLen++
+	for _, cols := range lines {
+		fmt.Fprintf(w, "%-*s", maxLen, cols[0])
+		fmt.Fprintln(w, cols[1])
 	}
 }
 

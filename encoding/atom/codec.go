@@ -1589,7 +1589,6 @@ func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
 	if den == 0 {
 		return errZeroDenominator("UR64", "")
 	}
-
 	value := (num << 32) + den
 	binary.BigEndian.PutUint64(a.data, value)
 	return
@@ -1626,7 +1625,6 @@ func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
 	if den == 0 {
 		return errZeroDenominator("SR32", "")
 	}
-
 	value := (int32(num) << 16) + int32(den)
 	binary.BigEndian.PutUint32(a.data, uint32(value))
 	return
@@ -1780,8 +1778,11 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 func SetSF64FromString(a *Atom, v string) (e error) {
 	// split string into whole and fractional parts
 	pieces := strings.Split(v, ".")
+	if len(pieces) == 1 { // no decimal specified, it's a whole number
+		pieces = append(pieces, "0")
+	}
 	if len(pieces) > 2 {
-		return fmt.Errorf("invalid fixed point data:%s", v)
+		return errStrInvalid("SF64", v)
 	}
 
 	// whole part to the first 32 bits of a uint64
