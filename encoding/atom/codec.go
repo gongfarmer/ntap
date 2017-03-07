@@ -143,6 +143,14 @@ func errInvalidEscape(t, v, note string) (e error) {
 func errUnescaped(typ string, r rune) error {
 	return fmt.Errorf("Character %s must be escaped in %s value", strconv.QuoteRune(r), typ)
 }
+func errZeroDenominator(typ string, v string) (e error) {
+	if v == "" {
+		e = fmt.Errorf("fractional type %s forbids zero in denominator", typ)
+	} else {
+		e = fmt.Errorf("fractional type %s forbids zero in denominator, got \"%s\"", typ, v)
+	}
+	return
+}
 
 // NewCodec returns a codec that performs type conversion for atom data.
 // A codec provides encoder/decoder methods for converting data from an atom's
@@ -496,6 +504,13 @@ func SI08ToInt64(buf []byte) (v int64, e error) {
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &i)
 	return int64(i), e
 }
+func SI16ToInt16(buf []byte) (v int16, e error) {
+	if e = checkByteCount(buf, 2, "SI16"); e != nil {
+		return
+	}
+	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
+	return
+}
 func SI16ToInt64(buf []byte) (v int64, e error) {
 	if e = checkByteCount(buf, 2, "SI16"); e != nil {
 		return
@@ -508,9 +523,8 @@ func SI32ToInt32(buf []byte) (v int32, e error) {
 	if e = checkByteCount(buf, 4, "SI32"); e != nil {
 		return
 	}
-	var i int32
-	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &i)
-	return i, e
+	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
+	return
 }
 func SI32ToInt64(buf []byte) (v int64, e error) {
 	var i int32
@@ -665,12 +679,16 @@ func UF64ToString(buf []byte) (v string, e error) {
 // ADE fixed point types, signed
 
 func SF32ToFloat64(buf []byte) (v float64, e error) {
+	if e = checkByteCount(buf, 4, "SF32"); e != nil {
+		return
+	}
+
 	var i int32
 	i, e = SI32ToInt32(buf)
 	if e != nil {
 		return
 	}
-	v = float64(i) / (math.MaxUint16 + 1)
+	v = float64(i) / float64(math.MaxUint16+1)
 	return
 }
 func SF64ToFloat64(buf []byte) (v float64, e error) {
@@ -680,13 +698,18 @@ func SF64ToFloat64(buf []byte) (v float64, e error) {
 		return
 	}
 	v = float64(i) / (math.MaxUint32 + 1)
+
 	return
 }
 func SF32ToString(buf []byte) (v string, e error) {
+	if e = checkByteCount(buf, 4, "SF32"); e != nil {
+		return
+	}
 	var f float64
 	f, e = SF32ToFloat64(buf)
 	if e == nil {
-		v = fmt.Sprintf("%0.4f", f)
+		v = fmt.Sprintf("%0.5f", f) // avoid rounding on 4th post-decimal digit
+		v = v[:len(v)-1]            // strip extra precision digit.
 	}
 	return
 }
@@ -694,11 +717,30 @@ func SF64ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 8, "SF64"); e != nil {
 		return
 	}
-	var f float64
-	f, e = SF64ToFloat64(buf)
-	if e == nil {
-		v = fmt.Sprintf("%.9f", f)
+	//	var f float64
+	//	f, e = SF64ToFloat64(buf)
+	//	if e == nil {
+	//		v = fmt.Sprintf("%.9f", f)
+	//	}
+
+	var intPart int32
+	intPart, e = SI32ToInt32(buf[:4])
+	if e != nil {
+		return
 	}
+	var fracPart uint64
+	fracPart, e = UI32ToUint64(buf[4:])
+	if e != nil {
+		return
+	}
+	fracPartFloat := float64(fracPart) / float64(1+math.MaxUint32)
+
+	// must request extra precision in printf verb to avoid rounding, the
+	// strip off the parts that are not wanted.
+	v = strings.Join([]string{
+		fmt.Sprintf("%d", intPart),
+		fmt.Sprintf("%0.012f", fracPartFloat)[2:11],
+	}, ".")
 	return
 }
 
@@ -1493,6 +1535,9 @@ func SetUR32FromString(a *Atom, v string) (e error) {
 	if err != io.EOF || matched != 2 {
 		return errStrInvalid("UR32", v)
 	}
+	if den == 0 {
+		return errZeroDenominator("UR32", v)
+	}
 	return SetUR32FromSliceOfUint(a, []uint64{num, den})
 }
 
@@ -1503,6 +1548,9 @@ func SetUR32FromSliceOfUint(a *Atom, v []uint64) (e error) {
 	var num, den uint64
 	num = v[0]
 	den = v[1]
+	if den == 0 {
+		return errZeroDenominator("UR32", "")
+	}
 	if num > math.MaxUint16 || den > math.MaxUint16 {
 		return errRange("UR32", v)
 	}
@@ -1522,6 +1570,9 @@ func SetUR64FromString(a *Atom, v string) (e error) {
 	if err != io.EOF || matched != 2 {
 		return errStrInvalid("UR64", v)
 	}
+	if den == 0 {
+		return errZeroDenominator("UR64", v)
+	}
 	return SetUR64FromSliceOfUint(a, []uint64{num, den})
 }
 
@@ -1534,6 +1585,9 @@ func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
 	den = v[1]
 	if num > math.MaxUint32 || den > math.MaxUint32 {
 		return errRange("UR64", v)
+	}
+	if den == 0 {
+		return errZeroDenominator("UR64", "")
 	}
 
 	value := (num << 32) + den
@@ -1553,6 +1607,9 @@ func SetSR32FromString(a *Atom, v string) (e error) {
 	if err != io.EOF || matched != 2 {
 		return errStrInvalid("SR32", v)
 	}
+	if den == 0 {
+		return errZeroDenominator("SR32", v)
+	}
 	return SetSR32FromSliceOfInt(a, []int64{num, den})
 }
 
@@ -1565,6 +1622,9 @@ func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
 	den = v[1]
 	if num > math.MaxInt16 || den > math.MaxInt16 || num < math.MinInt16 || den < math.MinInt16 {
 		return errRange("SR32", v)
+	}
+	if den == 0 {
+		return errZeroDenominator("SR32", "")
 	}
 
 	value := (int32(num) << 16) + int32(den)
@@ -1582,6 +1642,9 @@ func SetSR64FromString(a *Atom, v string) (e error) {
 	if err != io.EOF || matched != 2 {
 		return errStrInvalid("SR64", v)
 	}
+	if den == 0 {
+		return errZeroDenominator("SR64", v)
+	}
 	return SetSR64FromSliceOfInt(a, []int64{num, den})
 }
 
@@ -1594,6 +1657,9 @@ func SetSR64FromSliceOfInt(a *Atom, v []int64) (e error) {
 	den = v[1]
 	if num > math.MaxInt32 || den > math.MaxInt32 || num < math.MinInt32 || den < math.MinInt32 {
 		return errRange("SR64", v)
+	}
+	if den == 0 {
+		return errZeroDenominator("SR64", "")
 	}
 
 	value := (num << 32) + den
@@ -1746,6 +1812,8 @@ func SetSF64FromString(a *Atom, v string) (e error) {
 	return
 }
 
+// FIXME this might be better:
+// math.Modf returns integer and fractional floating-point numbers that sum to f. Both values have the same sign as f.
 func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 	binary.BigEndian.PutUint64(a.data, uint64(v*(1+math.MaxUint32)))
 	return
