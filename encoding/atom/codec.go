@@ -723,6 +723,10 @@ func SF64ToString(buf []byte) (v string, e error) {
 	//		v = fmt.Sprintf("%.9f", f)
 	//	}
 
+	// FIXME this might be better:
+	// math.Modf returns integer and fractional floating-point numbers that sum to f. Both values have the same sign as f.
+	// The sign bit on the bottom half is a problem though, ADE doesn't have a sign bit there
+
 	var intPart int32
 	intPart, e = SI32ToInt32(buf[:4])
 	if e != nil {
@@ -1722,6 +1726,9 @@ func SetUF32FromString(a *Atom, v string) (e error) {
 }
 
 func SetUF32FromFloat64(a *Atom, v float64) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
 	return
 }
@@ -1743,7 +1750,9 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 
 	// fractional part
 	var fract float64
-	fract, e = strconv.ParseFloat(pieces[1], 64)
+	if len(pieces) == 2 {
+		fract, e = strconv.ParseFloat(pieces[1], 64)
+	}
 	if e != nil {
 		return
 	}
@@ -1768,7 +1777,10 @@ func SetSF32FromString(a *Atom, v string) (e error) {
 }
 
 func SetSF32FromFloat64(a *Atom, v float64) (e error) {
-	if -32768.0 > v || v >= 32768.0 {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
+	if v < -32768.0 || v >= 32768.0 {
 		return errRange("SF32", v)
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
@@ -1776,46 +1788,28 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 }
 
 func SetSF64FromString(a *Atom, v string) (e error) {
-	// split string into whole and fractional parts
-	pieces := strings.Split(v, ".")
-	if len(pieces) == 1 { // no decimal specified, it's a whole number
-		pieces = append(pieces, "0")
-	}
-	if len(pieces) > 2 {
-		return errStrInvalid("SF64", v)
+	if !strings.HasPrefix(v, "-") {
+		e = SetUF64FromString(a, v)
+		return
 	}
 
-	// whole part to the first 32 bits of a uint64
-	var whole int64
-	whole, e = strconv.ParseInt(pieces[0], 10, 64)
+	// input string represents a negative number
+	e = SetUF64FromString(a, v[1:])
 	if e != nil {
 		return
 	}
-	whole <<= 32
 
-	// fractional part
-	var fract float64
-	fract, e = strconv.ParseFloat(pieces[1], 64)
-	if e != nil {
-		return
-	}
-	if 0.0 <= fract && fract < (1+math.MaxUint32) {
-		fract *= ((1 + math.MaxUint32) / math.Pow(10, 9))
-	}
-
-	// invert the bits in the fractional value, if negative number
-	iFract := int64(fract)
-	if whole < 0 {
-		iFract = -1 * iFract
-	}
-
-	binary.BigEndian.PutUint64(a.data, uint64(whole+iFract))
+	// Whole part has incorrect sign.
+	// Can't just flip the sign bit, because 2s complement.
+	var signed int32 = -1 * int32(binary.BigEndian.Uint32(a.data))
+	binary.BigEndian.PutUint32(a.data, uint32(signed))
 	return
 }
 
-// FIXME this might be better:
-// math.Modf returns integer and fractional floating-point numbers that sum to f. Both values have the same sign as f.
 func SetSF64FromFloat64(a *Atom, v float64) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	binary.BigEndian.PutUint64(a.data, uint64(v*(1+math.MaxUint32)))
 	return
 }

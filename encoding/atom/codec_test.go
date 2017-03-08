@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+// FIXME: add tests where numeric types are given NaN and Inf
+
 // implement function curryErrFuncing for err funcs so that I can specify the type and
 // expected bytes at the top of the test func, and the amount of bytes provided
 // in each test separately.
@@ -2487,13 +2489,92 @@ func TestSetFP64FromFloat64(t *testing.T) {
 
 // FIXME
 //func SetUF32FromString(a *Atom, v string) (e error) {
+func TestSetUF32FromString(t *testing.T) {
+	tests := []encoderTest{
+		// examples straight from doc 112-0002 (Data Types)
+		// only the first 4 digits of precision matter here
+		encoderTest{"65535.9999848", []byte("\xff\xff\xff\xff"), nil},
+		encoderTest{"1.000000000", []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{"0.000000000", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"0.0000152587890625", []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{"0.000030517578125", []byte("\x00\x00\x00\x02"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUF32FromString(atom, input.(string))
+	})
+}
+
 //func SetUF32FromFloat64(a *Atom, v float64) (e error) {
-//func SetUF64FromString(a *Atom, v string) (e error) {
+
+func TestSetUF64FromString(t *testing.T) {
+	tests := []encoderTest{
+		// examples straight from doc 112-0002 (Data Types)
+		// only the first 4 digits of precision matter here
+		encoderTest{"4294967295.999999999767169", []byte("\xff\xff\xff\xff\xff\xff\xff\xff"), nil},
+		encoderTest{"0.000000000", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"1.000000000", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"0.000000000232831", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{"0.000000000465661", []byte("\x00\x00\x00\x00\x00\x00\x00\x02"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUF64FromString(atom, input.(string))
+	})
+}
+
 //func SetUF64FromFloat64(a *Atom, v float64) (e error) {
 //func SetSF32FromString(a *Atom, v string) (e error) {
 //func SetSF32FromFloat64(a *Atom, v float64) (e error) {
-//func SetSF64FromString(a *Atom, v string) (e error) {
-//func SetSF64FromFloat64(a *Atom, v float64) (e error) {
+func TestSetSF32FromFloat64(t *testing.T) {
+	tests := []encoderTest{
+		// examples straight from doc 112-0002 (Data Types)
+		// only the first 4 digits of precision matter here
+		encoderTest{float64(32767.99998474121), []byte("\x7f\xff\xff\xff"), nil},
+		encoderTest{float64(-32768.0000), []byte("\x80\x00\x00\x00"), nil},
+		encoderTest{float64(-32752.6250), []byte("\x80\x0f\x60\x00"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSF32FromFloat64(atom, input.(float64))
+	})
+}
+func TestSetSF32FromFString(t *testing.T) {
+	tests := []encoderTest{
+		// examples straight from doc 112-0002 (Data Types)
+		// only the first 4 digits of precision matter here
+		encoderTest{"32767.99998474121", []byte("\x7f\xff\xff\xff"), nil},
+		encoderTest{"-32768.0000", []byte("\x80\x00\x00\x00"), nil},
+		encoderTest{"-32752.6250", []byte("\x80\x0f\x60\x00"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSF32FromString(atom, input.(string))
+	})
+}
+
+func TestSetSF64FromFloat64(t *testing.T) {
+	tests := []encoderTest{
+		// examples straight from doc 112-0002 (Data Types)
+		// only the first 4 digits of precision matter here
+		encoderTest{float64(-2147483648.000000000), []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{float64(2147483647.999999999), []byte("\x7f\xff\xff\xff\xff\xff\xff\xff"), nil},
+		encoderTest{float64(-1.000000000), []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
+		encoderTest{float64(1.000000000), []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSF64FromFloat64(atom, input.(float64))
+	})
+}
+func TestSetSF64FromString(t *testing.T) {
+	tests := []encoderTest{
+		// examples straight from doc 112-0002 (Data Types)
+		// only the first 4 digits of precision matter here
+		encoderTest{"-2147483648.000000000", []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"2147483647.999999999", []byte("\x7f\xff\xff\xff\xff\xff\xff\xff"), nil},
+		encoderTest{"-1.000000000", []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
+		encoderTest{"1.000000000", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetSF64FromString(atom, input.(string))
+	})
+}
 
 func TestSetFC32FromString(t *testing.T) {
 	typ := "FC32"
