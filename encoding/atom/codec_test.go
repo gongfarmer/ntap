@@ -10,6 +10,8 @@ import (
 )
 
 // FIXME: add tests where numeric types are given NaN and Inf
+// FIXME: add tests of strings without decimal points on all float types
+// FIXME: add tests where all fromString are given empty string as input
 
 // implement function curryErrFuncing for err funcs so that I can specify the type and
 // expected bytes at the top of the test func, and the amount of bytes provided
@@ -2487,43 +2489,73 @@ func TestSetFP64FromFloat64(t *testing.T) {
 	})
 }
 
-// FIXME
-//func SetUF32FromString(a *Atom, v string) (e error) {
 func TestSetUF32FromString(t *testing.T) {
+	// only the first 4 digits of precision matter here
 	tests := []encoderTest{
 		// examples straight from doc 112-0002 (Data Types)
-		// only the first 4 digits of precision matter here
 		encoderTest{"65535.9999848", []byte("\xff\xff\xff\xff"), nil},
-		encoderTest{"1.000000000", []byte("\x00\x01\x00\x00"), nil},
-		encoderTest{"0.000000000", []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{"0.0000152587890625", []byte("\x00\x00\x00\x01"), nil},
 		encoderTest{"0.000030517578125", []byte("\x00\x00\x00\x02"), nil},
+
+		encoderTest{"0", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"0.0000", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"0.00000000", []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{"1", []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{"1.0000", []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{"1.00000000", []byte("\x00\x01\x00\x00"), nil},
+
+		encoderTest{"65536", nil, errRange("UF32", "65536.000000000")},
+		encoderTest{".", nil, errStrInvalid("UF32", ".")},
+		encoderTest{".0.", nil, errStrInvalid("UF32", ".0.")},
+		encoderTest{".0.0", nil, errStrInvalid("UF32", ".0.0")},
+		encoderTest{"0.0.", nil, errStrInvalid("UF32", "0.0.")},
+		encoderTest{"0.0.0", nil, errStrInvalid("UF32", "0.0.0")},
+		encoderTest{"0x27262524", nil, errStrInvalid("UF32", "0x27262524")},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetUF32FromString(atom, input.(string))
 	})
 }
 
+// TODO
 //func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 
 func TestSetUF64FromString(t *testing.T) {
+	// only the first 9 digits of precision matter here
+	zero := make([]byte, 8)
 	tests := []encoderTest{
 		// examples straight from doc 112-0002 (Data Types)
-		// only the first 4 digits of precision matter here
 		encoderTest{"4294967295.999999999767169", []byte("\xff\xff\xff\xff\xff\xff\xff\xff"), nil},
-		encoderTest{"0.000000000", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
-		encoderTest{"1.000000000", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
 		encoderTest{"0.000000000232831", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
 		encoderTest{"0.000000000465661", []byte("\x00\x00\x00\x00\x00\x00\x00\x02"), nil},
+
+		encoderTest{"0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0.0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"0.000000000", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"1", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"1.0", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"1.000000000", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"1.", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{".2", []byte("\x00\x00\x00\x00\x33\x33\x33\x33"), nil},
+		encoderTest{"256.8", []byte("\x00\x00\x01\x00\xcc\xcc\xcc\xcc"), nil},
+
+		encoderTest{".", zero, errStrInvalid("UF64", ".")},
+		encoderTest{".0.", zero, errStrInvalid("UF64", ".0.")},
+		encoderTest{".0.0", zero, errStrInvalid("UF64", ".0.0")},
+		encoderTest{"0.0.", zero, errStrInvalid("UF64", "0.0.")},
+		encoderTest{"0.0.0", zero, errStrInvalid("UF64", "0.0.0")},
+		encoderTest{"0x27262524", zero, errStrInvalid("UF64", "0x27262524")},
+		encoderTest{"4294967296", zero, errRange("UF64", "4294967296")},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetUF64FromString(atom, input.(string))
 	})
 }
 
+// TODO
 //func SetUF64FromFloat64(a *Atom, v float64) (e error) {
 //func SetSF32FromString(a *Atom, v string) (e error) {
-//func SetSF32FromFloat64(a *Atom, v float64) (e error) {
+
 func TestSetSF32FromFloat64(t *testing.T) {
 	tests := []encoderTest{
 		// examples straight from doc 112-0002 (Data Types)
@@ -2549,14 +2581,17 @@ func TestSetSF32FromFString(t *testing.T) {
 	})
 }
 
+// NOTE: UFIX64 can support up to 2147483647.999999999, which cannot be
+// expressed with float64 (see IEEE 754 floating point format, which is limited
+// to a max of 16 significant decimal digits.)
+// This is why the tests here don't cover the max range of SF64.
 func TestSetSF64FromFloat64(t *testing.T) {
 	tests := []encoderTest{
-		// examples straight from doc 112-0002 (Data Types)
-		// only the first 4 digits of precision matter here
-		encoderTest{float64(-2147483648.000000000), []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
-		encoderTest{float64(2147483647.999999999), []byte("\x7f\xff\xff\xff\xff\xff\xff\xff"), nil},
-		encoderTest{float64(-1.000000000), []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
-		encoderTest{float64(1.000000000), []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{float64(-2147483648.0), []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{float64(-2147483648.999999), []byte("\x80\x00\x00\x00\xff\xff\xef\xff"), nil},
+		encoderTest{float64(2147483647.999999), []byte("\x7f\xff\xff\xff\xff\xff\xef\xff"), nil},
+		encoderTest{float64(-1.0), []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
+		encoderTest{float64(1.0), []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF64FromFloat64(atom, input.(float64))
@@ -2565,7 +2600,7 @@ func TestSetSF64FromFloat64(t *testing.T) {
 func TestSetSF64FromString(t *testing.T) {
 	tests := []encoderTest{
 		// examples straight from doc 112-0002 (Data Types)
-		// only the first 4 digits of precision matter here
+		// only the first 9 digits of precision matter here
 		encoderTest{"-2147483648.000000000", []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{"2147483647.999999999", []byte("\x7f\xff\xff\xff\xff\xff\xff\xff"), nil},
 		encoderTest{"-1.000000000", []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},

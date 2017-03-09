@@ -122,7 +122,7 @@ func errRange(t string, v interface{}) (e error) {
 	case uint, uint8, uint16, uint32, uint64, int, int32, int64:
 		e = fmt.Errorf("value exceeds range for type %s: %d", t, v)
 	case float32, float64:
-		e = fmt.Errorf("value exceeds range for type %s: %f", t, v)
+		e = fmt.Errorf("value exceeds range for type %s: %0.9f", t, v)
 	case []uint64, []int64:
 		e = fmt.Errorf("value exceeds range for type %s: %v", t, v)
 	case string:
@@ -1722,6 +1722,12 @@ func SetFP64FromFloat64(a *Atom, v float64) (e error) {
 func SetUF32FromString(a *Atom, v string) (e error) {
 	var f float64
 	f, e = strconv.ParseFloat(v, 64)
+	if e != nil {
+		return errStrInvalid("UF32", v)
+	}
+	if f >= (math.MaxUint16 + 1) {
+		return errRange("UF32", f)
+	}
 	return SetUF32FromFloat64(a, f)
 }
 
@@ -1734,37 +1740,60 @@ func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 }
 
 func SetUF64FromString(a *Atom, v string) (e error) {
-	// split string into whole and fractional parts
-	pieces := strings.Split(v, ".")
-	if len(pieces) > 2 {
-		return fmt.Errorf("invalid fixed point data:%s", v)
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
 	}
 
-	// whole part to the first 32 bits of a uint64
+	// split string into whole and fractional parts
+	iDec := strings.Index(v, ".")
+
+	// convert whole part to uint32
 	var whole uint64
-	whole, e = strconv.ParseUint(pieces[0], 10, 64)
-	if e != nil {
-		return
+	if iDec == -1 {
+		whole, e = strconv.ParseUint(v, 10, 64)
+	} else if iDec == 0 {
+		whole = 0
+		if len(v) == 1 {
+			return errStrInvalid("UF64", v)
+		}
+	} else {
+		whole, e = strconv.ParseUint(v[:iDec], 10, 64)
 	}
-	whole <<= 32
+	if e != nil {
+		return errStrInvalid("UF64", v)
+	}
+	if whole > math.MaxUint32 {
+		return errRange("UF64", v)
+	}
 
 	// fractional part
-	var fract float64
-	if len(pieces) == 2 {
-		fract, e = strconv.ParseFloat(pieces[1], 64)
-	}
-	if e != nil {
-		return
-	}
-	if 0.0 <= fract && fract < (1+math.MaxUint32) {
-		fract *= ((1 + math.MaxUint32) / math.Pow(10, 9))
+	var fractF float64
+	if iDec > -1 && iDec != len(v)-1 {
+		iEnd := len(v)
+		if iEnd-iDec > 16 {
+			iEnd = iDec + 16
+		}
+		// send fractional string for conversion, including the decimal point
+		//		fmt.Printf("  f '%s' :'%s' ", v, v[iDec:iEnd])
+		fractF, e = strconv.ParseFloat(v[iDec:iEnd], 64)
+		if e != nil {
+			return errStrInvalid("UF64", v)
+		}
+		// 	fmt.Printf(" => %0.15f\n", fractF)
 	}
 
-	binary.BigEndian.PutUint64(a.data, whole+uint64(fract))
+	//	fmt.Printf("  float64bits = %x\n", math.Float64bits(float64(fractF)))
+
+	binary.BigEndian.PutUint32(a.data, uint32(whole))
+	binary.BigEndian.PutUint32(a.data[4:], uint32(fractF*(math.MaxUint32+1.0)))
+
 	return
 }
 
 func SetUF64FromFloat64(a *Atom, v float64) (e error) {
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
 	var i = uint64(v * (1 + math.MaxUint32))
 	binary.BigEndian.PutUint64(a.data, i)
 	return
@@ -1801,7 +1830,7 @@ func SetSF64FromString(a *Atom, v string) (e error) {
 
 	// Whole part has incorrect sign.
 	// Can't just flip the sign bit, because 2s complement.
-	var signed int32 = -1 * int32(binary.BigEndian.Uint32(a.data))
+	var signed = -1 * int32(binary.BigEndian.Uint32(a.data))
 	binary.BigEndian.PutUint32(a.data, uint32(signed))
 	return
 }
@@ -1810,7 +1839,12 @@ func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 	if len(a.data) != 8 {
 		a.data = make([]byte, 8)
 	}
-	binary.BigEndian.PutUint64(a.data, uint64(v*(1+math.MaxUint32)))
+	whole, fract := math.Modf(v)
+	if fract < 0 {
+		fract *= -1
+	}
+	binary.BigEndian.PutUint32(a.data, uint32(whole))
+	binary.BigEndian.PutUint32(a.data[4:], uint32(fract*math.MaxUint32))
 	return
 }
 
