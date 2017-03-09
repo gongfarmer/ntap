@@ -870,17 +870,20 @@ func TestSF32ToFloat64(t *testing.T) {
 }
 
 //func SF64ToFloat64(buf []byte) (v float64, e error) {
-//func SF32ToString(buf []byte) (v string, e error) {
 
 func TestSF32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("SF32", 4)
 	zero := ""
 	tests := []decoderTest{
-		// examples straight from the doc
 		decoderTest{[]byte("\x00\x00\x00\x00"), "0.0000", nil},
-		decoderTest{[]byte("\x7f\xff\xff\xff"), "32767.9999", nil},
+		decoderTest{[]byte("\x7f\xff\xff\xf9"), "32767.9999", nil},
 		decoderTest{[]byte("\x80\x00\x00\x00"), "-32768.0000", nil},
 		decoderTest{[]byte("\x80\x0f\x60\x00"), "-32752.6250", nil},
+
+		decoderTest{[]byte("\x00\x01\x80\x00"), "1.5000", nil},
+		decoderTest{[]byte("\x00\x01\x80\x00"), "1.5000", nil},
+		decoderTest{[]byte("\xff\xfe\xfe\x36"), "-1.0070", nil},
+		decoderTest{[]byte("\xff\xfe\x33\x34"), "-1.8000", nil},
 
 		decoderTest{[]byte(""), zero, byteCountErr(0)},
 		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
@@ -896,12 +899,11 @@ func TestSF64ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("SF64", 8)
 	zero := ""
 	tests := []decoderTest{
-		// the following 2 values result in the same string due to precision limits
 		decoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), "-2147483648.000000000", nil},
-		decoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x01"), "-2147483648.000000000", nil},
-		decoderTest{[]byte("\x7f\xff\xff\xff\xff\xff\xff\xff"), "2147483647.999999999", nil},
+		decoderTest{[]byte("\x7f\xff\xff\xff\xff\xff\xff\xfb"), "2147483647.999999999", nil},
 		decoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), "-1.000000000", nil},
 		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), "1.000000000", nil},
+
 		decoderTest{[]byte(""), zero, byteCountErr(0)},
 		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
 		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
@@ -2520,14 +2522,17 @@ func TestSetUF32FromString(t *testing.T) {
 // TODO
 //func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 
+// NOTE: See comment over func SetUF64FromString(..) for explanation of these values.
 func TestSetUF64FromString(t *testing.T) {
 	// only the first 9 digits of precision matter here
 	zero := make([]byte, 8)
 	tests := []encoderTest{
 		// examples straight from doc 112-0002 (Data Types)
-		encoderTest{"4294967295.999999999767169", []byte("\xff\xff\xff\xff\xff\xff\xff\xff"), nil},
-		encoderTest{"0.000000000232831", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
-		encoderTest{"0.000000000465661", []byte("\x00\x00\x00\x00\x00\x00\x00\x02"), nil},
+		encoderTest{"4294967295.9999999997671694", []byte("\xff\xff\xff\xff\xff\xff\xff\xff"), nil},
+		encoderTest{"4294967295.999999999767169", []byte("\xff\xff\xff\xff\xff\xff\xff\xfe"), nil},
+		encoderTest{"4294967295.999999999", []byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), nil},
+		encoderTest{"0.0000000002328306", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{"0.0000000004656613", []byte("\x00\x00\x00\x00\x00\x00\x00\x02"), nil},
 
 		encoderTest{"0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{"0.0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
@@ -2568,13 +2573,21 @@ func TestSetSF32FromFloat64(t *testing.T) {
 		return SetSF32FromFloat64(atom, input.(float64))
 	})
 }
-func TestSetSF32FromFString(t *testing.T) {
+func TestSetSF32FromString(t *testing.T) {
 	tests := []encoderTest{
 		// examples straight from doc 112-0002 (Data Types)
 		// only the first 4 digits of precision matter here
 		encoderTest{"32767.99998474121", []byte("\x7f\xff\xff\xff"), nil},
 		encoderTest{"-32768.0000", []byte("\x80\x00\x00\x00"), nil},
 		encoderTest{"-32752.6250", []byte("\x80\x0f\x60\x00"), nil},
+
+		encoderTest{"1.5000", []byte("\x00\x01\x80\x00"), nil},
+		encoderTest{"1.5000", []byte("\x00\x01\x80\x00"), nil},
+		encoderTest{"-1.0070", []byte("\xff\xfe\xfe\x36"), nil},
+		encoderTest{"-1.8000", []byte("\xff\xfe\x33\x34"), nil},
+		encoderTest{"-1.8000", []byte("\xff\xfe\x33\x34"), nil},
+		encoderTest{"-32767.9999", []byte("\x80\x00\x00\x07"), nil},
+		encoderTest{"32767.9999", []byte("\x7f\xff\xff\xf9"), nil},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF32FromString(atom, input.(string))
@@ -2588,8 +2601,10 @@ func TestSetSF32FromFString(t *testing.T) {
 func TestSetSF64FromFloat64(t *testing.T) {
 	tests := []encoderTest{
 		encoderTest{float64(-2147483648.0), []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
-		encoderTest{float64(-2147483648.999999), []byte("\x80\x00\x00\x00\xff\xff\xef\xff"), nil},
-		encoderTest{float64(2147483647.999999), []byte("\x7f\xff\xff\xff\xff\xff\xef\xff"), nil},
+		encoderTest{float64(-2147483648.999999), []byte("\x80\x00\x00\x00\xff\xff\xf0\x00"), nil},
+		encoderTest{float64(2147483647.999999), []byte("\x7f\xff\xff\xff\xff\xff\xf0\x00"), nil},
+		encoderTest{float64(1.999999999), []byte("\x00\x00\x00\x01\xff\xff\xff\xfb"), nil},
+		encoderTest{float64(1.9999999997671694), []byte("\x00\x00\x00\x01\xff\xff\xff\xff"), nil},
 		encoderTest{float64(-1.0), []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
 		encoderTest{float64(1.0), []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
 	}
@@ -2602,7 +2617,7 @@ func TestSetSF64FromString(t *testing.T) {
 		// examples straight from doc 112-0002 (Data Types)
 		// only the first 9 digits of precision matter here
 		encoderTest{"-2147483648.000000000", []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
-		encoderTest{"2147483647.999999999", []byte("\x7f\xff\xff\xff\xff\xff\xff\xff"), nil},
+		encoderTest{"2147483647.999999999", []byte("\x7f\xff\xff\xff\xff\xff\xff\xfb"), nil},
 		encoderTest{"-1.000000000", []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
 		encoderTest{"1.000000000", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
 	}

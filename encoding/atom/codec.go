@@ -707,9 +707,10 @@ func SF32ToString(buf []byte) (v string, e error) {
 	}
 	var f float64
 	f, e = SF32ToFloat64(buf)
+	f = Round(f, 0.5, 5)
 	if e == nil {
-		v = fmt.Sprintf("%0.5f", f) // avoid rounding on 4th post-decimal digit
-		v = v[:len(v)-1]            // strip extra precision digit.
+		//		fmt.Printf("%.16f  (%0.4f)\n", f, f)
+		v = fmt.Sprintf("%0.4f", f)
 	}
 	return
 }
@@ -723,27 +724,32 @@ func SF64ToString(buf []byte) (v string, e error) {
 	//		v = fmt.Sprintf("%.9f", f)
 	//	}
 
-	// FIXME this might be better:
-	// math.Modf returns integer and fractional floating-point numbers that sum to f. Both values have the same sign as f.
-	// The sign bit on the bottom half is a problem though, ADE doesn't have a sign bit there
+	// get integer part
+	var whole = int32(binary.BigEndian.Uint32(buf[:4]))
+	//	var intPart int32
+	//	intPart, e = SI32ToInt32(buf[:4])
+	//	if e != nil {
+	//		return
+	//	}
+	//
+	//	if (buf[0] & 0x80) == 128 { // if negative number (sign bit is 1)
+	//	}
 
-	var intPart int32
-	intPart, e = SI32ToInt32(buf[:4])
-	if e != nil {
-		return
-	}
 	var fracPart uint64
 	fracPart, e = UI32ToUint64(buf[4:])
 	if e != nil {
 		return
 	}
+	//fmt.Printf("fracPart: %d => ", fracPart)
 	fracPartFloat := float64(fracPart) / float64(1+math.MaxUint32)
+	//fmt.Printf("div: %.16f\n", fracPartFloat)
+	fracPartFloat = Round(fracPartFloat, 0.5, 9)
 
-	// must request extra precision in printf verb to avoid rounding, the
-	// strip off the parts that are not wanted.
+	// must request extra precision in printf verb to avoid rounding
+	//fmt.Printf("%0.16f", fracPartFloat)
 	v = strings.Join([]string{
-		fmt.Sprintf("%d", intPart),
-		fmt.Sprintf("%0.012f", fracPartFloat)[2:11],
+		fmt.Sprintf("%d", whole),
+		fmt.Sprintf("%0.12f", fracPartFloat)[2:11],
 	}, ".")
 	return
 }
@@ -1739,6 +1745,19 @@ func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 	return
 }
 
+// 2017-03-09 fhanson
+// The doc states this range limit for ADE type UFIX64:
+///    "The highest value is 0xFFFFFFFFFFFFFFFF
+//      = 231 + 230 + … + 21 + 20 + 2-1 +2-2 + … + 2-31 + 2-32
+//      = 4294967295.999999999767169"
+//
+// That is too little precision.  The actual highest positive value is:
+//     0x7FFFFFFFFFFFFFFF = 4294967295.9999999997671694 (has a 4 appended.)
+// The missing fractional number means that if you do the natural thing and
+// write a unit test for this range based on the doc, you'll expect this:
+//     4294967295.999999999767169 = 0x7FFFFFFFFFFFFFFF
+// but you'll get this:
+//     4294967295.999999999767169 = 0x7FFFFFFFFFFFFFFE
 func SetUF64FromString(a *Atom, v string) (e error) {
 	if len(a.data) != 8 {
 		a.data = make([]byte, 8)
@@ -1770,22 +1789,26 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 	var fractF float64
 	if iDec > -1 && iDec != len(v)-1 {
 		iEnd := len(v)
-		if iEnd-iDec > 16 {
-			iEnd = iDec + 16
+		if iEnd-iDec > 17 {
+			iEnd = iDec + 17
 		}
 		// send fractional string for conversion, including the decimal point
-		//		fmt.Printf("  f '%s' :'%s' ", v, v[iDec:iEnd])
+		//fmt.Printf("  f '%s' :'%s' ", v, v[iDec:iEnd])
 		fractF, e = strconv.ParseFloat(v[iDec:iEnd], 64)
 		if e != nil {
 			return errStrInvalid("UF64", v)
 		}
-		// 	fmt.Printf(" => %0.15f\n", fractF)
+		//fmt.Printf(" => %0.15f\n", fractF)
 	}
 
 	//	fmt.Printf("  float64bits = %x\n", math.Float64bits(float64(fractF)))
 
+	// Move the precision places to be kept to the left of the decimal place.
+	fractF *= (math.MaxUint32 + 1)
+	fractF = Round(fractF, 0.5, 6) // match rounding magnitude of ADE ccat
+
 	binary.BigEndian.PutUint32(a.data, uint32(whole))
-	binary.BigEndian.PutUint32(a.data[4:], uint32(fractF*(math.MaxUint32+1.0)))
+	binary.BigEndian.PutUint32(a.data[4:], uint32(fractF))
 
 	return
 }
@@ -1816,6 +1839,13 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 	return
 }
 
+// The doc states this:
+//     The highest positive value is:
+//     0x7FFFFFFFFFFFFFFF = 2147483647.999999999
+// This is incorrect.  The actual highest positive value is:
+//     0x7FFFFFFFFFFFFFFF =  2147483647.9999999997671694
+// As a result, the correct conversion procedure results in an almost-right value like
+// My measurements show that float value as too low.
 func SetSF64FromString(a *Atom, v string) (e error) {
 	if !strings.HasPrefix(v, "-") {
 		e = SetUF64FromString(a, v)
@@ -1844,7 +1874,7 @@ func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 		fract *= -1
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(whole))
-	binary.BigEndian.PutUint32(a.data[4:], uint32(fract*math.MaxUint32))
+	binary.BigEndian.PutUint32(a.data[4:], uint32(fract*(1+math.MaxUint32)))
 	return
 }
 
@@ -2222,4 +2252,27 @@ func ValidUUIDString(s string) bool {
 		len(groups[2]) == 4 &&
 		len(groups[3]) == 4 &&
 		len(groups[4]) == 12
+}
+
+func Round(val float64, roundOn float64, places int) float64 {
+	pow := math.Pow(10, float64(places))
+	digit := pow * val
+	_, div := math.Modf(digit)
+
+	var round float64
+	if val > 0 {
+		if div >= roundOn {
+			round = math.Ceil(digit)
+		} else {
+			round = math.Floor(digit)
+		}
+	} else {
+		if div >= roundOn {
+			round = math.Floor(digit)
+		} else {
+			round = math.Ceil(digit)
+		}
+	}
+
+	return round / pow
 }
