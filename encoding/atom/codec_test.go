@@ -9,9 +9,7 @@ import (
 	"testing"
 )
 
-// FIXME: add tests where numeric types are given NaN and Inf
 // FIXME: add tests of strings without decimal points on all float types
-// FIXME: add tests where all fromString are given empty string as input
 
 // implement function curryErrFuncing for err funcs so that I can specify the type and
 // expected bytes at the top of the test func, and the amount of bytes provided
@@ -748,7 +746,6 @@ func TestUF64ToFloat64(t *testing.T) {
 		return UF64ToFloat64(input)
 	})
 }
-
 func TestUF32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("UF32", 4)
 	zero := ""
@@ -957,9 +954,6 @@ func TestSF32ToFloat64(t *testing.T) {
 		return SF32ToFloat64(input)
 	})
 }
-
-//func SF64ToFloat64(buf []byte) (v float64, e error) {
-
 func TestSF32ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("SF32", 4)
 	zero := ""
@@ -983,7 +977,6 @@ func TestSF32ToString(t *testing.T) {
 		return SF32ToString(input)
 	})
 }
-
 func TestSF64ToString(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("SF64", 8)
 	zero := ""
@@ -1002,7 +995,6 @@ func TestSF64ToString(t *testing.T) {
 		decoderTest{[]byte("\xff\xff\xff\xfe\x66\x66\x66\x67"), "-1.600000000", nil},
 		decoderTest{[]byte("\x07\x5b\xcd\x15\x80\x00\x00\x00"), "123456789.500000000", nil},
 		decoderTest{[]byte("\xf8\xa4\x32\xea\x80\x00\x00\x00"), "-123456789.500000000", nil},
-
 		decoderTest{[]byte(""), zero, byteCountErr(0)},
 		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
 		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
@@ -1012,7 +1004,31 @@ func TestSF64ToString(t *testing.T) {
 		return SF64ToString(input)
 	})
 }
-
+func TestSF64ToFloat64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SF64", 8)
+	zero := float64(0)
+	tests := []decoderTest{
+		decoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), -2147483648.0, nil},
+		decoderTest{[]byte("\x80\x00\x00\x01\x00\x00\x00\x00"), -2147483647.0, nil},
+		decoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x05"), -2147483647.999999999, nil},
+		decoderTest{[]byte("\x7f\xff\xff\xff\xff\xff\xff\xfb"), 2147483647.999999999, nil},
+		decoderTest{[]byte("\x7f\xff\xff\xff\x99\x99\x99\x99"), 2147483647.6, nil},
+		decoderTest{[]byte("\x80\x00\x00\x00\x66\x66\x66\x67"), -2147483647.6, nil},
+		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), 1.000000000, nil},
+		decoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), -1.000000000, nil},
+		decoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), 1.500000000, nil},
+		decoderTest{[]byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), -1.500000000, nil},
+		decoderTest{[]byte("\x07\x5b\xcd\x15\x80\x00\x00\x00"), 123456789.5, nil},
+		decoderTest{[]byte("\xf8\xa4\x32\xea\x80\x00\x00\x00"), -123456789.5, nil},
+		decoderTest{[]byte(""), zero, byteCountErr(0)},
+		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+		decoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return SF64ToFloat64(input)
+	})
+}
 func TestUR32ToSliceOfUint(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("UR32", 4)
 	zero := []uint64(nil)
@@ -1218,7 +1234,6 @@ func TestSR64ToString(t *testing.T) {
 		return SR64ToString(input)
 	})
 }
-
 func funcFC32ToUint32(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("FC32", 4)
 	zero := 0
@@ -2534,6 +2549,9 @@ func TestSetFP32FromFloat64(t *testing.T) {
 		encoderTest{float64(math.MaxFloat32), []byte("\x7F\x7F\xFF\xFF"), nil},
 		encoderTest{float64(math.SmallestNonzeroFloat32), []byte("\x00\x00\x00\x01"), nil},
 		encoderTest{float64(math.MaxFloat64), zero, errRange(typ, math.MaxFloat64)},
+		encoderTest{math.NaN(), zero, errRange(typ, math.NaN())},
+		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
+		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetFP32FromFloat64(atom, input.(float64))
@@ -2567,6 +2585,8 @@ func TestSetFP64FromString(t *testing.T) {
 	})
 }
 func TestSetFP64FromFloat64(t *testing.T) {
+	zero := make([]byte, 8)
+	typ := "FP64"
 	tests := []encoderTest{
 		encoderTest{float64(-1.23456789012345672E+09), []byte("\xc1\xd2\x65\x80\xb4\x87\xe6\xb7"), nil},
 		encoderTest{float64(3.27670000000000030E+01), []byte("\x40\x40\x62\x2d\x0e\x56\x04\x19"), nil},
@@ -2584,6 +2604,9 @@ func TestSetFP64FromFloat64(t *testing.T) {
 		encoderTest{float64(4.29496720000000000E+07), []byte("\x41\x84\x7a\xe1\x40\x00\x00\x00"), nil},
 		encoderTest{float64(math.MaxFloat64), []byte("\x7F\xEF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
 		encoderTest{float64(math.SmallestNonzeroFloat64), []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{math.NaN(), zero, errRange(typ, math.NaN())},
+		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
+		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetFP64FromFloat64(atom, input.(float64))
@@ -2591,48 +2614,69 @@ func TestSetFP64FromFloat64(t *testing.T) {
 }
 
 func TestSetUF32FromString(t *testing.T) {
+	typ := "UF32"
+	zero := make([]byte, 4)
 	// only the first 4 digits of precision matter here
 	tests := []encoderTest{
-		// examples straight from doc 112-0002 (Data Types)
 		encoderTest{"65535.9999848", []byte("\xff\xff\xff\xff"), nil},
 		encoderTest{"0.0000152587890625", []byte("\x00\x00\x00\x01"), nil},
 		encoderTest{"0.000030517578125", []byte("\x00\x00\x00\x02"), nil},
-
 		encoderTest{"0", []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{"0.0000", []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{"0.00000000", []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{"1", []byte("\x00\x01\x00\x00"), nil},
 		encoderTest{"1.0000", []byte("\x00\x01\x00\x00"), nil},
 		encoderTest{"1.00000000", []byte("\x00\x01\x00\x00"), nil},
-
-		encoderTest{"65536", nil, errRange("UF32", "65536.000000000")},
-		encoderTest{".", nil, errStrInvalid("UF32", ".")},
-		encoderTest{".0.", nil, errStrInvalid("UF32", ".0.")},
-		encoderTest{".0.0", nil, errStrInvalid("UF32", ".0.0")},
-		encoderTest{"0.0.", nil, errStrInvalid("UF32", "0.0.")},
-		encoderTest{"0.0.0", nil, errStrInvalid("UF32", "0.0.0")},
-		encoderTest{"0x27262524", nil, errStrInvalid("UF32", "0x27262524")},
+		encoderTest{"65536", zero, errRange("UF32", "65536.000000000")},
+		encoderTest{".", zero, errStrInvalid("UF32", ".")},
+		encoderTest{".0.", zero, errStrInvalid("UF32", ".0.")},
+		encoderTest{".0.0", zero, errStrInvalid("UF32", ".0.0")},
+		encoderTest{"0.0.", zero, errStrInvalid("UF32", "0.0.")},
+		encoderTest{"0.0.0", zero, errStrInvalid("UF32", "0.0.0")},
+		encoderTest{"0x27262524", zero, errStrInvalid("UF32", "0x27262524")},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", " ", ""}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetUF32FromString(atom, input.(string))
 	})
 }
 
-// TODO
-//func SetUF32FromFloat64(a *Atom, v float64) (e error) {
+func TestSetUF32FromFloat64(t *testing.T) {
+	typ := "UF32"
+	zero := make([]byte, 4)
+	// only the first 4 digits of precision matter here
+	tests := []encoderTest{
+		encoderTest{float64(65535.9999848), []byte("\xff\xff\xff\xff"), nil},
+		encoderTest{float64(0.0000152587890625), []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{float64(0.000030517578125), []byte("\x00\x00\x00\x02"), nil},
+		encoderTest{float64(0), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{float64(1), []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{float64(0.0), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{float64(1.0), []byte("\x00\x01\x00\x00"), nil},
+		encoderTest{float64(65536.0), zero, errRange(typ, 65536.0)},
+		encoderTest{math.NaN(), zero, errRange(typ, math.NaN())},
+		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
+		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUF32FromFloat64(atom, input.(float64))
+	})
+}
 
 // NOTE: See comment over func SetUF64FromString(..) for explanation of these values.
 func TestSetUF64FromString(t *testing.T) {
-	// only the first 9 digits of precision matter here
+	typ := "UF64"
 	zero := make([]byte, 8)
 	tests := []encoderTest{
-		// examples straight from doc 112-0002 (Data Types)
+		// only the first 9 digits of precision matter here
 		encoderTest{"4294967295.9999999997671694", []byte("\xff\xff\xff\xff\xff\xff\xff\xff"), nil},
 		encoderTest{"4294967295.999999999767169", []byte("\xff\xff\xff\xff\xff\xff\xff\xfe"), nil},
 		encoderTest{"4294967295.999999999", []byte("\xff\xff\xff\xff\xff\xff\xff\xfb"), nil},
 		encoderTest{"0.0000000002328306", []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
 		encoderTest{"0.0000000004656613", []byte("\x00\x00\x00\x00\x00\x00\x00\x02"), nil},
-
 		encoderTest{"0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{"0.0", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{"0.000000000", []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
@@ -2642,44 +2686,67 @@ func TestSetUF64FromString(t *testing.T) {
 		encoderTest{"1.", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
 		encoderTest{".2", []byte("\x00\x00\x00\x00\x33\x33\x33\x33"), nil},
 		encoderTest{"256.8", []byte("\x00\x00\x01\x00\xcc\xcc\xcc\xcc"), nil},
-
-		encoderTest{".", zero, errStrInvalid("UF64", ".")},
-		encoderTest{".0.", zero, errStrInvalid("UF64", ".0.")},
-		encoderTest{".0.0", zero, errStrInvalid("UF64", ".0.0")},
-		encoderTest{"0.0.", zero, errStrInvalid("UF64", "0.0.")},
-		encoderTest{"0.0.0", zero, errStrInvalid("UF64", "0.0.0")},
-		encoderTest{"0x27262524", zero, errStrInvalid("UF64", "0x27262524")},
-		encoderTest{"4294967296", zero, errRange("UF64", "4294967296")},
+		encoderTest{".", zero, errStrInvalid(typ, ".")},
+		encoderTest{".0.", zero, errStrInvalid(typ, ".0.")},
+		encoderTest{".0.0", zero, errStrInvalid(typ, ".0.0")},
+		encoderTest{"0.0.", zero, errStrInvalid(typ, "0.0.")},
+		encoderTest{"0.0.0", zero, errStrInvalid(typ, "0.0.0")},
+		encoderTest{"0x27262524", zero, errStrInvalid(typ, "0x27262524")},
+		encoderTest{"4294967296", zero, errRange(typ, "4294967296")},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", " ", ""}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetUF64FromString(atom, input.(string))
 	})
 }
-
-// TODO
-//func SetUF64FromFloat64(a *Atom, v float64) (e error) {
-//func SetSF32FromString(a *Atom, v string) (e error) {
-
+func TestSetUF64FromFloat64(t *testing.T) {
+	zero := make([]byte, 8)
+	typ := "UF64"
+	tests := []encoderTest{
+		// examples straight from doc 112-0002 (Data Types)
+		// only the first 4 digits of precision matter here
+		encoderTest{4294967295.0, []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
+		encoderTest{4294967294.5, []byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), nil},
+		encoderTest{4294967293.0, []byte("\xff\xff\xff\xfd\x00\x00\x00\x00"), nil},
+		encoderTest{256.8, []byte("\x00\x00\x01\x00\xcc\xcc\xcc\xcc"), nil},
+		encoderTest{float64(0), zero, nil},
+		encoderTest{float64(1), []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{float64(-1), zero, errRange(typ, float64(-1))},
+		encoderTest{math.NaN(), zero, errRange(typ, math.NaN())},
+		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
+		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
+	}
+	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
+		return SetUF64FromFloat64(atom, input.(float64))
+	})
+}
 func TestSetSF32FromFloat64(t *testing.T) {
+	zero := make([]byte, 4)
+	typ := "SF32"
 	tests := []encoderTest{
 		// examples straight from doc 112-0002 (Data Types)
 		// only the first 4 digits of precision matter here
 		encoderTest{float64(32767.99998474121), []byte("\x7f\xff\xff\xff"), nil},
 		encoderTest{float64(-32768.0000), []byte("\x80\x00\x00\x00"), nil},
 		encoderTest{float64(-32752.6250), []byte("\x80\x0f\x60\x00"), nil},
+		encoderTest{math.NaN(), zero, errRange(typ, math.NaN())},
+		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
+		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF32FromFloat64(atom, input.(float64))
 	})
 }
 func TestSetSF32FromString(t *testing.T) {
+	typ := "SF32"
+	zero := make([]byte, 4)
 	tests := []encoderTest{
-		// examples straight from doc 112-0002 (Data Types)
-		// only the first 4 digits of precision matter here
 		encoderTest{"32767.99998474121", []byte("\x7f\xff\xff\xff"), nil},
 		encoderTest{"-32768.0000", []byte("\x80\x00\x00\x00"), nil},
 		encoderTest{"-32752.6250", []byte("\x80\x0f\x60\x00"), nil},
-
 		encoderTest{"1.5000", []byte("\x00\x01\x80\x00"), nil},
 		encoderTest{"1.5000", []byte("\x00\x01\x80\x00"), nil},
 		encoderTest{"-1.0070", []byte("\xff\xfe\xfe\x36"), nil},
@@ -2687,6 +2754,10 @@ func TestSetSF32FromString(t *testing.T) {
 		encoderTest{"-1.8000", []byte("\xff\xfe\x33\x34"), nil},
 		encoderTest{"-32767.9999", []byte("\x80\x00\x00\x07"), nil},
 		encoderTest{"32767.9999", []byte("\x7f\xff\xff\xf9"), nil},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", " ", ""}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF32FromString(atom, input.(string))
@@ -2700,6 +2771,8 @@ func TestSetSF32FromString(t *testing.T) {
 // once, because it can't handle that many sig figs.
 // This is why the tests here don't cover the max range of SF64.
 func TestSetSF64FromFloat64(t *testing.T) {
+	zero := make([]byte, 8)
+	typ := "SF64"
 	tests := []encoderTest{
 		encoderTest{float64(-2147483648.0), []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{float64(-2147483648.999999), []byte("\x80\x00\x00\x00\xff\xff\xf0\x00"), nil},
@@ -2711,12 +2784,17 @@ func TestSetSF64FromFloat64(t *testing.T) {
 
 		encoderTest{-2147483648.0, []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{-2147483647.0, []byte("\x80\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{math.NaN(), zero, errRange(typ, math.NaN())},
+		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
+		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF64FromFloat64(atom, input.(float64))
 	})
 }
 func TestSetSF64FromString(t *testing.T) {
+	typ := "SF64"
+	zero := make([]byte, 8)
 	tests := []encoderTest{
 		encoderTest{"-2147483648.000000000", []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{"-2147483647.000000000", []byte("\x80\x00\x00\x01\x00\x00\x00\x00"), nil},
@@ -2732,6 +2810,10 @@ func TestSetSF64FromString(t *testing.T) {
 		encoderTest{"-1.6", []byte("\xff\xff\xff\xfe\x66\x66\x66\x67"), nil},
 		encoderTest{"123456789.5", []byte("\x07\x5b\xcd\x15\x80\x00\x00\x00"), nil},
 		encoderTest{"-123456789.5", []byte("\xf8\xa4\x32\xea\x80\x00\x00\x00"), nil},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", " ", ""}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF64FromString(atom, input.(string))
@@ -2914,7 +2996,6 @@ func TestSetIP32FromString(t *testing.T) {
 		encoderTest{"0x7F0000017F0000017F0000017F000001", []byte("\x7F\x00\x00\x01\x7F\x00\x00\x01\x7F\x00\x00\x01\x7F\x00\x00\x01"), nil},
 		encoderTest{"0x00000000FFFFFFFF", []byte("\x00\x00\x00\x00\xff\xff\xff\xff"), nil},
 	}
-
 	var arrInvalid = []string{"dog", "...", ".", " ", "",
 		"192.168.1.1.128", "192.168..1", "192.168.1.", "192..168.1", ".192.168.1",
 		"1.1.1", "1.1.1.256", "256.1.1.1", "1000.1.1.1",
@@ -3334,6 +3415,8 @@ func TestSetCSTRFromDelimitedString(t *testing.T) {
 }
 
 func TestSetDATAFromHexString(t *testing.T) {
+	typ := "DATA"
+	zero := []byte(nil)
 	tests := []encoderTest{
 		encoderTest{"0x00", []byte("\x00"), nil},
 		encoderTest{"0x0000", []byte("\x00\x00"), nil},
@@ -3344,6 +3427,10 @@ func TestSetDATAFromHexString(t *testing.T) {
 		encoderTest{"0xFFFFFFFF", []byte("\xFF\xFF\xFF\xFF"), nil},
 		encoderTest{"0xFFFFFFFFFFFFFFFF", []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
 		encoderTest{"", []byte{}, nil},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", " "}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetDATAFromHexString(atom, input.(string))

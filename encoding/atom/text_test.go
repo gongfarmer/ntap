@@ -38,15 +38,21 @@ func TestUnmarshalText(t *testing.T) {
 	}
 }
 
+func checkFailedTest(t *testing.T) {
+	if t.Failed() && txtWriteDebugFiles {
+		fmt.Println("text_test.go: failed test results are available for inspection here: ", failedOutputDir)
+	}
+}
+
 // NOTE: marshaled text output is not guaranteed to always match its input, as
 // odd but valid inputs may be normalized.
 func TestMarshalText(t *testing.T) {
+	defer checkFailedTest(t)
 	var got []byte
 	var err error
 	if txtWriteDebugFiles {
 		os.RemoveAll(failedOutputDir)
 		os.Mkdir(failedOutputDir, 0766)
-		fmt.Println("failed test results are available for inspection here: ", failedOutputDir)
 	}
 
 	// Assumes testfiles and TestAtoms have matching order

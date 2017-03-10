@@ -682,7 +682,6 @@ func SF32ToFloat64(buf []byte) (v float64, e error) {
 	if e = checkByteCount(buf, 4, "SF32"); e != nil {
 		return
 	}
-
 	var i int32
 	i, e = SI32ToInt32(buf)
 	if e != nil {
@@ -692,13 +691,15 @@ func SF32ToFloat64(buf []byte) (v float64, e error) {
 	return
 }
 func SF64ToFloat64(buf []byte) (v float64, e error) {
+	if e = checkByteCount(buf, 8, "SF64"); e != nil {
+		return
+	}
 	var i int64
 	i, e = SI64ToInt64(buf)
 	if e != nil {
 		return
 	}
 	v = float64(i) / (math.MaxUint32 + 1)
-
 	return
 }
 func SF32ToString(buf []byte) (v string, e error) {
@@ -1678,7 +1679,7 @@ func SetFP32FromFloat64(a *Atom, v float64) (e error) {
 	if len(a.data) != 4 {
 		a.data = make([]byte, 4)
 	}
-	if v > math.MaxFloat32 {
+	if v > math.MaxFloat32 || math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("FP32", v)
 	}
 	var bits uint32 = math.Float32bits(float32(v))
@@ -1702,6 +1703,9 @@ func SetFP64FromFloat64(a *Atom, v float64) (e error) {
 	if len(a.data) != 8 {
 		a.data = make([]byte, 8)
 	}
+	if math.IsNaN(v) || math.IsInf(v, 0) {
+		return errRange("FP64", v)
+	}
 	binary.BigEndian.PutUint64(a.data, uint64(v))
 	var bits = math.Float64bits(v)
 	binary.BigEndian.PutUint64(a.data, bits)
@@ -1711,6 +1715,9 @@ func SetFP64FromFloat64(a *Atom, v float64) (e error) {
 // encode of fixed point types
 
 func SetUF32FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 64)
 	if e != nil {
@@ -1725,6 +1732,9 @@ func SetUF32FromString(a *Atom, v string) (e error) {
 func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 	if len(a.data) != 4 {
 		a.data = make([]byte, 4)
+	}
+	if int(v) > math.MaxUint16 || math.IsNaN(v) || math.IsInf(v, 0) {
+		return errRange("UF32", v)
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
 	return
@@ -1802,14 +1812,23 @@ func SetUF64FromFloat64(a *Atom, v float64) (e error) {
 	if len(a.data) != 8 {
 		a.data = make([]byte, 8)
 	}
+	if v < 0 || math.IsNaN(v) || math.IsInf(v, 0) {
+		return errRange("UF64", v)
+	}
 	var i = uint64(v * (1 + math.MaxUint32))
 	binary.BigEndian.PutUint64(a.data, i)
 	return
 }
 
 func SetSF32FromString(a *Atom, v string) (e error) {
+	if len(a.data) != 4 {
+		a.data = make([]byte, 4)
+	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 64)
+	if e != nil {
+		return errStrInvalid("SF32", v)
+	}
 	return SetSF32FromFloat64(a, f)
 }
 
@@ -1817,7 +1836,7 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 	if len(a.data) != 4 {
 		a.data = make([]byte, 4)
 	}
-	if v < -32768.0 || v >= 32768.0 {
+	if v < -32768.0 || v >= 32768.0 || math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("SF32", v)
 	}
 	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
@@ -1834,6 +1853,10 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 func SetSF64FromString(a *Atom, v string) (e error) {
 	if len(a.data) != 8 {
 		a.data = make([]byte, 8)
+	}
+
+	if _, e = strconv.ParseFloat(v, 128); e != nil {
+		return errStrInvalid("SF64", v)
 	}
 
 	iMinus := strings.IndexByte(v, '-')
@@ -1859,6 +1882,9 @@ func SetSF64FromString(a *Atom, v string) (e error) {
 func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 	if len(a.data) != 8 {
 		a.data = make([]byte, 8)
+	}
+	if math.IsNaN(v) || math.IsInf(v, 0) {
+		return errRange("SF64", v)
 	}
 	whole, fract := math.Modf(v)
 	if fract < 0 {
@@ -2154,7 +2180,7 @@ func SetDATAFromHexString(a *Atom, v string) (e error) {
 
 	// non-empty input must be strictly hex
 	if !strings.HasPrefix(v, "0x") {
-		return fmt.Errorf("hexadecimal string should start with 0x, got \"%s\"", v)
+		return errStrInvalid("DATA", v)
 	}
 	buffer, e := hex.DecodeString(v[2:])
 	if e != nil {
