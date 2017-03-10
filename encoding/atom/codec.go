@@ -726,6 +726,7 @@ func SF64ToString(buf []byte) (v string, e error) {
 
 	// get integer part
 	var whole = int32(binary.BigEndian.Uint32(buf[:4]))
+	//whole, e = SI32ToInt32(buf[:4])
 	//	var intPart int32
 	//	intPart, e = SI32ToInt32(buf[:4])
 	//	if e != nil {
@@ -733,23 +734,24 @@ func SF64ToString(buf []byte) (v string, e error) {
 	//	}
 	//
 	//	if (buf[0] & 0x80) == 128 { // if negative number (sign bit is 1)
+	//		whole++
 	//	}
 
-	var fracPart uint64
-	fracPart, e = UI32ToUint64(buf[4:])
+	var iFrac uint64
+	iFrac, e = UI32ToUint64(buf[4:])
 	if e != nil {
 		return
 	}
 	//fmt.Printf("fracPart: %d => ", fracPart)
-	fracPartFloat := float64(fracPart) / float64(1+math.MaxUint32)
+	fFrac := float64(iFrac) / float64(1+math.MaxUint32)
 	//fmt.Printf("div: %.16f\n", fracPartFloat)
-	fracPartFloat = Round(fracPartFloat, 0.5, 9)
+	fFrac = Round(fFrac, 0.5, 9)
 
 	// must request extra precision in printf verb to avoid rounding
 	//fmt.Printf("%0.16f", fracPartFloat)
 	v = strings.Join([]string{
 		fmt.Sprintf("%d", whole),
-		fmt.Sprintf("%0.12f", fracPartFloat)[2:11],
+		fmt.Sprintf("%0.12f", fFrac)[2:11],
 	}, ".")
 	return
 }

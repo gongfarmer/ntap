@@ -66,7 +66,8 @@ func runDecoderTests(t *testing.T, tests []decoderTest, f decodeFunc) {
 
 		// compare using DeepEqual instead of == so slice types like UR32 can be compared
 		if !reflect.DeepEqual(gotValue, test.WantValue) {
-			t.Errorf("%v(%x): got %T \"%[3]v\" (% [3]x), want %[4]T \"%[4]v\" (% [4]x)", funcName, test.Input, gotValue, test.WantValue)
+			//t.Errorf("%v(%x): got %T \"%[3]v\" (% [3]x), want %[4]T \"%[4]v\" (% [4]x)", funcName, test.Input, gotValue, test.WantValue)
+			t.Errorf("%v(%x): got %T \"%[3]v\", want %[4]T \"%[4]v\"", funcName, test.Input, gotValue, test.WantValue)
 		}
 	}
 }
@@ -900,9 +901,21 @@ func TestSF64ToString(t *testing.T) {
 	zero := ""
 	tests := []decoderTest{
 		decoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x00"), "-2147483648.000000000", nil},
+		decoderTest{[]byte("\x80\x00\x00\x01\x00\x00\x00\x00"), "-2147483647.000000000", nil},
+		decoderTest{[]byte("\x80\x00\x00\x00\x00\x00\x00\x05"), "-2147483647.999999999", nil},
 		decoderTest{[]byte("\x7f\xff\xff\xff\xff\xff\xff\xfb"), "2147483647.999999999", nil},
-		decoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), "-1.000000000", nil},
+		decoderTest{[]byte("\x7f\xff\xff\xff\x99\x99\x99\x99"), "2147483647.600000000", nil},
+		decoderTest{[]byte("\x80\x00\x00\x00\x66\x66\x66\x67"), "-2147483647.600000000", nil},
 		decoderTest{[]byte("\x00\x00\x00\x01\x00\x00\x00\x00"), "1.000000000", nil},
+		decoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), "-1.000000000", nil},
+		decoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), "1.500000000", nil},
+		decoderTest{[]byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), "-1.500000000", nil},
+		decoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), "1.500000000", nil},
+		decoderTest{[]byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), "-1.500000000", nil},
+		decoderTest{[]byte("\x00\x00\x00\x01\x99\x99\x99\x99"), "1.600000000", nil},
+		decoderTest{[]byte("\xff\xff\xff\xfe\x66\x66\x66\x67"), "-1.600000000", nil},
+		decoderTest{[]byte("\x07\x5b\xcd\x15\x80\x00\x00\x00"), "123456789.500000000", nil},
+		decoderTest{[]byte("\xf8\xa4\x32\xea\x80\x00\x00\x00"), "-123456789.500000000", nil},
 
 		decoderTest{[]byte(""), zero, byteCountErr(0)},
 		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
@@ -2596,7 +2609,9 @@ func TestSetSF32FromString(t *testing.T) {
 
 // NOTE: UFIX64 can support up to 2147483647.999999999, which cannot be
 // expressed with float64 (see IEEE 754 floating point format, which is limited
-// to a max of 16 significant decimal digits.)
+// to a max of 16 significant decimal digits.)  The problem is not really the
+// range, float64 can support 0.999999999 or 2147483647 but not both at
+// once, because it can't handle that many sig figs.
 // This is why the tests here don't cover the max range of SF64.
 func TestSetSF64FromFloat64(t *testing.T) {
 	tests := []encoderTest{
@@ -2614,12 +2629,22 @@ func TestSetSF64FromFloat64(t *testing.T) {
 }
 func TestSetSF64FromString(t *testing.T) {
 	tests := []encoderTest{
-		// examples straight from doc 112-0002 (Data Types)
-		// only the first 9 digits of precision matter here
 		encoderTest{"-2147483648.000000000", []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{"-2147483647.000000000", []byte("\x80\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"-2147483647.999999999", []byte("\x80\x00\x00\x00\x00\x00\x00\x05"), nil},
 		encoderTest{"2147483647.999999999", []byte("\x7f\xff\xff\xff\xff\xff\xff\xfb"), nil},
-		encoderTest{"-1.000000000", []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
-		encoderTest{"1.000000000", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"2147483647.600000000", []byte("\x7f\xff\xff\xff\x99\x99\x99\x99"), nil},
+		encoderTest{"-2147483647.600000000", []byte("\x80\x00\x00\x00\x66\x66\x66\x67"), nil},
+		encoderTest{"1.0", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+		encoderTest{"-1.0", []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
+		encoderTest{"1.5", []byte("\x00\x00\x00\x01\x80\x00\x00\x00"), nil},
+		encoderTest{"-1.5", []byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), nil},
+		encoderTest{"1.5", []byte("\x00\x00\x00\x01\x80\x00\x00\x00"), nil},
+		encoderTest{"-1.5", []byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), nil},
+		encoderTest{"1.6", []byte("\x00\x00\x00\x01\x99\x99\x99\x99"), nil},
+		encoderTest{"-1.6", []byte("\xff\xff\xff\xfe\x66\x66\x66\x67"), nil},
+		encoderTest{"123456789.5", []byte("\x07\x5b\xcd\x15\x80\x00\x00\x00"), nil},
+		encoderTest{"-123456789.5", []byte("\xf8\xa4\x32\xea\x80\x00\x00\x00"), nil},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF64FromString(atom, input.(string))
