@@ -1849,22 +1849,28 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 // As a result, the correct conversion procedure results in an almost-right value like
 // My measurements show that float value as too low.
 func SetSF64FromString(a *Atom, v string) (e error) {
-	if !strings.HasPrefix(v, "-") {
-		e = SetUF64FromString(a, v)
+	if len(a.data) != 8 {
+		a.data = make([]byte, 8)
+	}
+
+	iMinus := strings.IndexByte(v, '-')
+	if iMinus == -1 {
+		SetUF64FromString(a, v)
 		return
 	}
 
-	// input string represents a negative number
-	e = SetUF64FromString(a, v[1:])
+	// Number is negative.
+	// Discard sign and set as UFIX64
+	SetUF64FromString(a, v[iMinus+1:])
+	signed, e := SI64ToInt64(a.data)
 	if e != nil {
-		return
+		return e
 	}
 
-	// Whole part has incorrect sign.
-	// Can't just flip the sign bit, because 2s complement.
-	var signed = -1 * int32(binary.BigEndian.Uint32(a.data))
-	binary.BigEndian.PutUint32(a.data, uint32(signed))
-	return
+	// Reapply sign by pretending bytes are an int64.
+	// This sorts out the 2s complement.
+	SetSI64FromInt64(a, -1*signed)
+	return nil
 }
 
 func SetSF64FromFloat64(a *Atom, v float64) (e error) {

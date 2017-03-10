@@ -910,8 +910,6 @@ func TestSF64ToString(t *testing.T) {
 		decoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00"), "-1.000000000", nil},
 		decoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), "1.500000000", nil},
 		decoderTest{[]byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), "-1.500000000", nil},
-		decoderTest{[]byte("\x00\x00\x00\x01\x80\x00\x00\x00"), "1.500000000", nil},
-		decoderTest{[]byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), "-1.500000000", nil},
 		decoderTest{[]byte("\x00\x00\x00\x01\x99\x99\x99\x99"), "1.600000000", nil},
 		decoderTest{[]byte("\xff\xff\xff\xfe\x66\x66\x66\x67"), "-1.600000000", nil},
 		decoderTest{[]byte("\x07\x5b\xcd\x15\x80\x00\x00\x00"), "123456789.500000000", nil},
@@ -2622,6 +2620,9 @@ func TestSetSF64FromFloat64(t *testing.T) {
 		encoderTest{float64(1.9999999997671694), []byte("\x00\x00\x00\x01\xff\xff\xff\xff"), nil},
 		encoderTest{float64(-1.0), []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
 		encoderTest{float64(1.0), []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
+
+		encoderTest{-2147483648.0, []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{-2147483647.0, []byte("\x80\x00\x00\x01\x00\x00\x00\x00"), nil},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
 		return SetSF64FromFloat64(atom, input.(float64))
@@ -2637,8 +2638,6 @@ func TestSetSF64FromString(t *testing.T) {
 		encoderTest{"-2147483647.600000000", []byte("\x80\x00\x00\x00\x66\x66\x66\x67"), nil},
 		encoderTest{"1.0", []byte("\x00\x00\x00\x01\x00\x00\x00\x00"), nil},
 		encoderTest{"-1.0", []byte("\xff\xff\xff\xff\x00\x00\x00\x00"), nil},
-		encoderTest{"1.5", []byte("\x00\x00\x00\x01\x80\x00\x00\x00"), nil},
-		encoderTest{"-1.5", []byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), nil},
 		encoderTest{"1.5", []byte("\x00\x00\x00\x01\x80\x00\x00\x00"), nil},
 		encoderTest{"-1.5", []byte("\xff\xff\xff\xfe\x80\x00\x00\x00"), nil},
 		encoderTest{"1.6", []byte("\x00\x00\x00\x01\x99\x99\x99\x99"), nil},
