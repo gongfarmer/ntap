@@ -22,19 +22,25 @@ var Tests []Test
 //  .xml: xml file representation
 // These are all read at init() time and kept in memory to avoid disk reads
 // during benchmarking.
-type Test struct {
-	atom     *Atom  // Atom object
-	inBytes  []byte // bytes from in file
-	binBytes []byte // bytes from bin file
-	txtBytes []byte // bytes from txt file
-	xmlBytes []byte // bytes from xml file
-	inPath   string // path to *.in file
-	binPath  string // path to *.bin file
-	txtPath  string // path to *.txt file
-	xmlPath  string // path to *.xml file
-}
+type (
+	Test struct {
+		atom     *Atom  // Atom object
+		inBytes  []byte // bytes from in file
+		binBytes []byte // bytes from bin file
+		txtBytes []byte // bytes from txt file
+		xmlBytes []byte // bytes from xml file
+		inPath   string // path to *.in file
+		binPath  string // path to *.bin file
+		txtPath  string // path to *.txt file
+		xmlPath  string // path to *.xml file
+	}
 
-type list []string
+	PathTest struct {
+		Input     string
+		WantValue []string
+		WantError error
+	}
+)
 
 // NewTest creates a new Test object from a given base path.
 // It assumes that all 4 related test files would share the same base pathname, differing only in file extensions.
@@ -152,15 +158,6 @@ func init() {
 	}
 }
 
-func (l list) includes(target string) bool {
-	for _, s := range l {
-		if s == target {
-			return true
-		}
-	}
-	return false
-}
-
 func BenchmarkMarshalBinary(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		for _, t := range Tests {
@@ -202,4 +199,110 @@ func BenchmarkUnmarshalText(b *testing.B) {
 		}
 	}
 	b.ReportAllocs()
+}
+
+// Tests of atom path matching
+// TODO:
+// test case where target name appears earlier in the path too
+var TestAtom = new(Atom)
+
+func init() {
+	TestAtom.UnmarshalText([]byte(`
+ROOT:CONT:
+  CN1A:CONT:
+    CN2A:CONT:
+      CN3A:CONT:
+        CN4A:CONT:
+          LF5A:UI32:1
+          LF5B:CSTR:"hello from depth 5"
+        END
+        LF4B:CSTR:"hello from depth 4"
+      END
+    END
+  END
+  CN1B:CONT:
+    NODE:CONT:
+      NODE:CONT:
+        NODE:CONT:
+          NODE:CONT:
+            NODE:CONT:
+              NODE:CONT:
+                NODE:USTR:"branch1 result"
+              END
+            END
+          END
+          NODE:CONT:
+            NODE:CONT:
+              NODE:CONT:
+                NODE:USTR:"branch2 result"
+              END
+            END
+          END
+          NODE:CONT:
+            NODE:CONT:
+              NODE:CONT:
+                NODE:USTR:"branch3 result"
+              END
+            END
+          END
+          NODE:USTR:"too much NODE"
+        END
+      END
+    END
+  END
+END
+`))
+}
+
+func TestAtomsAtPath(t *testing.T) {
+
+	type ss []string
+	zero := []string{}
+	tests := []PathTest{
+		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5A", ss{"LF5A:UI32:1"}, nil},
+		PathTest{"CN1A/CN2A/CN3A/LF4B", ss{`LF4B:CSTR:"hello from depth 4"`}, nil},
+		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5B", ss{`LF5B:CSTR:"hello from depth 5"`}, nil},
+		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE",
+			ss{
+				`NODE:USTR:"branch1 result"`,
+				`NODE:USTR:"branch2 result"`,
+				`NODE:USTR:"branch3 result"`,
+			},
+			nil,
+		},
+
+		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no child named 'THER'")},
+		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
+		PathTest{"CN1A/NONE", zero, fmt.Errorf("atom 'ROOT/CN1A' has no child named 'NONE'")},
+	}
+	runPathTests(t, tests)
+}
+func runPathTests(t *testing.T, tests []PathTest) {
+	for _, test := range tests {
+		atoms, gotErr := TestAtom.AtomsAtPath(test.Input)
+
+		// check for expected error result
+		switch {
+		case gotErr == nil && test.WantError == nil:
+		case gotErr != nil && test.WantError == nil:
+			t.Errorf("%s: got err {%s}, want err <nil>", test.Input, gotErr)
+		case gotErr == nil && test.WantError != nil:
+			t.Errorf("%s: got err <nil>, want err {%s}", test.Input, test.WantError)
+		case gotErr.Error() != test.WantError.Error():
+			t.Errorf("%s: got err {%s}, want err {%s}", test.Input, gotErr, test.WantError)
+		}
+
+		// convert result atoms to string representations
+		var results []string
+		for _, a := range atoms {
+			results = append(results, strings.TrimSpace(a.String()))
+		}
+
+		// compare each result atom in order
+		for i, want := range test.WantValue {
+			if want != results[i] {
+				t.Errorf("%s: got %s, want %s", test.Input, results[i], want)
+			}
+		}
+	}
 }

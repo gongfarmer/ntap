@@ -1,5 +1,9 @@
 package atom
 
+// This file provides methods for reading and writing atom data values.
+// There are two types of functions:
+//  * Set<adetype>From<goType>, to set atom values
+//  * <adetype>To<goType>, to read an atom value into a go variable
 import (
 	"bytes"
 	"encoding/binary"
@@ -62,11 +66,15 @@ type (
 	ADEType string
 	GoType  string
 
-	codec struct {
+	// A Codec (coder/decoder) object provides access to the data value of an atom.
+	// It contains a full set of getter and setter methods which accept or return
+	// the atom data as various Go native types.
+	// Go types that don't make sense for a given ADE type (eg. SliceOfInt for a
+	// string type) simply return an error when called.
+	Codec struct {
 		Atom    *Atom
 		Decoder decoder
 		Encoder encoder
-		Writer  io.Writer // writes bytes directly to Atom.data
 	}
 	decoder struct {
 		String          func(buf []byte) (string, error)
@@ -152,26 +160,25 @@ func errZeroDenominator(typ string, v string) (e error) {
 	return
 }
 
-// NewCodec returns a codec that performs type conversion for atom data.
-// A codec provides encoder/decoder methods for converting data from an atom's
+// NewCodec returns a Codec that performs type conversion for atom data.
+// A Codec provides encoder/decoder methods for converting data from an atom's
 // ADE type into suitable Go types, and vice versa.
-func NewCodec(a *Atom) *codec {
-	c := codec{
+func NewCodec(a *Atom) *Codec {
+	c := Codec{
 		Atom:    a,
 		Decoder: decoderByType[a.Type()],
 		Encoder: encoderByType[a.Type()],
-		Writer:  bytes.NewBuffer(a.data), // allows writing directly to a.data, not a copy
 	}
 	return &c
 }
 
-// NewEncoder returns a new encoder that provides functions for converting Go
+// newEncoder returns a new encoder that provides functions for converting Go
 // native types into ADE Atom data.  The returned encoder contains all of the
 // default encoding methods, which simply return an error stating that the
 // encoding is not supported.
 // The caller should implement whichever encoding methods are appropriate for
-// the ADE data type's codec.
-func NewEncoder(i interface{}) encoder {
+// the ADE data type's Codec.
+func newEncoder(i interface{}) encoder {
 	return encoder{
 		SetString:          func(a *Atom, v string) (e error) { return errNoEncoder(a, "string") },
 		SetStringDelimited: func(a *Atom, v string) (e error) { return errNoEncoder(a, "string(delimited)") },
@@ -185,13 +192,13 @@ func NewEncoder(i interface{}) encoder {
 	}
 }
 
-// NewEncoder returns a new encoder that provides functions for converting Go
+// newEncoder returns a new encoder that provides functions for converting Go
 // native types into ADE Atom data.  The returned encoder contains all of the
 // default encoding methods, which simply return an error stating that the
 // encoding is not supported.
 // The caller should implement whichever encoding methods are appropriate for
-// the ADE data type's codec.
-func NewDecoder(from ADEType) decoder {
+// the ADE data type's Codec.
+func newDecoder(from ADEType) decoder {
 	return decoder{
 		String:          func([]byte) (v string, e error) { return v, errNoDecoder(from, "string") },
 		StringDelimited: func([]byte) (v string, e error) { return v, errNoDecoder(from, "string(delimited)") },
@@ -209,123 +216,123 @@ var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
 
 // Decoder methods: pass atom data to the decoder for type conversion to go type
-func (c codec) String() (string, error)          { return c.Decoder.String(c.Atom.data) }
-func (c codec) StringDelimited() (string, error) { return c.Decoder.StringDelimited(c.Atom.data) }
-func (c codec) Bool() (bool, error)              { return c.Decoder.Bool(c.Atom.data) }
-func (c codec) Uint() (uint64, error)            { return c.Decoder.Uint(c.Atom.data) }
-func (c codec) Int() (int64, error)              { return c.Decoder.Int(c.Atom.data) }
-func (c codec) Float() (float64, error)          { return c.Decoder.Float(c.Atom.data) }
-func (c codec) SliceOfUint() ([]uint64, error)   { return c.Decoder.SliceOfUint(c.Atom.data) }
-func (c codec) SliceOfInt() ([]int64, error)     { return c.Decoder.SliceOfInt(c.Atom.data) }
-func (c codec) SliceOfByte() ([]byte, error)     { return c.Atom.data, nil }
+func (c Codec) String() (string, error)          { return c.Decoder.String(c.Atom.data) }
+func (c Codec) StringDelimited() (string, error) { return c.Decoder.StringDelimited(c.Atom.data) }
+func (c Codec) Bool() (bool, error)              { return c.Decoder.Bool(c.Atom.data) }
+func (c Codec) Uint() (uint64, error)            { return c.Decoder.Uint(c.Atom.data) }
+func (c Codec) Int() (int64, error)              { return c.Decoder.Int(c.Atom.data) }
+func (c Codec) Float() (float64, error)          { return c.Decoder.Float(c.Atom.data) }
+func (c Codec) SliceOfUint() ([]uint64, error)   { return c.Decoder.SliceOfUint(c.Atom.data) }
+func (c Codec) SliceOfInt() ([]int64, error)     { return c.Decoder.SliceOfInt(c.Atom.data) }
+func (c Codec) SliceOfByte() ([]byte, error)     { return c.Atom.data, nil }
 
 // Encoder methods: convert given data type to []byte and store in ATom
-func (c codec) SetString(v string) error          { return c.Encoder.SetString(c.Atom, v) }
-func (c codec) SetStringDelimited(v string) error { return c.Encoder.SetStringDelimited(c.Atom, v) }
-func (c codec) SetBool(v bool) error              { return c.Encoder.SetBool(c.Atom, v) }
-func (c codec) SetUint(v uint64) error            { return c.Encoder.SetUint(c.Atom, v) }
-func (c codec) SetInt(v int64) error              { return c.Encoder.SetInt(c.Atom, v) }
-func (c codec) SetFloat(v float64) error          { return c.Encoder.SetFloat(c.Atom, v) }
-func (c codec) SetSliceOfUint(v []uint64) error   { return c.Encoder.SetSliceOfUint(c.Atom, v) }
-func (c codec) SetSliceOfInt(v []int64) error     { return c.Encoder.SetSliceOfInt(c.Atom, v) }
-func (c codec) SetSliceOfByte(v []byte) error     { return c.Encoder.SetSliceOfByte(c.Atom, v) }
+func (c Codec) SetString(v string) error          { return c.Encoder.SetString(c.Atom, v) }
+func (c Codec) SetStringDelimited(v string) error { return c.Encoder.SetStringDelimited(c.Atom, v) }
+func (c Codec) SetBool(v bool) error              { return c.Encoder.SetBool(c.Atom, v) }
+func (c Codec) SetUint(v uint64) error            { return c.Encoder.SetUint(c.Atom, v) }
+func (c Codec) SetInt(v int64) error              { return c.Encoder.SetInt(c.Atom, v) }
+func (c Codec) SetFloat(v float64) error          { return c.Encoder.SetFloat(c.Atom, v) }
+func (c Codec) SetSliceOfUint(v []uint64) error   { return c.Encoder.SetSliceOfUint(c.Atom, v) }
+func (c Codec) SetSliceOfInt(v []int64) error     { return c.Encoder.SetSliceOfInt(c.Atom, v) }
+func (c Codec) SetSliceOfByte(v []byte) error     { return c.Encoder.SetSliceOfByte(c.Atom, v) }
 
 // Initialize decoder table, which makes decoders accessible by ADE type.
 // Variable 'd' is used for assignment, because Go disallows assigning directly
 // to a struct member of a map value.  Example:
-//    decoderByType[UI01] = NewDecoder(UI01)
+//    decoderByType[UI01] = newDecoder(UI01)
 //    decoderByType[UI01].Bool = UI32ToBool //illegal
 func init() {
 	// ADE unsigned int types
-	dec := NewDecoder(UI01)
+	dec := newDecoder(UI01)
 	dec.String = UI32ToString
 	dec.StringDelimited = dec.String
 	dec.Bool = UI01ToBool
 	dec.Uint = UI32ToUint64
 	decoderByType[UI01] = dec
 
-	dec = NewDecoder(UI08)
+	dec = newDecoder(UI08)
 	dec.String = UI08ToString
 	dec.StringDelimited = dec.String
 	dec.Uint = UI08ToUint64
 	decoderByType[UI08] = dec
 
-	dec = NewDecoder(UI16)
+	dec = newDecoder(UI16)
 	dec.String = UI16ToString
 	dec.StringDelimited = dec.String
 	dec.Uint = UI16ToUint64
 	decoderByType[UI16] = dec
 
-	dec = NewDecoder(UI32)
+	dec = newDecoder(UI32)
 	dec.String = UI32ToString
 	dec.StringDelimited = dec.String
 	dec.Uint = UI32ToUint64
 	decoderByType[UI32] = dec
 
-	dec = NewDecoder(UI64)
+	dec = newDecoder(UI64)
 	dec.String = UI64ToString
 	dec.StringDelimited = dec.String
 	dec.Uint = UI64ToUint64
 	decoderByType[UI64] = dec
 
 	// ADE signed int types
-	dec = NewDecoder(SI08)
+	dec = newDecoder(SI08)
 	dec.String = SI08ToString
 	dec.StringDelimited = dec.String
 	dec.Int = SI08ToInt64
 	decoderByType[SI08] = dec
 
-	dec = NewDecoder(SI16)
+	dec = newDecoder(SI16)
 	dec.String = SI16ToString
 	dec.StringDelimited = dec.String
 	dec.Int = SI16ToInt64
 	decoderByType[SI16] = dec
 
-	dec = NewDecoder(SI32)
+	dec = newDecoder(SI32)
 	dec.String = SI32ToString
 	dec.StringDelimited = dec.String
 	dec.Int = SI32ToInt64
 	decoderByType[SI32] = dec
 
-	dec = NewDecoder(SI64)
+	dec = newDecoder(SI64)
 	dec.String = SI64ToString
 	dec.StringDelimited = dec.String
 	dec.Int = SI64ToInt64
 	decoderByType[SI64] = dec
 
 	// ADE floating point types
-	dec = NewDecoder(FP32)
+	dec = newDecoder(FP32)
 	dec.String = FP32ToString
 	dec.StringDelimited = dec.String
 	dec.Float = FP32ToFloat64
 	decoderByType[FP32] = dec
 
-	dec = NewDecoder(FP64)
+	dec = newDecoder(FP64)
 	dec.String = FP64ToString
 	dec.StringDelimited = dec.String
 	dec.Float = FP64ToFloat64
 	decoderByType[FP64] = dec
 
 	// ADE fixed point types
-	dec = NewDecoder(UF32)
+	dec = newDecoder(UF32)
 	dec.String = UF32ToString
 	dec.StringDelimited = dec.String
 	dec.Float = UF32ToFloat64
 	decoderByType[UF32] = dec
 
-	dec = NewDecoder(UF64)
+	dec = newDecoder(UF64)
 	dec.String = UF64ToString
 	dec.StringDelimited = dec.String
 	dec.Float = UF64ToFloat64
 	decoderByType[UF64] = dec
 
-	dec = NewDecoder(SF32)
+	dec = newDecoder(SF32)
 	dec.String = SF32ToString
 	dec.StringDelimited = dec.String
 	dec.Float = SF32ToFloat64
 	decoderByType[SF32] = dec
 
-	dec = NewDecoder(SF64)
+	dec = newDecoder(SF64)
 	dec.String = SF64ToString
 	dec.StringDelimited = dec.String
 	dec.Float = SF64ToFloat64
@@ -333,74 +340,74 @@ func init() {
 
 	// ADE fractional types
 
-	dec = NewDecoder(UR32)
+	dec = newDecoder(UR32)
 	dec.String = UR32ToString
 	dec.StringDelimited = dec.String
 	dec.SliceOfUint = UR32ToSliceOfUint
 	decoderByType[UR32] = dec
 
-	dec = NewDecoder(UR64)
+	dec = newDecoder(UR64)
 	dec.String = UR64ToString
 	dec.StringDelimited = dec.String
 	dec.SliceOfUint = UR64ToSliceOfUint
 	decoderByType[UR64] = dec
 
-	dec = NewDecoder(SR32)
+	dec = newDecoder(SR32)
 	dec.String = SR32ToString
 	dec.StringDelimited = dec.String
 	dec.SliceOfInt = SR32ToSliceOfInt
 	decoderByType[SR32] = dec
 
-	dec = NewDecoder(SR64)
+	dec = newDecoder(SR64)
 	dec.String = SR64ToString
 	dec.StringDelimited = dec.String
 	dec.SliceOfInt = SR64ToSliceOfInt
 	decoderByType[SR64] = dec
 
 	// ADE Four char code
-	dec = NewDecoder(FC32)
+	dec = newDecoder(FC32)
 	dec.String = FC32ToStringDelimited
 	dec.StringDelimited = dec.String
 	decoderByType[FC32] = dec
 
 	// ADE ENUM type
-	dec = NewDecoder(ENUM)
+	dec = newDecoder(ENUM)
 	dec.String = SI32ToString
 	dec.StringDelimited = dec.String
 	dec.Int = SI32ToInt64
 	decoderByType[ENUM] = dec
 
 	// ADE UUID type
-	dec = NewDecoder(UUID)
+	dec = newDecoder(UUID)
 	dec.String = UUIDToString
 	dec.StringDelimited = dec.String
 	decoderByType[UUID] = dec
 
 	// IP Address types
-	dec = NewDecoder(IP32)
+	dec = newDecoder(IP32)
 	dec.String = IP32ToString
 	dec.StringDelimited = dec.String
 	dec.Uint = IP32ToUint64
 	decoderByType[IP32] = dec
 
-	dec = NewDecoder(IPAD)
+	dec = newDecoder(IPAD)
 	dec.String = IPADToString
 	dec.StringDelimited = dec.String
 	decoderByType[IPAD] = dec
 
 	// ADE String types
-	dec = NewDecoder(CSTR)
+	dec = newDecoder(CSTR)
 	dec.String = CSTRToString
 	dec.StringDelimited = CSTRToStringDelimited
 	decoderByType[CSTR] = dec
 
-	dec = NewDecoder(USTR)
+	dec = newDecoder(USTR)
 	dec.String = USTRToString
 	dec.StringDelimited = USTRToStringDelimited
 	decoderByType[USTR] = dec
 
 	// DATA type, and aliases
-	dec = NewDecoder(DATA)
+	dec = newDecoder(DATA)
 	dec.String = BytesToHexString
 	dec.StringDelimited = dec.String
 	decoderByType[DATA] = dec
@@ -408,13 +415,13 @@ func init() {
 	decoderByType[Cnct] = dec
 
 	// NULL type
-	dec = NewDecoder(NULL)
+	dec = newDecoder(NULL)
 	dec.String = func([]byte) (s string, e error) { return }
 	dec.StringDelimited = dec.String
 	decoderByType[NULL] = dec
 
 	// ADE container
-	dec = NewDecoder(CONT)
+	dec = newDecoder(CONT)
 	dec.String = func([]byte) (s string, e error) { return }
 	dec.StringDelimited = dec.String
 	decoderByType[CONT] = dec
@@ -460,7 +467,7 @@ func UI32ToUint64(buf []byte) (v uint64, e error) {
 	if e = checkByteCount(buf, 4, "UI32"); e != nil {
 		return
 	}
-	var ui32 uint32 = binary.BigEndian.Uint32(buf)
+	var ui32 = binary.BigEndian.Uint32(buf)
 	return uint64(ui32), e
 }
 func UI64ToUint64(buf []byte) (v uint64, e error) {
@@ -708,7 +715,7 @@ func SF32ToString(buf []byte) (v string, e error) {
 	}
 	var f float64
 	f, e = SF32ToFloat64(buf)
-	f = Round(f, 0.5, 5)
+	f = Round(f, 5)
 	if e == nil {
 		v = fmt.Sprintf("%0.4f", f)
 	}
@@ -1123,141 +1130,141 @@ Encoder method table for ADE types
 
 func init() {
 	// ADE unsigned int types
-	enc := NewEncoder(UI01)
+	enc := newEncoder(UI01)
 	enc.SetString = SetUI01FromString
 	enc.SetBool = SetUI01FromBool
 	enc.SetUint = SetUI01FromUint64
 	encoderByType[UI01] = enc
 
-	enc = NewEncoder(UI08)
+	enc = newEncoder(UI08)
 	enc.SetString = SetUI08FromString
 	enc.SetUint = SetUI08FromUint64
 	encoderByType[UI08] = enc
 
-	enc = NewEncoder(UI16)
+	enc = newEncoder(UI16)
 	enc.SetString = SetUI16FromString
 	enc.SetUint = SetUI16FromUint64
 	encoderByType[UI16] = enc
 
-	enc = NewEncoder(UI32)
+	enc = newEncoder(UI32)
 	enc.SetString = SetUI32FromString
 	enc.SetUint = SetUI32FromUint64
 	encoderByType[UI32] = enc
 
-	enc = NewEncoder(UI64)
+	enc = newEncoder(UI64)
 	enc.SetString = SetUI64FromString
 	enc.SetUint = SetUI64FromUint64
 	encoderByType[UI64] = enc
 
 	// ADE signed int types
-	enc = NewEncoder(SI08)
+	enc = newEncoder(SI08)
 	enc.SetString = SetSI08FromString
 	enc.SetInt = SetSI08FromInt64
 	encoderByType[SI08] = enc
 
-	enc = NewEncoder(SI16)
+	enc = newEncoder(SI16)
 	enc.SetString = SetSI16FromString
 	enc.SetInt = SetSI16FromInt64
 	encoderByType[SI16] = enc
 
-	enc = NewEncoder(SI32)
+	enc = newEncoder(SI32)
 	enc.SetString = SetSI32FromString
 	enc.SetInt = SetSI32FromInt64
 	encoderByType[SI32] = enc
 
-	enc = NewEncoder(SI64)
+	enc = newEncoder(SI64)
 	enc.SetString = SetSI64FromString
 	enc.SetInt = SetSI64FromInt64
 	encoderByType[SI64] = enc
 
 	// ADE floating point types
-	enc = NewEncoder(FP32)
+	enc = newEncoder(FP32)
 	enc.SetString = SetFP32FromString
 	enc.SetFloat = SetFP32FromFloat64
 	encoderByType[FP32] = enc
 
-	enc = NewEncoder(FP64)
+	enc = newEncoder(FP64)
 	enc.SetString = SetFP64FromString
 	enc.SetFloat = SetFP64FromFloat64
 	encoderByType[FP64] = enc
 
 	// ADE fixed point types
-	enc = NewEncoder(UF32)
+	enc = newEncoder(UF32)
 	enc.SetString = SetUF32FromString
 	enc.SetFloat = SetUF32FromFloat64
 	encoderByType[UF32] = enc
 
-	enc = NewEncoder(UF64)
+	enc = newEncoder(UF64)
 	enc.SetString = SetUF64FromString
 	enc.SetFloat = SetUF64FromFloat64
 	encoderByType[UF64] = enc
 
-	enc = NewEncoder(SF32)
+	enc = newEncoder(SF32)
 	enc.SetString = SetSF32FromString
 	enc.SetFloat = SetSF32FromFloat64
 	encoderByType[SF32] = enc
 
-	enc = NewEncoder(SF64)
+	enc = newEncoder(SF64)
 	enc.SetString = SetSF64FromString
 	enc.SetFloat = SetSF64FromFloat64
 	encoderByType[SF64] = enc
 
 	// ADE fractional types
 
-	enc = NewEncoder(UR32)
+	enc = newEncoder(UR32)
 	enc.SetString = SetUR32FromString
 	enc.SetSliceOfUint = SetUR32FromSliceOfUint
 	encoderByType[UR32] = enc
 
-	enc = NewEncoder(UR64)
+	enc = newEncoder(UR64)
 	enc.SetString = SetUR64FromString
 	enc.SetSliceOfUint = SetUR64FromSliceOfUint
 	encoderByType[UR64] = enc
 
-	enc = NewEncoder(SR32)
+	enc = newEncoder(SR32)
 	enc.SetString = SetSR32FromString
 	enc.SetSliceOfInt = SetSR32FromSliceOfInt
 	encoderByType[SR32] = enc
 
-	enc = NewEncoder(SR64)
+	enc = newEncoder(SR64)
 	enc.SetString = SetSR64FromString
 	enc.SetSliceOfInt = SetSR64FromSliceOfInt
 	encoderByType[SR64] = enc
 
 	// ADE Four char code
-	enc = NewEncoder(FC32)
+	enc = newEncoder(FC32)
 	enc.SetString = SetFC32FromString
 	enc.SetUint = SetFC32FromUint64
 	encoderByType[FC32] = enc
 
 	// IP Address types
-	enc = NewEncoder(IP32)
+	enc = newEncoder(IP32)
 	enc.SetString = SetIP32FromString
 	enc.SetUint = SetIP32FromUint64
 	encoderByType[IP32] = enc
 
-	enc = NewEncoder(IPAD)
+	enc = newEncoder(IPAD)
 	enc.SetString = SetIPADFromString
 	encoderByType[IPAD] = enc
 
 	// ADE UUID type
-	enc = NewEncoder(UUID)
+	enc = newEncoder(UUID)
 	enc.SetString = SetUUIDFromString
 	encoderByType[UUID] = enc
 
 	// ADE String types
-	enc = NewEncoder(CSTR)
+	enc = newEncoder(CSTR)
 	enc.SetString = SetCSTRFromString
 	enc.SetStringDelimited = SetCSTRFromDelimitedString
 	encoderByType[CSTR] = enc
 
-	enc = NewEncoder(USTR)
+	enc = newEncoder(USTR)
 	enc.SetString = SetUSTRFromString
 	enc.SetStringDelimited = SetUSTRFromDelimitedString
 	encoderByType[USTR] = enc
 
 	// DATA type, and aliases
-	enc = NewEncoder(DATA)
+	enc = newEncoder(DATA)
 	enc.SetString = SetDATAFromHexString
 	enc.SetStringDelimited = SetDATAFromHexString
 	encoderByType[DATA] = enc
@@ -1265,18 +1272,18 @@ func init() {
 	encoderByType[Cnct] = enc
 
 	// ADE ENUM type
-	enc = NewEncoder(ENUM)
+	enc = newEncoder(ENUM)
 	enc.SetString = SetSI32FromString
 	enc.SetInt = SetSI32FromInt64
 	encoderByType[ENUM] = enc
 
 	// NULL type
-	enc = NewEncoder(NULL)
+	enc = newEncoder(NULL)
 	enc.SetString = func(_ *Atom, _ string) (e error) { return }
 	encoderByType[NULL] = enc
 
 	// ADE container
-	enc = NewEncoder(CONT)
+	enc = newEncoder(CONT)
 	enc.SetString = func(_ *Atom, _ string) (e error) { return }
 	encoderByType[CONT] = enc
 }
@@ -1682,7 +1689,7 @@ func SetFP32FromFloat64(a *Atom, v float64) (e error) {
 	if v > math.MaxFloat32 || math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("FP32", v)
 	}
-	var bits uint32 = math.Float32bits(float32(v))
+	var bits = math.Float32bits(float32(v))
 	binary.BigEndian.PutUint32(a.data, bits)
 	return
 }
@@ -1800,7 +1807,7 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 
 	// Move the precision places to be kept to the left of the decimal place.
 	fractF *= (math.MaxUint32 + 1)
-	fractF = Round(fractF, 0.5, 6) // match rounding magnitude of ADE ccat
+	fractF = Round(fractF, 6) // match rounding magnitude of ADE ccat
 
 	binary.BigEndian.PutUint32(a.data, uint32(whole))
 	binary.BigEndian.PutUint32(a.data[4:], uint32(fractF))
@@ -2271,20 +2278,21 @@ func ValidUUIDString(s string) bool {
 		len(groups[4]) == 12
 }
 
-func Round(val float64, roundOn float64, places int) float64 {
+// Round the given decimal floating point value at the given place.
+func Round(val float64, places int) float64 {
 	pow := math.Pow(10, float64(places))
 	digit := pow * val
 	_, div := math.Modf(digit)
 
 	var round float64
 	if val > 0 {
-		if div >= roundOn {
+		if div >= 0.5 {
 			round = math.Ceil(digit)
 		} else {
 			round = math.Floor(digit)
 		}
 	} else {
-		if div >= roundOn {
+		if div >= 0.5 {
 			round = math.Floor(digit)
 		} else {
 			round = math.Ceil(digit)

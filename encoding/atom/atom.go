@@ -1,8 +1,6 @@
-// Package atom provides encodings for the ADE AtomContainer format.
-// It includes conversions between text and binary formats, as well as an
-// encoding-independent struct to provide convenient accessors.
-// TODO Encoder and Decoder as in encoding/xml, encoding/json
-// see encoding/gob/example_test.go for model of how this works
+// Package atom provides encodings for ADE AtomContainers.
+// It includes a struct type with getters/setters for ADE data types, and
+// provides conversions to and from text and binary atom container formats.
 package atom
 
 import (
@@ -27,7 +25,7 @@ type Atom struct {
 	Name     string
 	typ      ADEType
 	data     []byte
-	Value    *codec
+	Value    *Codec
 	Children []*Atom
 }
 
@@ -35,6 +33,77 @@ type Atom struct {
 func (a *Atom) Type() ADEType {
 	return a.typ
 }
+
+// AtomsAtPath returns a slice of all Atom descendants at the given path.
+// If no atom is found, it returns an error message that describes which path
+// part doesn't exist.
+func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
+	var index int
+	var pathParts = strings.Split(path, "/")
+	if pathParts[0] != a.Name {
+		pathParts = append([]string{a.Name}, pathParts...)
+		index++
+	}
+	return getAtomsAtPath(a, pathParts, index)
+}
+
+// must return no atoms on error
+func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e error) {
+	if a.Type() != CONT {
+		e = fmt.Errorf("atom '%s' is not a container", strings.Join(pathParts[:index], "/"))
+		return
+	}
+
+	// find all child atoms whose name matches the next path part
+	var nextAtoms []*Atom
+	for _, child := range a.Children {
+		if child.Name != pathParts[index] {
+			continue
+		}
+		nextAtoms = append(nextAtoms, child)
+	}
+
+	// return error if no child atoms matched
+	if len(nextAtoms) == 0 {
+		pathSoFar := strings.Join(pathParts[:index], "/")
+		e = fmt.Errorf("atom '%s' has no child named '%s'", pathSoFar, pathParts[index])
+		return
+	}
+
+	// if this is the final path part, then return all matched atoms regardless of type
+	if index == len(pathParts)-1 { // if last path part
+		atoms = append(atoms, nextAtoms...)
+		return
+	}
+
+	// search child atoms for the rest of the path
+	var foundCont bool
+	for _, child := range nextAtoms {
+		if child.Type() != CONT {
+			continue
+		}
+		foundCont = true
+		if moreAtoms, err := getAtomsAtPath(child, pathParts, index+1); err == nil {
+			atoms = append(atoms, moreAtoms...)
+		} else {
+			return atoms, err
+		}
+	}
+
+	// if none of the matching children were containers, return error
+	if !foundCont {
+		pathSoFar := strings.Join(pathParts[:index], "/")
+		e = fmt.Errorf("atom '%s' has no container child named '%s'", pathSoFar, pathParts[index])
+		return
+	}
+	return
+}
+
+// AtomAtPath returns the single Atom descendant at the given path, or nil if none.
+// ValueAtPath returns the atom Value object at the given path, or nil if none.
+// FIXME: provide a way to get all children of a node without specifying all
+// their names -- needed to access data in attribute containers.
+// FIXME: provide a way to replace specifier at 1 level with *? multi-level with **?
 
 // Zero sets the atom to the type Atom's zero value.
 // It sets the atom data to a zero-length slice, releasing any
@@ -46,7 +115,7 @@ func (a *Atom) Zero() {
 	a.Children = []*Atom{}
 }
 
-// SetType sets the type of an Atom object, and handles updating the codec and
+// SetType sets the type of an Atom object, and handles updating the Codec and
 // data fields to match.
 func (a *Atom) SetType(newType ADEType) {
 	a.typ = newType
@@ -76,7 +145,7 @@ func (a *Atom) ZeroData() {
 	case CONT, NULL:
 		a.data = nil
 	default:
-		panic(fmt.Sprintf("Unknown ADE type: %s", string(a.typ)))
+		panic(fmt.Sprintf("unknown ADE type: %s", string(a.typ)))
 	}
 }
 
@@ -84,7 +153,7 @@ func (a *Atom) ZeroData() {
 func (a Atom) String() string {
 	buf, err := a.MarshalText()
 	if err != nil {
-		panic(fmt.Errorf("Failed to write Atom '%s:%s' to text: %s", a.Name, a.Type(), err))
+		panic(fmt.Errorf("failed to write Atom '%s:%s' to text: %s", a.Name, a.Type(), err))
 	}
 	return string(buf)
 }

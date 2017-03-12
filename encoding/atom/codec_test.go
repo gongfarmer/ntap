@@ -11,8 +11,8 @@ import (
 
 // FIXME: add tests of strings without decimal points on all float types
 
-// implement function curryErrFuncing for err funcs so that I can specify the type and
-// expected bytes at the top of the test func, and the amount of bytes provided
+// implement function curryErrFunc so I can specify ADE type and expected
+// bytes at the top of each test func, and the amount of bytes provided
 // in each test separately.
 func (f errFunc) curryErrFunc(strAdeType string, want int) func(int) error {
 	return func(got int) error {
@@ -1884,8 +1884,8 @@ func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 	for _, test := range tests {
 		funcName := GetFunctionName(f)
 		var inputAtom = new(Atom)
-		var gotErr error = f(inputAtom, test.Input)
-		var gotValue []byte = inputAtom.data
+		var gotErr = f(inputAtom, test.Input)
+		var gotValue = inputAtom.data
 
 		switch {
 		case gotErr == nil && test.WantError == nil:
