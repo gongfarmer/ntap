@@ -52,6 +52,9 @@ func init() {
 ROOT:CONT:
   CN1A:CONT:
 		DOGS:UI32:1
+		DOGS:UI32:2
+		DOGS:UI32:3
+		CATS:UI32:1
     CN2A:CONT:
       CN3A:CONT:
         CN4A:CONT:
@@ -63,7 +66,7 @@ ROOT:CONT:
     END
   END
   CN1B:CONT:
-		DOGS:UI32:2
+		DOGS:UI32:12
     NODE:CONT:
       NODE:CONT:
         NODE:CONT:
@@ -94,7 +97,7 @@ ROOT:CONT:
     END
   END
   CN1C:CONT:
-    DOGS:UI32:3
+    DOGS:UI32:23
   END
 	GINF:CONT:
 		BVER:UI32:4
@@ -159,7 +162,10 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{"*/DOGS", []string{
 			`DOGS:UI32:1`,
 			`DOGS:UI32:2`,
-			`DOGS:UI32:3`}, nil,
+			`DOGS:UI32:3`,
+			`DOGS:UI32:12`,
+			`DOGS:UI32:23`,
+		}, nil,
 		},
 		PathTest{"GINF/*/AVAL/0x00000001", []string{
 			`0x00000001:UI32:908767`,
@@ -178,6 +184,39 @@ func TestAtomsAtPath(t *testing.T) {
 			`0x00000001:CSTR:"10.4.0"`}, nil,
 		},
 		PathTest{"CN1A/NONE", zero, nil},
+		PathTest{"CN1A/*[@type=ui32]", []string{
+			`DOGS:UI32:1`,
+			`DOGS:UI32:2`,
+			`DOGS:UI32:3`,
+			`CATS:UI32:1`,
+		}, nil,
+		},
+
+		// test path specification by index.  start from 1 like xpath.
+		PathTest{"CN1A/DOGS[0]", zero, fmt.Errorf("path indices start from 1, not 0")},
+		PathTest{"CN1A/DOGS[1]", []string{`DOGS:UI32:1`}, nil},
+		PathTest{"CN1A/DOGS[2]", []string{`DOGS:UI32:2`}, nil},
+		PathTest{"CN1A/DOGS[3]", []string{`DOGS:UI32:3`}, nil},
+		PathTest{"CN1A/DOGS[4]", []string{}, nil},
+		PathTest{"*/DOGS[4]", []string{`DOGS:UI32:12`}, nil},
+		PathTest{"*/DOGS[5]", []string{`DOGS:UI32:23`}, nil},
+		PathTest{"*/DOGS[6]", []string{}, nil},
+
+		// FIXME what if ] is part of the name?  use delimiters? require hex specificiation?  require 4 chars or hex?
+		PathTest{"CN1A/*[@name=DOGS]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		PathTest{"CN1A/DOGS", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+
+		// syntactically valid but semantically impossible .. name CN1A != name DOGS
+		PathTest{"CN1A[@name=DOGS]", []string{}, nil},
+
+		PathTest{"CN1A/[position()>3]", []string{"DOGS:UI32:3", "CATS:UI32:1"}, nil},
+		PathTest{"[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
+		PathTest{"[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
+		PathTest{"CN1A/DOGS[@data>=2]", []string{
+			`DOGS:UI32:2`,
+			`DOGS:UI32:3`}, nil,
+		},
+		PathTest{"CN1A/DOGS[@data<2]", []string{`DOGS:UI32:1`, `CATS:UI32:1`}, nil},
 
 		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no container child named 'THER'")},
 		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
@@ -206,6 +245,10 @@ func runPathTests(t *testing.T, tests []PathTest) {
 		}
 
 		// compare each result atom in order
+		if len(results) != len(test.WantValue) {
+			t.Errorf("%s: got %s, want %s", test.Input, results, test.WantValue)
+			continue
+		}
 		for i, want := range test.WantValue {
 			if want != results[i] {
 				t.Errorf("%s: got %s, want %s", test.Input, results[i], want)

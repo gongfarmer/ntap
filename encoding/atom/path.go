@@ -47,11 +47,7 @@ func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e er
 
 	// find all child atoms whose name matches the next path part
 	var nextAtoms []*Atom
-	for _, child := range a.Children {
-		if pathParts[index] == "*" || child.Name == pathParts[index] {
-			nextAtoms = append(nextAtoms, child)
-		}
-	}
+	nextAtoms, e = filterOnPath(a.Children, pathParts[index])
 
 	// if this is the final path part, then return all matched atoms regardless of type
 	if index == len(pathParts)-1 { // if last path part
@@ -79,5 +75,34 @@ func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e er
 		e = fmt.Errorf("atom '%s' has no container child named '%s'", pathSoFar, pathParts[index])
 		return
 	}
+	return
+}
+
+func filterOnPath(children []*Atom, pathPart string) (nextAtoms []*Atom, e error) {
+	name, filter := extractNameAndFilter(pathPart)
+	if name == "" {
+		e = fmt.Errorf("empty name is not allowed in path specification.  Prepend a name or wildcard ('*','**').")
+		return
+	}
+	fmt.Printf("got scan results: name(%s), filter(%)\n", name, filter)
+	for _, child := range children {
+		if name == "*" || name == "**" || child.Name == name {
+			nextAtoms = append(nextAtoms, child)
+		}
+	}
+	return
+}
+
+func extractNameAndFilter(path string) (name, filter string) {
+	i_start := strings.IndexByte(path, '[')
+	if i_start == -1 {
+		return path, ""
+	}
+	i_end := strings.LastIndexByte(path, ']')
+	if i_end == -1 {
+		return path, ""
+	}
+	name = path[:i_start]
+	filter = path[i_start:i_end]
 	return
 }
