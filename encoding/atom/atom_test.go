@@ -304,33 +304,31 @@ END
 }
 
 func TestAtomsAtPath(t *testing.T) {
-
-	type ss []string
 	zero := []string{}
 	tests := []PathTest{
 		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5A",
-			ss{"LF5A:UI32:1"}, nil},
+			[]string{"LF5A:UI32:1"}, nil},
 		PathTest{"CN1A/CN2A/CN3A/LF4B",
-			ss{`LF4B:CSTR:"hello from depth 4"`}, nil},
+			[]string{`LF4B:CSTR:"hello from depth 4"`}, nil},
 		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5B",
-			ss{`LF5B:CSTR:"hello from depth 5"`}, nil},
-		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE", ss{
+			[]string{`LF5B:CSTR:"hello from depth 5"`}, nil},
+		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE", []string{
 			`NODE:USTR:"branch1 result"`,
 			`NODE:USTR:"branch2 result"`,
 			`NODE:USTR:"branch3 result"`}, nil,
 		},
-		//		PathTest{"*/DOGS", ss{
-		//			`DOGS:UI32:1`,
-		//			`DOGS:UI32:2`,
-		//			`DOGS:UI32:3`}, nil,
-		//		},
-		PathTest{"GINF/*/AVAL/0x00000001", ss{
+		PathTest{"*/DOGS", []string{
+			`DOGS:UI32:1`,
+			`DOGS:UI32:2`,
+			`DOGS:UI32:3`}, nil,
+		},
+		PathTest{"GINF/*/AVAL/0x00000001", []string{
 			`0x00000001:UI32:908767`,
 			`0x00000001:UI64:1484722540084888`,
 			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
 			`0x00000001:CSTR:"10.4.0"`}, nil,
 		},
-		PathTest{"GINF/*/AVAL/*", ss{
+		PathTest{"GINF/*/AVAL/*", []string{
 			`0x00000000:UI32:2`,
 			`0x00000001:UI32:908767`,
 			`0x00000000:UI32:2`,
