@@ -210,6 +210,7 @@ func init() {
 	TestAtom.UnmarshalText([]byte(`
 ROOT:CONT:
   CN1A:CONT:
+		DOGS:UI32:1
     CN2A:CONT:
       CN3A:CONT:
         CN4A:CONT:
@@ -221,6 +222,7 @@ ROOT:CONT:
     END
   END
   CN1B:CONT:
+		DOGS:UI32:2
     NODE:CONT:
       NODE:CONT:
         NODE:CONT:
@@ -250,6 +252,53 @@ ROOT:CONT:
       END
     END
   END
+  CN1C:CONT:
+    DOGS:UI32:3
+  END
+	GINF:CONT:
+		BVER:UI32:4
+		BTIM:UI64:1484723582627327
+		GIDV:CONT:
+			AVER:UI32:2
+			ATIM:UI64:1
+			AVTP:FC32:'UI32'
+			APER:FC32:'READ'
+			AVAL:CONT:
+				0x00000000:UI32:2
+				0x00000001:UI32:908767
+			END
+		END
+		GPVD:CONT:
+			AVER:UI32:2
+			ATIM:UI64:1
+			AVTP:FC32:'UI64'
+			APER:FC32:'READ'
+			AVAL:CONT:
+				0x00000000:UI32:2
+				0x00000001:UI64:1484722540084888
+			END
+		END
+		GVND:CONT:
+			AVER:UI32:2
+			ATIM:UI64:1
+			AVTP:FC32:'CSTR'
+			APER:FC32:'READ'
+			AVAL:CONT:
+				0x00000000:UI32:2
+				0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"
+			END
+		END
+		GSIV:CONT:
+			AVER:UI32:2
+			ATIM:UI64:1
+			AVTP:FC32:'CSTR'
+			APER:FC32:'READ'
+			AVAL:CONT:
+				0x00000000:UI32:2
+				0x00000001:CSTR:"10.4.0"
+			END
+		END
+	END
 END
 `))
 }
@@ -259,16 +308,37 @@ func TestAtomsAtPath(t *testing.T) {
 	type ss []string
 	zero := []string{}
 	tests := []PathTest{
-		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5A", ss{"LF5A:UI32:1"}, nil},
-		PathTest{"CN1A/CN2A/CN3A/LF4B", ss{`LF4B:CSTR:"hello from depth 4"`}, nil},
-		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5B", ss{`LF5B:CSTR:"hello from depth 5"`}, nil},
-		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE",
-			ss{
-				`NODE:USTR:"branch1 result"`,
-				`NODE:USTR:"branch2 result"`,
-				`NODE:USTR:"branch3 result"`,
-			},
-			nil,
+		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5A",
+			ss{"LF5A:UI32:1"}, nil},
+		PathTest{"CN1A/CN2A/CN3A/LF4B",
+			ss{`LF4B:CSTR:"hello from depth 4"`}, nil},
+		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5B",
+			ss{`LF5B:CSTR:"hello from depth 5"`}, nil},
+		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE", ss{
+			`NODE:USTR:"branch1 result"`,
+			`NODE:USTR:"branch2 result"`,
+			`NODE:USTR:"branch3 result"`}, nil,
+		},
+		//		PathTest{"*/DOGS", ss{
+		//			`DOGS:UI32:1`,
+		//			`DOGS:UI32:2`,
+		//			`DOGS:UI32:3`}, nil,
+		//		},
+		PathTest{"GINF/*/AVAL/0x00000001", ss{
+			`0x00000001:UI32:908767`,
+			`0x00000001:UI64:1484722540084888`,
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000001:CSTR:"10.4.0"`}, nil,
+		},
+		PathTest{"GINF/*/AVAL/*", ss{
+			`0x00000000:UI32:2`,
+			`0x00000001:UI32:908767`,
+			`0x00000000:UI32:2`,
+			`0x00000001:UI64:1484722540084888`,
+			`0x00000000:UI32:2`,
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000000:UI32:2`,
+			`0x00000001:CSTR:"10.4.0"`}, nil,
 		},
 
 		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no child named 'THER'")},

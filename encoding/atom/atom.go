@@ -57,10 +57,9 @@ func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e er
 	// find all child atoms whose name matches the next path part
 	var nextAtoms []*Atom
 	for _, child := range a.Children {
-		if child.Name != pathParts[index] {
-			continue
+		if pathParts[index] == "*" || child.Name == pathParts[index] {
+			nextAtoms = append(nextAtoms, child)
 		}
-		nextAtoms = append(nextAtoms, child)
 	}
 
 	// return error if no child atoms matched
