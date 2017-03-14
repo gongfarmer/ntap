@@ -177,13 +177,13 @@ func lex(input string) *lexer {
 		items:      make(chan item),
 		lineNumber: 1,
 	}
-	go l.run() // Concurrently run state machine
+	go l.run(lexLine) // Concurrently run state machine
 	return l
 }
 
 // run lexes the input by executing state functions until the state is nil.
-func (l *lexer) run() {
-	for state := lexLine; state != nil; {
+func (l *lexer) run(start stateFn) {
+	for state := start; state != nil; {
 		state = state(l)
 	}
 	close(l.items) // No more tokens will be delivered
@@ -312,7 +312,7 @@ func lexLine(l *lexer) stateFn {
 	ok := true
 	for ok {
 		if l.bufferSize() != 0 {
-			s := fmt.Sprintf("expecting empy buffer at start of line, got <<<%s>>>", l.buffer())
+			s := fmt.Sprintf("expecting empty buffer at start of line, got <<<%s>>>", l.buffer())
 			panic(s)
 		}
 		r := l.next()

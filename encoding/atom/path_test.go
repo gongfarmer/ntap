@@ -211,7 +211,7 @@ func TestAtomsAtPath(t *testing.T) {
 
 		PathTest{"CN1A/[position()>3]", []string{"DOGS:UI32:3", "CATS:UI32:1"}, nil},
 		PathTest{"[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
-		PathTest{"[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
+		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
 		PathTest{"CN1A/DOGS[@data>=2]", []string{
 			`DOGS:UI32:2`,
 			`DOGS:UI32:3`}, nil,
