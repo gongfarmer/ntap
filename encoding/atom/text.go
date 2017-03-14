@@ -150,12 +150,13 @@ type (
 
 	// lexer holds the state of the scanner
 	lexer struct {
-		input      string    // the string being scanned
-		start      uint32    // start position of this item
-		width      int       // width of last rune read from input
-		items      chan item // channel of scanned items
-		pos        uint32    // current string offset
-		lineNumber uint32    // 1+number of newlines seen
+		input        string    // the string being scanned
+		start        uint32    // start position of this item
+		width        int       // width of last rune read from input
+		items        chan item // channel of scanned items
+		pos          uint32    // current string offset
+		lineNumber   uint32    // 1+number of newlines seen
+		prevItemType itemEnum  // type of previous item emitted
 	}
 )
 
@@ -253,6 +254,7 @@ func (l *lexer) acceptRun(valid string) int {
 func (l *lexer) emit(t itemEnum) {
 	l.items <- item{t, l.input[l.start:l.pos], l.lineNumber}
 	l.start = l.pos
+	l.prevItemType = t
 }
 
 // chars returns a count of the chars seen in the current value

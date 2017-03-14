@@ -62,6 +62,83 @@ import (
 	"strings"
 )
 
+const (
+	alphabetLowerCase      = "abcdefghijklmnopqrstuvwxyz"
+	itemLeftParen          = "iParenL"
+	itemRightParen         = "iParenR"
+	itemArithmeticOperator = "iArithmeticOp"
+	itemBooleanOperator    = "iBooleanOp"
+	itemComparisonOperator = "iCompareOp"
+	itemOperator           = "iOperator"
+	itemFunction           = "iFunction"
+)
+
+type itemList []*item
+
+func (s *itemList) push(it *item) {
+	*s = append(*s, it)
+}
+
+// remove and return the first list item
+func (s *itemList) shift() (it *item) {
+	if len(*s) == 0 {
+		return nil
+	}
+	it = (*s)[0]
+	*s = (*s)[1:]
+	return
+}
+
+// pop an item off the stack and return it.
+// Return ok=false if stack is empty.
+func (s *itemList) pop() (it *item) {
+	size := len(*s)
+	ok := size > 0
+	if !ok {
+		return
+	}
+	it = (*s)[size-1]  // get item from stack top
+	*s = (*s)[:size-2] // resize stack
+	return
+}
+
+// pop the stack only if the top item has the specified type.
+// Return ok=true if an item is popped.
+func (s *itemList) popType(typ itemEnum) (it *item, ok bool) {
+	if s.empty() || s.top().typ != typ {
+		return
+	}
+	return s.pop(), true
+}
+
+// peek at the top item on the stack without removing it.
+func (s *itemList) top() (it *item) {
+	if s.empty() {
+		return nil
+	}
+	return (*s)[len(*s)-1]
+}
+
+func (s *itemList) empty() bool {
+	return len(*s) != 0
+}
+
+// filterParser is a parser for translating filter specification tokens
+// into a callable boolean filter function.
+// This parser's methods construct a stack of operations, then resolve the
+// stack as much as possible, leaving placeholders for the atom and position
+// which will be passed in.
+// The path syntax uses infix notation (operators are between arguments). This
+// parser implements Djikstra's shunting-yard algorithm to transform the input
+// into an abstract syntax tree which is simpler to evaluate.
+type filterParser struct {
+	outputQueue itemList    // items ordered for evaluation
+	opStack     itemList    // holds operators until their operands reach output queue
+	items       <-chan item // items received from lexer
+	err         error       // indicates parsing succeeded or describes what failed
+}
+type filterFunc func(a Atom, i int, next filterFunc) bool
+
 func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	var pathParts = append([]string{a.Name}, strings.Split(path, "/")...)
 	return getAtomsAtPath(a, pathParts, 1)
@@ -98,8 +175,8 @@ func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e er
 		}
 	}
 
-	// if none of the matching children were containers, return error
 	if !foundCont {
+		// none of the matching children were containers, return error
 		pathSoFar := strings.Join(pathParts[:index], "/")
 		e = fmt.Errorf("atom '%s' has no container child named '%s'", pathSoFar, pathParts[index])
 		return
@@ -143,15 +220,12 @@ func extractNameAndFilter(path string) (name, filter string) {
 
 // lexer - identifies tokens in the path definition
 // holds the state of the scanner
-func readPath(path string) {
-	// Convert text into Atom values
-	var atoms []*Atom
-	var lexr = lex(string(input))
-	atoms, err = parse(lexr.items)
-	if err != nil {
-		return
-	}
 
+// filterStringToFunc converts a filter expression into a func that evaluates
+// whether an atom at a given position should be filtered.
+func filterStringToFunc(path string) (f filterFunc, e error) {
+	var lexr = lex(path)
+	return parseFilterTokens(lexr.items)
 }
 
 func lexPath(input string) *lexer {
@@ -163,7 +237,7 @@ func lexPath(input string) *lexer {
 	return l
 }
 
-// lexFilter splits the filter into tokens.
+// lexFilterExpression splits the filter into tokens.
 // The filter is everything within the [].
 // Example:  for path "CN1A[not(@type=CONT) and not(@name=DOGS)]",
 // This function would be extracting tokens from this string:
@@ -185,24 +259,159 @@ func lexFilterExpression(l *lexer) stateFn {
 			l.emit(itemEOF)
 			ok = false
 		case r == '@':
-			l.lexAtomAttribute()
-		case isPrintableRune(r):
+			lexAtomAttribute(l)
+		case r == '"':
 			l.backup()
-			return lexAtomName
+			lexString(l)
+		case r == '(':
+			l.emit(itemLeftParen)
+		case r == ')':
+			l.emit(itemRightParen)
+		case r == '+', r == '*': // no division because / is path separator, not needed anyway
+			l.emit(itemOperator)
+		case strings.ContainsRune(digits, r):
+			lexNumber(l)
+		case r == '-':
+			if l.prevItemType == itemNumber {
+				l.emit(itemOperator)
+			}
+			lexNumber(l)
+		case strings.ContainsRune("=<>!", r):
+			lexComparisonOperator(l)
+		case strings.ContainsRune(alphabetLowerCase, r):
+			lexBooleanOperator(l)
 		default:
-			return l.errorf("invalid line: %s", l.line())
+			return l.errorf("invalid filter expression: %s", l.line())
 		}
 	}
-	// Correctly reached EOF.
-	return nil // Stop the run loop
+	// correctly reached EOF.
+	return nil // stop the run loop
+}
+
+// lexAtomAttribute accepts @name, @type or @data.  The @ is already read.
+func lexAtomAttribute(l *lexer) stateFn {
+	if l.first() != '@' {
+		panic("lexAtomAttribute called without leading attribute sigil @")
+	}
+	l.acceptRun(alphabetLowerCase)
+	l.emit(itemFunction)
+	return lexFilterExpression
 }
 
 // accept @name, @type or @data.  The @ is already read.
-func lexAtomAttribute(l *lexer) stateFn {
-	if l.first() != '@' {
-		// if this happens it's a code problem, no xpath input should cause this
-		panic("lexAtomAttribute called without leading attribute sigil @")
+func lexComparisonOperator(l *lexer) stateFn {
+	l.acceptRun("=<>!")
+	l.emit(itemOperator)
+	return lexFilterExpression
+}
+
+// accept "and", "or".
+func lexBooleanOperator(l *lexer) stateFn {
+	l.acceptRun(alphabetLowerCase)
+	l.emit(itemOperator)
+	return lexFilterExpression
+}
+
+// parseFilterTokens translates stream of tokens emitted by the lexer into a
+// function that can evaluate whether an atom gets filtered.
+func parseFilterTokens(ch <-chan item) (f filterFunc, e error) {
+	var state = filterParser{items: ch}
+	state.receiveTokens()
+	return state.evaluate(), state.err
+}
+
+// receiveTokens gets tokens from the lexer and sends them to the parser
+// for parsing.
+func (p *filterParser) receiveTokens() {
+	for p.parseFilterToken(p.readItem()) {
 	}
-	l.acceptRun("abcdefghijklmnopqrstuvwxyz")
-	l.emit(itemAtomAttribute)
+}
+
+// read next time from item channel, and return it.
+func (p *filterParser) readItem() (it item) {
+	var ok bool
+	select {
+	case it, ok = <-p.items:
+		if !ok {
+			it = item{typ: itemEOF, value: "EOF"}
+		}
+	}
+	return it
+}
+
+// errorf sets the error field in the parser, and returns false to indicate that
+// parsing should stop.
+func (p *filterParser) errorf(format string, args ...interface{}) bool {
+	p.err = fmt.Errorf(
+		strings.Join([]string{
+			"parse error in path filter: ",
+			fmt.Sprintf(format, args...),
+		}, ""))
+	return false
+}
+
+// parseFilterTokens receives tokens from the lexer in the order they are found
+// in the path string, and queues them into evaluation order.
+// This is an implementation of Djikstra's shunting-yard algorithm.
+// https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+func (p *filterParser) parseFilterToken(it item) bool {
+	switch it.typ {
+	case itemNumber:
+		p.outputQueue.push(&it)
+	case itemFunction:
+		p.opStack.push(&it)
+	case itemOperator:
+		for {
+			op, ok := p.opStack.popType(itemOperator)
+			if !ok {
+				break
+			}
+			p.outputQueue.push(op)
+		}
+		p.opStack.push(&it)
+	case itemLeftParen:
+		p.opStack.push(&it)
+	case itemRightParen:
+		for {
+			if p.opStack.empty() {
+				return p.errorf("mismatched parentheses in filter expression")
+			}
+			if p.opStack.top().typ == itemLeftParen {
+				p.opStack.pop()
+				break
+			}
+			op := p.opStack.pop()
+			p.outputQueue.push(op)
+		}
+		if p.opStack.top().typ == itemFunction {
+			op := p.opStack.pop()
+			p.outputQueue.push(op)
+		}
+	case itemEOF:
+		for {
+			op := p.opStack.pop()
+			if op.typ == itemLeftParen || op.typ == itemRightParen {
+				return p.errorf("mismatched parentheses in filter expression")
+			}
+			p.outputQueue.push(op)
+			if op.typ == itemEOF {
+				break
+			}
+		}
+		return false
+	default:
+		return p.errorf("unexpected item type: %s", it.typ)
+	}
+	return true
+}
+
+// evaluate
+func (p *filterParser) evaluate() (f filterFunc) {
+	for {
+		it := p.outputQueue.shift()
+		if it == nil {
+			break
+		}
+	}
+	return
 }
