@@ -114,24 +114,26 @@ func (a *Atom) UnmarshalText(input []byte) (err error) {
 // The lexer sends tokens to the parser over a channel.
 
 const (
-	digits           = "0123456789"
-	hexDigits        = "0123456789abcdefABCDEF"
-	whitespaceChars  = "\t\r "
-	eof              = -1
-	numOfADETypes    = 32
-	itemAtomName     = "iName"     // atom name
-	itemAtomType     = "iType"     // atom type
-	itemVinculum     = "iVinc"     // fraction divider
-	itemNumber       = "iNumber"   // number value
-	itemUUID         = "iUUID"     // uuid value
-	itemNULL         = "iNULL"     // null value
-	itemIP32         = "iIP32"     // IPv4 address as 1 byte per octet
-	itemString       = "iString"   // string value
-	itemContainerEnd = "iEND"      // AtomContainer end
-	itemFC32Hex      = "iFC32hex"  // FCHR32 value as 8 hexadecimal digits
-	itemFC32Quoted   = "iFC32quot" // FCHR32 value as single quoted 4 chars
-	itemError        = "iErr"      // error occurred, value is text of error
-	itemEOF          = "iEOF"      // end of input
+	digits            = "0123456789"
+	hexDigits         = "0123456789abcdefABCDEF"
+	alphabetLowerCase = "abcdefghijklmnopqrstuvwxyz"
+	alphabetUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	whitespaceChars   = "\t\r "
+	eof               = -1
+	numOfADETypes     = 32
+	itemAtomName      = "iName"     // atom name
+	itemAtomType      = "iType"     // atom type
+	itemVinculum      = "iVinc"     // fraction divider
+	itemNumber        = "iNumber"   // number value
+	itemUUID          = "iUUID"     // uuid value
+	itemNULL          = "iNULL"     // null value
+	itemIP32          = "iIP32"     // IPv4 address as 1 byte per octet
+	itemString        = "iString"   // string value
+	itemContainerEnd  = "iEND"      // AtomContainer end
+	itemFC32Hex       = "iFC32hex"  // FCHR32 value as 8 hexadecimal digits
+	itemFC32Quoted    = "iFC32quot" // FCHR32 value as single quoted 4 chars
+	itemError         = "iErr"      // error occurred, value is text of error
+	itemEOF           = "iEOF"      // end of input
 )
 
 var printableChars = strPrintableChars()
@@ -705,17 +707,7 @@ func strPrintableChars() string {
 
 // returns string of all alphanumeric chars < ascii 127
 func strAlphaNumeric() string {
-	var b = make([]byte, 62)
-	for c := '0'; c < '9'; c++ {
-		b = append(b, byte(c))
-	}
-	for c := 'a'; c < 'z'; c++ {
-		b = append(b, byte(c))
-	}
-	for c := 'A'; c < 'Z'; c++ {
-		b = append(b, byte(c))
-	}
-	return string(b)
+	return strings.Join([]string{alphabetLowerCase, alphabetUpperCase, digits, "_"}, "")
 }
 
 /**********************************************************
