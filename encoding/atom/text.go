@@ -185,7 +185,6 @@ func lex(input string) *lexer {
 // run lexes the input by executing state functions until the state is nil.
 func (l *lexer) run(start stateFn) {
 	for state := start; state != nil; {
-		fmt.Println(GetFunctionName(state))
 		state = state(l)
 	}
 	close(l.items) // No more tokens will be delivered
@@ -210,9 +209,14 @@ func (l *lexer) ignore() {
 	l.start = l.pos
 }
 
-// backup steps back one rune.
-// Can only be called once per call of next.
+// backup undoes the last call to next().
+// Usually this means backing up the position by the byte width of the last
+// consumed char. If the last call to next() did not consume a char, then do
+// nothing.
 func (l *lexer) backup() {
+	if l.width == 0 {
+		return // last next() failed to consume anything. Nothing to undo.
+	}
 	l.pos -= uint32(l.width)
 	if l.input[l.pos] == '\n' {
 		l.lineNumber--
@@ -240,16 +244,14 @@ func (l *lexer) readToEndOfLine() {
 	}
 }
 
-// acceptRun consumes a run of runes from the valid set.
+// acceptRun consumes a run of 0 or more runes from the valid set.
 // Returns a count of runes consumed.
 func (l *lexer) acceptRun(valid string) int {
 	i := 0
 	for strings.IndexRune(valid, l.next()) >= 0 {
 		i++
 	}
-	if i > 0 {
-		l.backup()
-	}
+	l.backup()
 	return i
 }
 
