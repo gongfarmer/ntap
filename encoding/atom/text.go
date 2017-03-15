@@ -185,6 +185,7 @@ func lex(input string) *lexer {
 // run lexes the input by executing state functions until the state is nil.
 func (l *lexer) run(start stateFn) {
 	for state := start; state != nil; {
+		fmt.Println(GetFunctionName(state))
 		state = state(l)
 	}
 	close(l.items) // No more tokens will be delivered
@@ -246,7 +247,9 @@ func (l *lexer) acceptRun(valid string) int {
 	for strings.IndexRune(valid, l.next()) >= 0 {
 		i++
 	}
-	l.backup()
+	if i > 0 {
+		l.backup()
+	}
 	return i
 }
 

@@ -186,11 +186,13 @@ func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e er
 
 func filterOnPathElement(children []*Atom, pathPart string) (nextAtoms []*Atom, e error) {
 	name, filter := extractNameAndFilter(pathPart)
+	fmt.Printf("%20s Extracted name and filter (%s,%s)\n", pathPart, name, filter)
+	filterStringToFunc(filter)
 	if name == "" {
 		e = fmt.Errorf("empty name is not allowed in path specification.  Prepend a name or wildcard ('*','**').")
 		return
 	}
-	fmt.Printf("got scan results: name(%s), filter(%)\n", name, filter)
+	//	fmt.Printf("got scan results: name(%s), filter(%)\n", name, filter)
 	for _, child := range children {
 		if name == "*" || name == "**" || child.Name == name {
 			nextAtoms = append(nextAtoms, child)
@@ -214,17 +216,18 @@ func extractNameAndFilter(path string) (name, filter string) {
 		return path, ""
 	}
 	name = path[:i_start]
-	filter = path[i_start:i_end]
+	filter = path[i_start+1 : i_end]
 	return
 }
 
-// lexer - identifies tokens in the path definition
-// holds the state of the scanner
+// lexer - identifies tokens(aka items) in the atom path definition.
+// Path lexing is done by the same lexer used for Atom Text format lexing.
+// They use very different parsers though.
 
 // filterStringToFunc converts a filter expression into a func that evaluates
 // whether an atom at a given position should be filtered.
 func filterStringToFunc(path string) (f filterFunc, e error) {
-	var lexr = lex(path)
+	var lexr = lexPath(path)
 	return parseFilterTokens(lexr.items)
 }
 
@@ -233,6 +236,7 @@ func lexPath(input string) *lexer {
 		input: input,
 		items: make(chan item),
 	}
+	fmt.Printf(">>> start lexing %s\n", input)
 	go l.run(lexFilterExpression)
 	return l
 }
@@ -256,13 +260,13 @@ func lexFilterExpression(l *lexer) stateFn {
 		case isSpace(r):
 			l.ignore()
 		case r == eof:
+			fmt.Println("hit EOF")
 			l.emit(itemEOF)
 			ok = false
 		case r == '@':
 			lexAtomAttribute(l)
 		case r == '"':
-			l.backup()
-			lexString(l)
+			lexStringInPath(l)
 		case r == '(':
 			l.emit(itemLeftParen)
 		case r == ')':
@@ -270,21 +274,22 @@ func lexFilterExpression(l *lexer) stateFn {
 		case r == '+', r == '*': // no division because / is path separator, not needed anyway
 			l.emit(itemOperator)
 		case strings.ContainsRune(digits, r):
-			lexNumber(l)
+			lexNumberInPath(l)
 		case r == '-':
 			if l.prevItemType == itemNumber {
 				l.emit(itemOperator)
 			}
-			lexNumber(l)
+			lexNumberInPath(l)
 		case strings.ContainsRune("=<>!", r):
 			lexComparisonOperator(l)
 		case strings.ContainsRune(alphabetLowerCase, r):
 			lexBooleanOperator(l)
 		default:
-			return l.errorf("invalid filter expression: %s", l.line())
+			return l.errorf("invalid filter expression: %s", l.input)
 		}
 	}
 	// correctly reached EOF.
+	fmt.Printf("lexFilterExpression is finished with '%s'\n", l.input)
 	return nil // stop the run loop
 }
 
@@ -309,6 +314,70 @@ func lexComparisonOperator(l *lexer) stateFn {
 func lexBooleanOperator(l *lexer) stateFn {
 	l.acceptRun(alphabetLowerCase)
 	l.emit(itemOperator)
+	return lexFilterExpression
+}
+
+// accept a delimited string
+func lexStringInPath(l *lexer) stateFn {
+	// expect double quotes
+	if l.first() != '"' {
+		l.backup()
+		return l.errorf("strings should be delimited with double-quotes, got %s", l.input)
+	}
+
+	// Read in chars
+	var r rune
+	var done = false
+	for !done {
+		r = l.next()
+		switch r {
+		case '\\':
+			r = l.next()
+			if !strings.ContainsRune("\\\"nrx", r) {
+				l.backup()
+				return l.errorf("invalid escape atom path: %s", l.input)
+			}
+		case '"':
+			done = true
+		case '\n':
+			l.backup()
+			return l.errorf("unterminated string in atom path: %s", l.input)
+		}
+	}
+
+	if r != '"' {
+		return l.errorf("unterminated string in atom path: %s", l.input)
+	}
+
+	l.emit(itemString)
+	return lexFilterExpression
+}
+
+func lexNumberInPath(l *lexer) stateFn {
+	if l.accept("+-") { // Optional leading sign.
+		if l.buffer() == "+" { // discard leading +, keep leading -
+			l.ignore()
+		}
+	}
+
+	digits := "0123456789"
+	if l.accept("0") && l.accept("xX") { // Is it hex?
+		digits = hexDigits
+	}
+	l.acceptRun(digits)
+	if l.accept(".") {
+		l.acceptRun(digits)
+	}
+	if l.accept("eE") {
+		l.accept("+-")
+		l.acceptRun("0123456789")
+	}
+
+	// Next thing mustn't be alphanumeric.
+	if l.accept(alphaNumericChars) {
+		return l.errorf("invalid numeric value: %s", l.input)
+	}
+	l.emit(itemNumber)
 	return lexFilterExpression
 }
 
@@ -390,13 +459,13 @@ func (p *filterParser) parseFilterToken(it item) bool {
 	case itemEOF:
 		for {
 			op := p.opStack.pop()
+			if op == nil {
+				break
+			}
 			if op.typ == itemLeftParen || op.typ == itemRightParen {
 				return p.errorf("mismatched parentheses in filter expression")
 			}
 			p.outputQueue.push(op)
-			if op.typ == itemEOF {
-				break
-			}
 		}
 		return false
 	default:
@@ -412,6 +481,7 @@ func (p *filterParser) evaluate() (f filterFunc) {
 		if it == nil {
 			break
 		}
+		fmt.Printf(" eval %s: %s\n", it.typ, it.value)
 	}
 	return
 }
