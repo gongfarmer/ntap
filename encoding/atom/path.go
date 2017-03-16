@@ -70,6 +70,7 @@ const (
 	itemComparisonOperator = "iCompareOp"
 	itemOperator           = "iOperator"
 	itemFunction           = "iFunction"
+	itemVariable           = "iVar"
 )
 
 type itemList []*item
@@ -83,8 +84,7 @@ func (s *itemList) shift() (it *item) {
 	if len(*s) == 0 {
 		return nil
 	}
-	it = (*s)[0]
-	*s = (*s)[1:]
+	it, *s = (*s)[0], (*s)[1:]
 	return
 }
 
@@ -118,6 +118,7 @@ func (s itemList) top() (it *item) {
 	return s[len(s)-1]
 }
 
+// empty returns true if the list is empty.
 func (s *itemList) empty() bool {
 	return len(*s) == 0
 }
@@ -136,7 +137,7 @@ type filterParser struct {
 	items       <-chan item // items received from lexer
 	err         error       // indicates parsing succeeded or describes what failed
 }
-type filterFunc func(a Atom, i int, next filterFunc) bool
+type filterFunc func(a Atom, i int) bool
 
 func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	var pathParts = append([]string{a.Name}, strings.Split(path, "/")...)
@@ -184,19 +185,32 @@ func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e er
 }
 
 func filterOnPathElement(children []*Atom, pathPart string) (nextAtoms []*Atom, e error) {
-	name, filter := extractNameAndFilter(pathPart)
-	fmt.Printf("%20s Extracted name and filter (%s,%s)\n", pathPart, name, filter)
-	filterStringToFunc(filter)
-	if name == "" {
-		e = fmt.Errorf("empty name is not allowed in path specification.  Prepend a name or wildcard ('*','**').")
+	strName, strFilter := extractNameAndFilter(pathPart)
+	fmt.Printf("%20s Extracted name and filter (%s,%s)\n", pathPart, strName, strFilter)
+	// use the name to build up a list of candidate atoms
+	if strName == "" {
+		e = fmt.Errorf("empty name is not allowed in path specification. Prepend a name or wildcard.")
 		return
 	}
-	//	fmt.Printf("got scan results: name(%s), filter(%)\n", name, filter)
 	for _, child := range children {
-		if name == "*" || name == "**" || child.Name == name {
+		if strName == "*" || child.Name == strName {
 			nextAtoms = append(nextAtoms, child)
 		}
 	}
+
+	// apply filter to determine which elements to keep
+	runFilter, e := filterStringToFunc(strFilter)
+	if e != nil {
+		return nextAtoms[:0], e
+	}
+
+	filteredAtoms := nextAtoms[:0]
+	for i, atomPtr := range nextAtoms {
+		if runFilter(*atomPtr, i) {
+			filteredAtoms = append(filteredAtoms, atomPtr)
+		}
+	}
+
 	return
 }
 
@@ -318,7 +332,7 @@ func lexAtomAttribute(l *lexer) stateFn {
 		panic("lexAtomAttribute called without leading attribute sigil @")
 	}
 	l.acceptRun(alphaNumericChars)
-	l.emit(itemFunction)
+	l.emit(itemVariable)
 	return lexFilterExpression
 }
 
@@ -468,7 +482,7 @@ func (p *filterParser) errorf(format string, args ...interface{}) bool {
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (p *filterParser) parseFilterToken(it item) bool {
 	switch it.typ {
-	case itemNumber, itemString:
+	case itemNumber, itemString, itemVariable:
 		p.outputQueue.push(&it)
 	case itemFunction:
 		p.opStack.push(&it)
@@ -518,7 +532,6 @@ func (p *filterParser) parseFilterToken(it item) bool {
 // evaluate
 func (p *filterParser) evaluate() (f filterFunc) {
 	fmt.Printf("evaluate: %s\n", p.outputQueue)
-	fmt.Printf("          (opStack is empty? %t\n", p.opStack.empty())
 	//	for {
 	//		it := p.outputQueue.shift()
 	//		if it == nil {
@@ -527,4 +540,84 @@ func (p *filterParser) evaluate() (f filterFunc) {
 	//		fmt.Printf(" eval %s: %s\n", it.typ, it.value)
 	//	}
 	return
+}
+
+// evaluate the list of items.
+func eval(l itemList, a Atom, i int) (result bool) {
+	for !l.empty() {
+		switch l.top().typ {
+		case itemBooleanOperator:
+			result, l = evalBooleanOperator(l, a, i)
+		case itemArithmeticOperator:
+			result, l = evalArithmeticOperator(l, a, i)
+		case itemComparisonOperator:
+			result, l = evalComparisonOperator(l, a, i)
+		default:
+			panic(fmt.Sprintf("unknown token type %s", op.typ))
+		}
+	}
+	// calculate a boolean value from op and vars
+	return result
+}
+func evalBooleanOperator(l itemList, a Atom, i int) (result bool, l litemList) {
+	op := l.pop()
+	if op.typ != itemBooleanOperator {
+		panic(fmt.Sprintf("expected itemBooleanOperator, received type %s", op.typ))
+	}
+	switch op.value {
+	case "not":
+		return !eval(l, a, i)
+	case "and":
+		result1, l = eval(l)
+		result2, l = eval(l)
+		return result1 && result2
+	case "or":
+		result1, l = eval(l)
+		if result1 {
+			return result1, l
+		}
+		result2, l = eval(l)
+		return (result1 || result2), l
+	default:
+		panic(fmt.Sprintf("unknown boolean operator: %s", op.value))
+	}
+}
+
+// Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
+// FIXME: how to get val1 and val2?  Need an intermediate type that lets me check
+// whether they're floats or ints.
+// Perhaps a new itemType?  Could go heavyweight and use Atom.
+func evalArithmeticOperator(l itemList, a Atom, i int) (result bool, l litemList) {
+	op := l.pop()
+	if op.typ != itemComparisonOperator {
+		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
+	}
+	val1, l := evalNumeric(l)
+	val2, l := evalNumeric(l)
+	switch op.value {
+	case "+":
+		return val1 + val2
+	case "-":
+		return val1 - val2
+	case "*":
+		return val1 * val2
+	case "/":
+		return val1 / val2
+	default:
+		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
+	}
+}
+func evalComparisonOperator(l itemList, a Atom, i int) (result bool, l litemList) {
+	op := l.pop()
+	if op.typ != itemComparisonOperator {
+		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
+	}
+	switch op.value {
+	case "+":
+	case "-":
+	case "*":
+	case "/":
+	default:
+		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
+	}
 }
