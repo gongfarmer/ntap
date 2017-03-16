@@ -59,6 +59,8 @@ package atom
 // this is good because it handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
 import (
 	"fmt"
+	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -71,6 +73,9 @@ const (
 	itemOperator           = "iOperator"
 	itemFunction           = "iFunction"
 	itemVariable           = "iVar"
+	itemInteger            = "iInt"
+	itemFloat              = "iFloat"
+	itemHex                = "iHex"
 )
 
 type itemList []*item
@@ -405,21 +410,25 @@ func lexBareString(l *lexer) stateFn {
 }
 
 func lexNumberInPath(l *lexer) stateFn {
+	var isHex, isFloatingPoint, isSigned, isExponent bool
 	if l.accept("+-") { // Optional leading sign.
+		isSigned = true
 		if l.buffer() == "+" { // discard leading +, keep leading -
 			l.ignore()
 		}
 	}
-
 	digits := "0123456789"
 	if l.accept("0") && l.accept("xX") { // Is it hex?
+		isHex = true
 		digits = hexDigits
 	}
 	l.acceptRun(digits)
 	if l.accept(".") {
+		isFloatingPoint = true
 		l.acceptRun(digits)
 	}
 	if l.accept("eE") {
+		isExponent = true
 		l.accept("+-")
 		l.acceptRun("0123456789")
 	}
@@ -428,7 +437,18 @@ func lexNumberInPath(l *lexer) stateFn {
 	if l.accept(alphaNumericChars) {
 		return l.errorf("invalid numeric value: %s", l.input)
 	}
-	l.emit(itemNumber)
+	if (isHex && isFloatingPoint) || (isHex && isExponent) || (isHex && isSigned) {
+		return l.errorf("invalid numeric value: %s", l.input)
+	}
+
+	switch {
+	case isFloatingPoint:
+		l.emit(itemFloat)
+	case isHex:
+		l.emit(itemHex)
+	default:
+		l.emit(itemInteger)
+	}
 	return lexFilterExpression
 }
 
@@ -542,82 +562,228 @@ func (p *filterParser) evaluate() (f filterFunc) {
 	return
 }
 
+// evaluator is for determining whether a single atom from the list of
+// candidate atoms satisfies filter criteria.
+//
+// A path expression has two parts: /root/name[filter]
+// ignoring the /root/ part, evaluation proceeds as follows:
+// name:     all child atoms with name "name" are collected in a slice
+// [filter]: slice items are checked against [filter] and removed if they don't pass
+//
+// This is used in the [filter] part. For each atom in the slice, an evaluator
+// is created containing the parsed filter, the atom and information about
+// where the atom appears in the slice.  Then the eval() method is called to
+// parse the filter tokens using the other values in the struct.
+type evaluator struct {
+	tokens   itemList // filter to evaluate each atom against
+	atom     Atom     // atom currently being evaluated from the atom list
+	position int      // index of the atom in the atom list
+	count    int      // number of atoms in the atom list
+}
+
 // evaluate the list of items.
-func eval(l itemList, a Atom, i int) (result bool) {
-	for !l.empty() {
-		switch l.top().typ {
+func (e *evaluator) eval() (result bool) {
+	for !e.tokens.empty() {
+		switch e.tokens.top().typ {
 		case itemBooleanOperator:
-			result, l = evalBooleanOperator(l, a, i)
+			result = e.evalBooleanOperator()
 		case itemArithmeticOperator:
-			result, l = evalArithmeticOperator(l, a, i)
+			result = e.evalArithmeticOperator()
 		case itemComparisonOperator:
-			result, l = evalComparisonOperator(l, a, i)
+			result = e.evalComparisonOperator()
 		default:
-			panic(fmt.Sprintf("unknown token type %s", op.typ))
+			panic(fmt.Sprintf("unknown token type %s", e.tokens.top().typ))
 		}
 	}
 	// calculate a boolean value from op and vars
 	return result
 }
-func evalBooleanOperator(l itemList, a Atom, i int) (result bool, l litemList) {
-	op := l.pop()
+func (e *evaluator) evalBooleanOperator() (result bool) {
+	op := e.tokens.pop()
 	if op.typ != itemBooleanOperator {
 		panic(fmt.Sprintf("expected itemBooleanOperator, received type %s", op.typ))
 	}
 	switch op.value {
 	case "not":
-		return !eval(l, a, i)
+		result = !e.eval()
 	case "and":
-		result1, l = eval(l)
-		result2, l = eval(l)
-		return result1 && result2
+		result = e.eval() && e.eval()
 	case "or":
-		result1, l = eval(l)
-		if result1 {
-			return result1, l
-		}
-		result2, l = eval(l)
-		return (result1 || result2), l
+		result = e.eval() || e.eval()
 	default:
 		panic(fmt.Sprintf("unknown boolean operator: %s", op.value))
 	}
+	return result
 }
 
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
-// FIXME: how to get val1 and val2?  Need an intermediate type that lets me check
-// whether they're floats or ints.
-// Perhaps a new itemType?  Could go heavyweight and use Atom.
-func evalArithmeticOperator(l itemList, a Atom, i int) (result bool, l litemList) {
-	op := l.pop()
+func (e *evaluator) evalArithmeticOperator() (result interface{}) {
+	op := e.tokens.pop()
+	//	if op.typ != itemComparisonOperator {
+	//		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
+	//	}
+	//	switch op.value {
+	//	case "+":
+	//		result = e.evalValue() + e.evalValue()
+	//	case "-":
+	//		result = e.evalValue() - e.evalValue()
+	//	case "*":
+	//		result = e.evalValue() * e.evalValue()
+	//	case "/":
+	//		result = e.evalValue() / e.evalValue()
+	//	default:
+	//		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
+	//	}
+	return result
+}
+func (e *evaluator) evalComparisonOperator() bool {
+	op := e.tokens.pop()
 	if op.typ != itemComparisonOperator {
 		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
 	}
-	val1, l := evalNumeric(l)
-	val2, l := evalNumeric(l)
+	values := coerce(e.evalValue(), e.evalValue())
 	switch op.value {
-	case "+":
-		return val1 + val2
-	case "-":
-		return val1 - val2
-	case "*":
-		return val1 * val2
-	case "/":
-		return val1 / val2
+	case "=":
+		return val1 == val2
+	case "!=":
+		return val1 != val2
+	case "<":
+		return val1 < val2
+	case ">":
+		return val1 > val2
+	case "<=":
+		return val1 <= val2
+	case ">=":
+		return val1 >= val2
 	default:
 		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
 	}
 }
-func evalComparisonOperator(l itemList, a Atom, i int) (result bool, l litemList) {
-	op := l.pop()
-	if op.typ != itemComparisonOperator {
-		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
-	}
-	switch op.value {
-	case "+":
-	case "-":
-	case "*":
-	case "/":
+func (e *evaluator) evalValue() (result interface{}) {
+	var err error
+	switch e.tokens.top().typ {
+	case itemInteger:
+		result, err = strconv.ParseInt(e.tokens.pop().value, 10, 64)
+	case itemFloat:
+		result, err = strconv.ParseFloat(e.tokens.pop().value, 64)
+	case itemHex:
+		result, err = strconv.ParseInt(e.tokens.pop().value, 16, 64)
+	case itemString:
+		result = e.tokens.pop().value
+	case itemFunction:
+		result = e.evalFunction()
+	case itemVariable:
+		result = e.evalVariable()
 	default:
-		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
+		panic(fmt.Sprintf("value has unknown type: %s", e.tokens.top().typ))
 	}
+	if err != nil {
+		panic("failed to convert '%s' to value")
+	}
+	return result
+}
+func (e *evaluator) evalVariable() (result interface{}) {
+	item := e.tokens.pop()
+	if item.typ != itemVariable {
+		panic(fmt.Sprintf("expected itemVariable, received type %s", item.typ))
+	}
+	switch item.value {
+	case "@name":
+		return e.atom.Name
+	case "@type":
+		return e.atom.Type()
+	case "@data":
+	default:
+		panic(fmt.Sprintf("unknown variable: %s", item.value))
+	}
+
+	// Must get Atom value. Decide what concrete type to return.
+	switch {
+	case e.atom.Value.IsBool():
+		result, _ = e.atom.Value.Bool()
+	case e.atom.Value.IsFloat():
+		result, _ = e.atom.Value.Float()
+	case e.atom.Value.IsUint():
+		result, _ = e.atom.Value.Uint()
+	case e.atom.Value.IsInt(), e.atom.Value.IsInt():
+		result, _ = e.atom.Value.Int()
+	default:
+		result, _ = e.atom.Value.String()
+	}
+	return result
+}
+func (e *evaluator) evalFunction() (result interface{}) {
+	item := e.tokens.pop()
+	if item.typ != itemFunction {
+		panic(fmt.Sprintf("expected itemFunction, received type %s", item.typ))
+	}
+	switch item.value {
+	case "position()":
+		return e.position
+	case "count()":
+		return e.count
+	case "last()":
+		return e.position == e.count
+	default:
+		panic(fmt.Sprintf("unknown variable: %s", item.value))
+	}
+}
+
+// coerce takes a slice of interface{} and attempts to find a common numeric
+// type that all values can be coerced to, based on their concrete types.
+// If no numeric type is possible, type string is returned.
+// Examples:
+//    1.0, 6.73: both are float so type float is returned.
+//    1,   6.73: int and float, both can cast to float so float is returned
+//    1,   5:    2 integers, none negative, return uint
+//    -1,  5:    2 integers, 1 is negative, so return int
+//    7  eleven: int and string.  There's no saving this one.  Return string.
+
+// For example, given values (1.0 6.73), both are float so type float is returned.
+func coerce(values ...interface{}) reflect.Type {
+	var success = true
+	for _, v := range values {
+		if _, ok := v.(float64); !ok {
+			success = false
+			break
+		}
+	}
+	if success {
+		return reflect.TypeOf((*float64)(nil))
+	}
+
+	success = true
+	for _, v := range values {
+		if _, ok := v.(uint64); !ok {
+			success = false
+			break
+		}
+	}
+	if success {
+		return reflect.TypeOf((*uint64)(nil))
+	}
+
+	success = true
+	for _, v := range values {
+		if _, ok := v.(int64); !ok {
+			success = false
+			break
+		}
+	}
+	if success {
+		return reflect.TypeOf((*int64)(nil))
+	}
+
+	success = true
+	for _, v := range values {
+		if _, ok := v.(bool); !ok {
+			success = false
+			break
+		}
+	}
+	if success {
+		return reflect.TypeOf(true)
+	}
+
+	return reflect.TypeOf("")
 }

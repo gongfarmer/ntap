@@ -128,13 +128,13 @@ func errStrInvalid(t string, v string) error {
 func errRange(t string, v interface{}) (e error) {
 	switch v := v.(type) {
 	case uint, uint8, uint16, uint32, uint64, int, int32, int64:
-		e = fmt.Errorf("value exceeds range for type %s: %d", t, v)
+		e = fmt.Errorf("value exceeds range of type %s: %d", t, v)
 	case float32, float64:
-		e = fmt.Errorf("value exceeds range for type %s: %0.9f", t, v)
+		e = fmt.Errorf("value exceeds range of type %s: %0.9f", t, v)
 	case []uint64, []int64:
-		e = fmt.Errorf("value exceeds range for type %s: %v", t, v)
+		e = fmt.Errorf("value exceeds range of type %s: %v", t, v)
 	case string:
-		e = fmt.Errorf("value exceeds range for type %s: %v", t, v)
+		e = fmt.Errorf("value exceeds range of type %s: %v", t, v)
 	default:
 		panic(fmt.Errorf("cannot handle type %T", v))
 	}
@@ -149,7 +149,7 @@ func errInvalidEscape(t, v, note string) (e error) {
 	return
 }
 func errUnescaped(typ string, r rune) error {
-	return fmt.Errorf("Character %s must be escaped in %s value", strconv.QuoteRune(r), typ)
+	return fmt.Errorf("character %s must be escaped in %s value", strconv.QuoteRune(r), typ)
 }
 func errZeroDenominator(typ string, v string) (e error) {
 	if v == "" {
@@ -273,6 +273,7 @@ func init() {
 	dec.String = UI64ToString
 	dec.StringDelimited = dec.String
 	dec.Uint = UI64ToUint64
+	dec.Int = UI64ToInt64
 	decoderByType[UI64] = dec
 
 	// ADE signed int types
@@ -475,6 +476,16 @@ func UI64ToUint64(buf []byte) (v uint64, e error) {
 		return
 	}
 	return binary.BigEndian.Uint64(buf), e
+}
+func UI64ToInt64(buf []byte) (v int64, e error) {
+	if e = checkByteCount(buf, 8, "UI64"); e != nil {
+		return
+	}
+	var ui = binary.BigEndian.Uint64(buf)
+	if ui > math.MaxInt64 {
+		return 0, errRange("int64", ui)
+	}
+	return int64(ui), e
 }
 func UI08ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 1, "UI08"); e != nil {
@@ -2300,4 +2311,43 @@ func Round(val float64, places int) float64 {
 	}
 
 	return round / pow
+}
+
+// Data type introspection methods
+// Clients with an Atom can use these to decide how to handle atom data.
+// They are intended to provide hints as to how the data should be handled, rather
+// than a straight mapping of what decoder funcs are provided for each type.
+// (eg. every ADE type implements String() and FromString(), not just the ones
+// that return true for IsString().)
+
+func (c Codec) IsBool() bool {
+	return c.Atom.Type() == "UI01"
+}
+func (c *Codec) IsUint() bool {
+	switch c.Atom.Type() {
+	case "UI08", "UI16", "UI32", "UI64":
+		return true
+	}
+	return false
+}
+func (c *Codec) IsInt() bool {
+	switch c.Atom.Type() {
+	case "SI08", "SI16", "SI32", "SI64":
+		return true
+	}
+	return false
+}
+func (c *Codec) IsFloat() bool {
+	switch c.Atom.Type() {
+	case "FP32", "FP64", "UF32", "UF64", "SF32", "SF64":
+		return true
+	}
+	return false
+}
+func (c *Codec) IsString() bool {
+	switch c.Atom.Type() {
+	case "CSTR", "USTR", "FC32", "IP32", "IPAD", "DATA", "CNCT", "cnct", "UUID":
+		return true
+	}
+	return false
 }
