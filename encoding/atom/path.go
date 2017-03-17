@@ -188,14 +188,14 @@ func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e er
 	return
 }
 
-func filterOnPathElement(children []*Atom, pathPart string) (nextAtoms []*Atom, e error) {
+func filterOnPathElement(children []*Atom, pathPart string) (filteredAtoms []*Atom, e error) {
 	strName, strFilter := extractNameAndFilter(pathPart)
-	fmt.Printf("%20s Extracted name and filter (%s,%s)\n", pathPart, strName, strFilter)
 	// use the name to build up a list of candidate atoms
 	if strName == "" {
 		e = fmt.Errorf("empty name is not allowed in path specification. Prepend a name or wildcard.")
 		return
 	}
+	var nextAtoms []*Atom
 	for _, child := range children {
 		if strName == "*" || child.Name == strName {
 			nextAtoms = append(nextAtoms, child)
@@ -203,16 +203,21 @@ func filterOnPathElement(children []*Atom, pathPart string) (nextAtoms []*Atom, 
 	}
 
 	// apply filter to determine which elements to keep
-	runFilter, e := filterStringToFunc(strFilter)
+	filter, e := NewFilter(strFilter)
+	fmt.Printf("NEWF \"%s\" => %s/ %v\n", pathPart, strName, filter.tokens)
 	if e != nil {
-		return nextAtoms[:0], e
+		panic(e)
 	}
 
-	filteredAtoms := nextAtoms[:0]
+	filteredAtoms = nextAtoms[:0] // overwrite nextAtoms in-place during filtering
+	count := len(nextAtoms)
 	for i, atomPtr := range nextAtoms {
-		if runFilter(*atomPtr, i) {
+		satisfied := false
+		if filter.Satisfied(atomPtr, i, count) {
 			filteredAtoms = append(filteredAtoms, atomPtr)
+			satisfied = true
 		}
+		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
 	}
 
 	return
@@ -243,9 +248,11 @@ func extractNameAndFilter(path string) (name, filter string) {
 
 // filterStringToFunc converts a filter expression into a func that evaluates
 // whether an atom at a given position should be filtered.
-func filterStringToFunc(path string) (f filterFunc, e error) {
+func NewFilter(path string) (ev *evaluator, err error) {
 	var lexr = lexPath(path)
-	return parseFilterTokens(lexr.items)
+	ev = new(evaluator)
+	ev.tokens, err = parseFilterTokens(lexr.items)
+	return
 }
 
 func lexPath(input string) *lexer {
@@ -253,7 +260,6 @@ func lexPath(input string) *lexer {
 		input: input,
 		items: make(chan item),
 	}
-	fmt.Printf(">>> start lexing '%s'\n", input)
 	go l.run(lexFilterExpression)
 	return l
 }
@@ -298,7 +304,9 @@ func lexFilterExpression(l *lexer) stateFn {
 			l.emit(itemOperator)
 		case strings.ContainsRune("=<>!", r):
 			lexComparisonOperator(l)
-		case r == 'o', r == 'a', r == 'n': // start of "or"/"and"/"not"
+
+		case r == 'o', r == 'a', r == 'n':
+			// FIXME merge this whole o/a/n case with the case below
 			l.acceptRun(alphabetLowerCase)
 			for _, word := range []string{"or", "and", "not"} {
 				if l.buffer() == word {
@@ -326,7 +334,6 @@ func lexFilterExpression(l *lexer) stateFn {
 		}
 	}
 	// correctly reached EOF.
-	fmt.Printf("lexFilterExpression is finished with '%s'\n", l.input)
 	return nil // stop the run loop
 }
 
@@ -364,7 +371,6 @@ func lexFunctionCall(l *lexer) stateFn {
 func lexDelimitedString(l *lexer) stateFn {
 	// Find delimiter
 	delim := l.first()
-	fmt.Printf("Delimiter is %T(%c)\n", delim, delim)
 	if delim != '"' && delim != '\'' {
 		l.backup()
 		return l.errorf("strings should be delimited with double-quotes, got %s", l.input)
@@ -453,10 +459,10 @@ func lexNumberInPath(l *lexer) stateFn {
 
 // parseFilterTokens translates stream of tokens emitted by the lexer into a
 // function that can evaluate whether an atom gets filtered.
-func parseFilterTokens(ch <-chan item) (f filterFunc, e error) {
+func parseFilterTokens(ch <-chan item) (tokens itemList, e error) {
 	var state = filterParser{items: ch}
 	state.receiveTokens()
-	return state.evaluate(), state.err
+	return state.outputQueue, state.err
 }
 
 // receiveTokens gets tokens from the lexer and sends them to the parser
@@ -501,7 +507,7 @@ func (p *filterParser) errorf(format string, args ...interface{}) bool {
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (p *filterParser) parseFilterToken(it item) bool {
 	switch it.typ {
-	case itemNumber, itemString, itemVariable:
+	case itemInteger, itemHex, itemFloat, itemString, itemVariable:
 		p.outputQueue.push(&it)
 	case itemFunction:
 		p.opStack.push(&it)
@@ -533,7 +539,6 @@ func (p *filterParser) parseFilterToken(it item) bool {
 			p.outputQueue.push(op)
 		}
 	case itemEOF:
-		fmt.Println("Got eof. emptying op stack: ", p.opStack)
 		for !p.opStack.empty() {
 			op := p.opStack.pop()
 			if op.typ == itemLeftParen || op.typ == itemRightParen {
@@ -574,29 +579,30 @@ func (p *filterParser) evaluate() (f filterFunc) {
 // where the atom appears in the slice.  Then the eval() method is called to
 // parse the filter tokens using the other values in the struct.
 type evaluator struct {
-	tokens   itemList // filter to evaluate each atom against
-	atom     Atom     // atom currently being evaluated from the atom list
-	position int      // index of the atom in the atom list
-	count    int      // number of atoms in the atom list
+	tokens   itemList // filter against which to to evaluate atoms, do not alter
+	Tokens   itemList // Copy of .tokens which is modified during evaluation
+	AtomPtr  *Atom    // atom currently being evaluated from the atom list
+	Position int      // index of the atom in the atom list
+	Count    int      // number of atoms in the atom list
 }
 
 // evaluate the list of items.
 func (e *evaluator) eval() (result bool) {
-	for !e.tokens.empty() {
-		switch e.tokens.top().typ {
+	for !e.Tokens.empty() {
+		switch e.Tokens.top().typ {
 		case itemBooleanOperator:
 			result = e.evalBooleanOperator()
 		case itemComparisonOperator:
 			result = e.evalComparisonOperator()
 		default:
-			panic(fmt.Sprintf("unknown token type %s", e.tokens.top().typ))
+			panic(fmt.Sprintf("unknown token type %s", e.Tokens.top().typ))
 		}
 	}
 	// calculate a boolean value from op and vars
 	return result
 }
 func (e *evaluator) evalBooleanOperator() (result bool) {
-	op := e.tokens.pop()
+	op := e.Tokens.pop()
 	if op.typ != itemBooleanOperator {
 		panic(fmt.Sprintf("expected itemBooleanOperator, received type %s", op.typ))
 	}
@@ -615,7 +621,7 @@ func (e *evaluator) evalBooleanOperator() (result bool) {
 
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
 func (e *evaluator) evalArithmeticOperator() (result interface{}) {
-	op := e.tokens.pop()
+	op := e.Tokens.pop()
 	if op.typ != itemArithmeticOperator {
 		panic(fmt.Sprintf("expected itemArithmeticOperator, received type %s", op.typ))
 	}
@@ -636,7 +642,7 @@ func (e *evaluator) evalArithmeticOperator() (result interface{}) {
 	return result
 }
 func (e *evaluator) evalComparisonOperator() bool {
-	op := e.tokens.pop()
+	op := e.Tokens.pop()
 	if op.typ != itemComparisonOperator {
 		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
 	}
@@ -661,15 +667,15 @@ func (e *evaluator) evalComparisonOperator() bool {
 }
 func (e *evaluator) evalValue() (result interface{}) {
 	var err error
-	switch e.tokens.top().typ {
+	switch e.Tokens.top().typ {
 	case itemInteger:
-		result, err = strconv.ParseInt(e.tokens.pop().value, 10, 64)
+		result, err = strconv.ParseInt(e.Tokens.pop().value, 10, 64)
 	case itemFloat:
-		result, err = strconv.ParseFloat(e.tokens.pop().value, 64)
+		result, err = strconv.ParseFloat(e.Tokens.pop().value, 64)
 	case itemHex:
-		result, err = strconv.ParseInt(e.tokens.pop().value, 16, 64)
+		result, err = strconv.ParseInt(e.Tokens.pop().value, 16, 64)
 	case itemString:
-		result = e.tokens.pop().value
+		result = e.Tokens.pop().value
 	case itemFunction:
 		result = e.evalFunction()
 	case itemVariable:
@@ -677,7 +683,7 @@ func (e *evaluator) evalValue() (result interface{}) {
 	case itemArithmeticOperator:
 		result = e.evalArithmeticOperator()
 	default:
-		panic(fmt.Sprintf("value has unknown type: %s", e.tokens.top().typ))
+		panic(fmt.Sprintf("value has unknown type: %s", e.Tokens.top().typ))
 	}
 	if err != nil {
 		panic("failed to convert '%s' to value")
@@ -685,15 +691,15 @@ func (e *evaluator) evalValue() (result interface{}) {
 	return result
 }
 func (e *evaluator) evalVariable() (result interface{}) {
-	item := e.tokens.pop()
+	item := e.Tokens.pop()
 	if item.typ != itemVariable {
 		panic(fmt.Sprintf("expected itemVariable, received type %s", item.typ))
 	}
 	switch item.value {
 	case "@name":
-		return e.atom.Name
+		return e.AtomPtr.Name
 	case "@type":
-		return e.atom.Type()
+		return e.AtomPtr.Type()
 	case "@data":
 	default:
 		panic(fmt.Sprintf("unknown variable: %s", item.value))
@@ -701,34 +707,43 @@ func (e *evaluator) evalVariable() (result interface{}) {
 
 	// Must get Atom value. Decide what concrete type to return.
 	switch {
-	case e.atom.Value.IsBool():
-		result, _ = e.atom.Value.Bool()
-	case e.atom.Value.IsFloat():
-		result, _ = e.atom.Value.Float()
-	case e.atom.Value.IsUint():
-		result, _ = e.atom.Value.Uint()
-	case e.atom.Value.IsInt(), e.atom.Value.IsInt():
-		result, _ = e.atom.Value.Int()
+	case e.AtomPtr.Value.IsBool():
+		result, _ = e.AtomPtr.Value.Bool()
+	case e.AtomPtr.Value.IsFloat():
+		result, _ = e.AtomPtr.Value.Float()
+	case e.AtomPtr.Value.IsUint():
+		result, _ = e.AtomPtr.Value.Uint()
+	case e.AtomPtr.Value.IsInt(), e.AtomPtr.Value.IsInt():
+		result, _ = e.AtomPtr.Value.Int()
 	default:
-		result, _ = e.atom.Value.String()
+		result, _ = e.AtomPtr.Value.String()
 	}
 	return result
 }
 func (e *evaluator) evalFunction() (result interface{}) {
-	item := e.tokens.pop()
+	item := e.Tokens.pop()
 	if item.typ != itemFunction {
 		panic(fmt.Sprintf("expected itemFunction, received type %s", item.typ))
 	}
 	switch item.value {
 	case "position()":
-		return e.position
+		return e.Position
 	case "count()":
-		return e.count
+		return e.Count
 	case "last()":
-		return e.position == e.count
+		return e.Position == e.Count
 	default:
 		panic(fmt.Sprintf("unknown variable: %s", item.value))
 	}
+}
+
+func (e *evaluator) Satisfied(a *Atom, index int, count int) bool {
+	e.AtomPtr = a
+	e.Position = index
+	e.Count = count
+	e.Tokens = e.Tokens[:0]
+	copy(e.tokens, e.Tokens)
+	return e.eval()
 }
 
 // Implement explicit type coercion for equality and arithmetic operators
