@@ -59,7 +59,6 @@ package atom
 // this is good because it handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
 import (
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -587,8 +586,6 @@ func (e *evaluator) eval() (result bool) {
 		switch e.tokens.top().typ {
 		case itemBooleanOperator:
 			result = e.evalBooleanOperator()
-		case itemArithmeticOperator:
-			result = e.evalArithmeticOperator()
 		case itemComparisonOperator:
 			result = e.evalComparisonOperator()
 		default:
@@ -619,21 +616,23 @@ func (e *evaluator) evalBooleanOperator() (result bool) {
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
 func (e *evaluator) evalArithmeticOperator() (result interface{}) {
 	op := e.tokens.pop()
-	//	if op.typ != itemComparisonOperator {
-	//		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
-	//	}
-	//	switch op.value {
-	//	case "+":
-	//		result = e.evalValue() + e.evalValue()
-	//	case "-":
-	//		result = e.evalValue() - e.evalValue()
-	//	case "*":
-	//		result = e.evalValue() * e.evalValue()
-	//	case "/":
-	//		result = e.evalValue() / e.evalValue()
-	//	default:
-	//		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
-	//	}
+	if op.typ != itemArithmeticOperator {
+		panic(fmt.Sprintf("expected itemArithmeticOperator, received type %s", op.typ))
+	}
+	val1 := e.evalValue().(Arithmeticker)
+	val2 := e.evalValue().(Arithmeticker)
+	switch op.value {
+	case "+":
+		result = val1.Plus(val2)
+	case "-":
+		result = val1.Minus(val2)
+	case "*":
+		result = val1.Multiply(val2)
+	case "/":
+		result = val1.Divide(val2)
+	default:
+		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
+	}
 	return result
 }
 func (e *evaluator) evalComparisonOperator() bool {
@@ -641,20 +640,21 @@ func (e *evaluator) evalComparisonOperator() bool {
 	if op.typ != itemComparisonOperator {
 		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
 	}
-	values := coerce(e.evalValue(), e.evalValue())
+	val1 := e.evalValue().(Comparer)
+	val2 := e.evalValue().(Comparer)
 	switch op.value {
 	case "=":
-		return val1 == val2
+		return val1.Equal(val2)
 	case "!=":
-		return val1 != val2
+		return !val1.Equal(val2)
 	case "<":
-		return val1 < val2
+		return val1.LessThan(val2)
 	case ">":
-		return val1 > val2
+		return val1.GreaterThan(val2)
 	case "<=":
-		return val1 <= val2
+		return val1.LessThan(val2) || val1.Equal(val2)
 	case ">=":
-		return val1 >= val2
+		return val1.GreaterThan(val2) || val1.Equal(val2)
 	default:
 		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
 	}
@@ -674,6 +674,8 @@ func (e *evaluator) evalValue() (result interface{}) {
 		result = e.evalFunction()
 	case itemVariable:
 		result = e.evalVariable()
+	case itemArithmeticOperator:
+		result = e.evalArithmeticOperator()
 	default:
 		panic(fmt.Sprintf("value has unknown type: %s", e.tokens.top().typ))
 	}
@@ -729,61 +731,95 @@ func (e *evaluator) evalFunction() (result interface{}) {
 	}
 }
 
-// coerce takes a slice of interface{} and attempts to find a common numeric
-// type that all values can be coerced to, based on their concrete types.
-// If no numeric type is possible, type string is returned.
-// Examples:
-//    1.0, 6.73: both are float so type float is returned.
-//    1,   6.73: int and float, both can cast to float so float is returned
-//    1,   5:    2 integers, none negative, return uint
-//    -1,  5:    2 integers, 1 is negative, so return int
-//    7  eleven: int and string.  There's no saving this one.  Return string.
+// Implement explicit type coercion for equality and arithmetic operators
+type (
+	Float64 float64
+	Uint64  uint64
+	Int64   int64
+	Strang  string
 
-// For example, given values (1.0 6.73), both are float so type float is returned.
-func coerce(values ...interface{}) reflect.Type {
-	var success = true
-	for _, v := range values {
-		if _, ok := v.(float64); !ok {
-			success = false
-			break
-		}
+	Comparer interface {
+		Equal(other Comparer) bool
+		LessThan(other Comparer) bool
+		GreaterThan(other Comparer) bool
 	}
-	if success {
-		return reflect.TypeOf((*float64)(nil))
+	Arithmeticker interface {
+		Plus(other Arithmeticker) Arithmeticker
+		Minus(other Arithmeticker) Arithmeticker
+		Multiply(other Arithmeticker) Arithmeticker
+		Divide(other Arithmeticker) Arithmeticker
 	}
+)
 
-	success = true
-	for _, v := range values {
-		if _, ok := v.(uint64); !ok {
-			success = false
-			break
-		}
-	}
-	if success {
-		return reflect.TypeOf((*uint64)(nil))
-	}
-
-	success = true
-	for _, v := range values {
-		if _, ok := v.(int64); !ok {
-			success = false
-			break
-		}
-	}
-	if success {
-		return reflect.TypeOf((*int64)(nil))
-	}
-
-	success = true
-	for _, v := range values {
-		if _, ok := v.(bool); !ok {
-			success = false
-			break
-		}
-	}
-	if success {
-		return reflect.TypeOf(true)
-	}
-
-	return reflect.TypeOf("")
+func (v Float64) Equal(other Comparer) bool {
+	return v == other.(Float64)
+}
+func (v Float64) LessThan(other Comparer) bool {
+	return v < other.(Float64)
+}
+func (v Float64) GreaterThan(other Comparer) bool {
+	return v > other.(Float64)
+}
+func (v Uint64) Equal(other Comparer) bool {
+	return v == other.(Uint64)
+}
+func (v Uint64) LessThan(other Comparer) bool {
+	return v < other.(Uint64)
+}
+func (v Uint64) GreaterThan(other Comparer) bool {
+	return v > other.(Uint64)
+}
+func (v Int64) Equal(other Comparer) bool {
+	return v == other.(Int64)
+}
+func (v Int64) LessThan(other Comparer) bool {
+	return v < other.(Int64)
+}
+func (v Int64) GreaterThan(other Comparer) bool {
+	return v > other.(Int64)
+}
+func (v Strang) Equal(other Comparer) bool {
+	return v == other.(Strang)
+}
+func (v Strang) LessThan(other Comparer) bool {
+	return v < other.(Strang)
+}
+func (v Strang) GreaterThan(other Comparer) bool {
+	return v > other.(Strang)
+}
+func (v Float64) Plus(other Arithmeticker) Arithmeticker {
+	return v + other.(Float64)
+}
+func (v Float64) Minus(other Arithmeticker) Arithmeticker {
+	return v - other.(Float64)
+}
+func (v Float64) Multiply(other Arithmeticker) Arithmeticker {
+	return v * other.(Float64)
+}
+func (v Float64) Divide(other Arithmeticker) Arithmeticker {
+	return v / other.(Float64)
+}
+func (v Uint64) Plus(other Arithmeticker) Arithmeticker {
+	return v + other.(Uint64)
+}
+func (v Uint64) Minus(other Arithmeticker) Arithmeticker {
+	return v - other.(Uint64)
+}
+func (v Uint64) Multiply(other Arithmeticker) Arithmeticker {
+	return v * other.(Uint64)
+}
+func (v Uint64) Divide(other Arithmeticker) Arithmeticker {
+	return v / other.(Uint64)
+}
+func (v Int64) Plus(other Arithmeticker) Arithmeticker {
+	return v + other.(Int64)
+}
+func (v Int64) Minus(other Arithmeticker) Arithmeticker {
+	return v - other.(Int64)
+}
+func (v Int64) Multiply(other Arithmeticker) Arithmeticker {
+	return v * other.(Int64)
+}
+func (v Int64) Divide(other Arithmeticker) Arithmeticker {
+	return v / other.(Int64)
 }
