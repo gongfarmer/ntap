@@ -85,12 +85,14 @@ func (a *Atom) ZeroData() {
 }
 
 // String returns the atom's text description in ADE ContainerText format.
+// This is a single line, it doesn't include a list of child atoms.
 func (a Atom) String() string {
-	buf, err := a.MarshalText()
-	if err != nil {
-		panic(fmt.Errorf("failed to write Atom '%s:%s' to text: %s", a.Name, a.Type(), err))
+	if a.Type() == CONT {
+		return fmt.Sprintf("%s:%s:", a.Name, a.Type())
+	} else {
+		str, _ := a.Value.StringDelimited()
+		return fmt.Sprintf("%s:%s:%s", a.Name, a.Type(), str)
 	}
-	return string(buf)
 }
 
 // AddChild makes the Atom pointed to by the argument a child of this Atom.

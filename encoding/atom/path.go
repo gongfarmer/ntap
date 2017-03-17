@@ -49,7 +49,7 @@ package atom
 ///   string: do nothing
 ///   operator: execute if stack has enough args
 ///   keyword: evaluate unary (eg. position(), @value,@type)
-/// }
+/// } value
 /// }
 
 // parsing objective: a single func which can take in an atom and position, and
@@ -70,7 +70,8 @@ const (
 	itemBooleanOperator    = "iBooleanOp"
 	itemComparisonOperator = "iCompareOp"
 	itemOperator           = "iOperator"
-	itemFunction           = "iFunction"
+	itemFunctionBool       = "iFunctionBool"
+	itemFunctionNumeric    = "iFunctionNum"
 	itemVariable           = "iVar"
 	itemInteger            = "iInt"
 	itemFloat              = "iFloat"
@@ -201,23 +202,29 @@ func filterOnPathElement(children []*Atom, pathPart string) (filteredAtoms []*At
 			nextAtoms = append(nextAtoms, child)
 		}
 	}
+	if strFilter == "" {
+		return nextAtoms, e
+	}
 
 	// apply filter to determine which elements to keep
 	filter, e := NewFilter(strFilter)
-	fmt.Printf("NEWF \"%s\" => %s/ %v\n", pathPart, strName, filter.tokens)
+	//	fmt.Printf("NEWF \"%s\" => %s/ %v\n", pathPart, strName, filter.tokens)
 	if e != nil {
 		panic(e)
 	}
+	//	for _, t := range filter.tokens {
+	//		//		fmt.Println("      ", t.typ, " : ", t.value)
+	//	}
 
-	filteredAtoms = nextAtoms[:0] // overwrite nextAtoms in-place during filtering
+	filteredAtoms = nextAtoms[:0] // overwrite nextAtoms in place during filtering
 	count := len(nextAtoms)
 	for i, atomPtr := range nextAtoms {
-		satisfied := false
+		//		satisfied := false
 		if filter.Satisfied(atomPtr, i, count) {
 			filteredAtoms = append(filteredAtoms, atomPtr)
-			satisfied = true
+			//			satisfied = true
 		}
-		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
+		//		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
 	}
 
 	return
@@ -294,14 +301,14 @@ func lexFilterExpression(l *lexer) stateFn {
 		case r == ')':
 			l.emit(itemRightParen)
 		case r == '+', r == '*': // no division because / is path separator, not needed anyway
-			l.emit(itemOperator)
+			l.emit(itemArithmeticOperator)
 		case strings.ContainsRune(digits, r):
 			lexNumberInPath(l)
 		case r == '-':
 			if l.prevItemType == itemOperator {
 				lexNumberInPath(l)
 			}
-			l.emit(itemOperator)
+			l.emit(itemArithmeticOperator)
 		case strings.ContainsRune("=<>!", r):
 			lexComparisonOperator(l)
 
@@ -310,7 +317,7 @@ func lexFilterExpression(l *lexer) stateFn {
 			l.acceptRun(alphabetLowerCase)
 			for _, word := range []string{"or", "and", "not"} {
 				if l.buffer() == word {
-					l.emit(itemOperator)
+					l.emit(itemBooleanOperator)
 					break
 				}
 			}
@@ -334,7 +341,7 @@ func lexFilterExpression(l *lexer) stateFn {
 		}
 	}
 	// correctly reached EOF.
-	return nil // stop the run loop
+	return nil
 }
 
 // lexAtomAttribute accepts @name, @type or @data.  The @ is already read.
@@ -347,10 +354,9 @@ func lexAtomAttribute(l *lexer) stateFn {
 	return lexFilterExpression
 }
 
-// accept @name, @type or @data.  The @ is already read.
 func lexComparisonOperator(l *lexer) stateFn {
 	l.acceptRun("=<>!")
-	l.emit(itemOperator)
+	l.emit(itemComparisonOperator)
 	return lexFilterExpression
 }
 
@@ -363,8 +369,11 @@ func lexFunctionCall(l *lexer) stateFn {
 	if !(l.accept("(") && l.accept(")")) {
 		return l.errorf("invalid function call: %s", l.input)
 	}
-	l.emit(itemFunction)
-
+	if l.buffer() == "last()" {
+		l.emit(itemFunctionBool)
+	} else {
+		l.emit(itemFunctionNumeric)
+	}
 	return lexFilterExpression
 }
 
@@ -375,6 +384,7 @@ func lexDelimitedString(l *lexer) stateFn {
 		l.backup()
 		return l.errorf("strings should be delimited with double-quotes, got %s", l.input)
 	}
+	l.ignore() // discard delimiter
 
 	// Read in chars
 	var r rune
@@ -396,11 +406,16 @@ func lexDelimitedString(l *lexer) stateFn {
 		}
 	}
 
-	if r != '"' {
+	if r != delim {
 		return l.errorf("unterminated string in atom path: %s", l.input)
 	}
 
+	// discard delimiter and emit string value
+	l.backup()
 	l.emit(itemString)
+	l.next()
+	l.ignore()
+
 	return lexFilterExpression
 }
 
@@ -416,7 +431,7 @@ func lexBareString(l *lexer) stateFn {
 
 func lexNumberInPath(l *lexer) stateFn {
 	var isHex, isFloatingPoint, isSigned, isExponent bool
-	if l.accept("+-") { // Optional leading sign.
+	if l.bufferSize() == 0 && l.accept("+-") { // Optional leading sign.
 		isSigned = true
 		if l.buffer() == "+" { // discard leading +, keep leading -
 			l.ignore()
@@ -438,10 +453,6 @@ func lexNumberInPath(l *lexer) stateFn {
 		l.acceptRun("0123456789")
 	}
 
-	// Next thing mustn't be alphanumeric.
-	if l.accept(alphaNumericChars) {
-		return l.errorf("invalid numeric value: %s", l.input)
-	}
 	if (isHex && isFloatingPoint) || (isHex && isExponent) || (isHex && isSigned) {
 		return l.errorf("invalid numeric value: %s", l.input)
 	}
@@ -503,15 +514,13 @@ func (p *filterParser) errorf(format string, args ...interface{}) bool {
 
 // parseFilterTokens receives tokens from the lexer in the order they are found
 // in the path string, and queues them into evaluation order.
-// This is an implementation of Djikstra's shunting-yard algorithm.
+// This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (p *filterParser) parseFilterToken(it item) bool {
 	switch it.typ {
-	case itemInteger, itemHex, itemFloat, itemString, itemVariable:
+	case itemInteger, itemHex, itemFloat, itemString, itemVariable, itemFunctionBool, itemFunctionNumeric:
 		p.outputQueue.push(&it)
-	case itemFunction:
-		p.opStack.push(&it)
-	case itemOperator:
+	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
 		for {
 			op, ok := p.opStack.popType(itemOperator)
 			if !ok {
@@ -534,10 +543,10 @@ func (p *filterParser) parseFilterToken(it item) bool {
 			op := p.opStack.pop()
 			p.outputQueue.push(op)
 		}
-		if p.opStack.top().typ == itemFunction {
-			op := p.opStack.pop()
-			p.outputQueue.push(op)
-		}
+		//		if p.opStack.top().typ == itemFunction {
+		//			op := p.opStack.pop()
+		//			p.outputQueue.push(op)
+		//		}
 	case itemEOF:
 		for !p.opStack.empty() {
 			op := p.opStack.pop()
@@ -551,19 +560,6 @@ func (p *filterParser) parseFilterToken(it item) bool {
 		panic(fmt.Sprintf("unexpected item type: %s", it.typ))
 	}
 	return true
-}
-
-// evaluate
-func (p *filterParser) evaluate() (f filterFunc) {
-	fmt.Printf("evaluate: %s\n", p.outputQueue)
-	//	for {
-	//		it := p.outputQueue.shift()
-	//		if it == nil {
-	//			break
-	//		}
-	//		fmt.Printf(" eval %s: %s\n", it.typ, it.value)
-	//	}
-	return
 }
 
 // evaluator is for determining whether a single atom from the list of
@@ -580,13 +576,13 @@ func (p *filterParser) evaluate() (f filterFunc) {
 // parse the filter tokens using the other values in the struct.
 type evaluator struct {
 	tokens   itemList // filter against which to to evaluate atoms, do not alter
-	Tokens   itemList // Copy of .tokens which is modified during evaluation
+	Tokens   itemList // Copy of .tokens to consume during evaluation
 	AtomPtr  *Atom    // atom currently being evaluated from the atom list
-	Position int      // index of the atom in the atom list
+	Position int      // index of the atom in the atom list, starts from 1
 	Count    int      // number of atoms in the atom list
 }
 
-// evaluate the list of items.
+// evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
 func (e *evaluator) eval() (result bool) {
 	for !e.Tokens.empty() {
 		switch e.Tokens.top().typ {
@@ -594,6 +590,17 @@ func (e *evaluator) eval() (result bool) {
 			result = e.evalBooleanOperator()
 		case itemComparisonOperator:
 			result = e.evalComparisonOperator()
+		case itemArithmeticOperator:
+			number := e.evalArithmeticOperator()
+			result = number.Equal(Int64Type(e.Position))
+		case itemInteger, itemHex:
+			number := e.evalNumber()
+			result = number.Equal(Int64Type(e.Position))
+		case itemFunctionBool:
+			result = e.evalFunctionBool()
+		case itemFunctionNumeric:
+			number := e.evalFunctionNumeric()
+			result = number.Equal(Int64Type(e.Position))
 		default:
 			panic(fmt.Sprintf("unknown token type %s", e.Tokens.top().typ))
 		}
@@ -620,13 +627,13 @@ func (e *evaluator) evalBooleanOperator() (result bool) {
 }
 
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
-func (e *evaluator) evalArithmeticOperator() (result interface{}) {
+func (e *evaluator) evalArithmeticOperator() (result Arithmeticker) {
 	op := e.Tokens.pop()
 	if op.typ != itemArithmeticOperator {
 		panic(fmt.Sprintf("expected itemArithmeticOperator, received type %s", op.typ))
 	}
-	val1 := e.evalValue().(Arithmeticker)
-	val2 := e.evalValue().(Arithmeticker)
+	val1 := e.evalNumber()
+	val2 := e.evalNumber()
 	switch op.value {
 	case "+":
 		result = val1.Plus(val2)
@@ -646,112 +653,169 @@ func (e *evaluator) evalComparisonOperator() bool {
 	if op.typ != itemComparisonOperator {
 		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
 	}
-	val1 := e.evalValue().(Comparer)
-	val2 := e.evalValue().(Comparer)
+	rhs := e.evalComparable()
+	lhs := e.evalComparable()
 	switch op.value {
 	case "=":
-		return val1.Equal(val2)
+		return lhs.Equal(rhs)
 	case "!=":
-		return !val1.Equal(val2)
+		return !lhs.Equal(rhs)
 	case "<":
-		return val1.LessThan(val2)
+		return lhs.LessThan(rhs)
 	case ">":
-		return val1.GreaterThan(val2)
+		return lhs.GreaterThan(rhs)
 	case "<=":
-		return val1.LessThan(val2) || val1.Equal(val2)
+		return lhs.LessThan(rhs) || lhs.Equal(rhs)
 	case ">=":
-		return val1.GreaterThan(val2) || val1.Equal(val2)
+		return lhs.GreaterThan(rhs) || lhs.Equal(rhs)
 	default:
 		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
 	}
 }
-func (e *evaluator) evalValue() (result interface{}) {
+func (e *evaluator) evalNumber() (result Arithmeticker) {
+	var err error
+	ok := true
+	switch e.Tokens.top().typ {
+	case itemInteger:
+		v, err := strconv.ParseInt(e.Tokens.pop().value, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		result = Int64Type(v)
+	case itemFloat:
+		v, err := strconv.ParseFloat(e.Tokens.pop().value, 64)
+		if err != nil {
+			panic(err)
+		}
+		result = Float64Type(v)
+	case itemHex:
+		v, err := strconv.ParseInt(e.Tokens.pop().value, 16, 64)
+		if err != nil {
+			panic(err)
+		}
+		result = Int64Type(v)
+	case itemFunctionNumeric:
+		result = e.evalFunctionNumeric()
+	case itemVariable:
+		result, ok = e.evalVariable().(Arithmeticker)
+	case itemArithmeticOperator:
+		result = e.evalArithmeticOperator()
+	default:
+		panic(fmt.Sprintf("value has invalid numeric type: %s", e.Tokens.top().typ))
+	}
+	if err != nil || !ok {
+		panic("failed to convert '%s' to numeric value")
+	}
+	return result
+}
+func (e *evaluator) evalComparable() (result Comparer) {
 	var err error
 	switch e.Tokens.top().typ {
 	case itemInteger:
-		result, err = strconv.ParseInt(e.Tokens.pop().value, 10, 64)
+		v, errr := strconv.ParseInt(e.Tokens.pop().value, 10, 64)
+		err = errr
+		result = Int64Type(v)
 	case itemFloat:
-		result, err = strconv.ParseFloat(e.Tokens.pop().value, 64)
+		v, errr := strconv.ParseFloat(e.Tokens.pop().value, 64)
+		err = errr
+		result = Float64Type(v)
 	case itemHex:
-		result, err = strconv.ParseInt(e.Tokens.pop().value, 16, 64)
+		v, errr := strconv.ParseInt(e.Tokens.pop().value, 16, 64)
+		err = errr
+		result = Int64Type(v)
 	case itemString:
-		result = e.Tokens.pop().value
-	case itemFunction:
-		result = e.evalFunction()
+		result = StringType(e.Tokens.pop().value)
 	case itemVariable:
 		result = e.evalVariable()
+	case itemFunctionNumeric:
+		result = e.evalFunctionNumeric()
 	case itemArithmeticOperator:
 		result = e.evalArithmeticOperator()
 	default:
 		panic(fmt.Sprintf("value has unknown type: %s", e.Tokens.top().typ))
 	}
 	if err != nil {
-		panic("failed to convert '%s' to value")
+		panic("failed to convert '%s' to comparable value")
 	}
 	return result
 }
-func (e *evaluator) evalVariable() (result interface{}) {
+func (e *evaluator) evalVariable() (result Comparer) {
 	item := e.Tokens.pop()
 	if item.typ != itemVariable {
 		panic(fmt.Sprintf("expected itemVariable, received type %s", item.typ))
 	}
 	switch item.value {
 	case "@name":
-		return e.AtomPtr.Name
+		return StringType(e.AtomPtr.Name)
 	case "@type":
-		return e.AtomPtr.Type()
+		return StringType(e.AtomPtr.Type())
 	case "@data":
 	default:
 		panic(fmt.Sprintf("unknown variable: %s", item.value))
 	}
 
-	// Must get Atom value. Decide what concrete type to return.
+	// Must get Atom value. Choose concrete type to return.
 	switch {
-	case e.AtomPtr.Value.IsBool():
-		result, _ = e.AtomPtr.Value.Bool()
 	case e.AtomPtr.Value.IsFloat():
-		result, _ = e.AtomPtr.Value.Float()
+		v, _ := e.AtomPtr.Value.Float()
+		result = Float64Type(v)
+	case e.AtomPtr.Value.IsInt():
+		v, _ := e.AtomPtr.Value.Int()
+		result = Int64Type(v)
 	case e.AtomPtr.Value.IsUint():
-		result, _ = e.AtomPtr.Value.Uint()
-	case e.AtomPtr.Value.IsInt(), e.AtomPtr.Value.IsInt():
-		result, _ = e.AtomPtr.Value.Int()
+		v, _ := e.AtomPtr.Value.Uint()
+		result = Uint64Type(v)
+	case e.AtomPtr.Value.IsBool():
+		v, _ := e.AtomPtr.Value.Uint() // use UINT since it's represented as 0/1
+		result = Uint64Type(v)
 	default:
-		result, _ = e.AtomPtr.Value.String()
+		v, _ := e.AtomPtr.Value.String()
+		result = StringType(v)
 	}
 	return result
 }
-func (e *evaluator) evalFunction() (result interface{}) {
+func (e *evaluator) evalFunctionBool() (result bool) {
 	item := e.Tokens.pop()
-	if item.typ != itemFunction {
-		panic(fmt.Sprintf("expected itemFunction, received type %s", item.typ))
+	if item.typ != itemFunctionBool {
+		panic(fmt.Sprintf("expected itemFunctionBool, received type %s", item.typ))
 	}
 	switch item.value {
-	case "position()":
-		return e.Position
-	case "count()":
-		return e.Count
 	case "last()":
 		return e.Position == e.Count
 	default:
-		panic(fmt.Sprintf("unknown variable: %s", item.value))
+		panic(fmt.Sprintf("unknown boolean function: %s", item.value))
+	}
+}
+func (e *evaluator) evalFunctionNumeric() (result Arithmeticker) {
+	item := e.Tokens.pop()
+	if item.typ != itemFunctionNumeric {
+		panic(fmt.Sprintf("expected itemFunctionNumeric, received type %s", item.typ))
+	}
+	switch item.value {
+	case "position()":
+		return Uint64Type(e.Position)
+	case "count()":
+		return Uint64Type(e.Count)
+	default:
+		panic(fmt.Sprintf("unknown numeric function: %s", item.value))
 	}
 }
 
 func (e *evaluator) Satisfied(a *Atom, index int, count int) bool {
 	e.AtomPtr = a
-	e.Position = index
+	e.Position = index + 1 // XPath convention: position starts at 1
 	e.Count = count
-	e.Tokens = e.Tokens[:0]
-	copy(e.tokens, e.Tokens)
+	e.Tokens = e.tokens // copy will be consumed during evaluation
+	// FIXME: can I make this use an indexing system rather than popping, to avoid allocation?
 	return e.eval()
 }
 
 // Implement explicit type coercion for equality and arithmetic operators
 type (
-	Float64 float64
-	Uint64  uint64
-	Int64   int64
-	Strang  string
+	Int64Type   int64
+	Uint64Type  uint64
+	Float64Type float64
+	StringType  string
 
 	Comparer interface {
 		Equal(other Comparer) bool
@@ -759,6 +823,7 @@ type (
 		GreaterThan(other Comparer) bool
 	}
 	Arithmeticker interface {
+		Comparer
 		Plus(other Arithmeticker) Arithmeticker
 		Minus(other Arithmeticker) Arithmeticker
 		Multiply(other Arithmeticker) Arithmeticker
@@ -766,75 +831,196 @@ type (
 	}
 )
 
-func (v Float64) Equal(other Comparer) bool {
-	return v == other.(Float64)
+func (v Float64Type) Equal(other Comparer) bool {
+	switch o := other.(type) {
+	case Float64Type:
+		return v == o
+	case Uint64Type:
+		return float64(v) == float64(o)
+	case Int64Type:
+		return float64(v) == float64(o)
+	default:
+		return false
+	}
 }
-func (v Float64) LessThan(other Comparer) bool {
-	return v < other.(Float64)
+func (v Float64Type) LessThan(other Comparer) bool {
+	switch o := other.(type) {
+	case Float64Type:
+		return v < o
+	case Uint64Type:
+		return float64(v) < float64(o)
+	case Int64Type:
+		return float64(v) < float64(o)
+	default:
+		return false
+	}
 }
-func (v Float64) GreaterThan(other Comparer) bool {
-	return v > other.(Float64)
+func (v Float64Type) GreaterThan(other Comparer) bool {
+	switch o := other.(type) {
+	case Float64Type:
+		return v > o
+	case Uint64Type:
+		return float64(v) > float64(o)
+	case Int64Type:
+		return float64(v) > float64(o)
+	default:
+		return false
+	}
 }
-func (v Uint64) Equal(other Comparer) bool {
-	return v == other.(Uint64)
+func (v Uint64Type) Equal(other Comparer) bool {
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(v) == o
+	case Int64Type:
+		return Int64Type(v) == o
+	default:
+		return v == o.(Uint64Type)
+	}
 }
-func (v Uint64) LessThan(other Comparer) bool {
-	return v < other.(Uint64)
+func (v Uint64Type) LessThan(other Comparer) bool {
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(v) < o
+	case Int64Type:
+		return Int64Type(v) < o
+	default:
+		return v < o.(Uint64Type)
+	}
 }
-func (v Uint64) GreaterThan(other Comparer) bool {
-	return v > other.(Uint64)
+func (v Uint64Type) GreaterThan(other Comparer) bool {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) > other
+	case Int64Type:
+		return Int64Type(v) > other
+	default:
+		return v > other.(Uint64Type)
+	}
 }
-func (v Int64) Equal(other Comparer) bool {
-	return v == other.(Int64)
+func (v Int64Type) Equal(other Comparer) bool {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) == other
+	default:
+		return v == other.(Int64Type)
+	}
 }
-func (v Int64) LessThan(other Comparer) bool {
-	return v < other.(Int64)
+func (v Int64Type) LessThan(other Comparer) bool {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) < other
+	default:
+		return v < other.(Int64Type)
+	}
 }
-func (v Int64) GreaterThan(other Comparer) bool {
-	return v > other.(Int64)
+func (v Int64Type) GreaterThan(other Comparer) bool {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) > other
+	default:
+		return v > other.(Int64Type)
+	}
 }
-func (v Strang) Equal(other Comparer) bool {
-	return v == other.(Strang)
+func (v StringType) Equal(other Comparer) bool {
+	otherString, ok := other.(StringType)
+	if !ok {
+		panic(fmt.Sprintf("cannot type assert to string: %v", other))
+	}
+	return strings.EqualFold(string(v), string(otherString)) // case insensitive comparison
 }
-func (v Strang) LessThan(other Comparer) bool {
-	return v < other.(Strang)
+func (v StringType) LessThan(other Comparer) bool {
+	if other, ok := other.(StringType); ok {
+		return v < other
+	}
+	return false
 }
-func (v Strang) GreaterThan(other Comparer) bool {
-	return v > other.(Strang)
+func (v StringType) GreaterThan(other Comparer) bool {
+	if other, ok := other.(StringType); ok {
+		return v > other
+	}
+	return false
 }
-func (v Float64) Plus(other Arithmeticker) Arithmeticker {
-	return v + other.(Float64)
+func (v Float64Type) Plus(other Arithmeticker) Arithmeticker {
+	return v + other.(Float64Type)
 }
-func (v Float64) Minus(other Arithmeticker) Arithmeticker {
-	return v - other.(Float64)
+func (v Float64Type) Minus(other Arithmeticker) Arithmeticker {
+	return v - other.(Float64Type)
 }
-func (v Float64) Multiply(other Arithmeticker) Arithmeticker {
-	return v * other.(Float64)
+func (v Float64Type) Multiply(other Arithmeticker) Arithmeticker {
+	return v * other.(Float64Type)
 }
-func (v Float64) Divide(other Arithmeticker) Arithmeticker {
-	return v / other.(Float64)
+func (v Float64Type) Divide(other Arithmeticker) Arithmeticker {
+	return v / other.(Float64Type)
 }
-func (v Uint64) Plus(other Arithmeticker) Arithmeticker {
-	return v + other.(Uint64)
+func (v Uint64Type) Plus(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) + other
+	case Int64Type:
+		return Int64Type(v) + other
+	default:
+		return v + other.(Uint64Type)
+	}
 }
-func (v Uint64) Minus(other Arithmeticker) Arithmeticker {
-	return v - other.(Uint64)
+func (v Uint64Type) Minus(other Arithmeticker) Arithmeticker {
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(v) - o
+	case Int64Type:
+		return Int64Type(v) - o
+	default:
+		return v - o.(Uint64Type)
+	}
 }
-func (v Uint64) Multiply(other Arithmeticker) Arithmeticker {
-	return v * other.(Uint64)
+func (v Uint64Type) Multiply(other Arithmeticker) Arithmeticker {
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(v) * o
+	case Int64Type:
+		return Int64Type(v) * o
+	default:
+		return v * o.(Uint64Type)
+	}
 }
-func (v Uint64) Divide(other Arithmeticker) Arithmeticker {
-	return v / other.(Uint64)
+func (v Uint64Type) Divide(other Arithmeticker) Arithmeticker {
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(v) / o
+	case Int64Type:
+		return Int64Type(v) / o
+	default:
+		return v / o.(Uint64Type)
+	}
 }
-func (v Int64) Plus(other Arithmeticker) Arithmeticker {
-	return v + other.(Int64)
+func (v Int64Type) Plus(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) + other
+	default:
+		return v + other.(Int64Type)
+	}
 }
-func (v Int64) Minus(other Arithmeticker) Arithmeticker {
-	return v - other.(Int64)
+func (v Int64Type) Minus(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) - other
+	default:
+		return v - other.(Int64Type)
+	}
 }
-func (v Int64) Multiply(other Arithmeticker) Arithmeticker {
-	return v * other.(Int64)
+func (v Int64Type) Multiply(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) * other
+	default:
+		return v * other.(Int64Type)
+	}
 }
-func (v Int64) Divide(other Arithmeticker) Arithmeticker {
-	return v / other.(Int64)
+func (v Int64Type) Divide(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(v) / other
+	default:
+		return v / other.(Int64Type)
+	}
 }

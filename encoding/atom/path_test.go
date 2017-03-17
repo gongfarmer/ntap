@@ -43,8 +43,6 @@ type (
 )
 
 // Tests of atom path matching
-// TODO:
-// test case where target name appears earlier in the path too
 var TestAtom = new(Atom)
 
 func init() {
@@ -98,6 +96,7 @@ ROOT:CONT:
   END
   CN1C:CONT:
     DOGS:UI32:23
+    TRUE:UI01:1
   END
 	GINF:CONT:
 		BVER:UI32:4
@@ -151,39 +150,39 @@ func TestAtomsAtPath(t *testing.T) {
 
 	zero := []string{}
 	tests := []PathTest{
-		//		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5A", []string{"LF5A:UI32:1"}, nil},
-		//		PathTest{"CN1A/CN2A/CN3A/LF4B", []string{`LF4B:CSTR:"hello from depth 4"`}, nil},
-		//		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5B", []string{`LF5B:CSTR:"hello from depth 5"`}, nil},
-		//		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE", []string{
-		//			`NODE:USTR:"branch1 result"`,
-		//			`NODE:USTR:"branch2 result"`,
-		//			`NODE:USTR:"branch3 result"`}, nil,
-		//		},
-		//		PathTest{"*/DOGS", []string{
-		//			`DOGS:UI32:1`,
-		//			`DOGS:UI32:2`,
-		//			`DOGS:UI32:3`,
-		//			`DOGS:UI32:12`,
-		//			`DOGS:UI32:23`,
-		//		}, nil,
-		//		},
-		//		PathTest{"GINF/*/AVAL/0x00000001", []string{
-		//			`0x00000001:UI32:908767`,
-		//			`0x00000001:UI64:1484722540084888`,
-		//			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-		//			`0x00000001:CSTR:"10.4.0"`}, nil,
-		//		},
-		//		PathTest{"GINF/*/AVAL/*", []string{
-		//			`0x00000000:UI32:2`,
-		//			`0x00000001:UI32:908767`,
-		//			`0x00000000:UI32:2`,
-		//			`0x00000001:UI64:1484722540084888`,
-		//			`0x00000000:UI32:2`,
-		//			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-		//			`0x00000000:UI32:2`,
-		//			`0x00000001:CSTR:"10.4.0"`}, nil,
-		//		},
-		//		PathTest{"CN1A/NONE", zero, nil},
+		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5A", []string{"LF5A:UI32:1"}, nil},
+		PathTest{"CN1A/CN2A/CN3A/LF4B", []string{`LF4B:CSTR:"hello from depth 4"`}, nil},
+		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5B", []string{`LF5B:CSTR:"hello from depth 5"`}, nil},
+		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE", []string{
+			`NODE:USTR:"branch1 result"`,
+			`NODE:USTR:"branch2 result"`,
+			`NODE:USTR:"branch3 result"`}, nil,
+		},
+		PathTest{"*/DOGS", []string{
+			`DOGS:UI32:1`,
+			`DOGS:UI32:2`,
+			`DOGS:UI32:3`,
+			`DOGS:UI32:12`,
+			`DOGS:UI32:23`,
+		}, nil,
+		},
+		PathTest{"GINF/*/AVAL/0x00000001", []string{
+			`0x00000001:UI32:908767`,
+			`0x00000001:UI64:1484722540084888`,
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000001:CSTR:"10.4.0"`}, nil,
+		},
+		PathTest{"GINF/*/AVAL/*", []string{
+			`0x00000000:UI32:2`,
+			`0x00000001:UI32:908767`,
+			`0x00000000:UI32:2`,
+			`0x00000001:UI64:1484722540084888`,
+			`0x00000000:UI32:2`,
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000000:UI32:2`,
+			`0x00000001:CSTR:"10.4.0"`}, nil,
+		},
+		PathTest{"CN1A/NONE", zero, nil},
 		PathTest{"CN1A/*[@type=\"ui32\"]", []string{
 			`DOGS:UI32:1`,
 			`DOGS:UI32:2`,
@@ -192,8 +191,28 @@ func TestAtomsAtPath(t *testing.T) {
 		}, nil,
 		},
 
+		// Test arithmetic operators
+		PathTest{"CN1C/TRUE[0]", []string{}, nil},
+		PathTest{"CN1C/TRUE", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[1]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[1+1-1*1]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[1+((1-1)*1)]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[0=0]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[ 0 = 0 ]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[64/8-7]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[0.25 * 4]", []string{"TRUE:UI01:1"}, nil},
+
+		// test XPath functions
+		PathTest{"CN1C/TRUE[position() = 1]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[count() = 1]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[count() = position()]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[last()]", []string{"TRUE:UI01:1"}, nil},
+		PathTest{"CN1C/TRUE[!last()]", []string{}, nil},
+
 		// test path specification by index.  start from 1 like xpath.
-		PathTest{"CN1A/DOGS[0]", zero, fmt.Errorf("path indices start from 1, not 0")},
+		// xpath returns no error on request for 0 index, even though it cannot exist.
+		// xpath in general favours returning no results over returning an error.
+		PathTest{"CN1A/DOGS[0]", []string{}, nil},
 		PathTest{"CN1A/DOGS[1]", []string{`DOGS:UI32:1`}, nil},
 		PathTest{"CN1A/DOGS[2]", []string{`DOGS:UI32:2`}, nil},
 		PathTest{"CN1A/DOGS[3]", []string{`DOGS:UI32:3`}, nil},
@@ -204,22 +223,24 @@ func TestAtomsAtPath(t *testing.T) {
 
 		// FIXME what if ] is part of the name?  use delimiters? require hex specificiation?  require 4 chars or hex?
 		PathTest{"CN1A/*[@name=\"DOGS\"]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		//		PathTest{"CN1A/DOGS", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		PathTest{"CN1A/*[@name='DOGS']", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		PathTest{"CN1A/*[@name=DOGS]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		PathTest{"CN1A/DOGS", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
 
-		// syntactically valid but semantically impossible .. name CN1A != name DOGS
+		// syntactically valid but semantically a contradiction, name CN1A != name DOGS
 		PathTest{"CN1A[@name=DOGS]", []string{}, nil},
 
-		PathTest{"CN1A/*[position()>3]", []string{"DOGS:UI32:3", "CATS:UI32:1"}, nil},
+		PathTest{"CN1A/*[position()>3]", []string{"CATS:UI32:1", "CN2A:CONT:"}, nil},
 		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
 		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
-		//		PathTest{"CN1A/DOGS[@data>=2]", []string{
-		//			`DOGS:UI32:2`,
-		//			`DOGS:UI32:3`}, nil,
-		//		},
-		//		PathTest{"CN1A/DOGS[@data<2]", []string{`DOGS:UI32:1`, `CATS:UI32:1`}, nil},
-		//
-		//		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no container child named 'THER'")},
-		//		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
+		PathTest{"CN1A/DOGS[@data>=2]", []string{
+			`DOGS:UI32:2`,
+			`DOGS:UI32:3`}, nil,
+		},
+		PathTest{"CN1A/*[@data<2]", []string{`DOGS:UI32:1`, `CATS:UI32:1`}, nil},
+
+		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no container child named 'THER'")},
+		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
 	}
 	runPathTests(t, tests)
 }

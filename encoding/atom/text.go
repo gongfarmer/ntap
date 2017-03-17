@@ -143,7 +143,7 @@ type (
 	itemEnum string
 	stateFn  func(*lexer) stateFn
 
-	// item represents a token returned from the scanenr
+	// item represents a token returned from the scanner
 	item struct {
 		typ   itemEnum // type of item, such as itemAtomName/itemAtomType
 		value string   // Value, such as "23.2"
