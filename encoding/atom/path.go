@@ -85,6 +85,7 @@ package atom
 // this is good because it handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -104,8 +105,11 @@ const (
 	itemHex                = "iHex"
 )
 
-func errInvalidPath(path string) error {
-	return fmt.Errorf("invalid path expression: \"%s\"", path)
+func errInvalidPath(msg string) error {
+	return fmt.Errorf("invalid path test: %s", msg)
+}
+func errInvalidPredicate(msg string) error {
+	return fmt.Errorf("invalid predicate: %s", msg)
 }
 
 type itemList []*item
@@ -179,19 +183,24 @@ func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
 	fmt.Println("path expression ", path)
 	switch {
 	case path == "/":
-		return []*Atom{a}, nil
+		atoms, e = []*Atom{a}, nil
 	case strings.HasPrefix(path, "//"):
 		pathParts := strings.Split(path[2:], "/")
-		return getAtomsAnywhere(a, pathParts, 0)
+		atoms, e = getAtomsAnywhere(a, pathParts, 0)
 	case strings.HasPrefix(path, "/"):
 		pathParts := strings.Split(path[1:], "/")
-		return getAtomsAtPath([]*Atom{a}, pathParts, 0)
+		atoms, e = getAtomsAtPath([]*Atom{a}, pathParts, 0)
 	case path == "":
-		return atoms, errInvalidPath(path)
+		e = errInvalidPath(`""`)
 	default:
 		pathParts := strings.Split(path, "/")
-		return getAtomsAtPath([]*Atom{a}, pathParts, 0)
+		atoms, e = getAtomsAtPath([]*Atom{a}, pathParts, 0)
 	}
+	if e != nil {
+		// include path expression in error message
+		e = fmt.Errorf(fmt.Sprint(e.Error(), path))
+	}
+	return
 }
 
 // getAtomsAnywhere searches the entire tree for matches to the given path that
@@ -205,12 +214,12 @@ func getAtomsAnywhere(a *Atom, pathParts []string, index int) (atoms []*Atom, e 
 func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []*Atom, e error) {
 
 	// find all atoms whose name matches the next path element
-	theCandidates, e := locationStep(candidates, pathParts[index])
+	theCandidates, e := doLocationStep(candidates, pathParts[index])
 	if e != nil {
 		return
 	}
 
-	// if this is the final path element, then return all matched atoms regardless of type
+	// on final path element, return all matched atoms regardless of type
 	if index == len(pathParts)-1 { // if last path part
 		return theCandidates, nil
 	}
@@ -223,13 +232,17 @@ func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []
 	return getAtomsAtPath(nextCandidates, pathParts, index+1)
 }
 
-func locationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) {
-	pathTest, predicate := extractNameAndFilter(pathPart)
+func doLocationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) {
+	pathTest, predicate, e := splitLocationStep(pathPart)
+	if e != nil {
+		return
+	}
+	fmt.Printf("    >>> %s >>> %s\n", pathTest, predicate)
 
 	// build up a list of possible atoms that match the path test
 	atoms, e = doPathTest(candidates, pathTest)
 	if e != nil {
-		return
+		return atoms, errInvalidPath("")
 	}
 
 	// cull those that don't satisfy the predicate
@@ -239,7 +252,7 @@ func locationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) 
 // pathTest builds a list of atoms whose name matches the path test string.
 func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
 	if pathTest == "" {
-		return nil, errInvalidPath(pathTest)
+		return atoms, errInvalidPath("")
 	}
 	if pathTest == "*" {
 		return candidates, nil
@@ -261,43 +274,45 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 
 	// apply predicate to determine which elements to keep
 	filter, e := NewFilter(predicate)
-	//	fmt.Printf("NEWF \"%s\" => %s/ %v\n", pathPart, strName, filter.tokens)
+	fmt.Printf("NEWF \"%s\" => %v\n", predicate, filter.tokens)
 	if e != nil {
-		panic(e)
+		return atoms, errInvalidPredicate(predicate)
 	}
-	//	for _, t := range filter.tokens {
-	//		//		fmt.Println("      ", t.typ, " : ", t.value)
-	//	}
+	for _, t := range filter.tokens {
+		fmt.Println("      ", t.typ, " : ", t.value)
+	}
 
 	atoms = candidates[:0] // overwrite nextAtoms in place during filtering
 	count := len(candidates)
 	for i, atomPtr := range candidates {
-		//		satisfied := false
+		satisfied := false
 		if filter.Satisfied(atomPtr, i, count) {
 			atoms = append(atoms, atomPtr)
-			//			satisfied = true
+			satisfied = true
 		}
-		//		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
+		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
 	}
 	return
 }
 
-// extractNameAndFilter reads a single path element, and returns two strings
-// containing the path element name and filter. The square brackets around the
+// splitLocationStep reads a single path element, and returns two strings
+// containing the path test and predicate . The square brackets around the
 // filter are stripped.
 // Example:
 // "CN1A[@name=DOGS and @type=UI32]" => "CN1A", "@name=DOGS and @type=UI32"
-func extractNameAndFilter(path string) (name, filter string) {
+func splitLocationStep(path string) (pathTest, predicate string, e error) {
 	i_start := strings.IndexByte(path, '[')
 	if i_start == -1 {
-		return path, ""
+		pathTest = path
+		return
 	}
 	i_end := strings.LastIndexByte(path, ']')
-	if i_end == -1 {
-		return path, ""
+	if i_end == -1 { // path lacks closing ]
+		e = errInvalidPredicate("")
+		return
 	}
-	name = path[:i_start]
-	filter = path[i_start+1 : i_end]
+	pathTest = path[:i_start]
+	predicate = path[i_start+1 : i_end]
 	return
 }
 
@@ -357,10 +372,12 @@ func lexFilterExpression(l *lexer) stateFn {
 		case strings.ContainsRune(digits, r):
 			lexNumberInPath(l)
 		case r == '-':
-			if l.prevItemType == itemOperator {
+			if strings.ContainsRune(digits, rune(l.peek())) && !isNumericItem(l.prevItemType) {
 				lexNumberInPath(l)
+			} else {
+				l.emit(itemArithmeticOperator)
 			}
-			l.emit(itemArithmeticOperator)
+
 		case strings.ContainsRune("=<>!", r):
 			lexComparisonOperator(l)
 
@@ -473,7 +490,12 @@ func lexDelimitedString(l *lexer) stateFn {
 // Doesn't handle any escaping, use delimited strings for anything non-trivial.
 func lexBareString(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
-	l.emit(itemString)
+	switch l.buffer() {
+	case "div", "mod":
+		l.emit(itemArithmeticOperator)
+	default:
+		l.emit(itemString)
+	}
 	return lexFilterExpression
 }
 
@@ -689,8 +711,11 @@ func (e *evaluator) evalArithmeticOperator() (result Arithmeticker) {
 		result = val1.Minus(val2)
 	case "*":
 		result = val1.Multiply(val2)
-	case "/":
+	case "div":
+		fmt.Println(val1, "Divide", val2)
 		result = val1.Divide(val2)
+	case "mod":
+		result = val1.Mod(val2)
 	default:
 		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
 	}
@@ -717,7 +742,7 @@ func (e *evaluator) evalComparisonOperator() bool {
 	case ">=":
 		return lhs.GreaterThan(rhs) || lhs.Equal(rhs)
 	default:
-		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
+		panic(fmt.Sprintf("unknown comparison operator: %s", op.value))
 	}
 }
 func (e *evaluator) evalNumber() (result Arithmeticker) {
@@ -878,6 +903,7 @@ type (
 		Minus(other Arithmeticker) Arithmeticker
 		Multiply(other Arithmeticker) Arithmeticker
 		Divide(other Arithmeticker) Arithmeticker
+		Mod(other Arithmeticker) Arithmeticker
 	}
 )
 
@@ -1000,7 +1026,28 @@ func (v Float64Type) Multiply(other Arithmeticker) Arithmeticker {
 	return v * other.(Float64Type)
 }
 func (v Float64Type) Divide(other Arithmeticker) Arithmeticker {
-	return v / other.(Float64Type)
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(float64(v) / float64(other))
+	case Int64Type:
+		return Float64Type(float64(v) / float64(other))
+	case Uint64Type:
+		return Float64Type(float64(v) / float64(other))
+	default:
+		panic(fmt.Sprintf("Division not supported for type %T'%[1]v'", other))
+	}
+}
+func (v Float64Type) Mod(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(math.Mod(float64(v), float64(other)))
+	case Int64Type:
+		return Float64Type(math.Mod(float64(v), float64(other)))
+	case Uint64Type:
+		return Float64Type(math.Mod(float64(v), float64(other)))
+	default:
+		panic(fmt.Sprintf("Arithmetic modulus not supported for type %T'%[1]v'", other))
+	}
 }
 func (v Uint64Type) Plus(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
@@ -1042,6 +1089,16 @@ func (v Uint64Type) Divide(other Arithmeticker) Arithmeticker {
 		return v / o.(Uint64Type)
 	}
 }
+func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(math.Mod(float64(v), float64(o)))
+	case Int64Type:
+		return Int64Type(v) % o
+	default:
+		return v % o.(Uint64Type)
+	}
+}
 func (v Int64Type) Plus(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
 	case Float64Type:
@@ -1073,4 +1130,15 @@ func (v Int64Type) Divide(other Arithmeticker) Arithmeticker {
 	default:
 		return v / other.(Int64Type)
 	}
+}
+func (v Int64Type) Mod(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(math.Mod(float64(v), float64(other)))
+	default:
+		return v % other.(Int64Type)
+	}
+}
+func isNumericItem(it itemEnum) bool {
+	return it == itemInteger || it == itemFloat
 }

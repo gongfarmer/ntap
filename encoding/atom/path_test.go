@@ -134,14 +134,13 @@ func init() {
 func TestAtomsAtPath(t *testing.T) {
 	// Placeholder error for stuff that should return error but I haven't
 	// written the error yet
-	var err error
 	zero := []string{}
 	allAtoms := "ROOT:CONT: 0001:CONT: LEAF:UI32:1 LEAF:UI32:2 LEAF:UI32:3 0002:CONT: LEAF:UI32:4 LEAF:UI32:5 LEAF:UI32:6 0003:CONT: LEAF:UI32:7 LEAF:UI32:8 LEAF:UI32:9"
 	tests := []PathTest{
 		// Part 1 -- test paths with no filters
 
 		// Empty path request returns empty result and no error
-		PathTest{TestAtom1, "", zero, errInvalidPath("")},
+		PathTest{TestAtom1, "", zero, errInvalidPath(`""`)},
 
 		// Single slash path request returns root element only (which contains entire doc)
 		PathTest{TestAtom1, "/", []string{"ROOT:CONT:"}, nil},
@@ -153,22 +152,14 @@ func TestAtomsAtPath(t *testing.T) {
 		// Double slash prefix means all matching atoms at any level
 		PathTest{TestAtom1, "//", zero, errInvalidPath("//")},
 		PathTest{TestAtom1, "//LEAF", []string{
-			"LEAF:UI32:1",
-			"LEAF:UI32:2",
-			"LEAF:UI32:3",
-			"LEAF:UI32:4",
-			"LEAF:UI32:5",
-			"LEAF:UI32:6",
-			"LEAF:UI32:7",
-			"LEAF:UI32:8",
-			"LEAF:UI32:9",
-		}, err},
-		PathTest{TestAtom1, "//leaf", zero, err}, // case sensitive
+			"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3", "LEAF:UI32:4", "LEAF:UI32:5",
+			"LEAF:UI32:6", "LEAF:UI32:7", "LEAF:UI32:8", "LEAF:UI32:9"}, nil},
+		PathTest{TestAtom1, "//leaf", zero, nil}, // case sensitive
 		// FIXME: test that CONT with same name as its leaf can be found
 
-		// Double slash * returns entire every atom as a separate element.
-		// NOT the same as / which returns entire doc as 1 element.
-		PathTest{TestAtom1, "//*", strings.Split(allAtoms, " "), err},
+		// "//*" returns every atom in the tree as a separate element.
+		// This differs from "/" which returns entire tree as 1 element.
+		PathTest{TestAtom1, "//*", strings.Split(allAtoms, " "), nil},
 
 		// Individual atoms can be found
 		PathTest{TestAtom1, "ROOT/0001", []string{"0001:CONT:"}, nil},
@@ -179,59 +170,58 @@ func TestAtomsAtPath(t *testing.T) {
 
 		// Multiple atoms can be found from same branch
 		PathTest{TestAtom1, "ROOT/0001/LEAF", []string{
-			"LEAF:UI32:1",
-			"LEAF:UI32:2",
-			"LEAF:UI32:3",
-		}, nil},
+			"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3"}, nil},
 
-		////		// Multiple atoms can be found from different branches
-		////		PathTest{TestAtom1, "*/LEAF", []string{
-		////			"LEAF:UI32:1",
-		////			"LEAF:UI32:2",
-		////			"LEAF:UI32:3",
-		////			"LEAF:UI32:4",
-		////			"LEAF:UI32:5",
-		////			"LEAF:UI32:6",
-		////			"LEAF:UI32:7",
-		////			"LEAF:UI32:8",
-		////			"LEAF:UI32:9",
-		////		}, nil},
-		////		PathTest{TestAtomGINF, "GINF/*/AVAL/0x00000001", []string{
-		////			"0x00000001:UI32:908767",
-		////			"0x00000001:UI64:1484722540084888",
-		////			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-		////			`0x00000001:CSTR:"10.4.0"`}, nil,
-		////		},
-		////		PathTest{TestAtomGINF, "GINF/*/AVAL/*", []string{
-		////			"0x00000000:UI32:2",
-		////			"0x00000001:UI32:908767",
-		////			"0x00000000:UI32:2",
-		////			"0x00000001:UI64:1484722540084888",
-		////			"0x00000000:UI32:2",
-		////			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-		////			"0x00000000:UI32:2",
-		////			`0x00000001:CSTR:"10.4.0"`}, nil,
-		////		},
+		// Multiple atoms can be found from different branches
+		PathTest{TestAtom1, "ROOT/*/LEAF", []string{
+			"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3", "LEAF:UI32:4", "LEAF:UI32:5",
+			"LEAF:UI32:6", "LEAF:UI32:7", "LEAF:UI32:8", "LEAF:UI32:9"}, nil},
 
-		//
-		// 		// Test arithmetic operators
-		// 		PathTest{"CN1C/TRUE[0]", []string{}, nil},
-		// 		PathTest{"CN1C/TRUE", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[1]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[1+1-1*1]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[1+((1-1)*1)]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[0=0]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[ 0 = 0 ]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[64/8-7]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[0.25 * 4]", []string{"TRUE:UI01:1"}, nil},
-		//
-		// 		// test XPath functions
-		// 		PathTest{"CN1C/TRUE[position() = 1]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[count() = 1]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[count() = position()]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[last()]", []string{"TRUE:UI01:1"}, nil},
-		// 		PathTest{"CN1C/TRUE[not last()]", []string{}, nil},
-		//
+		PathTest{TestAtomGINF, "GINF/*/AVAL/0x00000001", []string{
+			"0x00000001:UI32:908767",
+			"0x00000001:UI64:1484722540084888",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000001:CSTR:"10.4.0"`}, nil,
+		},
+		PathTest{TestAtomGINF, "GINF/*/AVAL/*", []string{
+			"0x00000000:UI32:2",
+			"0x00000001:UI32:908767",
+			"0x00000000:UI32:2",
+			"0x00000001:UI64:1484722540084888",
+			"0x00000000:UI32:2",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			"0x00000000:UI32:2",
+			`0x00000001:CSTR:"10.4.0"`}, nil,
+		},
+
+		// Test arithmetic operators
+		PathTest{TestAtom1, "ROOT/*/LEAF[0]", []string{}, nil}, // there's no 0 index, as per XPath convention.
+		PathTest{TestAtom1, "ROOT/*/LEAF[1]", []string{"LEAF:UI32:1"}, nil},
+		PathTest{TestAtom1, "ROOT/*/LEAF[2]", []string{"LEAF:UI32:2"}, nil},
+		PathTest{TestAtom1, "ROOT/*/LEAF[1+1-1*1]", []string{"LEAF:UI32:1"}, nil},
+		PathTest{TestAtom1, "ROOT/*/LEAF[1+((1-1)*1)]", []string{"LEAF:UI32:1"}, nil},
+		PathTest{TestAtom1, "ROOT/*/LEAF[2+-1]", []string{"LEAF:UI32:1"}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[0=0]", []string{"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3"}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[ 0 = 0 ]", []string{"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3"}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[0=1]", []string{}, nil},
+
+		// division is "div" not "/". Div and mod are operators, not functions, so no ()
+		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, errInvalidPredicate("ROOT[64/8-7]")},
+		PathTest{TestAtom1, "ROOT[64 div 8-7]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom1, "ROOT[-7+64 div 8]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom1, "ROOT[0.25 * 4]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom1, "ROOT[11 mod 10]", []string{"ROOT:CONT:"}, nil},
+		//PathTest{TestAtom1, "ROOT[64 shazbot 8]", []string{}, errInvalidPredicate("ROOT/ROOT/LEAF[64 shazbot 8]")},
+
+		// test that operator precedence follows correct order of operations
+
+		// // test XPath functions
+		//		PathTest{TestAtom1, "ROOT/0001/*[position() = 1]", []string{"LEAF:UI32:1"}, nil},
+		//		PathTest{TestAtom1, "ROOT/0001/*[count() = 1]", []string{"LEAF:UI32:1"}, nil},
+		//		PathTest{TestAtom1, "ROOT/0001/*[count() = position()]", []string{"LEAF:UI32:1"}, nil},
+		//		PathTest{TestAtom1, "ROOT/0001/*[last()]", []string{"LEAF:UI32:1"}, nil},
+		//		PathTest{TestAtom1, "ROOT/0001/*[not last()]", []string{}, nil},
+
 		// 		// test path specification by index.  start from 1 like xpath.
 		// 		// xpath returns no error on request for 0 index, even though it cannot exist.
 		// 		// xpath in general favours returning no results over returning an error.
