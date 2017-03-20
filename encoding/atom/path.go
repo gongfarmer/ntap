@@ -205,17 +205,21 @@ func getAtomsAnywhere(a *Atom, pathParts []string, index int) (atoms []*Atom, e 
 func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []*Atom, e error) {
 
 	// find all atoms whose name matches the next path element
-	nextCandidates, e := locationStep(candidates, pathParts[index])
+	theCandidates, e := locationStep(candidates, pathParts[index])
 	if e != nil {
 		return
 	}
 
 	// if this is the final path element, then return all matched atoms regardless of type
 	if index == len(pathParts)-1 { // if last path part
-		return nextCandidates, nil
+		return theCandidates, nil
 	}
 
 	// search child atoms for the rest of the path
+	var nextCandidates [](*Atom)
+	for _, a := range theCandidates {
+		nextCandidates = append(nextCandidates, a.Children...)
+	}
 	return getAtomsAtPath(nextCandidates, pathParts, index+1)
 }
 
@@ -227,14 +231,12 @@ func locationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) 
 	if e != nil {
 		return
 	}
-	fmt.Println("lcoatinStep: pathTest", pathTest, "yields", atoms)
 
 	// cull those that don't satisfy the predicate
 	return doPredicate(atoms, predicate)
 }
 
-// pathTest is the part of XPath where a list of nodes is built that matches
-// the path test string by name.
+// pathTest builds a list of atoms whose name matches the path test string.
 func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
 	if pathTest == "" {
 		return nil, errInvalidPath(pathTest)
