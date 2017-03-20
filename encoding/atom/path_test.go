@@ -1,6 +1,11 @@
 // Benchmark Marshal / Unmarshal functions
 package atom
 
+// TESTS TO ADD:
+// * get all data rows in attr container except 0x00000000 index atom
+// * get all server names and ip address from NENT (is that in there?)
+// * test referring atom by @name with hex syntax
+
 //
 // Requirements for Path definition wildcards:
 //   - provide a way to select all attribute container data elemnts while
@@ -29,224 +34,242 @@ package atom
 // Currently, the user-provided path is matched only against what is stored as
 // the Name field, which is one or the other.
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
 
 type (
 	PathTest struct {
+		Atom      *Atom
 		Input     string
 		WantValue []string
 		WantError error
 	}
 )
 
-// Tests of atom path matching
-var TestAtom = new(Atom)
-
-func init() {
-	TestAtom.UnmarshalText([]byte(`
+const TestAtom1Text = `
 ROOT:CONT:
-  CN1A:CONT:
-		DOGS:UI32:1
-		DOGS:UI32:2
-		DOGS:UI32:3
-		CATS:UI32:1
-    CN2A:CONT:
-      CN3A:CONT:
-        CN4A:CONT:
-          LF5A:UI32:1
-          LF5B:CSTR:"hello from depth 5"
-        END
-        LF4B:CSTR:"hello from depth 4"
-      END
-    END
-  END
-  CN1B:CONT:
-		DOGS:UI32:12
-    NODE:CONT:
-      NODE:CONT:
-        NODE:CONT:
-          NODE:CONT:
-            NODE:CONT:
-              NODE:CONT:
-                NODE:USTR:"branch1 result"
-              END
-            END
-          END
-          NODE:CONT:
-            NODE:CONT:
-              NODE:CONT:
-                NODE:USTR:"branch2 result"
-              END
-            END
-          END
-          NODE:CONT:
-            NODE:CONT:
-              NODE:CONT:
-                NODE:USTR:"branch3 result"
-              END
-            END
-          END
-          NODE:USTR:"too much NODE"
-        END
-      END
-    END
-  END
-  CN1C:CONT:
-    DOGS:UI32:23
-    TRUE:UI01:1
-  END
-	GINF:CONT:
-		BVER:UI32:4
-		BTIM:UI64:1484723582627327
-		GIDV:CONT:
-			AVER:UI32:2
-			ATIM:UI64:1
-			AVTP:FC32:'UI32'
-			APER:FC32:'READ'
-			AVAL:CONT:
-				0x00000000:UI32:2
-				0x00000001:UI32:908767
-			END
+  0001:CONT:
+		LEAF:UI32:1
+		LEAF:UI32:2
+		LEAF:UI32:3
+	END
+  0002:CONT:
+		LEAF:UI32:4
+		LEAF:UI32:5
+		LEAF:UI32:6
+	END
+  0003:CONT:
+		LEAF:UI32:7
+		LEAF:UI32:8
+		LEAF:UI32:9
+	END
+END
+`
+const TestAtomGINFText = `
+GINF:CONT:
+	BVER:UI32:4
+	BTIM:UI64:1484723582627327
+	GIDV:CONT:
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'UI32'
+		APER:FC32:'READ'
+		AVAL:CONT:
+			0x00000000:UI32:2
+			0x00000001:UI32:908767
 		END
-		GPVD:CONT:
-			AVER:UI32:2
-			ATIM:UI64:1
-			AVTP:FC32:'UI64'
-			APER:FC32:'READ'
-			AVAL:CONT:
-				0x00000000:UI32:2
-				0x00000001:UI64:1484722540084888
-			END
+	END
+	GPVD:CONT:
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'UI64'
+		APER:FC32:'READ'
+		AVAL:CONT:
+			0x00000000:UI32:2
+			0x00000001:UI64:1484722540084888
 		END
-		GVND:CONT:
-			AVER:UI32:2
-			ATIM:UI64:1
-			AVTP:FC32:'CSTR'
-			APER:FC32:'READ'
-			AVAL:CONT:
-				0x00000000:UI32:2
-				0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"
-			END
+	END
+	GVND:CONT:
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'CSTR'
+		APER:FC32:'READ'
+		AVAL:CONT:
+			0x00000000:UI32:2
+			0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"
 		END
-		GSIV:CONT:
-			AVER:UI32:2
-			ATIM:UI64:1
-			AVTP:FC32:'CSTR'
-			APER:FC32:'READ'
-			AVAL:CONT:
-				0x00000000:UI32:2
-				0x00000001:CSTR:"10.4.0"
-			END
+	END
+	GSIV:CONT:
+		AVER:UI32:2
+		ATIM:UI64:1
+		AVTP:FC32:'CSTR'
+		APER:FC32:'READ'
+		AVAL:CONT:
+			0x00000000:UI32:2
+			0x00000001:CSTR:"10.4.0"
 		END
 	END
 END
-`))
+`
+
+// Tests of atom path matching
+var TestAtom1 = new(Atom)
+var TestAtomGINF = new(Atom)
+
+func init() {
+	err := TestAtom1.UnmarshalText([]byte(TestAtom1Text))
+	if err != nil {
+		panic(err)
+	}
+	err = TestAtomGINF.UnmarshalText([]byte(TestAtomGINFText))
+	if err != nil {
+		panic(err)
+	}
 }
 
+// Expected behaviour is intended to parallel XPath as closely as possible.
+// Test expectations are based on behaviour from this XPath test:
+//     http://www.freeformatter.com/xpath-tester.html
 func TestAtomsAtPath(t *testing.T) {
-
+	// Placeholder error for stuff that should return error but I haven't
+	// written the error yet
+	var err error
 	zero := []string{}
+	allAtoms := "ROOT:CONT: 0001:CONT: LEAF:UI32:1 LEAF:UI32:2 LEAF:UI32:3 0002:CONT: LEAF:UI32:4 LEAF:UI32:5 LEAF:UI32:6 0003:CONT: LEAF:UI32:7 LEAF:UI32:8 LEAF:UI32:9"
 	tests := []PathTest{
-		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5A", []string{"LF5A:UI32:1"}, nil},
-		PathTest{"CN1A/CN2A/CN3A/LF4B", []string{`LF4B:CSTR:"hello from depth 4"`}, nil},
-		PathTest{"CN1A/CN2A/CN3A/CN4A/LF5B", []string{`LF5B:CSTR:"hello from depth 5"`}, nil},
-		PathTest{"CN1B/NODE/NODE/NODE/NODE/NODE/NODE/NODE", []string{
-			`NODE:USTR:"branch1 result"`,
-			`NODE:USTR:"branch2 result"`,
-			`NODE:USTR:"branch3 result"`}, nil,
-		},
-		PathTest{"*/DOGS", []string{
-			`DOGS:UI32:1`,
-			`DOGS:UI32:2`,
-			`DOGS:UI32:3`,
-			`DOGS:UI32:12`,
-			`DOGS:UI32:23`,
-		}, nil,
-		},
-		PathTest{"GINF/*/AVAL/0x00000001", []string{
-			`0x00000001:UI32:908767`,
-			`0x00000001:UI64:1484722540084888`,
-			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-			`0x00000001:CSTR:"10.4.0"`}, nil,
-		},
-		PathTest{"GINF/*/AVAL/*", []string{
-			`0x00000000:UI32:2`,
-			`0x00000001:UI32:908767`,
-			`0x00000000:UI32:2`,
-			`0x00000001:UI64:1484722540084888`,
-			`0x00000000:UI32:2`,
-			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-			`0x00000000:UI32:2`,
-			`0x00000001:CSTR:"10.4.0"`}, nil,
-		},
-		PathTest{"CN1A/NONE", zero, nil},
-		PathTest{"CN1A/*[@type=\"ui32\"]", []string{
-			`DOGS:UI32:1`,
-			`DOGS:UI32:2`,
-			`DOGS:UI32:3`,
-			`CATS:UI32:1`,
-		}, nil,
-		},
+		// Part 1 -- test paths with no filters
 
-		// Test arithmetic operators
-		PathTest{"CN1C/TRUE[0]", []string{}, nil},
-		PathTest{"CN1C/TRUE", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[1]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[1+1-1*1]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[1+((1-1)*1)]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[0=0]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[ 0 = 0 ]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[64/8-7]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[0.25 * 4]", []string{"TRUE:UI01:1"}, nil},
+		// Empty path request returns empty result and no error
+		PathTest{TestAtom1, "", zero, errInvalidPath("")},
 
-		// test XPath functions
-		PathTest{"CN1C/TRUE[position() = 1]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[count() = 1]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[count() = position()]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[last()]", []string{"TRUE:UI01:1"}, nil},
-		PathTest{"CN1C/TRUE[!last()]", []string{}, nil},
+		// Single slash path request returns root element only (which contains entire doc)
+		PathTest{TestAtom1, "/", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "/ROOT", []string{"ROOT:CONT:"}, nil},
 
-		// test path specification by index.  start from 1 like xpath.
-		// xpath returns no error on request for 0 index, even though it cannot exist.
-		// xpath in general favours returning no results over returning an error.
-		PathTest{"CN1A/DOGS[0]", []string{}, nil},
-		PathTest{"CN1A/DOGS[1]", []string{`DOGS:UI32:1`}, nil},
-		PathTest{"CN1A/DOGS[2]", []string{`DOGS:UI32:2`}, nil},
-		PathTest{"CN1A/DOGS[3]", []string{`DOGS:UI32:3`}, nil},
-		PathTest{"CN1A/DOGS[4]", []string{}, nil},
-		PathTest{"*/DOGS[4]", []string{`DOGS:UI32:12`}, nil},
-		PathTest{"*/DOGS[5]", []string{`DOGS:UI32:23`}, nil},
-		PathTest{"*/DOGS[6]", []string{}, nil},
+		// predicates ended with / are errors, except a couple of special cases
+		PathTest{TestAtom1, "/ROOT/", zero, errInvalidPath("/ROOT/")},
 
-		// FIXME what if ] is part of the name?  use delimiters? require hex specificiation?  require 4 chars or hex?
-		PathTest{"CN1A/*[@name=\"DOGS\"]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		PathTest{"CN1A/*[@name='DOGS']", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		PathTest{"CN1A/*[@name=DOGS]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		PathTest{"CN1A/DOGS", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		// Double slash prefix means all matching atoms at any level
+		PathTest{TestAtom1, "//", zero, errInvalidPath("//")},
+		PathTest{TestAtom1, "//LEAF", []string{
+			"LEAF:UI32:1",
+			"LEAF:UI32:2",
+			"LEAF:UI32:3",
+			"LEAF:UI32:4",
+			"LEAF:UI32:5",
+			"LEAF:UI32:6",
+			"LEAF:UI32:7",
+			"LEAF:UI32:8",
+			"LEAF:UI32:9",
+		}, err},
+		PathTest{TestAtom1, "//leaf", zero, err}, // case sensitive
+		// FIXME: test that CONT with same name as its leaf can be found
 
-		// syntactically valid but semantically a contradiction, name CN1A != name DOGS
-		PathTest{"CN1A[@name=DOGS]", []string{}, nil},
+		// Double slash * returns entire every atom as a separate element.
+		// NOT the same as / which returns entire doc as 1 element.
+		PathTest{TestAtom1, "//*", strings.Split(allAtoms, " "), err},
 
-		PathTest{"CN1A/*[position()>3]", []string{"CATS:UI32:1", "CN2A:CONT:"}, nil},
-		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
-		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
-		PathTest{"CN1A/DOGS[@data>=2]", []string{
-			`DOGS:UI32:2`,
-			`DOGS:UI32:3`}, nil,
-		},
-		PathTest{"CN1A/*[@data<2]", []string{`DOGS:UI32:1`, `CATS:UI32:1`}, nil},
+		// Individual atoms can be found
+		PathTest{TestAtom1, "ROOT/0001", []string{"0001:CONT:"}, nil},
+		PathTest{TestAtom1, "/ROOT/0001", []string{"0001:CONT:"}, nil},
+		PathTest{TestAtom1, "/ROOT/0002", []string{"0002:CONT:"}, nil},
+		PathTest{TestAtom1, "/ROOT/0003", []string{"0003:CONT:"}, nil},
+		PathTest{TestAtom1, "0001", zero, nil},
 
-		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no container child named 'THER'")},
-		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
+		// Multiple atoms can be found from same branch
+		PathTest{TestAtom1, "ROOT/0001/LEAF", []string{
+			"LEAF:UI32:1",
+			"LEAF:UI32:2",
+			"LEAF:UI32:3",
+		}, nil},
+
+		////		// Multiple atoms can be found from different branches
+		////		PathTest{TestAtom1, "*/LEAF", []string{
+		////			"LEAF:UI32:1",
+		////			"LEAF:UI32:2",
+		////			"LEAF:UI32:3",
+		////			"LEAF:UI32:4",
+		////			"LEAF:UI32:5",
+		////			"LEAF:UI32:6",
+		////			"LEAF:UI32:7",
+		////			"LEAF:UI32:8",
+		////			"LEAF:UI32:9",
+		////		}, nil},
+		////		PathTest{TestAtomGINF, "GINF/*/AVAL/0x00000001", []string{
+		////			"0x00000001:UI32:908767",
+		////			"0x00000001:UI64:1484722540084888",
+		////			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+		////			`0x00000001:CSTR:"10.4.0"`}, nil,
+		////		},
+		////		PathTest{TestAtomGINF, "GINF/*/AVAL/*", []string{
+		////			"0x00000000:UI32:2",
+		////			"0x00000001:UI32:908767",
+		////			"0x00000000:UI32:2",
+		////			"0x00000001:UI64:1484722540084888",
+		////			"0x00000000:UI32:2",
+		////			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+		////			"0x00000000:UI32:2",
+		////			`0x00000001:CSTR:"10.4.0"`}, nil,
+		////		},
+
+		//
+		// 		// Test arithmetic operators
+		// 		PathTest{"CN1C/TRUE[0]", []string{}, nil},
+		// 		PathTest{"CN1C/TRUE", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[1]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[1+1-1*1]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[1+((1-1)*1)]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[0=0]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[ 0 = 0 ]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[64/8-7]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[0.25 * 4]", []string{"TRUE:UI01:1"}, nil},
+		//
+		// 		// test XPath functions
+		// 		PathTest{"CN1C/TRUE[position() = 1]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[count() = 1]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[count() = position()]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[last()]", []string{"TRUE:UI01:1"}, nil},
+		// 		PathTest{"CN1C/TRUE[not last()]", []string{}, nil},
+		//
+		// 		// test path specification by index.  start from 1 like xpath.
+		// 		// xpath returns no error on request for 0 index, even though it cannot exist.
+		// 		// xpath in general favours returning no results over returning an error.
+		// 		PathTest{"CN1A/DOGS[0]", []string{}, nil},
+		// 		PathTest{"CN1A/DOGS[1]", []string{`DOGS:UI32:1`}, nil},
+		// 		PathTest{"CN1A/DOGS[2]", []string{`DOGS:UI32:2`}, nil},
+		// 		PathTest{"CN1A/DOGS[3]", []string{`DOGS:UI32:3`}, nil},
+		// 		PathTest{"CN1A/DOGS[4]", []string{}, nil},
+		// 		PathTest{"*/DOGS[4]", []string{`DOGS:UI32:12`}, nil},
+		// 		PathTest{"*/DOGS[5]", []string{`DOGS:UI32:23`}, nil},
+		// 		PathTest{"*/DOGS[6]", []string{}, nil},
+		//
+		// 		// FIXME what if ] is part of the name?  use delimiters? require hex specificiation?  require 4 chars or hex?
+		// 		PathTest{"CN1A/*[@name=\"DOGS\"]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		// 		PathTest{"CN1A/*[@name='DOGS']", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		// 		PathTest{"CN1A/*[@name=DOGS]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		// 		PathTest{"CN1A/DOGS", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		//
+		// 		// syntactically valid but semantically a contradiction, name CN1A != name DOGS
+		// 		PathTest{"CN1A[@name=DOGS]", []string{}, nil},
+		//
+		// 		PathTest{"CN1A/*[position()>3]", []string{"CATS:UI32:1", "CN2A:CONT:"}, nil},
+		// 		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
+		// 		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
+		// 		PathTest{"CN1A/DOGS[@data>=2]", []string{
+		// 			`DOGS:UI32:2`,
+		// 			`DOGS:UI32:3`}, nil,
+		// 		},
+		// 		PathTest{"CN1A/*[@data<2]", []string{`DOGS:UI32:1`, `CATS:UI32:1`}, nil},
+		//
+		// 		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no container child named 'THER'")},
+		// 		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
 	}
 	runPathTests(t, tests)
 }
 func runPathTests(t *testing.T, tests []PathTest) {
 	for _, test := range tests {
-		atoms, gotErr := TestAtom.AtomsAtPath(test.Input)
+		atoms, gotErr := test.Atom.AtomsAtPath(test.Input)
 
 		// check for expected error result
 		switch {
@@ -267,12 +290,12 @@ func runPathTests(t *testing.T, tests []PathTest) {
 
 		// compare each result atom in order
 		if len(results) != len(test.WantValue) {
-			t.Errorf("%s: got %s, want %s", test.Input, results, test.WantValue)
+			t.Errorf("%s: got %d elements {%v}, want %d elements {%v}", test.Input, len(results), results, len(test.WantValue), test.WantValue)
 			continue
 		}
 		for i, want := range test.WantValue {
 			if want != results[i] {
-				t.Errorf("%s: got %s, want %s", test.Input, results[i], want)
+				t.Errorf("%s: got {%s}, want {%s}", test.Input, results[i], want)
 			}
 		}
 	}

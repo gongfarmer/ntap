@@ -32,8 +32,24 @@ package atom
 //  [==, @name, "XXXX"]
 //  [==, @data(numeric), 35]
 
+// Terminology:
+//     Each step is evaluated against the nodes in the current node-set.
+//
+//     A step consists of:
+//
+//     an axis (defines the tree-relationship between the selected nodes and the current node)
+//     a node-test (identifies a node within an axis)
+//     zero or more predicates (to further refine the selected node-set)
+//     The syntax for a location step is:
+//
+//     axisname::nodetest[predicate]
+
 // TODO:
 //   define boolean syntax for operators
+//   missing operators:   | (ie. //book | //cd ) div mod
+//   xpath axis support ( <something>::  ) https://www.w3schools.com/xml/xpath_axes.asp
+//   consider adopting xpath terminology (eg. predicate replaces filter)
+//   support for multiple predicates, eg. a[1][@href='help.php']
 //
 // FIXME paths should be resolveable using hex or non-hex FC32 representation.
 // Currently, the user-provided path is matched only against what is stored as
@@ -51,6 +67,16 @@ package atom
 ///   keyword: evaluate unary (eg. position(), @value,@type)
 /// } value
 /// }
+
+// Path expressions from XPath:
+/*
+	/   Selects from the root node (meanigless for Atom)
+	//  Selects nodes in the document from the current node that match the
+      selection no matter where they are
+	.   Selects the current node (meaningless for Atom)
+	..  Selects the parent of the current node (useful, just not at root)
+	@   Selects attributes (adopted for atom attributes)
+*/
 
 // parsing objective: a single func which can take in an atom and position, and
 // return a bool indicating whether to keep it.
@@ -77,6 +103,10 @@ const (
 	itemFloat              = "iFloat"
 	itemHex                = "iHex"
 )
+
+func errInvalidPath(path string) error {
+	return fmt.Errorf("invalid path expression: \"%s\"", path)
+}
 
 type itemList []*item
 
@@ -144,70 +174,91 @@ type filterParser struct {
 }
 type filterFunc func(a Atom, i int) bool
 
-func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
-	var pathParts = append([]string{a.Name}, strings.Split(path, "/")...)
-	return getAtomsAtPath(a, pathParts, 1)
+func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
+	path := strings.TrimSpace(path_raw)
+	fmt.Println("path expression ", path)
+	switch {
+	case path == "/":
+		return []*Atom{a}, nil
+	case strings.HasPrefix(path, "//"):
+		pathParts := strings.Split(path[2:], "/")
+		return getAtomsAnywhere(a, pathParts, 0)
+	case strings.HasPrefix(path, "/"):
+		pathParts := strings.Split(path[1:], "/")
+		return getAtomsAtPath([]*Atom{a}, pathParts, 0)
+	case path == "":
+		return atoms, errInvalidPath(path)
+	default:
+		pathParts := strings.Split(path, "/")
+		return getAtomsAtPath([]*Atom{a}, pathParts, 0)
+	}
+}
+
+// getAtomsAnywhere searches the entire tree for matches to the given path that
+// ppear at any level.
+// must return no atoms on error
+func getAtomsAnywhere(a *Atom, pathParts []string, index int) (atoms []*Atom, e error) {
+	return getAtomsAtPath(a.AtomList(), pathParts, 0)
 }
 
 // must return no atoms on error
-func getAtomsAtPath(a *Atom, pathParts []string, index int) (atoms []*Atom, e error) {
-	if a.Type() != CONT {
-		e = fmt.Errorf("atom '%s' is not a container", strings.Join(pathParts[:index], "/"))
+func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []*Atom, e error) {
+
+	// find all atoms whose name matches the next path element
+	nextCandidates, e := locationStep(candidates, pathParts[index])
+	if e != nil {
 		return
 	}
-
-	// find all child atoms whose name matches the next path element
-	var nextAtoms []*Atom
-	nextAtoms, e = filterOnPathElement(a.Children, pathParts[index])
 
 	// if this is the final path element, then return all matched atoms regardless of type
 	if index == len(pathParts)-1 { // if last path part
-		atoms = append(atoms, nextAtoms...)
-		return
+		return nextCandidates, nil
 	}
 
 	// search child atoms for the rest of the path
-	var foundCont bool
-	for _, child := range nextAtoms {
-		if child.Type() != CONT {
-			continue
-		}
-		foundCont = true
-		if moreAtoms, err := getAtomsAtPath(child, pathParts, index+1); err == nil {
-			atoms = append(atoms, moreAtoms...)
-		} else {
-			return atoms, err
-		}
-	}
+	return getAtomsAtPath(nextCandidates, pathParts, index+1)
+}
 
-	if !foundCont {
-		// none of the matching children were containers, return error
-		pathSoFar := strings.Join(pathParts[:index], "/")
-		e = fmt.Errorf("atom '%s' has no container child named '%s'", pathSoFar, pathParts[index])
+func locationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) {
+	pathTest, predicate := extractNameAndFilter(pathPart)
+
+	// build up a list of possible atoms that match the path test
+	atoms, e = doPathTest(candidates, pathTest)
+	if e != nil {
 		return
+	}
+	fmt.Println("lcoatinStep: pathTest", pathTest, "yields", atoms)
+
+	// cull those that don't satisfy the predicate
+	return doPredicate(atoms, predicate)
+}
+
+// pathTest is the part of XPath where a list of nodes is built that matches
+// the path test string by name.
+func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
+	if pathTest == "" {
+		return nil, errInvalidPath(pathTest)
+	}
+	if pathTest == "*" {
+		return candidates, nil
+	}
+	for _, a := range candidates {
+		if a.Name == pathTest {
+			atoms = append(atoms, a)
+		}
 	}
 	return
 }
 
-func filterOnPathElement(children []*Atom, pathPart string) (filteredAtoms []*Atom, e error) {
-	strName, strFilter := extractNameAndFilter(pathPart)
-	// use the name to build up a list of candidate atoms
-	if strName == "" {
-		e = fmt.Errorf("empty name is not allowed in path specification. Prepend a name or wildcard.")
-		return
-	}
-	var nextAtoms []*Atom
-	for _, child := range children {
-		if strName == "*" || child.Name == strName {
-			nextAtoms = append(nextAtoms, child)
-		}
-	}
-	if strFilter == "" {
-		return nextAtoms, e
+// doPredicate takes a list of atoms and filters out the ones that do not
+// satisfy the predicate.
+func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) {
+	if predicate == "" {
+		return candidates, nil
 	}
 
-	// apply filter to determine which elements to keep
-	filter, e := NewFilter(strFilter)
+	// apply predicate to determine which elements to keep
+	filter, e := NewFilter(predicate)
 	//	fmt.Printf("NEWF \"%s\" => %s/ %v\n", pathPart, strName, filter.tokens)
 	if e != nil {
 		panic(e)
@@ -216,17 +267,16 @@ func filterOnPathElement(children []*Atom, pathPart string) (filteredAtoms []*At
 	//		//		fmt.Println("      ", t.typ, " : ", t.value)
 	//	}
 
-	filteredAtoms = nextAtoms[:0] // overwrite nextAtoms in place during filtering
-	count := len(nextAtoms)
-	for i, atomPtr := range nextAtoms {
+	atoms = candidates[:0] // overwrite nextAtoms in place during filtering
+	count := len(candidates)
+	for i, atomPtr := range candidates {
 		//		satisfied := false
 		if filter.Satisfied(atomPtr, i, count) {
-			filteredAtoms = append(filteredAtoms, atomPtr)
+			atoms = append(atoms, atomPtr)
 			//			satisfied = true
 		}
 		//		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
 	}
-
 	return
 }
 
@@ -369,11 +419,7 @@ func lexFunctionCall(l *lexer) stateFn {
 	if !(l.accept("(") && l.accept(")")) {
 		return l.errorf("invalid function call: %s", l.input)
 	}
-	if l.buffer() == "last()" {
-		l.emit(itemFunctionBool)
-	} else {
-		l.emit(itemFunctionNumeric)
-	}
+	l.emit(itemFunctionNumeric)
 	return lexFilterExpression
 }
 
@@ -518,7 +564,7 @@ func (p *filterParser) errorf(format string, args ...interface{}) bool {
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (p *filterParser) parseFilterToken(it item) bool {
 	switch it.typ {
-	case itemInteger, itemHex, itemFloat, itemString, itemVariable, itemFunctionBool, itemFunctionNumeric:
+	case itemInteger, itemHex, itemFloat, itemString, itemVariable, itemFunctionNumeric:
 		p.outputQueue.push(&it)
 	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
 		for {
@@ -796,6 +842,8 @@ func (e *evaluator) evalFunctionNumeric() (result Arithmeticker) {
 		return Uint64Type(e.Position)
 	case "count()":
 		return Uint64Type(e.Count)
+	case "last()":
+		return Uint64Type(e.Count - 1)
 	default:
 		panic(fmt.Sprintf("unknown numeric function: %s", item.value))
 	}
