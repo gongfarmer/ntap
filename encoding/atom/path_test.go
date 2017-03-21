@@ -34,6 +34,7 @@ package atom
 // Currently, the user-provided path is matched only against what is stored as
 // the Name field, which is one or the other.
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -140,17 +141,17 @@ func TestAtomsAtPath(t *testing.T) {
 		// Part 1 -- test paths with no filters
 
 		// Empty path request returns empty result and no error
-		PathTest{TestAtom1, "", zero, errInvalidPath(`""`)},
+		PathTest{TestAtom1, "", zero, errInvalidPath(`<empty> in ""`)},
 
 		// Single slash path request returns root element only (which contains entire doc)
 		PathTest{TestAtom1, "/", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom1, "/ROOT", []string{"ROOT:CONT:"}, nil},
 
 		// predicates ended with / are errors, except a couple of special cases
-		PathTest{TestAtom1, "/ROOT/", zero, errInvalidPath("/ROOT/")},
+		PathTest{TestAtom1, "/ROOT/", zero, errInvalidPath(`<empty> in "/ROOT/"`)},
 
 		// Double slash prefix means all matching atoms at any level
-		PathTest{TestAtom1, "//", zero, errInvalidPath("//")},
+		PathTest{TestAtom1, "//", zero, errInvalidPath(`<empty> in "//"`)},
 		PathTest{TestAtom1, "//LEAF", []string{
 			"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3", "LEAF:UI32:4", "LEAF:UI32:5",
 			"LEAF:UI32:6", "LEAF:UI32:7", "LEAF:UI32:8", "LEAF:UI32:9"}, nil},
@@ -205,15 +206,18 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "ROOT/0001/LEAF[ 0 = 0 ]", []string{"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3"}, nil},
 		PathTest{TestAtom1, "ROOT/0001/LEAF[0=1]", []string{}, nil},
 
-		// division is "div" not "/". Div and mod are operators, not functions, so no ()
-		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, errInvalidPredicate("ROOT[64/8-7]")},
-		PathTest{TestAtom1, "ROOT[64 div 8-7]", []string{"ROOT:CONT:"}, nil},
-		//		PathTest{TestAtom1, "ROOT[-7+64 div 8]", []string{"ROOT:CONT:"}, nil},
-		//		PathTest{TestAtom1, "ROOT[0.25 * 4]", []string{"ROOT:CONT:"}, nil},
-		//		PathTest{TestAtom1, "ROOT[11 mod 10]", []string{"ROOT:CONT:"}, nil},
-		//PathTest{TestAtom1, "ROOT[64 shazbot 8]", []string{}, errInvalidPredicate("ROOT/ROOT/LEAF[64 shazbot 8]")},
-
 		// test that operator precedence follows correct order of operations
+		PathTest{TestAtom1, "ROOT[ 3 + 4 * 2 div ( 1 - 5 )]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[64 div 8-7]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[-7+64 div 8]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[0.25 * 4]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[11 mod 10]", []string{"ROOT:CONT:"}, nil},
+
+		// division is "div" not "/".
+		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, fmt.Errorf(`invalid predicate in "ROOT[64/8-7]"`)},
+
+		// handle gibberish gracefully
+		PathTest{TestAtom1, "ROOT[64 shazbot 8]", []string{}, fmt.Errorf(`invalid predicate: unrecognized token 'shazbot' in "ROOT[64 shazbot 8]"`)},
 
 		// // test XPath functions
 		//		PathTest{TestAtom1, "ROOT/0001/*[position() = 1]", []string{"LEAF:UI32:1"}, nil},

@@ -51,6 +51,7 @@ package atom
 //   consider adopting xpath terminology (eg. predicate replaces filter)
 //   support for multiple predicates, eg. a[1][@href='help.php']
 //   review precedence table and see what else to implement (eg. idiv)
+//   distinct-values()  sum()
 //
 // FIXME paths should be resolveable using hex or non-hex FC32 representation.
 // Currently, the user-provided path is matched only against what is stored as
@@ -107,13 +108,20 @@ const (
 )
 
 func errInvalidPath(msg string) error {
+	if msg == "" {
+		return fmt.Errorf("invalid path test: <empty>")
+	}
 	return fmt.Errorf("invalid path test: %s", msg)
 }
 func errInvalidPredicate(msg string) error {
+	if msg == "" {
+		return fmt.Errorf("invalid predicate")
+	}
 	return fmt.Errorf("invalid predicate: %s", msg)
 }
 
 type itemList []*item
+type PathError error
 
 func (s *itemList) push(it *item) {
 	*s = append(*s, it)
@@ -168,20 +176,16 @@ func (s *itemList) empty() bool {
 // This parser's methods construct a stack of operations, then resolve the
 // stack as much as possible, leaving placeholders for the atom and position
 // which will be passed in.
-// The path syntax uses infix notation (operators are between arguments). This
-// parser implements Djikstra's shunting-yard algorithm to transform the input
-// into an abstract syntax tree which is simpler to evaluate.
 type filterParser struct {
 	outputQueue itemList    // items ordered for evaluation
 	opStack     itemList    // holds operators until their operands reach output queue
 	items       <-chan item // items received from lexer
-	err         error       // indicates parsing succeeded or describes what failed
+	err         PathError   // indicates parsing succeeded or describes what failed
 }
 type filterFunc func(a Atom, i int) bool
 
 func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
 	path := strings.TrimSpace(path_raw)
-	fmt.Println("path expression ", path)
 	switch {
 	case path == "/":
 		atoms, e = []*Atom{a}, nil
@@ -192,14 +196,14 @@ func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
 		pathParts := strings.Split(path[1:], "/")
 		atoms, e = getAtomsAtPath([]*Atom{a}, pathParts, 0)
 	case path == "":
-		e = errInvalidPath(`""`)
+		e = errInvalidPath("")
 	default:
 		pathParts := strings.Split(path, "/")
 		atoms, e = getAtomsAtPath([]*Atom{a}, pathParts, 0)
 	}
 	if e != nil {
 		// include path expression in error message
-		e = fmt.Errorf(fmt.Sprint(e.Error(), path))
+		e = fmt.Errorf(fmt.Sprint(e.Error(), ` in "`, path, `"`))
 	}
 	return
 }
@@ -222,7 +226,7 @@ func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []
 
 	// on final path element, return all matched atoms regardless of type
 	if index == len(pathParts)-1 { // if last path part
-		return theCandidates, nil
+		return theCandidates, e
 	}
 
 	// search child atoms for the rest of the path
@@ -238,12 +242,11 @@ func doLocationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error
 	if e != nil {
 		return
 	}
-	fmt.Printf("    >>> %s >>> %s\n", pathTest, predicate)
 
 	// build up a list of possible atoms that match the path test
 	atoms, e = doPathTest(candidates, pathTest)
 	if e != nil {
-		return atoms, errInvalidPath("")
+		return atoms, e
 	}
 
 	// cull those that don't satisfy the predicate
@@ -277,19 +280,21 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 	filter, e := NewFilter(predicate)
 	fmt.Printf("NEWF \"%s\" => %v\n", predicate, filter.tokens)
 	if e != nil {
-		return atoms, errInvalidPredicate(predicate)
+		return atoms, e
 	}
-	for _, t := range filter.tokens {
-		fmt.Println("      ", t.typ, " : ", t.value)
-	}
+	//	for _, t := range filter.tokens {
+	//		fmt.Println("      ", t.typ, " : ", t.value)
+	//	}
 
 	atoms = candidates[:0] // overwrite nextAtoms in place during filtering
 	count := len(candidates)
 	for i, atomPtr := range candidates {
-		satisfied := false
-		if filter.Satisfied(atomPtr, i, count) {
+		satisfied, e := filter.Satisfied(atomPtr, i, count)
+		if e != nil {
+			return nil, e
+		}
+		if satisfied {
 			atoms = append(atoms, atomPtr)
-			satisfied = true
 		}
 		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
 	}
@@ -350,8 +355,8 @@ func lexFilterExpression(l *lexer) stateFn {
 	ok := true
 	for ok {
 		if l.bufferSize() != 0 {
-			s := fmt.Sprintf("expected to start with empty buffer, got <<<%s>>>", l.buffer())
-			panic(s)
+			str := "expected to start with empty buffer, got '%s'"
+			panic(fmt.Sprintf(str, l.buffer()))
 		}
 		r := l.next()
 		switch {
@@ -490,7 +495,7 @@ func lexDelimitedString(l *lexer) stateFn {
 func lexBareString(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
 	switch l.buffer() {
-	case "div", "mod":
+	case "div", "idiv", "mod":
 		l.emit(itemArithmeticOperator)
 	default:
 		l.emit(itemString)
@@ -598,11 +603,7 @@ func (p *filterParser) parseFilterToken(it item) bool {
 			if it_prec > precedence(p.opStack.top().value) {
 				break
 			}
-			op, ok := p.opStack.popType(itemOperator)
-			if !ok {
-				break
-			}
-			p.outputQueue.push(op)
+			p.outputQueue.push(p.opStack.pop())
 		}
 		p.opStack.push(&it)
 	case itemLeftParen:
@@ -660,11 +661,18 @@ type evaluator struct {
 	AtomPtr  *Atom    // atom currently being evaluated from the atom list
 	Position int      // index of the atom in the atom list, starts from 1
 	Count    int      // number of atoms in the atom list
+	Error    error
+}
+
+func (e *evaluator) errorf(format string, args ...interface{}) PathError {
+	msg := fmt.Sprintf(format, args...)
+	e.Error = PathError(errInvalidPredicate(msg))
+	return e.Error
 }
 
 // evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
 func (e *evaluator) eval() (result bool) {
-	for !e.Tokens.empty() {
+	for !e.Tokens.empty() && e.Error == nil {
 		switch e.Tokens.top().typ {
 		case itemBooleanOperator:
 			result = e.evalBooleanOperator()
@@ -682,16 +690,17 @@ func (e *evaluator) eval() (result bool) {
 			number := e.evalFunctionNumeric()
 			result = number.Equal(Int64Type(e.Position))
 		default:
-			panic(fmt.Sprintf("unknown token type %s", e.Tokens.top().typ))
+			e.errorf("unrecognized token '%s'", e.Tokens.top().value)
+			return
 		}
 	}
 	// calculate a boolean value from op and vars
-	return result
+	return
 }
 func (e *evaluator) evalBooleanOperator() (result bool) {
 	op := e.Tokens.pop()
 	if op.typ != itemBooleanOperator {
-		panic(fmt.Sprintf("expected itemBooleanOperator, received type %s", op.typ))
+		e.errorf("expected itemBooleanOperator, received type %s", op.typ)
 	}
 	switch op.value {
 	case "not":
@@ -701,7 +710,7 @@ func (e *evaluator) evalBooleanOperator() (result bool) {
 	case "or":
 		result = e.eval() || e.eval()
 	default:
-		panic(fmt.Sprintf("unknown boolean operator: %s", op.value))
+		e.errorf("unknown boolean operator: %s", op.value)
 	}
 	return result
 }
@@ -710,31 +719,34 @@ func (e *evaluator) evalBooleanOperator() (result bool) {
 func (e *evaluator) evalArithmeticOperator() (result Arithmeticker) {
 	op := e.Tokens.pop()
 	if op.typ != itemArithmeticOperator {
-		panic(fmt.Sprintf("expected itemArithmeticOperator, received type %s", op.typ))
+		e.errorf("expected itemArithmeticOperator, received type %s", op.typ)
 	}
-	val1 := e.evalNumber()
-	val2 := e.evalNumber()
+	rhs := e.evalNumber()
+	lhs := e.evalNumber()
 	switch op.value {
 	case "+":
-		result = val1.Plus(val2)
+		result = lhs.Plus(rhs)
 	case "-":
-		result = val1.Minus(val2)
+		result = lhs.Minus(rhs)
 	case "*":
-		result = val1.Multiply(val2)
+		result = lhs.Multiply(rhs)
 	case "div":
-		fmt.Println(val1, "Divide", val2)
-		result = val1.Divide(val2)
+		fmt.Println(lhs, "Divide", rhs)
+		result = lhs.Divide(rhs)
+	case "idiv":
+		result = lhs.IntegerDivide(rhs)
 	case "mod":
-		result = val1.Mod(val2)
+		result = lhs.Mod(rhs)
 	default:
-		panic(fmt.Sprintf("unknown arithmetic operator: %s", op.value))
+		e.errorf("unknown arithmetic operator: %s", op.value)
 	}
 	return result
 }
 func (e *evaluator) evalComparisonOperator() bool {
 	op := e.Tokens.pop()
 	if op.typ != itemComparisonOperator {
-		panic(fmt.Sprintf("expected itemComparisonOperator, received type %s", op.typ))
+		e.errorf("expected itemComparisonOperator, received type %s", op.typ)
+		return false
 	}
 	rhs := e.evalComparable()
 	lhs := e.evalComparable()
@@ -752,7 +764,8 @@ func (e *evaluator) evalComparisonOperator() bool {
 	case ">=":
 		return lhs.GreaterThan(rhs) || lhs.Equal(rhs)
 	default:
-		panic(fmt.Sprintf("unknown comparison operator: %s", op.value))
+		e.errorf("unknown comparison operator: %s", op.value)
+		return false
 	}
 }
 func (e *evaluator) evalNumber() (result Arithmeticker) {
@@ -762,19 +775,22 @@ func (e *evaluator) evalNumber() (result Arithmeticker) {
 	case itemInteger:
 		v, err := strconv.ParseInt(e.Tokens.pop().value, 10, 64)
 		if err != nil {
-			panic(err)
+			e.errorf(err.Error())
+			return
 		}
 		result = Int64Type(v)
 	case itemFloat:
 		v, err := strconv.ParseFloat(e.Tokens.pop().value, 64)
 		if err != nil {
-			panic(err)
+			e.errorf(err.Error())
+			return
 		}
 		result = Float64Type(v)
 	case itemHex:
 		v, err := strconv.ParseInt(e.Tokens.pop().value, 16, 64)
 		if err != nil {
-			panic(err)
+			e.errorf(err.Error())
+			return
 		}
 		result = Int64Type(v)
 	case itemFunctionNumeric:
@@ -784,10 +800,10 @@ func (e *evaluator) evalNumber() (result Arithmeticker) {
 	case itemArithmeticOperator:
 		result = e.evalArithmeticOperator()
 	default:
-		panic(fmt.Sprintf("value has invalid numeric type: %s", e.Tokens.top().typ))
+		e.errorf("value has invalid numeric type: %s", e.Tokens.top().typ)
 	}
 	if err != nil || !ok {
-		panic("failed to convert '%s' to numeric value")
+		e.errorf("failed to convert '%s' to numeric value")
 	}
 	return result
 }
@@ -815,17 +831,17 @@ func (e *evaluator) evalComparable() (result Comparer) {
 	case itemArithmeticOperator:
 		result = e.evalArithmeticOperator()
 	default:
-		panic(fmt.Sprintf("value has unknown type: %s", e.Tokens.top().typ))
+		e.errorf("value has unknown type: %s", e.Tokens.top().typ)
 	}
 	if err != nil {
-		panic("failed to convert '%s' to comparable value")
+		e.errorf("failed to convert '%s' to comparable value")
 	}
 	return result
 }
 func (e *evaluator) evalVariable() (result Comparer) {
 	item := e.Tokens.pop()
 	if item.typ != itemVariable {
-		panic(fmt.Sprintf("expected itemVariable, received type %s", item.typ))
+		e.errorf("expected itemVariable, received type %s", item.typ)
 	}
 	switch item.value {
 	case "@name":
@@ -834,7 +850,8 @@ func (e *evaluator) evalVariable() (result Comparer) {
 		return StringType(e.AtomPtr.Type())
 	case "@data":
 	default:
-		panic(fmt.Sprintf("unknown variable: %s", item.value))
+		e.errorf("unknown variable: %s", item.value)
+		return
 	}
 
 	// Must get Atom value. Choose concrete type to return.
@@ -860,19 +877,20 @@ func (e *evaluator) evalVariable() (result Comparer) {
 func (e *evaluator) evalFunctionBool() (result bool) {
 	item := e.Tokens.pop()
 	if item.typ != itemFunctionBool {
-		panic(fmt.Sprintf("expected itemFunctionBool, received type %s", item.typ))
+		e.errorf("expected itemFunctionBool, received type %s", item.typ)
 	}
 	switch item.value {
-	case "last()":
-		return e.Position == e.Count
+	// FIXME there are none currently.  I removed the only one.
 	default:
-		panic(fmt.Sprintf("unknown boolean function: %s", item.value))
+		e.errorf("unknown boolean function: %s", item.value)
 	}
+	return
 }
 func (e *evaluator) evalFunctionNumeric() (result Arithmeticker) {
 	item := e.Tokens.pop()
 	if item.typ != itemFunctionNumeric {
-		panic(fmt.Sprintf("expected itemFunctionNumeric, received type %s", item.typ))
+		e.errorf("expected itemFunctionNumeric, received type %s", item.typ)
+		return
 	}
 	switch item.value {
 	case "position()":
@@ -882,17 +900,22 @@ func (e *evaluator) evalFunctionNumeric() (result Arithmeticker) {
 	case "last()":
 		return Uint64Type(e.Count - 1)
 	default:
-		panic(fmt.Sprintf("unknown numeric function: %s", item.value))
+		e.errorf("unknown numeric function: %s", item.value)
 	}
+	return
 }
 
-func (e *evaluator) Satisfied(a *Atom, index int, count int) bool {
+// Satisfied returns true if the atom/index/count combination satisfies
+// the predicate.
+func (e *evaluator) Satisfied(a *Atom, index int, count int) (result bool, err error) {
 	e.AtomPtr = a
 	e.Position = index + 1 // XPath convention: position starts at 1
 	e.Count = count
 	e.Tokens = e.tokens // copy will be consumed during evaluation
 	// FIXME: can I make this use an indexing system rather than popping, to avoid allocation?
-	return e.eval()
+	result = e.eval()
+	err = e.Error
+	return
 }
 
 // Implement explicit type coercion for equality and arithmetic operators
@@ -913,12 +936,13 @@ type (
 		Minus(other Arithmeticker) Arithmeticker
 		Multiply(other Arithmeticker) Arithmeticker
 		Divide(other Arithmeticker) Arithmeticker
+		IntegerDivide(other Arithmeticker) Arithmeticker
 		Mod(other Arithmeticker) Arithmeticker
 	}
 )
 
-// Define explicitly the type conversions to perform when performing arithmetic
-// on a pair of heterogenous types.
+// Define explicitly how to do type conversion when performing arithmetic on
+// pairs of heterogenous types.
 
 func (v Float64Type) Equal(other Comparer) bool {
 	switch o := other.(type) {
@@ -1036,7 +1060,15 @@ func (v Float64Type) Minus(other Arithmeticker) Arithmeticker {
 	return v - other.(Float64Type)
 }
 func (v Float64Type) Multiply(other Arithmeticker) Arithmeticker {
-	return v * other.(Float64Type)
+	switch other := other.(type) {
+	case Float64Type:
+		return Float64Type(float64(v) * float64(other))
+	case Int64Type:
+		return Float64Type(float64(v) * float64(other))
+	case Uint64Type:
+		return Float64Type(float64(v) * float64(other))
+	}
+	panic(fmt.Sprintf("multiplication not supported for type %T, value '%[1]v'", other))
 }
 func (v Float64Type) Divide(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
@@ -1046,9 +1078,19 @@ func (v Float64Type) Divide(other Arithmeticker) Arithmeticker {
 		return Float64Type(float64(v) / float64(other))
 	case Uint64Type:
 		return Float64Type(float64(v) / float64(other))
-	default:
-		panic(fmt.Sprintf("Division not supported for type %T'%[1]v'", other))
 	}
+	panic(fmt.Sprintf("division not supported for type %T, value '%[1]v'", other))
+}
+func (v Float64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Int64Type(int64(v) / int64(other))
+	case Int64Type:
+		return Int64Type(int64(v) / int64(other))
+	case Uint64Type:
+		return Int64Type(int64(v) / int64(other))
+	}
+	panic(fmt.Sprintf("integer division not supported for type %T, value '%[1]v'", other))
 }
 func (v Float64Type) Mod(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
@@ -1058,9 +1100,8 @@ func (v Float64Type) Mod(other Arithmeticker) Arithmeticker {
 		return Float64Type(math.Mod(float64(v), float64(other)))
 	case Uint64Type:
 		return Float64Type(math.Mod(float64(v), float64(other)))
-	default:
-		panic(fmt.Sprintf("Arithmetic modulus not supported for type %T'%[1]v'", other))
 	}
+	panic(fmt.Sprintf("arithmetic modulus not supported for type %T, value '%[1]v'", other))
 }
 func (v Uint64Type) Plus(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
@@ -1102,6 +1143,17 @@ func (v Uint64Type) Divide(other Arithmeticker) Arithmeticker {
 		return v / o.(Uint64Type)
 	}
 }
+func (v Uint64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Int64Type(int64(v) / int64(other))
+	case Int64Type:
+		return Int64Type(int64(v) / int64(other))
+	case Uint64Type:
+		return Uint64Type(uint64(v) / uint64(other))
+	}
+	panic(fmt.Sprintf("integer division not supported for type %T value'%[1]v'", other))
+}
 func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
 	switch o := other.(type) {
 	case Float64Type:
@@ -1135,6 +1187,17 @@ func (v Int64Type) Multiply(other Arithmeticker) Arithmeticker {
 	default:
 		return v * other.(Int64Type)
 	}
+}
+func (v Int64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
+	switch other := other.(type) {
+	case Float64Type:
+		return Int64Type(int64(v) / int64(other))
+	case Int64Type:
+		return Int64Type(int64(v) / int64(other))
+	case Uint64Type:
+		return Int64Type(int64(v) / int64(other))
+	}
+	panic(fmt.Sprintf("integer division not supported for type %T value '%[1]v'", other))
 }
 func (v Int64Type) Divide(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
