@@ -50,6 +50,7 @@ package atom
 //   xpath axis support ( <something>::  ) https://www.w3schools.com/xml/xpath_axes.asp
 //   consider adopting xpath terminology (eg. predicate replaces filter)
 //   support for multiple predicates, eg. a[1][@href='help.php']
+//   review precedence table and see what else to implement (eg. idiv)
 //
 // FIXME paths should be resolveable using hex or non-hex FC32 representation.
 // Currently, the user-provided path is matched only against what is stored as
@@ -320,7 +321,7 @@ func splitLocationStep(path string) (pathTest, predicate string, e error) {
 // Path lexing is done by the same lexer used for Atom Text format lexing.
 // They use very different parsers though.
 
-// filterStringToFunc converts a filter expression into a func that evaluates
+// filterStringToFunc converts a predicate into a func that evaluates
 // whether an atom at a given position should be filtered.
 func NewFilter(path string) (ev *evaluator, err error) {
 	var lexr = lexPath(path)
@@ -367,7 +368,7 @@ func lexFilterExpression(l *lexer) stateFn {
 			l.emit(itemLeftParen)
 		case r == ')':
 			l.emit(itemRightParen)
-		case r == '+', r == '*': // no division because / is path separator, not needed anyway
+		case r == '+', r == '*':
 			l.emit(itemArithmeticOperator)
 		case strings.ContainsRune(digits, r):
 			lexNumberInPath(l)
@@ -377,10 +378,8 @@ func lexFilterExpression(l *lexer) stateFn {
 			} else {
 				l.emit(itemArithmeticOperator)
 			}
-
 		case strings.ContainsRune("=<>!", r):
 			lexComparisonOperator(l)
-
 		case r == 'o', r == 'a', r == 'n':
 			// FIXME merge this whole o/a/n case with the case below
 			l.acceptRun(alphabetLowerCase)
@@ -406,10 +405,10 @@ func lexFilterExpression(l *lexer) stateFn {
 				lexBareString(l)
 			}
 		default:
-			return l.errorf("invalid filter expression: %s", l.input)
+			return l.errorf("invalid predicate: %s", l.input)
 		}
 	}
-	// correctly reached EOF.
+
 	return nil
 }
 
@@ -447,7 +446,7 @@ func lexDelimitedString(l *lexer) stateFn {
 	delim := l.first()
 	if delim != '"' && delim != '\'' {
 		l.backup()
-		return l.errorf("strings should be delimited with double-quotes, got %s", l.input)
+		return l.errorf("string should be delimited with quotes, got %s", l.input)
 	}
 	l.ignore() // discard delimiter
 
@@ -591,7 +590,14 @@ func (p *filterParser) parseFilterToken(it item) bool {
 	case itemInteger, itemHex, itemFloat, itemString, itemVariable, itemFunctionNumeric:
 		p.outputQueue.push(&it)
 	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
+		it_prec := precedence(it.value)
 		for {
+			if p.opStack.empty() || !isOperatorItem(p.opStack.top()) {
+				break
+			}
+			if it_prec > precedence(p.opStack.top().value) {
+				break
+			}
 			op, ok := p.opStack.popType(itemOperator)
 			if !ok {
 				break
@@ -604,7 +610,7 @@ func (p *filterParser) parseFilterToken(it item) bool {
 	case itemRightParen:
 		for {
 			if p.opStack.empty() {
-				return p.errorf("mismatched parentheses in filter expression")
+				return p.errorf("mismatched parentheses in predicate")
 			}
 			if p.opStack.top().typ == itemLeftParen {
 				p.opStack.pop()
@@ -613,15 +619,11 @@ func (p *filterParser) parseFilterToken(it item) bool {
 			op := p.opStack.pop()
 			p.outputQueue.push(op)
 		}
-		//		if p.opStack.top().typ == itemFunction {
-		//			op := p.opStack.pop()
-		//			p.outputQueue.push(op)
-		//		}
 	case itemEOF:
 		for !p.opStack.empty() {
 			op := p.opStack.pop()
 			if op.typ == itemLeftParen || op.typ == itemRightParen {
-				return p.errorf("mismatched parentheses in filter expression")
+				return p.errorf("mismatched parentheses in predicate")
 			}
 			p.outputQueue.push(op)
 		}
@@ -630,6 +632,14 @@ func (p *filterParser) parseFilterToken(it item) bool {
 		panic(fmt.Sprintf("unexpected item type: %s", it.typ))
 	}
 	return true
+}
+
+func isOperatorItem(it *item) bool {
+	switch it.typ {
+	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
+		return true
+	}
+	return false
 }
 
 // evaluator is for determining whether a single atom from the list of
@@ -907,6 +917,9 @@ type (
 	}
 )
 
+// Define explicitly the type conversions to perform when performing arithmetic
+// on a pair of heterogenous types.
+
 func (v Float64Type) Equal(other Comparer) bool {
 	switch o := other.(type) {
 	case Float64Type:
@@ -1141,4 +1154,53 @@ func (v Int64Type) Mod(other Arithmeticker) Arithmeticker {
 }
 func isNumericItem(it itemEnum) bool {
 	return it == itemInteger || it == itemFloat
+}
+
+// These values are from the XPath 3.1 operator precdence table at
+//   https://www.w3.org/TR/xpath-3/#id-precedence-order
+// Not all of these operators are implemented here.
+func precedence(op string) (value int) {
+	switch op {
+	case ",":
+		value = 1
+	case "for", "some", "let", "every", "if":
+		value = 2
+	case "or":
+		value = 3
+	case "and":
+		value = 4
+	case "eq", "ne", "lt", "le", "gt", "ge", "=", "!=", "<", "<=", ">", ">=", "is", "<<", ">>":
+		value = 5
+	case "||":
+		value = 6
+	case "to":
+		value = 7
+	case "+", "-": // binary operators
+		value = 8
+	case "*", "div", "idiv", "mod":
+		value = 9
+	case "union", "|":
+		value = 10
+	case "intersect", "except":
+		value = 11
+	case "instance of":
+		value = 12
+	case "treat as":
+		value = 13
+	case "castable as":
+		value = 14
+	case "cast as":
+		value = 15
+	case "=>":
+		value = 16
+	//		case "-", "+": // unary operators
+	//			value = 17
+	case "!":
+		value = 18
+	case "/", "//":
+		value = 19
+	default:
+		panic(fmt.Sprintf("unknown operator: %s", op))
+	}
+	return value
 }

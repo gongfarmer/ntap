@@ -239,6 +239,7 @@ func TestAtomsAtPath(t *testing.T) {
 		// 		PathTest{"CN1A/*[@name='DOGS']", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
 		// 		PathTest{"CN1A/*[@name=DOGS]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
 		// 		PathTest{"CN1A/DOGS", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
+		// 		PathTest{TestAtomGINF, "//AVAL/@name > 0", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
 		//
 		// 		// syntactically valid but semantically a contradiction, name CN1A != name DOGS
 		// 		PathTest{"CN1A[@name=DOGS]", []string{}, nil},
