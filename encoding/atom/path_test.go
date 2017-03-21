@@ -219,12 +219,13 @@ func TestAtomsAtPath(t *testing.T) {
 		// handle gibberish gracefully
 		PathTest{TestAtom1, "ROOT[64 shazbot 8]", []string{}, fmt.Errorf(`invalid predicate: unrecognized token 'shazbot' in "ROOT[64 shazbot 8]"`)},
 
-		// // test XPath functions
-		//		PathTest{TestAtom1, "ROOT/0001/*[position() = 1]", []string{"LEAF:UI32:1"}, nil},
-		//		PathTest{TestAtom1, "ROOT/0001/*[count() = 1]", []string{"LEAF:UI32:1"}, nil},
-		//		PathTest{TestAtom1, "ROOT/0001/*[count() = position()]", []string{"LEAF:UI32:1"}, nil},
-		//		PathTest{TestAtom1, "ROOT/0001/*[last()]", []string{"LEAF:UI32:1"}, nil},
-		//		PathTest{TestAtom1, "ROOT/0001/*[not last()]", []string{}, nil},
+		// test XPath functions
+		PathTest{TestAtom1, "ROOT[position() = 1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[count() = 1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[count() = position()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[last()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[not(last())]", []string{}, nil},
+		PathTest{TestAtom1, "ROOT[not(not(last()))]", []string{"ROOT:CONT:"}, nil},
 
 		// 		// test path specification by index.  start from 1 like xpath.
 		// 		// xpath returns no error on request for 0 index, even though it cannot exist.

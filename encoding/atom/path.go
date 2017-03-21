@@ -385,26 +385,11 @@ func lexFilterExpression(l *lexer) stateFn {
 			}
 		case strings.ContainsRune("=<>!", r):
 			lexComparisonOperator(l)
-		case r == 'o', r == 'a', r == 'n':
-			// FIXME merge this whole o/a/n case with the case below
-			l.acceptRun(alphabetLowerCase)
-			for _, word := range []string{"or", "and", "not"} {
-				if l.buffer() == word {
-					l.emit(itemBooleanOperator)
-					break
-				}
-			}
-			if l.bufferSize() == 0 {
-				continue
-			}
-			if l.peek() == '(' {
-				lexFunctionCall(l)
-			} else {
-				lexBareString(l)
-			}
 		case strings.ContainsRune(alphaNumericChars, r):
 			l.acceptRun(alphabetLowerCase)
-			if l.peek() == '(' {
+			if l.buffer() == "or" || l.buffer() == "and" {
+				l.emit(itemBooleanOperator)
+			} else if l.peek() == '(' {
 				lexFunctionCall(l)
 			} else {
 				lexBareString(l)
@@ -438,11 +423,16 @@ func lexFunctionCall(l *lexer) stateFn {
 	if strings.TrimLeft(l.buffer(), alphaNumericChars) != "" {
 		return l.errorf("invalid function call prefix: %s", l.input)
 	}
-	// verify parentheses (no functions that support parameters are supported yet!)
-	if !(l.accept("(") && l.accept(")")) {
-		return l.errorf("invalid function call: %s", l.input)
+
+	// determine function return type
+	switch l.buffer() {
+	case "not":
+		l.emit(itemFunctionBool)
+	case "count", "position", "last":
+		l.emit(itemFunctionNumeric)
+	default:
+		return l.errorf("unrecognized function '%s'", l.buffer())
 	}
-	l.emit(itemFunctionNumeric)
 	return lexFilterExpression
 }
 
@@ -594,13 +584,15 @@ func (p *filterParser) parseFilterToken(it item) bool {
 	switch it.typ {
 	case itemInteger, itemHex, itemFloat, itemString, itemVariable, itemFunctionNumeric:
 		p.outputQueue.push(&it)
+	case itemFunctionBool:
+		p.opStack.push(&it)
 	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
-		it_prec := precedence(it.value)
+		itemPrec := precedence(it.value)
 		for {
 			if p.opStack.empty() || !isOperatorItem(p.opStack.top()) {
 				break
 			}
-			if it_prec > precedence(p.opStack.top().value) {
+			if itemPrec > precedence(p.opStack.top().value) {
 				break
 			}
 			p.outputQueue.push(p.opStack.pop())
@@ -690,7 +682,8 @@ func (e *evaluator) eval() (result bool) {
 			number := e.evalFunctionNumeric()
 			result = number.Equal(Int64Type(e.Position))
 		default:
-			e.errorf("unrecognized token '%s'", e.Tokens.top().value)
+			t := e.Tokens.top()
+			e.errorf("unrecognized token '%s'", t.value)
 			return
 		}
 	}
@@ -703,8 +696,6 @@ func (e *evaluator) evalBooleanOperator() (result bool) {
 		e.errorf("expected itemBooleanOperator, received type %s", op.typ)
 	}
 	switch op.value {
-	case "not":
-		result = !e.eval()
 	case "and":
 		result = e.eval() && e.eval()
 	case "or":
@@ -731,7 +722,6 @@ func (e *evaluator) evalArithmeticOperator() (result Arithmeticker) {
 	case "*":
 		result = lhs.Multiply(rhs)
 	case "div":
-		fmt.Println(lhs, "Divide", rhs)
 		result = lhs.Divide(rhs)
 	case "idiv":
 		result = lhs.IntegerDivide(rhs)
@@ -739,6 +729,7 @@ func (e *evaluator) evalArithmeticOperator() (result Arithmeticker) {
 		result = lhs.Mod(rhs)
 	default:
 		e.errorf("unknown arithmetic operator: %s", op.value)
+		return
 	}
 	return result
 }
@@ -750,8 +741,12 @@ func (e *evaluator) evalComparisonOperator() bool {
 	}
 	rhs := e.evalComparable()
 	lhs := e.evalComparable()
+	if e.Error != nil {
+		return false
+	}
 	switch op.value {
 	case "=":
+		fmt.Println(lhs, rhs)
 		return lhs.Equal(rhs)
 	case "!=":
 		return !lhs.Equal(rhs)
@@ -831,10 +826,13 @@ func (e *evaluator) evalComparable() (result Comparer) {
 	case itemArithmeticOperator:
 		result = e.evalArithmeticOperator()
 	default:
-		e.errorf("value has unknown type: %s", e.Tokens.top().typ)
+		e.errorf("expected comparable type, got %s", e.Tokens.top().typ)
+		return
 	}
 	if err != nil {
+		fmt.Println("got error ", err)
 		e.errorf("failed to convert '%s' to comparable value")
+		return
 	}
 	return result
 }
@@ -880,7 +878,8 @@ func (e *evaluator) evalFunctionBool() (result bool) {
 		e.errorf("expected itemFunctionBool, received type %s", item.typ)
 	}
 	switch item.value {
-	// FIXME there are none currently.  I removed the only one.
+	case "not":
+		return !e.eval()
 	default:
 		e.errorf("unknown boolean function: %s", item.value)
 	}
@@ -893,12 +892,10 @@ func (e *evaluator) evalFunctionNumeric() (result Arithmeticker) {
 		return
 	}
 	switch item.value {
-	case "position()":
+	case "position":
 		return Uint64Type(e.Position)
-	case "count()":
+	case "last", "count":
 		return Uint64Type(e.Count)
-	case "last()":
-		return Uint64Type(e.Count - 1)
 	default:
 		e.errorf("unknown numeric function: %s", item.value)
 	}
