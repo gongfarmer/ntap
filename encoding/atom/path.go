@@ -547,7 +547,7 @@ func lexNumberInPath(l *lexer) stateFn {
 		}
 	}
 	digits := "0123456789"
-	if l.accept("0") && l.accept("xX") { // Is it hex?
+	if (l.buffer() == "0" || l.accept("0")) && l.accept("xX") { // Is it hex?
 		isHex = true
 		digits = hexDigits
 	}
@@ -801,6 +801,9 @@ func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
 	}
 	rhs := pre.evalNumber()
 	lhs := pre.evalNumber()
+	if pre.Error != nil {
+		return
+	}
 	switch op.value {
 	case "+":
 		result = lhs.Plus(rhs)
@@ -856,8 +859,8 @@ func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 	var err error
 	ok := true
 	switch pre.Tokens.top().typ {
-	case itemInteger:
-		v, err := strconv.ParseInt(pre.Tokens.pop().value, 10, 64)
+	case itemInteger, itemHex:
+		v, err := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		if err != nil {
 			pre.errorf(err.Error())
 			return
@@ -870,42 +873,38 @@ func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 			return
 		}
 		result = Float64Type(v)
-	case itemHex:
-		v, err := strconv.ParseInt(pre.Tokens.pop().value, 16, 64)
-		if err != nil {
-			pre.errorf(err.Error())
-			return
-		}
-		result = Int64Type(v)
 	case itemFunctionNumeric:
 		result = pre.evalFunctionNumeric()
 	case itemVariable:
 		result, ok = pre.evalVariable().(Arithmeticker)
 	case itemArithmeticOperator:
 		result = pre.evalArithmeticOperator()
+	case itemBareString:
+		t := pre.Tokens.pop()
+		if v, ok := pre.getChildValue(t.value); ok {
+			result = v.(Arithmeticker)
+		} else {
+			pre.errorf("expect number, got %s", t.value)
+		}
 	default:
 		pre.errorf("value has invalid numeric type: %s", pre.Tokens.top().typ)
 	}
 	if err != nil || !ok {
-		pre.errorf("failed to convert '%s' to numeric value")
+		pre.errorf("expected numeric value")
 	}
 	return result
 }
 func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 	var err error
 	switch pre.Tokens.top().typ {
-	case itemInteger:
-		v, errr := strconv.ParseInt(pre.Tokens.pop().value, 10, 64)
+	case itemInteger, itemHex:
+		v, errr := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		err = errr
 		result = Int64Type(v)
 	case itemFloat:
 		v, errr := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		err = errr
 		result = Float64Type(v)
-	case itemHex:
-		v, errr := strconv.ParseInt(pre.Tokens.pop().value, 16, 64)
-		err = errr
-		result = Int64Type(v)
 	case itemBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
@@ -1007,7 +1006,7 @@ func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
 	return
 }
 
-// Implement explicit type coercion for equality and arithmetic operators
+// Implement a small type system with type coercion for operators
 type (
 	Int64Type   int64
 	Uint64Type  uint64
@@ -1141,27 +1140,28 @@ func (v Int64Type) Equal(other Equaler) bool {
 	return false
 }
 func (v Int64Type) LessThan(other Comparer) bool {
-	fmt.Println("INT64 LessThan", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) < o
 	case StringType:
 		return !(o.GreaterThan(v) || o.Equal(v))
+	case Uint64Type:
+		return v < Int64Type(o)
 	default:
 		return v < o.(Int64Type)
 	}
 }
 func (v Int64Type) GreaterThan(other Comparer) bool {
-	fmt.Println("INT64 GreaterThan", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) > o
 	case StringType:
 		return !(o.LessThan(v) || o.Equal(v))
+	case Uint64Type:
+		return v > Int64Type(o)
 	default:
 		return v > o.(Int64Type)
 	}
-	return false
 }
 func (v StringType) Equal(other Equaler) bool {
 	switch o := other.(type) {
@@ -1324,12 +1324,15 @@ func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
 	}
 }
 func (v Int64Type) Plus(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
+	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) + other
-	default:
-		return v + other.(Int64Type)
+		return Int64Type(int64(v) + int64(o))
+	case Int64Type:
+		return Int64Type(int64(v) + int64(o))
+	case Uint64Type:
+		return Int64Type(int64(v) + int64(o))
 	}
+	panic(fmt.Sprintf("integer addition not supported for type %T value '%[1]v'", other))
 }
 func (v Int64Type) Minus(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
