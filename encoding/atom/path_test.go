@@ -242,7 +242,7 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "ROOT[11 mod 10]", []string{"ROOT:CONT:"}, nil},
 
 		// division is "div" not "/".
-		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, fmt.Errorf(`invalid predicate in "ROOT[64/8-7]"`)},
+		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, fmt.Errorf(`invalid predicate: unterminated square brackets in "ROOT[64/8-7]"`)},
 
 		// handle gibberish operators gracefully
 		PathTest{TestAtom1, "ROOT[64 shazbot 8]", []string{}, fmt.Errorf(`invalid predicate: unrecognized token 'shazbot' in "ROOT[64 shazbot 8]"`)},
@@ -252,8 +252,8 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "ROOT[count() = 1]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom1, "ROOT[count() = position()]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom1, "ROOT[last()]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom1, "ROOT[not(last())]", []string{}, nil},
-		PathTest{TestAtom1, "ROOT[not(not(last()))]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[not(last())]", zero, errInvalidPredicate(`expect boolean, got 'last' in "ROOT[not(last())]"`)},
+		PathTest{TestAtom1, "ROOT[not(not(last()))]", zero, errInvalidPredicate(`expect boolean, got 'last' in "ROOT[not(not(last()))]"`)},
 		PathTest{TestAtom1, "ROOT[shazbot()]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[shazbot()]"`)},
 		PathTest{TestAtom1, "ROOT[shazbot(5)]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[shazbot(5)]"`)},
 		PathTest{TestAtom1, "ROOT[not(shazbot())]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[not(shazbot())]"`)},
@@ -263,7 +263,6 @@ func TestAtomsAtPath(t *testing.T) {
 		// multiple delimiters (or no delimiters) are accepted
 		PathTest{TestAtom1, `ROOT/0001/LEAF[@name="LEAF"]`, []string{`LEAF:UI32:1`, `LEAF:UI32:2`, `LEAF:UI32:3`}, nil},
 		PathTest{TestAtom1, "ROOT/0001/LEAF[@name='LEAF']", []string{`LEAF:UI32:1`, `LEAF:UI32:2`, `LEAF:UI32:3`}, nil},
-		PathTest{TestAtom1, "ROOT/0001/LEAF[@name=LEAF]", []string{`LEAF:UI32:1`, `LEAF:UI32:2`, `LEAF:UI32:3`}, nil},
 
 		PathTest{TestAtom1, "//LEAF",
 			strings.Split("LEAF:UI32:1 LEAF:UI32:2 LEAF:UI32:3 LEAF:UI32:4 LEAF:UI32:5 LEAF:UI32:6 LEAF:UI32:7 LEAF:UI32:8 LEAF:UI32:9", " "), nil},
@@ -286,16 +285,15 @@ func TestAtomsAtPath(t *testing.T) {
 			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
 			`0x00000001:CSTR:"10.4.0"`,
 		}, nil},
-
-		// syntactically valid but semantically a contradiction. No error and no results.
 		PathTest{TestAtom1, "/ROOT[@name=NONE]", []string{}, nil},
 
 		// Test less-than operator and its type conversions
 		PathTest{TestAtom2, "/ROOT/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
-		PathTest{TestAtom2, "/ROOT[UI_1 < 2]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 < 2]", strings.Split("ROOT:CONT:", " "), nil},
+
 		//		PathTest{TestAtom2, "/ROOT[UI_1 < 2.0]", []string{"ROOT:CONT:"}, nil},
-		//		PathTest{TestAtom2, "/ROOT[2 < UI_1]", []string{}, nil},
-		//		PathTest{TestAtom2, "/ROOT[UI_1 < UIMX]", []string{}, nil},
+		//PathTest{TestAtom2, "/ROOT[2 < UI_1]", []string{}, nil},
+		//PathTest{TestAtom2, "/ROOT[UI_1 < UIMX]", []string{}, nil},
 		//		PathTest{TestAtom2, "/ROOT[SI_N < UIMX]", []string{"ROOT:CONT:"}, nil},
 		//		PathTest{TestAtom2, "/ROOT[SI_N < UI_1]", []string{"ROOT:CONT:"}, nil},
 		//		PathTest{TestAtom2, "/ROOT[UI_1 < SI_P]", []string{"ROOT:CONT:"}, nil},

@@ -104,6 +104,7 @@ const (
 	itemVariable           = "iVar"
 	itemInteger            = "iInt"
 	itemFloat              = "iFloat"
+	itemBareString         = "iBareString"
 	itemHex                = "iHex"
 )
 
@@ -171,18 +172,13 @@ func (s *itemList) empty() bool {
 	return len(*s) == 0
 }
 
-// filterParser is a parser for translating filter specification tokens
-// into a callable boolean filter function.
-// This parser's methods construct a stack of operations, then resolve the
-// stack as much as possible, leaving placeholders for the atom and position
-// which will be passed in.
-type filterParser struct {
+// PredicateParser is a parser for interpreting predicate tokens.
+type PredicateParser struct {
 	outputQueue itemList    // items ordered for evaluation
 	opStack     itemList    // holds operators until their operands reach output queue
 	items       <-chan item // items received from lexer
 	err         PathError   // indicates parsing succeeded or describes what failed
 }
-type filterFunc func(a Atom, i int) bool
 
 func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
 	path := strings.TrimSpace(path_raw)
@@ -277,27 +273,12 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 	}
 
 	// apply predicate to determine which elements to keep
-	filter, e := NewFilter(predicate)
-	fmt.Printf("NEWF \"%s\" => %v\n", predicate, filter.tokens)
+	pre, e := NewPredicateEvaluator(predicate)
+	fmt.Printf("NEWF \"%s\" => %v\n", predicate, pre.tokens)
 	if e != nil {
-		return atoms, e
+		return
 	}
-	for _, t := range filter.tokens {
-		fmt.Println("      ", t.typ, " : ", t.value)
-	}
-
-	atoms = candidates[:0] // overwrite nextAtoms in place during filtering
-	count := len(candidates)
-	for i, atomPtr := range candidates {
-		satisfied, e := filter.Satisfied(atomPtr, i, count)
-		if e != nil {
-			return nil, e
-		}
-		if satisfied {
-			atoms = append(atoms, atomPtr)
-		}
-		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", satisfied, i, count, atomPtr.Name, atomPtr.Type(), filter.tokens)
-	}
+	atoms, e = pre.Evaluate(candidates)
 	return
 }
 
@@ -306,19 +287,20 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 // filter are stripped.
 // Example:
 // "CN1A[@name=DOGS and @type=UI32]" => "CN1A", "@name=DOGS and @type=UI32"
-func splitLocationStep(path string) (pathTest, predicate string, e error) {
+func splitLocationStep(pathRaw string) (pathTest, predicate string, e error) {
+	path := strings.TrimSpace(pathRaw)
 	i_start := strings.IndexByte(path, '[')
 	if i_start == -1 {
 		pathTest = path
 		if strings.HasSuffix(path, "]") {
 			// predicate terminator without predicate start
-			e = errInvalidPredicate("")
+			e = errInvalidPredicate("mismatched square brackets")
 		}
 		return
 	}
 	i_end := strings.LastIndexByte(path, ']')
 	if i_end == -1 { // path lacks closing ]
-		e = errInvalidPredicate("")
+		e = errInvalidPredicate("unterminated square brackets")
 		return
 	}
 	pathTest = path[:i_start]
@@ -330,18 +312,74 @@ func splitLocationStep(path string) (pathTest, predicate string, e error) {
 // Path lexing is done by the same lexer used for Atom Text format lexing.
 // They use very different parsers though.
 
-// filterStringToFunc converts a predicate into a func that evaluates
-// whether an atom at a given position should be filtered.
-func NewFilter(path string) (ev *evaluator, err error) {
-	var lexr = lexPath(path)
-	ev = new(evaluator)
-	ev.tokens, err = parseFilterTokens(lexr.items)
+// NewPredicateEvaluator reads the predicate from a string by sending
+func NewPredicateEvaluator(predicate string) (pre *PredicateEvaluator, err error) {
+	var lexr = NewPredicateLexer(predicate)
+	pre = new(PredicateEvaluator)
+	pre.tokens, err = parseTokens(lexr.items)
 	return
 }
 
-func lexPath(input string) *lexer {
+// Evaluate filters a list of atoms against the predicate conditions, returning
+// the atoms that satisfy the predicate.
+//
+// The candidate atoms must all be made available to the PredicaetEvaluator at
+// once, because the predicate may refer to individual child atoms by name,
+// requiring them to be evaluated against every other candidate.
+func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
+	fmt.Println("Start Evaluate with ", pre.tokens)
+	pre.Atoms = candidates
+	pre.Count = len(candidates)
+	for i, atomPtr := range candidates {
+		pre.Position = i + 1 // XPath convention, indexing starts at 1
+		pre.AtomPtr = atomPtr
+		pre.Tokens = pre.tokens
+		ok := pre.eval()
+		if pre.Error != nil {
+			return nil, pre.Error
+		}
+		if ok {
+			atoms = append(atoms, atomPtr)
+		}
+		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", ok, i, pre.Count, pre.AtomPtr.Name, pre.AtomPtr.Type(), pre.Tokens)
+	}
+	return
+}
+
+func (pre *PredicateEvaluator) getChildValue(atomName string) (v Comparer, ok bool) {
+	for _, a := range pre.AtomPtr.Children {
+		fmt.Println("         --> ", atomName, " vs. ", a.Name)
+		if a.Name != atomName {
+			continue
+		}
+		v = atomValueToComparerType(a)
+		ok = true
+		break
+	}
+	return
+}
+
+func atomValueToComparerType(a *Atom) (v Comparer) {
+	switch {
+	case a.Value.IsUint(), a.Value.IsBool():
+		x, _ := a.Value.Uint()
+		v = Uint64Type(x)
+	case a.Value.IsFloat():
+		x, _ := a.Value.Float()
+		v = Float64Type(x)
+	case a.Value.IsInt():
+		x, _ := a.Value.Int()
+		v = Int64Type(x)
+	default:
+		x, _ := a.Value.String()
+		v = StringType(x)
+	}
+	return
+}
+
+func NewPredicateLexer(predicate string) *lexer {
 	l := &lexer{
-		input: input,
+		input: predicate,
 		items: make(chan item),
 	}
 	go l.run(lexPredicate)
@@ -495,7 +533,7 @@ func lexBareString(l *lexer) stateFn {
 	case "div", "idiv", "mod":
 		l.emit(itemArithmeticOperator)
 	default:
-		l.emit(itemString)
+		l.emit(itemBareString)
 	}
 	return lexPredicate
 }
@@ -539,21 +577,20 @@ func lexNumberInPath(l *lexer) stateFn {
 	return lexPredicate
 }
 
-// parseFilterTokens translates stream of tokens emitted by the lexer into a
+// parseTokens translates stream of tokens emitted by the lexer into a
 // function that can evaluate whether an atom gets filtered.
-func parseFilterTokens(ch <-chan item) (tokens itemList, e error) {
-	var state = filterParser{items: ch}
-	state.receiveTokens()
-	return state.outputQueue, state.err
+func parseTokens(ch <-chan item) (tokens itemList, e error) {
+	var pp = PredicateParser{items: ch}
+	pp.receiveTokens()
+	return pp.outputQueue, pp.err
 }
 
 // receiveTokens gets tokens from the lexer and sends them to the parser
 // for parsing.
-func (p *filterParser) receiveTokens() {
-	//for p.parseFilterToken(p.readItem()) {
+func (pp *PredicateParser) receiveTokens() {
 	for {
-		it := p.readItem()
-		ok := p.parseFilterToken(it)
+		it := pp.readItem()
+		ok := pp.parseToken(it)
 		if it.typ == itemEOF || !ok {
 			break
 		}
@@ -561,10 +598,10 @@ func (p *filterParser) receiveTokens() {
 }
 
 // read next time from item channel, and return it.
-func (p *filterParser) readItem() (it item) {
+func (pp *PredicateParser) readItem() (it item) {
 	var ok bool
 	select {
-	case it, ok = <-p.items:
+	case it, ok = <-pp.items:
 		if !ok {
 			it = item{typ: itemEOF, value: "EOF"}
 		}
@@ -572,63 +609,63 @@ func (p *filterParser) readItem() (it item) {
 	return it
 }
 
-// errorf sets the error field in the parser, and returns false to indicate that
-// parsing should stop.
-func (p *filterParser) errorf(format string, args ...interface{}) bool {
-	p.err = errInvalidPredicate(fmt.Sprintf(format, args...))
+// errorf sets the error field in the parser, and indicates that parsing should
+// stop by returning false.
+func (pp *PredicateParser) errorf(format string, args ...interface{}) bool {
+	pp.err = errInvalidPredicate(fmt.Sprintf(format, args...))
 	return false
 }
 
-// parseFilterTokens receives tokens from the lexer in the order they are found
+// parseToken is given tokens from the lexer in the order they are found
 // in the path string, and queues them into evaluation order.
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-func (p *filterParser) parseFilterToken(it item) bool {
+func (pp *PredicateParser) parseToken(it item) bool {
 	fmt.Println("parse item ", it.value, it.typ)
 	switch it.typ {
 	case itemError:
-		return p.errorf(it.value)
-	case itemInteger, itemHex, itemFloat, itemString, itemVariable, itemFunctionNumeric:
-		p.outputQueue.push(&it)
+		return pp.errorf(it.value)
+	case itemInteger, itemHex, itemFloat, itemBareString, itemString, itemVariable, itemFunctionNumeric:
+		pp.outputQueue.push(&it)
 	case itemFunctionBool:
-		p.opStack.push(&it)
+		pp.opStack.push(&it)
 	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
 		itemPrec := precedence(it.value)
 		for {
-			if p.opStack.empty() || !isOperatorItem(p.opStack.top()) {
+			if pp.opStack.empty() || !isOperatorItem(pp.opStack.top()) {
 				break
 			}
-			if itemPrec > precedence(p.opStack.top().value) {
+			if itemPrec > precedence(pp.opStack.top().value) {
 				break
 			}
-			p.outputQueue.push(p.opStack.pop())
+			pp.outputQueue.push(pp.opStack.pop())
 		}
-		p.opStack.push(&it)
+		pp.opStack.push(&it)
 	case itemLeftParen:
-		p.opStack.push(&it)
+		pp.opStack.push(&it)
 	case itemRightParen:
 		for {
-			if p.opStack.empty() {
-				return p.errorf("mismatched parentheses")
+			if pp.opStack.empty() {
+				return pp.errorf("mismatched parentheses")
 			}
-			if p.opStack.top().typ == itemLeftParen {
-				p.opStack.pop()
+			if pp.opStack.top().typ == itemLeftParen {
+				pp.opStack.pop()
 				break
 			}
-			op := p.opStack.pop()
-			p.outputQueue.push(op)
+			op := pp.opStack.pop()
+			pp.outputQueue.push(op)
 		}
 	case itemEOF:
-		for !p.opStack.empty() {
-			op := p.opStack.pop()
+		for !pp.opStack.empty() {
+			op := pp.opStack.pop()
 			if op.typ == itemLeftParen || op.typ == itemRightParen {
-				return p.errorf("mismatched parentheses")
+				return pp.errorf("mismatched parentheses")
 			}
-			p.outputQueue.push(op)
+			pp.outputQueue.push(op)
 		}
 		return false
 	default:
-		return p.errorf("unexpected item %s", it.value)
+		return pp.errorf("unexpected item %s", it.value)
 	}
 	return true
 }
@@ -641,85 +678,129 @@ func isOperatorItem(it *item) bool {
 	return false
 }
 
-// evaluator is for determining whether a single atom from the list of
-// candidate atoms satisfies filter criteria.
+// PredicateEvaluator determines which candidate atoms satisfy the
+// predicate criteria.
 //
-// A path expression has two parts: /root/name[filter]
-// ignoring the /root/ part, evaluation proceeds as follows:
-// name:     all child atoms with name "name" are collected in a slice
-// [filter]: slice items are checked against [filter] and removed if they don't pass
-//
-// This is used in the [filter] part. For each atom in the slice, an evaluator
-// is created containing the parsed filter, the atom and information about
-// where the atom appears in the slice.  Then the eval() method is called to
-// parse the filter tokens using the other values in the struct.
-type evaluator struct {
-	tokens   itemList // filter against which to to evaluate atoms, do not alter
-	Tokens   itemList // Copy of .tokens to consume during evaluation
-	AtomPtr  *Atom    // atom currently being evaluated from the atom list
+// The predicate is the part of the path within the [].
+// Examples:
+//    /ROOT[1]
+//    /ROOT[@name=NONE]
+//		/ROOT/UI_1[@data < 2]
+type PredicateEvaluator struct {
+	tokens itemList // predicate criteria, as a list of tokens
+	Error  error    // evaluation status, nil on success
+
+	Tokens   itemList // Copy of tokens to consume during evaluation
+	Atoms    []*Atom  // Atoms being evaluated
+	AtomPtr  *Atom    // Atom currently being evaluated from the atom list
 	Position int      // index of the atom in the atom list, starts from 1
 	Count    int      // number of atoms in the atom list
-	Error    error
 }
 
-func (e *evaluator) errorf(format string, args ...interface{}) PathError {
+func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathError {
 	msg := fmt.Sprintf(format, args...)
-	e.Error = PathError(errInvalidPredicate(msg))
-	return e.Error
+	pre.Error = PathError(errInvalidPredicate(msg))
+	return pre.Error
 }
 
 // evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
-func (e *evaluator) eval() (result bool) {
-	for !e.Tokens.empty() && e.Error == nil {
-		switch e.Tokens.top().typ {
+func (pre *PredicateEvaluator) eval() (result bool) {
+	var results []Equaler
+	for !pre.Tokens.empty() && pre.Error == nil {
+		fmt.Println("EVAL TOKEN TYPE: ", pre.Tokens.top().typ)
+		switch pre.Tokens.top().typ {
 		case itemBooleanOperator:
-			result = e.evalBooleanOperator()
+			results = append(results, pre.evalBooleanOperator())
 		case itemComparisonOperator:
-			result = e.evalComparisonOperator()
+			results = append(results, pre.evalComparisonOperator())
 		case itemArithmeticOperator:
-			number := e.evalArithmeticOperator()
-			result = number.Equal(Int64Type(e.Position))
+			results = append(results, pre.evalArithmeticOperator())
 		case itemInteger, itemHex:
-			number := e.evalNumber()
-			result = number.Equal(Int64Type(e.Position))
+			results = append(results, pre.evalNumber())
 		case itemFunctionBool:
-			result = e.evalFunctionBool()
+			results = append(results, pre.evalFunctionBool())
 		case itemFunctionNumeric:
-			number := e.evalFunctionNumeric()
-			result = number.Equal(Int64Type(e.Position))
+			results = append(results, pre.evalFunctionNumeric())
 		default:
-			t := e.Tokens.top()
-			e.errorf("unrecognized token '%s'", t.value)
-			return
+			t := pre.Tokens.top()
+			pre.errorf("unrecognized token '%v'", t.value)
+			break // FIXME want break for, but this is just break out of switch
 		}
+	}
+	fmt.Println("EVAL() results: ", results, len(results), pre.Error)
+	if pre.Error != nil {
+		return
+	}
+	// verify that evaluation resulted in exactly 1 value
+	switch len(results) {
+	case 0:
+		pre.errorf("no result")
+		return
+	case 1:
+	default:
+		pre.errorf("unparsed values '%v'", results)
+		return
+	}
+	// verify that evaluation resulted in a usable type
+	switch r := results[0].(type) {
+	case BooleanType:
+		return bool(r)
+	case Int64Type:
+		return r.Equal(Int64Type(pre.Position))
+	case Uint64Type:
+		return r.Equal(Uint64Type(pre.Position))
+	case Float64Type:
+		return r.Equal(Float64Type(pre.Position))
+	default:
+		pre.errorf("result '%v' has unknown type %[1]T", results[0])
+		return
+	}
+	fmt.Println("EVAL() what am I doing over here???")
+	// calculate a boolean value from op and vars
+	return
+}
+func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
+	switch pre.Tokens.top().typ {
+	case itemBooleanOperator:
+		result = pre.evalBooleanOperator()
+	case itemComparisonOperator:
+		result = pre.evalComparisonOperator().(Equaler)
+	case itemFunctionBool:
+		result = pre.evalFunctionBool()
+	default:
+		t := pre.Tokens.top()
+		pre.errorf("expect boolean, got '%s'", t.value)
+		return
 	}
 	// calculate a boolean value from op and vars
 	return
 }
-func (e *evaluator) evalBooleanOperator() (result bool) {
-	op := e.Tokens.pop()
+func (pre *PredicateEvaluator) evalBooleanOperator() Equaler {
+	op := pre.Tokens.pop()
 	if op.typ != itemBooleanOperator {
-		e.errorf("expected boolean operator, received type %s", op.typ)
+		pre.errorf("expected boolean operator, received type %s", op.typ)
 	}
+	True := BooleanType(true)
+	var result bool
 	switch op.value {
 	case "and":
-		result = e.eval() && e.eval()
+		result = pre.evalBoolean().Equal(True) && pre.evalBoolean().Equal(True)
 	case "or":
-		result = e.eval() || e.eval()
+		result = pre.evalBoolean().Equal(True) || pre.evalBoolean().Equal(True)
 	default:
-		e.errorf("unknown boolean operator: %s", op.value)
+		pre.errorf("unknown boolean operator: %s", op.value)
 	}
-	return result
+	return BooleanType(result)
 }
 
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
-func (e *evaluator) evalArithmeticOperator() (result Arithmeticker) {
-	op := e.Tokens.pop()
+func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
+	op := pre.Tokens.pop()
 	if op.typ != itemArithmeticOperator {
-		e.errorf("expected itemArithmeticOperator, received type %s", op.typ)
+		pre.errorf("expected itemArithmeticOperator, received type %s", op.typ)
 	}
-	rhs := e.evalNumber()
-	lhs := e.evalNumber()
+	rhs := pre.evalNumber()
+	lhs := pre.evalNumber()
 	switch op.value {
 	case "+":
 		result = lhs.Plus(rhs)
@@ -734,190 +815,195 @@ func (e *evaluator) evalArithmeticOperator() (result Arithmeticker) {
 	case "mod":
 		result = lhs.Mod(rhs)
 	default:
-		e.errorf("unknown arithmetic operator: %s", op.value)
+		pre.errorf("unknown arithmetic operator: %s", op.value)
 		return
 	}
 	return result
 }
-func (e *evaluator) evalComparisonOperator() bool {
-	op := e.Tokens.pop()
+func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
+	var result bool
+	op := pre.Tokens.pop()
 	if op.typ != itemComparisonOperator {
-		e.errorf("expected itemComparisonOperator, received type %s", op.typ)
-		return false
+		pre.errorf("expected itemComparisonOperator, received type %s", op.typ)
+		return BooleanType(false)
 	}
-	rhs := e.evalComparable()
-	lhs := e.evalComparable()
-	if e.Error != nil {
-		return false
+	rhs := pre.evalComparable()
+	lhs := pre.evalComparable()
+	if pre.Error != nil {
+		return BooleanType(false)
 	}
 	switch op.value {
 	case "=":
 		fmt.Println(lhs, rhs)
-		return lhs.Equal(rhs)
+		result = lhs.Equal(rhs)
 	case "!=":
-		return !lhs.Equal(rhs)
+		result = !lhs.Equal(rhs)
 	case "<":
-		return lhs.LessThan(rhs)
+		result = lhs.LessThan(rhs)
 	case ">":
-		return lhs.GreaterThan(rhs)
+		result = lhs.GreaterThan(rhs)
 	case "<=":
-		return lhs.LessThan(rhs) || lhs.Equal(rhs)
+		result = lhs.LessThan(rhs) || lhs.Equal(rhs)
 	case ">=":
-		return lhs.GreaterThan(rhs) || lhs.Equal(rhs)
+		result = lhs.GreaterThan(rhs) || lhs.Equal(rhs)
 	default:
-		e.errorf("unknown comparison operator: %s", op.value)
-		return false
+		pre.errorf("unknown comparison operator: %s", op.value)
+		result = false
 	}
+	return BooleanType(result)
 }
-func (e *evaluator) evalNumber() (result Arithmeticker) {
+func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 	var err error
 	ok := true
-	switch e.Tokens.top().typ {
+	switch pre.Tokens.top().typ {
 	case itemInteger:
-		v, err := strconv.ParseInt(e.Tokens.pop().value, 10, 64)
+		v, err := strconv.ParseInt(pre.Tokens.pop().value, 10, 64)
 		if err != nil {
-			e.errorf(err.Error())
+			pre.errorf(err.Error())
 			return
 		}
 		result = Int64Type(v)
 	case itemFloat:
-		v, err := strconv.ParseFloat(e.Tokens.pop().value, 64)
+		v, err := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		if err != nil {
-			e.errorf(err.Error())
+			pre.errorf(err.Error())
 			return
 		}
 		result = Float64Type(v)
 	case itemHex:
-		v, err := strconv.ParseInt(e.Tokens.pop().value, 16, 64)
+		v, err := strconv.ParseInt(pre.Tokens.pop().value, 16, 64)
 		if err != nil {
-			e.errorf(err.Error())
+			pre.errorf(err.Error())
 			return
 		}
 		result = Int64Type(v)
 	case itemFunctionNumeric:
-		result = e.evalFunctionNumeric()
+		result = pre.evalFunctionNumeric()
 	case itemVariable:
-		result, ok = e.evalVariable().(Arithmeticker)
+		result, ok = pre.evalVariable().(Arithmeticker)
 	case itemArithmeticOperator:
-		result = e.evalArithmeticOperator()
+		result = pre.evalArithmeticOperator()
 	default:
-		e.errorf("value has invalid numeric type: %s", e.Tokens.top().typ)
+		pre.errorf("value has invalid numeric type: %s", pre.Tokens.top().typ)
 	}
 	if err != nil || !ok {
-		e.errorf("failed to convert '%s' to numeric value")
+		pre.errorf("failed to convert '%s' to numeric value")
 	}
 	return result
 }
-func (e *evaluator) evalComparable() (result Comparer) {
+func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 	var err error
-	switch e.Tokens.top().typ {
+	switch pre.Tokens.top().typ {
 	case itemInteger:
-		v, errr := strconv.ParseInt(e.Tokens.pop().value, 10, 64)
+		v, errr := strconv.ParseInt(pre.Tokens.pop().value, 10, 64)
 		err = errr
 		result = Int64Type(v)
 	case itemFloat:
-		v, errr := strconv.ParseFloat(e.Tokens.pop().value, 64)
+		v, errr := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		err = errr
 		result = Float64Type(v)
 	case itemHex:
-		v, errr := strconv.ParseInt(e.Tokens.pop().value, 16, 64)
+		v, errr := strconv.ParseInt(pre.Tokens.pop().value, 16, 64)
 		err = errr
 		result = Int64Type(v)
+	case itemBareString:
+		t := pre.Tokens.pop()
+		if v, ok := pre.getChildValue(t.value); ok {
+			fmt.Println("IBARESTRING converted to atom value ", v)
+			// string was an Atom name.  Substitute the atom value.
+			result = v
+		} else {
+			fmt.Println("IBARESTRING failed to convert to atom value ", t.value)
+			result = StringType(t.value)
+		}
 	case itemString:
-		result = StringType(e.Tokens.pop().value)
+		result = StringType(pre.Tokens.pop().value)
 	case itemVariable:
-		result = e.evalVariable()
+		result = pre.evalVariable()
 	case itemFunctionNumeric:
-		result = e.evalFunctionNumeric()
+		result = pre.evalFunctionNumeric()
 	case itemArithmeticOperator:
-		result = e.evalArithmeticOperator()
+		result = pre.evalArithmeticOperator()
 	default:
-		e.errorf("expected comparable type, got %s", e.Tokens.top().typ)
+		pre.errorf("expected comparable type, got %s", pre.Tokens.top().typ)
 		return
 	}
 	if err != nil {
 		fmt.Println("got error ", err)
-		e.errorf("failed to convert '%s' to comparable value")
+		pre.errorf("failed to convert '%s' to comparable value")
 		return
 	}
 	return result
 }
-func (e *evaluator) evalVariable() (result Comparer) {
-	item := e.Tokens.pop()
+func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
+	item := pre.Tokens.pop()
 	if item.typ != itemVariable {
-		e.errorf("expected itemVariable, received type %s", item.typ)
+		pre.errorf("expected itemVariable, received type %s", item.typ)
 	}
 	switch item.value {
 	case "@name":
-		return StringType(e.AtomPtr.Name)
+		return StringType(pre.AtomPtr.Name)
 	case "@type":
-		return StringType(e.AtomPtr.Type())
+		return StringType(pre.AtomPtr.Type())
 	case "@data":
 	default:
-		e.errorf("unknown variable: %s", item.value)
+		pre.errorf("unknown variable: %s", item.value)
 		return
 	}
 
 	// Must get Atom value. Choose concrete type to return.
 	switch {
-	case e.AtomPtr.Value.IsFloat():
-		v, _ := e.AtomPtr.Value.Float()
+	case pre.AtomPtr.Value.IsFloat():
+		v, _ := pre.AtomPtr.Value.Float()
 		result = Float64Type(v)
-	case e.AtomPtr.Value.IsInt():
-		v, _ := e.AtomPtr.Value.Int()
+	case pre.AtomPtr.Value.IsInt():
+		v, _ := pre.AtomPtr.Value.Int()
 		result = Int64Type(v)
-	case e.AtomPtr.Value.IsUint():
-		v, _ := e.AtomPtr.Value.Uint()
+	case pre.AtomPtr.Value.IsUint():
+		v, _ := pre.AtomPtr.Value.Uint()
 		result = Uint64Type(v)
-	case e.AtomPtr.Value.IsBool():
-		v, _ := e.AtomPtr.Value.Uint() // use UINT since it's represented as 0/1
+	case pre.AtomPtr.Value.IsBool():
+		v, _ := pre.AtomPtr.Value.Uint() // use UINT since it's represented as 0/1
 		result = Uint64Type(v)
 	default:
-		v, _ := e.AtomPtr.Value.String()
+		v, _ := pre.AtomPtr.Value.String()
 		result = StringType(v)
 	}
 	return result
 }
-func (e *evaluator) evalFunctionBool() (result bool) {
-	item := e.Tokens.pop()
+func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
+	var result bool
+	item := pre.Tokens.pop()
 	if item.typ != itemFunctionBool {
-		e.errorf("expected itemFunctionBool, received type %s", item.typ)
+		pre.errorf("expected itemFunctionBool, received type %s", item.typ)
 	}
 	switch item.value {
 	case "not":
-		return !e.eval()
+		r := pre.evalBoolean()
+		if r == nil {
+			result = false
+		} else {
+			result = r.Equal(BooleanType(false))
+		}
 	default:
-		e.errorf("unknown boolean function: %s", item.value)
+		pre.errorf("unknown boolean function: %s", item.value)
 	}
-	return
+	return BooleanType(result)
 }
-func (e *evaluator) evalFunctionNumeric() (result Arithmeticker) {
-	item := e.Tokens.pop()
+func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
+	item := pre.Tokens.pop()
 	if item.typ != itemFunctionNumeric {
-		e.errorf("expected itemFunctionNumeric, received type %s", item.typ)
+		pre.errorf("expected itemFunctionNumeric, received type %s", item.typ)
 		return
 	}
 	switch item.value {
 	case "position":
-		return Uint64Type(e.Position)
+		return Uint64Type(pre.Position)
 	case "last", "count":
-		return Uint64Type(e.Count)
+		return Uint64Type(pre.Count)
 	default:
-		e.errorf("unknown numeric function: %s", item.value)
+		pre.errorf("unknown numeric function: %s", item.value)
 	}
-	return
-}
-
-// Satisfied returns true if the atom/index/count combination satisfies
-// the predicate.
-func (e *evaluator) Satisfied(a *Atom, index int, count int) (result bool, err error) {
-	e.AtomPtr = a
-	e.Position = index + 1 // XPath convention: position starts at 1
-	e.Count = count
-	e.Tokens = e.tokens // copy will be consumed during evaluation
-	// FIXME: can I make this use an indexing system rather than popping, to avoid allocation?
-	result = e.eval()
-	err = e.Error
 	return
 }
 
@@ -927,9 +1013,13 @@ type (
 	Uint64Type  uint64
 	Float64Type float64
 	StringType  string
+	BooleanType bool
 
+	Equaler interface {
+		Equal(other Equaler) bool
+	}
 	Comparer interface {
-		Equal(other Comparer) bool
+		Equaler
 		LessThan(other Comparer) bool
 		GreaterThan(other Comparer) bool
 	}
@@ -947,7 +1037,7 @@ type (
 // Define explicitly how to do type conversion when performing arithmetic on
 // pairs of heterogenous types.
 
-func (v Float64Type) Equal(other Comparer) bool {
+func (v Float64Type) Equal(other Equaler) bool {
 	switch o := other.(type) {
 	case Float64Type:
 		return v == o
@@ -983,7 +1073,7 @@ func (v Float64Type) GreaterThan(other Comparer) bool {
 		return false
 	}
 }
-func (v Uint64Type) Equal(other Comparer) bool {
+func (v Uint64Type) Equal(other Equaler) bool {
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) == o
@@ -1029,7 +1119,7 @@ func (v Uint64Type) GreaterThan(other Comparer) bool {
 	}
 	return false
 }
-func (v Int64Type) Equal(other Comparer) bool {
+func (v Int64Type) Equal(other Equaler) bool {
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) == o
@@ -1073,7 +1163,7 @@ func (v Int64Type) GreaterThan(other Comparer) bool {
 	}
 	return false
 }
-func (v StringType) Equal(other Comparer) bool {
+func (v StringType) Equal(other Equaler) bool {
 	switch o := other.(type) {
 	case StringType:
 		// case insensitive comparison
@@ -1282,6 +1372,27 @@ func (v Int64Type) Mod(other Arithmeticker) Arithmeticker {
 		return Float64Type(math.Mod(float64(v), float64(other)))
 	default:
 		return v % other.(Int64Type)
+	}
+}
+func (v BooleanType) Equal(other Equaler) bool {
+	fmt.Println("EQUALERBOOL")
+	switch o := other.(type) {
+	case BooleanType:
+		return bool(v) == bool(o)
+	case Int64Type:
+		if bool(v) == false {
+			return int64(o) == 0
+		} else {
+			return int64(o) != 0
+		}
+	case Uint64Type:
+		if bool(v) == false {
+			return uint64(o) == 0
+		} else {
+			return uint64(o) != 0
+		}
+	default:
+		return false
 	}
 }
 func isNumericItem(it itemEnum) bool {
