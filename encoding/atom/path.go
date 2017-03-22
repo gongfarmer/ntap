@@ -340,23 +340,23 @@ func lexPath(input string) *lexer {
 		input: input,
 		items: make(chan item),
 	}
-	go l.run(lexFilterExpression)
+	go l.run(lexPredicate)
 	return l
 }
 
-// lexFilterExpression splits the filter into tokens.
+// lexPredicate splits the filter into tokens.
 // The filter is everything within the [].
 // Example:  for path "CN1A[not(@type=CONT) and not(@name=DOGS)]",
 // This function would be extracting tokens from this string:
 //     not(@type=CONT) and not(@name=DOGS)
 // it should find the following 13 tokens:
 //     not ( @type = CONT ) and not ( @name = DOGS )
-func lexFilterExpression(l *lexer) stateFn {
-	ok := true
-	for ok {
+// FIXME this is kinda crazy because these return stateFn but don't use it
+func lexPredicate(l *lexer) stateFn {
+	for {
 		if l.bufferSize() != 0 {
-			str := "expected to start with empty buffer, got '%s'"
-			panic(fmt.Sprintf(str, l.buffer()))
+			l.errorf(fmt.Sprintf(`could not parse "%s"`, l.buffer()))
+			return nil
 		}
 		r := l.next()
 		switch {
@@ -364,7 +364,7 @@ func lexFilterExpression(l *lexer) stateFn {
 			l.ignore()
 		case r == eof:
 			l.emit(itemEOF)
-			ok = false
+			break
 		case r == '@':
 			lexAtomAttribute(l)
 		case r == '"', r == '\'':
@@ -397,6 +397,9 @@ func lexFilterExpression(l *lexer) stateFn {
 		default:
 			return l.errorf("invalid predicate: %s", l.input)
 		}
+		if l.prevItemType == itemError {
+			return nil
+		}
 	}
 
 	return nil
@@ -409,13 +412,13 @@ func lexAtomAttribute(l *lexer) stateFn {
 	}
 	l.acceptRun(alphaNumericChars)
 	l.emit(itemVariable)
-	return lexFilterExpression
+	return lexPredicate
 }
 
 func lexComparisonOperator(l *lexer) stateFn {
 	l.acceptRun("=<>!")
 	l.emit(itemComparisonOperator)
-	return lexFilterExpression
+	return lexPredicate
 }
 
 func lexFunctionCall(l *lexer) stateFn {
@@ -431,9 +434,9 @@ func lexFunctionCall(l *lexer) stateFn {
 	case "count", "position", "last":
 		l.emit(itemFunctionNumeric)
 	default:
-		return l.errorf("unrecognized function '%s'", l.buffer())
+		return l.errorf(`unrecognized function "%s"`, l.buffer())
 	}
-	return lexFilterExpression
+	return lexPredicate
 }
 
 func lexDelimitedString(l *lexer) stateFn {
@@ -441,7 +444,7 @@ func lexDelimitedString(l *lexer) stateFn {
 	delim := l.first()
 	if delim != '"' && delim != '\'' {
 		l.backup()
-		return l.errorf("string should be delimited with quotes, got %s", l.input)
+		return l.errorf("expected delimited string, got %s", l.input)
 	}
 	l.ignore() // discard delimiter
 
@@ -455,18 +458,18 @@ func lexDelimitedString(l *lexer) stateFn {
 			r = l.next()
 			if !strings.ContainsRune("\\\"nrx", r) {
 				l.backup()
-				return l.errorf("invalid escape atom path: %s", l.input)
+				return l.errorf("invalid escape %s", l.input)
 			}
 		case delim: // accept either delimiter
 			done = true
 		case '\n':
 			l.backup()
-			return l.errorf("unterminated string in atom path: %s", l.input)
+			return l.errorf("unterminated string: %s", l.input)
 		}
 	}
 
 	if r != delim {
-		return l.errorf("unterminated string in atom path: %s", l.input)
+		return l.errorf("unterminated string: %s", l.input)
 	}
 
 	// discard delimiter and emit string value
@@ -475,7 +478,7 @@ func lexDelimitedString(l *lexer) stateFn {
 	l.next()
 	l.ignore()
 
-	return lexFilterExpression
+	return lexPredicate
 }
 
 // lexBareString accepts a non-delimited string of alphanumeric characters.
@@ -490,7 +493,7 @@ func lexBareString(l *lexer) stateFn {
 	default:
 		l.emit(itemString)
 	}
-	return lexFilterExpression
+	return lexPredicate
 }
 
 func lexNumberInPath(l *lexer) stateFn {
@@ -529,7 +532,7 @@ func lexNumberInPath(l *lexer) stateFn {
 	default:
 		l.emit(itemInteger)
 	}
-	return lexFilterExpression
+	return lexPredicate
 }
 
 // parseFilterTokens translates stream of tokens emitted by the lexer into a
@@ -546,8 +549,8 @@ func (p *filterParser) receiveTokens() {
 	//for p.parseFilterToken(p.readItem()) {
 	for {
 		it := p.readItem()
-		p.parseFilterToken(it)
-		if it.typ == itemEOF {
+		ok := p.parseFilterToken(it)
+		if it.typ == itemEOF || !ok {
 			break
 		}
 	}
@@ -568,11 +571,7 @@ func (p *filterParser) readItem() (it item) {
 // errorf sets the error field in the parser, and returns false to indicate that
 // parsing should stop.
 func (p *filterParser) errorf(format string, args ...interface{}) bool {
-	p.err = fmt.Errorf(
-		strings.Join([]string{
-			"parse error in path filter: ",
-			fmt.Sprintf(format, args...),
-		}, ""))
+	p.err = errInvalidPredicate(fmt.Sprintf(format, args...))
 	return false
 }
 
@@ -581,7 +580,10 @@ func (p *filterParser) errorf(format string, args ...interface{}) bool {
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (p *filterParser) parseFilterToken(it item) bool {
+	fmt.Println("parse item ", it.value, it.typ)
 	switch it.typ {
+	case itemError:
+		return p.errorf(it.value)
 	case itemInteger, itemHex, itemFloat, itemString, itemVariable, itemFunctionNumeric:
 		p.outputQueue.push(&it)
 	case itemFunctionBool:
@@ -603,7 +605,7 @@ func (p *filterParser) parseFilterToken(it item) bool {
 	case itemRightParen:
 		for {
 			if p.opStack.empty() {
-				return p.errorf("mismatched parentheses in predicate")
+				return p.errorf("mismatched parentheses")
 			}
 			if p.opStack.top().typ == itemLeftParen {
 				p.opStack.pop()
@@ -616,13 +618,13 @@ func (p *filterParser) parseFilterToken(it item) bool {
 		for !p.opStack.empty() {
 			op := p.opStack.pop()
 			if op.typ == itemLeftParen || op.typ == itemRightParen {
-				return p.errorf("mismatched parentheses in predicate")
+				return p.errorf("mismatched parentheses")
 			}
 			p.outputQueue.push(op)
 		}
 		return false
 	default:
-		panic(fmt.Sprintf("unexpected item type: %s", it.typ))
+		return p.errorf("unexpected item %s", it.value)
 	}
 	return true
 }

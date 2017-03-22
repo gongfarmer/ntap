@@ -195,6 +195,18 @@ func TestAtomsAtPath(t *testing.T) {
 			`0x00000001:CSTR:"10.4.0"`}, nil,
 		},
 
+		// test path indexing.  indexing starts from 1 not 0 (this is an XPath convention.)
+		// xpath returns no error on request for 0 index, even though it cannot exist.
+		PathTest{TestAtom1, "ROOT/0001/LEAF[0]", []string{}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[1]", []string{"LEAF:UI32:1"}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[2]", []string{"LEAF:UI32:2"}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[3]", []string{"LEAF:UI32:3"}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[4]", []string{}, nil},
+		PathTest{TestAtom1, "/ROOT/*/LEAF[4]", []string{"LEAF:UI32:4"}, nil},
+		PathTest{TestAtom1, "/ROOT/*/LEAF[5]", []string{"LEAF:UI32:5"}, nil},
+		PathTest{TestAtom1, "/ROOT/*/LEAF[6]", []string{"LEAF:UI32:6"}, nil},
+		PathTest{TestAtom1, "/ROOT/*/LEAF[100]", []string{}, nil},
+
 		// Test arithmetic operators
 		PathTest{TestAtom1, "ROOT/*/LEAF[0]", []string{}, nil}, // there's no 0 index, as per XPath convention.
 		PathTest{TestAtom1, "ROOT/*/LEAF[1]", []string{"LEAF:UI32:1"}, nil},
@@ -216,7 +228,7 @@ func TestAtomsAtPath(t *testing.T) {
 		// division is "div" not "/".
 		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, fmt.Errorf(`invalid predicate in "ROOT[64/8-7]"`)},
 
-		// handle gibberish gracefully
+		// handle gibberish operators gracefully
 		PathTest{TestAtom1, "ROOT[64 shazbot 8]", []string{}, fmt.Errorf(`invalid predicate: unrecognized token 'shazbot' in "ROOT[64 shazbot 8]"`)},
 
 		// test XPath functions
@@ -226,20 +238,11 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "ROOT[last()]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom1, "ROOT[not(last())]", []string{}, nil},
 		PathTest{TestAtom1, "ROOT[not(not(last()))]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom1, "ROOT[shazbot()]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[shazbot()]"`)},
+		PathTest{TestAtom1, "ROOT[shazbot(5)]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[shazbot(5)]"`)},
+		PathTest{TestAtom1, "ROOT[not(shazbot())]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[not(shazbot())]"`)},
 
-		// 		// test path specification by index.  start from 1 like xpath.
-		// 		// xpath returns no error on request for 0 index, even though it cannot exist.
-		// 		// xpath in general favours returning no results over returning an error.
-		// 		PathTest{"CN1A/DOGS[0]", []string{}, nil},
-		// 		PathTest{"CN1A/DOGS[1]", []string{`DOGS:UI32:1`}, nil},
-		// 		PathTest{"CN1A/DOGS[2]", []string{`DOGS:UI32:2`}, nil},
-		// 		PathTest{"CN1A/DOGS[3]", []string{`DOGS:UI32:3`}, nil},
-		// 		PathTest{"CN1A/DOGS[4]", []string{}, nil},
-		// 		PathTest{"*/DOGS[4]", []string{`DOGS:UI32:12`}, nil},
-		// 		PathTest{"*/DOGS[5]", []string{`DOGS:UI32:23`}, nil},
-		// 		PathTest{"*/DOGS[6]", []string{}, nil},
-		//
-		// 		// FIXME what if ] is part of the name?  use delimiters? require hex specificiation?  require 4 chars or hex?
+		// test usage of
 		// 		PathTest{"CN1A/*[@name=\"DOGS\"]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
 		// 		PathTest{"CN1A/*[@name='DOGS']", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
 		// 		PathTest{"CN1A/*[@name=DOGS]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
@@ -260,6 +263,8 @@ func TestAtomsAtPath(t *testing.T) {
 		//
 		// 		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no container child named 'THER'")},
 		// 		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
+
+		// 		// FIXME what if ] is part of the name?  use delimiters? require hex specificiation?  require 4 chars or hex?
 	}
 	runPathTests(t, tests)
 }
