@@ -282,9 +282,9 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 	if e != nil {
 		return atoms, e
 	}
-	//	for _, t := range filter.tokens {
-	//		fmt.Println("      ", t.typ, " : ", t.value)
-	//	}
+	for _, t := range filter.tokens {
+		fmt.Println("      ", t.typ, " : ", t.value)
+	}
 
 	atoms = candidates[:0] // overwrite nextAtoms in place during filtering
 	count := len(candidates)
@@ -310,6 +310,10 @@ func splitLocationStep(path string) (pathTest, predicate string, e error) {
 	i_start := strings.IndexByte(path, '[')
 	if i_start == -1 {
 		pathTest = path
+		if strings.HasSuffix(path, "]") {
+			// predicate terminator without predicate start
+			e = errInvalidPredicate("")
+		}
 		return
 	}
 	i_end := strings.LastIndexByte(path, ']')
@@ -695,7 +699,7 @@ func (e *evaluator) eval() (result bool) {
 func (e *evaluator) evalBooleanOperator() (result bool) {
 	op := e.Tokens.pop()
 	if op.typ != itemBooleanOperator {
-		e.errorf("expected itemBooleanOperator, received type %s", op.typ)
+		e.errorf("expected boolean operator, received type %s", op.typ)
 	}
 	switch op.value {
 	case "and":
@@ -990,65 +994,131 @@ func (v Uint64Type) Equal(other Comparer) bool {
 	}
 }
 func (v Uint64Type) LessThan(other Comparer) bool {
+	fmt.Println("UINT64 LessThan", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) < o
 	case Int64Type:
 		return Int64Type(v) < o
+	case StringType:
+		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
+			return float64(v) < x
+		}
+		if x, e := strconv.ParseUint(string(o), 10, 64); e == nil {
+			return uint64(v) < x
+		}
+		if x, e := strconv.ParseInt(string(o), 0, 64); e == nil {
+			return int64(v) < x
+		}
 	default:
 		return v < o.(Uint64Type)
 	}
+	return false
 }
 func (v Uint64Type) GreaterThan(other Comparer) bool {
-	switch other := other.(type) {
+	fmt.Println("UINT64 GreaterThan", v, other)
+	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) > other
+		return Float64Type(v) > o
 	case Int64Type:
-		return Int64Type(v) > other
+		return Int64Type(v) > o
+	case StringType:
+		return !(o.LessThan(v) || o.Equal(v))
 	default:
 		return v > other.(Uint64Type)
 	}
+	return false
 }
 func (v Int64Type) Equal(other Comparer) bool {
-	switch other := other.(type) {
+	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) == other
+		return Float64Type(v) == o
+	case Uint64Type:
+		return v == Int64Type(o)
+	case StringType:
+		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
+			return float64(v) == x
+		}
+		if x, e := strconv.ParseUint(string(o), 10, 64); e == nil {
+			return uint64(v) == x
+		}
+		if x, e := strconv.ParseInt(string(o), 0, 64); e == nil {
+			return int64(v) == x
+		}
 	default:
 		return v == other.(Int64Type)
 	}
+	return false
 }
 func (v Int64Type) LessThan(other Comparer) bool {
-	switch other := other.(type) {
+	fmt.Println("INT64 LessThan", v, other)
+	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) < other
+		return Float64Type(v) < o
+	case StringType:
+		return !(o.GreaterThan(v) || o.Equal(v))
 	default:
-		return v < other.(Int64Type)
+		return v < o.(Int64Type)
 	}
 }
 func (v Int64Type) GreaterThan(other Comparer) bool {
-	switch other := other.(type) {
+	fmt.Println("INT64 GreaterThan", v, other)
+	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) > other
+		return Float64Type(v) > o
+	case StringType:
+		return !(o.LessThan(v) || o.Equal(v))
 	default:
-		return v > other.(Int64Type)
+		return v > o.(Int64Type)
 	}
+	return false
 }
 func (v StringType) Equal(other Comparer) bool {
-	otherString, ok := other.(StringType)
-	if !ok {
-		panic(fmt.Sprintf("cannot type assert to string: %v", other))
+	switch o := other.(type) {
+	case StringType:
+		// case insensitive comparison
+		return strings.EqualFold(string(v), string(o))
+	case Int64Type:
+		return string(v) == strconv.Itoa(int(o))
+	case Uint64Type:
+		return string(v) == strconv.Itoa(int(o))
+	case Float64Type:
+		return string(v) == fmt.Sprintf("%G", o)
 	}
-	return strings.EqualFold(string(v), string(otherString)) // case insensitive comparison
+	return false
 }
 func (v StringType) LessThan(other Comparer) bool {
-	if other, ok := other.(StringType); ok {
-		return v < other
+	fmt.Println("StringType LessThan", v, other)
+	str := string(v)
+	if x, e := strconv.ParseFloat(str, 64); e == nil {
+		return Float64Type(x).LessThan(other)
+	}
+	if x, e := strconv.ParseUint(str, 10, 64); e == nil {
+		return Uint64Type(x).LessThan(other)
+	}
+	if x, e := strconv.ParseInt(str, 0, 64); e == nil {
+		// this case handles hex strings too, based on prefix
+		return Int64Type(x).LessThan(other)
+	}
+	if o, ok := other.(StringType); ok {
+		return str > string(o)
 	}
 	return false
 }
 func (v StringType) GreaterThan(other Comparer) bool {
-	if other, ok := other.(StringType); ok {
-		return v > other
+	str := string(v)
+	if x, e := strconv.ParseFloat(str, 64); e == nil {
+		return Float64Type(x).GreaterThan(other)
+	}
+	if x, e := strconv.ParseUint(str, 10, 64); e == nil {
+		return Uint64Type(x).GreaterThan(other)
+	}
+	if x, e := strconv.ParseInt(str, 0, 64); e == nil {
+		// this case handles hex strings too, based on prefix
+		return Int64Type(x).GreaterThan(other)
+	}
+	if o, ok := other.(StringType); ok {
+		return str > string(o)
 	}
 	return false
 }

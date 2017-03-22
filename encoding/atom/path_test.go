@@ -114,12 +114,28 @@ GINF:CONT:
 END
 `
 
+const TestAtom2Text = `
+ROOT:CONT:
+		UI_1:UI64:1
+		UIMX:UI64:0xFFFFFFFF
+		SI_N:SI64:-10
+		SI_P:SI64:15
+		FP_P:FP64:15.5
+		FP_N:FP64:-15.5
+END
+`
+
 // Tests of atom path matching
 var TestAtom1 = new(Atom)
+var TestAtom2 = new(Atom)
 var TestAtomGINF = new(Atom)
 
 func init() {
 	err := TestAtom1.UnmarshalText([]byte(TestAtom1Text))
+	if err != nil {
+		panic(err)
+	}
+	err = TestAtom2.UnmarshalText([]byte(TestAtom2Text))
 	if err != nil {
 		panic(err)
 	}
@@ -242,15 +258,54 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "ROOT[shazbot(5)]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[shazbot(5)]"`)},
 		PathTest{TestAtom1, "ROOT[not(shazbot())]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[not(shazbot())]"`)},
 
-		// test usage of
-		// 		PathTest{"CN1A/*[@name=\"DOGS\"]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		// 		PathTest{"CN1A/*[@name='DOGS']", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		// 		PathTest{"CN1A/*[@name=DOGS]", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		// 		PathTest{"CN1A/DOGS", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		// 		PathTest{TestAtomGINF, "//AVAL/@name > 0", []string{`DOGS:UI32:1`, `DOGS:UI32:2`, `DOGS:UI32:3`}, nil},
-		//
-		// 		// syntactically valid but semantically a contradiction, name CN1A != name DOGS
-		// 		PathTest{"CN1A[@name=DOGS]", []string{}, nil},
+		// test usage of attributes which retrieve atom data
+
+		// multiple delimiters (or no delimiters) are accepted
+		PathTest{TestAtom1, `ROOT/0001/LEAF[@name="LEAF"]`, []string{`LEAF:UI32:1`, `LEAF:UI32:2`, `LEAF:UI32:3`}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[@name='LEAF']", []string{`LEAF:UI32:1`, `LEAF:UI32:2`, `LEAF:UI32:3`}, nil},
+		PathTest{TestAtom1, "ROOT/0001/LEAF[@name=LEAF]", []string{`LEAF:UI32:1`, `LEAF:UI32:2`, `LEAF:UI32:3`}, nil},
+
+		PathTest{TestAtom1, "//LEAF",
+			strings.Split("LEAF:UI32:1 LEAF:UI32:2 LEAF:UI32:3 LEAF:UI32:4 LEAF:UI32:5 LEAF:UI32:6 LEAF:UI32:7 LEAF:UI32:8 LEAF:UI32:9", " "), nil},
+		PathTest{TestAtom1, "//LEAF[ @data = 2 ] ", []string{"LEAF:UI32:2"}, nil},
+		PathTest{TestAtom1, "//*[@data=3]", []string{"LEAF:UI32:3"}, nil},
+		PathTest{TestAtomGINF, "//AVAL/*", []string{
+			"0x00000000:UI32:2",
+			"0x00000001:UI32:908767",
+			"0x00000000:UI32:2",
+			"0x00000001:UI64:1484722540084888",
+			"0x00000000:UI32:2",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			"0x00000000:UI32:2",
+			`0x00000001:CSTR:"10.4.0"`,
+		}, nil},
+		PathTest{TestAtomGINF, "//AVAL/[@name > 0]", []string{}, errInvalidPath(`<empty> in "//AVAL/[@name > 0]"`)},
+		PathTest{TestAtomGINF, "//AVAL/*[@name > 0]", []string{
+			"0x00000001:UI32:908767",
+			"0x00000001:UI64:1484722540084888",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000001:CSTR:"10.4.0"`,
+		}, nil},
+
+		// syntactically valid but semantically a contradiction. No error and no results.
+		PathTest{TestAtom1, "/ROOT[@name=NONE]", []string{}, nil},
+
+		// Test less-than operator and its type conversions
+		PathTest{TestAtom2, "/ROOT/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 < 2]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[UI_1 < 2.0]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[2 < UI_1]", []string{}, nil},
+		//		PathTest{TestAtom2, "/ROOT[UI_1 < UIMX]", []string{}, nil},
+		//		PathTest{TestAtom2, "/ROOT[SI_N < UIMX]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[SI_N < UI_1]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[UI_1 < SI_P]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[UI_1 < FP_P]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[FP_N < UI_1]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[FP_N < UIMX]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[FP_N < SI_N]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[FP_N < SI_P]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[FP_N < FP_P]", []string{"ROOT:CONT:"}, nil},
+
 		//
 		// 		PathTest{"CN1A/*[position()>3]", []string{"CATS:UI32:1", "CN2A:CONT:"}, nil},
 		// 		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
