@@ -1213,19 +1213,35 @@ func (v StringType) GreaterThan(other Comparer) bool {
 	return false
 }
 func (v Float64Type) Plus(other Arithmeticker) Arithmeticker {
-	return v + other.(Float64Type)
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(float64(v) + float64(o))
+	case Int64Type:
+		return Float64Type(float64(v) + float64(o))
+	case Uint64Type:
+		return Float64Type(float64(v) + float64(o))
+	}
+	panic(fmt.Sprintf("addition not supported for type %T, value '%[1]v'", other))
 }
 func (v Float64Type) Minus(other Arithmeticker) Arithmeticker {
-	return v - other.(Float64Type)
+	switch o := other.(type) {
+	case Float64Type:
+		return Float64Type(float64(v) - float64(o))
+	case Int64Type:
+		return Float64Type(float64(v) - float64(o))
+	case Uint64Type:
+		return Float64Type(float64(v) - float64(o))
+	}
+	panic(fmt.Sprintf("multiplication not supported for type %T, value '%[1]v'", other))
 }
 func (v Float64Type) Multiply(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
+	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(float64(v) * float64(other))
+		return Float64Type(float64(v) * float64(o))
 	case Int64Type:
-		return Float64Type(float64(v) * float64(other))
+		return Float64Type(float64(v) * float64(o))
 	case Uint64Type:
-		return Float64Type(float64(v) * float64(other))
+		return Float64Type(float64(v) * float64(o))
 	}
 	panic(fmt.Sprintf("multiplication not supported for type %T, value '%[1]v'", other))
 }
@@ -1326,21 +1342,32 @@ func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
 func (v Int64Type) Plus(other Arithmeticker) Arithmeticker {
 	switch o := other.(type) {
 	case Float64Type:
-		return Int64Type(int64(v) + int64(o))
+		return Float64Type(float64(v) + float64(o))
 	case Int64Type:
 		return Int64Type(int64(v) + int64(o))
 	case Uint64Type:
-		return Int64Type(int64(v) + int64(o))
+		if int64(v) < 0 {
+			return Int64Type(int64(v) + int64(o))
+		} else {
+			return Uint64Type(uint64(v) + uint64(o))
+		}
 	}
 	panic(fmt.Sprintf("integer addition not supported for type %T value '%[1]v'", other))
 }
 func (v Int64Type) Minus(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(v) - other
-	default:
-		return v - other.(Int64Type)
+		return Float64Type(float64(v) - float64(other))
+	case Int64Type:
+		return Int64Type(int64(v) - int64(other))
+	case Uint64Type:
+		if v < 0 {
+			return Int64Type(int64(v) - int64(other))
+		} else {
+			return Uint64Type(uint64(v) - uint64(other))
+		}
 	}
+	panic(fmt.Sprintf("subtraction not supported for type %T value '%[1]v'", other))
 }
 func (v Int64Type) Multiply(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
