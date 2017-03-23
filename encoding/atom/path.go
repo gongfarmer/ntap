@@ -348,11 +348,11 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 
 func (pre *PredicateEvaluator) getChildValue(atomName string) (v Comparer, ok bool) {
 	for _, a := range pre.AtomPtr.Children {
-		fmt.Println("         --> ", atomName, " vs. ", a.Name)
 		if a.Name != atomName {
 			continue
 		}
 		v = atomValueToComparerType(a)
+		fmt.Printf("  getChildValue(%s) := %v.(%[2]T)\n", atomName, v)
 		ok = true
 		break
 	}
@@ -1309,23 +1309,25 @@ func (v Uint64Type) Multiply(other Arithmeticker) Arithmeticker {
 	}
 }
 func (v Uint64Type) Divide(other Arithmeticker) Arithmeticker {
+	fmt.Println("UI64::Divide", v, other)
 	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) / o
+		return Float64Type(float64(v) / float64(o))
 	case Int64Type:
-		return Int64Type(v) / o
-	default:
-		return v / o.(Uint64Type)
+		return Float64Type(float64(v) / float64(o))
+	case Uint64Type:
+		return Float64Type(float64(v) / float64(o))
 	}
+	panic(fmt.Sprintf("division not supported for type %T value '%[1]v'", other))
 }
 func (v Uint64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
+	switch o := other.(type) {
 	case Float64Type:
-		return Int64Type(int64(v) / int64(other))
+		return Int64Type(int64(v) / int64(o))
 	case Int64Type:
-		return Int64Type(int64(v) / int64(other))
+		return Int64Type(int64(v) / int64(o))
 	case Uint64Type:
-		return Uint64Type(uint64(v) / uint64(other))
+		return Uint64Type(uint64(v) / uint64(o))
 	}
 	panic(fmt.Sprintf("integer division not supported for type %T value'%[1]v'", other))
 }
@@ -1372,10 +1374,17 @@ func (v Int64Type) Minus(other Arithmeticker) Arithmeticker {
 func (v Int64Type) Multiply(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(v) * other
-	default:
-		return v * other.(Int64Type)
+		return Float64Type(float64(v) * float64(other))
+	case Int64Type:
+		return Int64Type(int64(v) * int64(other))
+	case Uint64Type:
+		if v < 0 {
+			return Int64Type(int64(v) * int64(other))
+		} else {
+			return Uint64Type(uint64(v) * uint64(other))
+		}
 	}
+	panic(fmt.Sprintf("subtraction not supported for type %T value '%[1]v'", other))
 }
 func (v Int64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
@@ -1391,10 +1400,13 @@ func (v Int64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
 func (v Int64Type) Divide(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(v) / other
-	default:
-		return v / other.(Int64Type)
+		return Float64Type(float64(v) / float64(other))
+	case Int64Type:
+		return Float64Type(float64(v) / float64(other))
+	case Uint64Type:
+		return Float64Type(float64(v) / float64(other))
 	}
+	panic(fmt.Sprintf("division not supported for type %T value '%[1]v'", other))
 }
 func (v Int64Type) Mod(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {

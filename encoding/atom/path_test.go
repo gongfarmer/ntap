@@ -287,6 +287,35 @@ func TestAtomsAtPath(t *testing.T) {
 		}, nil},
 		PathTest{TestAtom1, "/ROOT[@name=NONE]", []string{}, nil},
 
+		// === Equality Operator testing.
+		PathTest{TestAtom2, "/ROOT/UI_1[2 = @data]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[2 = UI_1]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[2.0 = UI_1]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[2.0 = 2.00000000000]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 = 2]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[UIMX = UI_1]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[UIMX = SI_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 = SI_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[SI_P = UI_1]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[FP_P = UI_1]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 = FP_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[UIMX = FP_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N = FP_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[SI_P = FP_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[FP_P = FP_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 = UI_1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[2.0 = 2]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UIMX = UIMX]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N = SI_N]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_P = SI_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_P = FP_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_N = FP_N]", []string{"ROOT:CONT:"}, nil},
+
+		// === Comparison Operator testing.
+		// For all possible combinations of 2 types, test the pair twice
+		// so that they switch being the left-hand-side/right-hand-side.
+		// These are different code paths.
+
 		// Test less-than operator and its type conversions
 		PathTest{TestAtom2, "/ROOT/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 < 2]", strings.Split("ROOT:CONT:", " "), nil},
@@ -319,30 +348,12 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[SI_P > FP_N]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_P > FP_N]", []string{"ROOT:CONT:"}, nil},
 
-		// Test equals operator and its type conversions
-		PathTest{TestAtom2, "/ROOT/UI_1[2 = @data]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[2 = UI_1]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[2.0 = UI_1]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[UI_1 = 2]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[UIMX = UI_1]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[UIMX = SI_N]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[UI_1 = SI_N]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[SI_P = UI_1]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[FP_P = UI_1]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[UI_1 = FP_N]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[UIMX = FP_N]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[SI_N = FP_N]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[SI_P = FP_N]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[FP_P = FP_N]", zero, nil},
-		PathTest{TestAtom2, "/ROOT[UI_1 = UI_1]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[2.0 = 2]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[UIMX = UIMX]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[SI_N = SI_N]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[SI_P = SI_P]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[FP_P = FP_P]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[FP_N = FP_N]", []string{"ROOT:CONT:"}, nil},
+		// === Arithmetic Operator testing.
+		// For all possible combinations of 2 types, test the pair twice
+		// so that they switch being the left-hand-side/right-hand-side.
+		// These are different code paths.
 
-		// Test plus operator and its type conversions
+		// addition
 		PathTest{TestAtom2, "/ROOT[UI_1 + 2 = 3]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 + UI_1 = 2]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 + 2.0 = 0x00000003]", []string{"ROOT:CONT:"}, nil},
@@ -357,21 +368,51 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N + SI_N = -25.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N + UI_1 = -14.5]", []string{"ROOT:CONT:"}, nil},
 
-		// Test minus operator and its type conversions
+		// subtraction
 		PathTest{TestAtom2, "/ROOT[0xFFFFFFFE = UIMX - UI_1]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 - 2 = -1]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 - UI_1 = 0]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 - 2.0 = -1]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 - SI_N = 11]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[UI_1 - FP_N = 14.5]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 - FP_N = 16.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_N - UI_1 = -11]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[5 = SI_N - SI_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[-25 = SI_N - SI_P]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_N - UI_1 = -11]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_P - UI_1 = 14]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_N - FP_P = -25.5]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[SI_N - FP_N = -25.5]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[FP_N - SI_N = 5.5]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N - FP_N = 5.5]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_N - SI_N = -5.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N - UI_1 = -16.5]", []string{"ROOT:CONT:"}, nil},
+
+		// multiplication
+		PathTest{TestAtom2, "/ROOT[UI_1 * 2 = 2.0]", strings.Split("ROOT:CONT:", " "), nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 * UI_1 = 0x01]", strings.Split("ROOT:CONT:", " "), nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 * 2.0 = 0x02]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 * SI_N = -10]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 * FP_N = -15.5]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[-150 = SI_N * SI_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N * UI_1 = -10]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_P * UI_1 = 15]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N * FP_P = -155]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N * FP_N = 155.000]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_N * SI_N = 0x9B]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_N * UI_1 = -15.5]", []string{"ROOT:CONT:"}, nil},
+
+		// division
+		PathTest{TestAtom2, "/ROOT[UI_1 div 2 = 0.5]", strings.Split("ROOT:CONT:", " "), nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 div UI_1 = 0x01]", strings.Split("ROOT:CONT:", " "), nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 div 2.0 = 0.5]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 div SI_N = -0.1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[UI_1 div FP_N = -0.06451612903225806451]", []string{"ROOT:CONT:"}, nil},
+		// FIXME: allow this?
+		//		PathTest{TestAtom2, "/ROOT[UI_1 div FP_N = -.06451612903225806451]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[-0.6666666666666666 = SI_N div SI_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N div UI_1 = -10]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_P div UI_1 = SI_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N div FP_P = -0.64516129032258064516]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[SI_N div FP_N = 0.64516129032258064516]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_N div SI_N = 1.55]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_N div UI_1 = FP_N]", []string{"ROOT:CONT:"}, nil},
 
 		//
 		// 		PathTest{"CN1A/*[position()>3]", []string{"CATS:UI32:1", "CN2A:CONT:"}, nil},
