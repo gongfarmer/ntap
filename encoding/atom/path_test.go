@@ -200,6 +200,18 @@ func TestAtomsAtPath(t *testing.T) {
 			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
 			`0x00000001:CSTR:"10.4.0"`}, nil,
 		},
+		PathTest{TestAtomGINF, "GINF/*/AVAL/*[@name > 0x00000000]", []string{
+			"0x00000001:UI32:908767",
+			"0x00000001:UI64:1484722540084888",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000001:CSTR:"10.4.0"`}, nil,
+		},
+		PathTest{TestAtomGINF, "GINF/*/AVAL/*[@name > 0]", []string{
+			"0x00000001:UI32:908767",
+			"0x00000001:UI64:1484722540084888",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000001:CSTR:"10.4.0"`}, nil,
+		},
 		PathTest{TestAtomGINF, "GINF/*/AVAL/*", []string{
 			"0x00000000:UI32:2",
 			"0x00000001:UI32:908767",
@@ -211,8 +223,8 @@ func TestAtomsAtPath(t *testing.T) {
 			`0x00000001:CSTR:"10.4.0"`}, nil,
 		},
 
-		// test path indexing.  indexing starts from 1 not 0 (this is an XPath convention.)
-		// xpath returns no error on request for 0 index, even though it cannot exist.
+		// test path indexing.  indexing starts from 1 not 0, per XPath convention.
+		// xpath returns no error on request for 0 index
 		PathTest{TestAtom1, "ROOT/0001/LEAF[0]", []string{}, nil},
 		PathTest{TestAtom1, "ROOT/0001/LEAF[1]", []string{"LEAF:UI32:1"}, nil},
 		PathTest{TestAtom1, "ROOT/0001/LEAF[2]", []string{"LEAF:UI32:2"}, nil},
@@ -447,7 +459,6 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod 4 = -3.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
 
-		// 		PathTest{"CN1A/*[position()>3]", []string{"CATS:UI32:1", "CN2A:CONT:"}, nil},
 		// 		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
 		// 		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
 		// 		PathTest{"CN1A/DOGS[@data>=2]", []string{
