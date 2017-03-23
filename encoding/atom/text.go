@@ -115,6 +115,7 @@ func (a *Atom) UnmarshalText(input []byte) (err error) {
 
 const (
 	digits            = "0123456789"
+	numericChars      = ".0123456789"
 	hexDigits         = "0123456789abcdefABCDEF"
 	alphabetLowerCase = "abcdefghijklmnopqrstuvwxyz"
 	alphabetUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

@@ -417,10 +417,10 @@ func lexPredicate(l *lexer) stateFn {
 			l.emit(itemRightParen)
 		case r == '+', r == '*':
 			l.emit(itemArithmeticOperator)
-		case strings.ContainsRune(digits, r):
+		case strings.ContainsRune(numericChars, r):
 			lexNumberInPath(l)
 		case r == '-':
-			if strings.ContainsRune(digits, rune(l.peek())) && !isNumericItem(l.prevItemType) {
+			if strings.ContainsRune(numericChars, rune(l.peek())) && !isNumericItem(l.prevItemType) {
 				lexNumberInPath(l)
 			} else {
 				l.emit(itemArithmeticOperator)
@@ -898,12 +898,12 @@ func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 	var err error
 	switch pre.Tokens.top().typ {
 	case itemInteger, itemHex:
-		v, errr := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
-		err = errr
+		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
+		err = e
 		result = Int64Type(v)
 	case itemFloat:
-		v, errr := strconv.ParseFloat(pre.Tokens.pop().value, 64)
-		err = errr
+		v, e := strconv.ParseFloat(pre.Tokens.pop().value, 64)
+		err = e
 		result = Float64Type(v)
 	case itemBareString:
 		t := pre.Tokens.pop()
@@ -1276,7 +1276,7 @@ func (v Float64Type) Mod(other Arithmeticker) Arithmeticker {
 	case Uint64Type:
 		return Float64Type(math.Mod(float64(v), float64(other)))
 	}
-	panic(fmt.Sprintf("arithmetic modulus not supported for type %T, value '%[1]v'", other))
+	panic(fmt.Sprintf("modulus not supported for type %T, value '%[1]v'", other))
 }
 func (v Uint64Type) Plus(other Arithmeticker) Arithmeticker {
 	switch other := other.(type) {
@@ -1336,10 +1336,11 @@ func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
 	case Float64Type:
 		return Float64Type(math.Mod(float64(v), float64(o)))
 	case Int64Type:
-		return Int64Type(v) % o
-	default:
-		return v % o.(Uint64Type)
+		return Int64Type(int64(v) % int64(o))
+	case Uint64Type:
+		return Uint64Type(uint64(v) % uint64(o))
 	}
+	panic(fmt.Sprintf("modulus not supported for type %T value'%[1]v'", other))
 }
 func (v Int64Type) Plus(other Arithmeticker) Arithmeticker {
 	switch o := other.(type) {
@@ -1409,12 +1410,19 @@ func (v Int64Type) Divide(other Arithmeticker) Arithmeticker {
 	panic(fmt.Sprintf("division not supported for type %T value '%[1]v'", other))
 }
 func (v Int64Type) Mod(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
+	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(math.Mod(float64(v), float64(other)))
-	default:
-		return v % other.(Int64Type)
+		return Float64Type(math.Mod(float64(v), float64(o)))
+	case Int64Type:
+		return Int64Type(int64(v) % int64(o))
+	case Uint64Type:
+		if v < 0 {
+			return Int64Type(int64(v) % int64(o))
+		} else {
+			return Uint64Type(uint64(v) % uint64(o))
+		}
 	}
+	panic(fmt.Sprintf("modulus not supported for type %T value '%[1]v'", other))
 }
 func (v BooleanType) Equal(other Equaler) bool {
 	fmt.Println("EQUALERBOOL")
