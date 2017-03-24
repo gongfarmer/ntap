@@ -302,12 +302,20 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 		return
 	}
 
-	// apply predicate to determine which elements to keep
-	pre, e := NewPredicateEvaluator(predicate)
-	if e != nil {
-		return
+	// a predicate including union operator "|" must be treated as a set
+	// of independent predicates, return the union of the results.
+	for _, predicate := range strings.Split(predicate, "|") {
+		// apply predicate to determine which elements to keep
+		pre, e := NewPredicateEvaluator(predicate)
+		if e != nil {
+			return []*Atom{}, e
+		}
+		results, e := pre.Evaluate(candidates)
+		if e != nil {
+			return []*Atom{}, e
+		}
+		atoms = append(atoms, results...)
 	}
-	atoms, e = pre.Evaluate(candidates)
 	return
 }
 

@@ -435,6 +435,7 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N div SI_N = 1.55]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N div UI_1 = FP_N]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT/UINT[position() le last() div 2]", []string{
+			// get the first half  of the set
 			"UINT:UI32:1",
 			"UINT:UI32:2",
 			"UINT:UI32:3",
@@ -442,6 +443,7 @@ func TestAtomsAtPath(t *testing.T) {
 			"UINT:UI32:5",
 		}, nil},
 		PathTest{TestAtom2, "/ROOT/UINT[position() > last() div 2]", []string{
+			// get the last half  of the set
 			"UINT:UI32:6",
 			"UINT:UI32:7",
 			"UINT:UI32:8",
@@ -483,6 +485,7 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod 4 = -3.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtomGINF, "//AVAL/*[@name_int32 mod 2 = 0]", []string{
+			// get even-numbered elements
 			"0x00000000:UI32:2",
 			"0x00000000:UI32:2",
 			"0x00000000:UI32:2",
@@ -511,17 +514,16 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[ | position() = 1]", []string{}, errInvalidPredicate(`| has no left-hand-side value in "/ROOT[ | position() = 1]"`)},
 		PathTest{TestAtom2, "/ROOT[ position() = 1 |]", []string{}, errInvalidPredicate(`| has no right-hand-side value in "/ROOT[ position() = 1 |]"`)},
 		PathTest{TestAtom2, "/ROOT[ position() = 1 | ()]", []string{}, errInvalidPredicate(`| has no right-hand-side value in "/ROOT[ position() = 1 | ()]"`)},
-		//		PathTest{TestAtomGINF, `//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{
-		//			"0x00000000:UI32:2",
-		//			"0x00000001:UI32:908767",
-		//			"0x00000000:UI32:2",
-		//			"0x00000001:UI64:1484722540084888",
-		//			"0x00000000:UI32:2",
-		//			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-		//			"0x00000000:UI32:2",
-		//			`0x00000001:CSTR:"10.4.0"`,
-		//		}, nil},
-
+		PathTest{TestAtomGINF, `[//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{
+			"0x00000000:UI32:2",
+			"0x00000001:UI32:908767",
+			"0x00000000:UI32:2",
+			"0x00000001:UI64:1484722540084888",
+			"0x00000000:UI32:2",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			"0x00000000:UI32:2",
+			`0x00000001:CSTR:"10.4.0"`,
+		}, nil},
 	}
 	runPathTests(t, tests)
 }
