@@ -87,6 +87,7 @@ package atom
 // this is good because it handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
 import (
 	"fmt"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -181,6 +182,27 @@ type PredicateParser struct {
 	err         PathError   // indicates parsing succeeded or describes what failed
 }
 
+// func New(out io.Writer, prefix string, flag int) *Logger
+//     New creates a new Logger. The out variable sets the destination to which
+// 		    log data will be written. The prefix appears at the beginning of each
+// 				    generated log line. The flag argument defines the logging properties.
+//
+//
+// type AtomPath struct {
+// 	Path string
+// 	Log log.Logger
+// 	Evaluator PathErr
+// }
+//
+// func NewAtomPath(path_raw string) {
+// 	path := strings.TrimSpace(path_raw)
+// 	logger := log.New(ioutil.Discard,
+//
+// }
+//
+// func (ap* AtomPath) SetLogger(l log.Logger) {
+// }
+
 func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
 	path := strings.TrimSpace(path_raw)
 	switch {
@@ -234,19 +256,25 @@ func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []
 }
 
 func doLocationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) {
-	pathTest, predicate, e := splitLocationStep(pathPart)
+	pathTest, predicates, e := splitLocationStep(pathPart)
 	if e != nil {
 		return
 	}
 
-	// build up a list of possible atoms that match the path test
+	// collect atoms that match the path test
 	atoms, e = doPathTest(candidates, pathTest)
 	if e != nil {
 		return atoms, e
 	}
 
-	// cull those that don't satisfy the predicate
-	return doPredicate(atoms, predicate)
+	// cull those that don't satisfy all predicates
+	for _, p := range predicates {
+		atoms, e = doPredicate(atoms, p)
+		if e != nil {
+			return
+		}
+	}
+	return
 }
 
 // pathTest builds a list of atoms whose name matches the path test string.
@@ -262,6 +290,7 @@ func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
 			atoms = append(atoms, a)
 		}
 	}
+	log.Printf("pathTest(%s) got atoms %v\n", pathTest, atoms)
 	return
 }
 
@@ -269,7 +298,8 @@ func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
 // satisfy the predicate.
 func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) {
 	if predicate == "" {
-		return candidates, nil
+		e = errInvalidPredicate("empty predicate")
+		return
 	}
 
 	// apply predicate to determine which elements to keep
@@ -285,8 +315,9 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 // containing the path test and predicate . The square brackets around the
 // filter are stripped.
 // Example:
-// "CN1A[@name=DOGS and @type=UI32]" => "CN1A", "@name=DOGS and @type=UI32"
-func splitLocationStep(pathRaw string) (pathTest, predicate string, e error) {
+//   "CN1A[@type=UI32]" => "CN1A", ["@type=UI32"]
+//   "CN1A[@name=ROOT][@type=UI32][3]" => "CN1A", ["@name=ROOT","@type=UI32","3"]
+func splitLocationStep(pathRaw string) (pathTest string, predicates []string, e error) {
 	path := strings.TrimSpace(pathRaw)
 	i_start := strings.IndexByte(path, '[')
 	if i_start == -1 {
@@ -297,13 +328,21 @@ func splitLocationStep(pathRaw string) (pathTest, predicate string, e error) {
 		}
 		return
 	}
-	i_end := strings.LastIndexByte(path, ']')
-	if i_end == -1 { // path lacks closing ]
-		e = errInvalidPredicate("unterminated square brackets")
-		return
+	pathTest = strings.TrimSpace(path[:i_start])
+	// there's at least one predicate if we get here
+
+	// collect each predicate delimited by [ ... ]
+	for _, p := range strings.Split(path[i_start+1:], "[") {
+		trimmed := strings.TrimSpace(p)
+		if !strings.HasSuffix(trimmed, "]") {
+			e = errInvalidPredicate("unterminated square brackets")
+			break
+		}
+		// strip ] and any preceding whitespace
+		predicates = append(predicates, strings.TrimSpace(trimmed[:len(trimmed)-1]))
 	}
-	pathTest = path[:i_start]
-	predicate = path[i_start+1 : i_end]
+
+	// Already verified that there's nothing after the last ], so done
 	return
 }
 
@@ -315,7 +354,7 @@ func splitLocationStep(pathRaw string) (pathTest, predicate string, e error) {
 func NewPredicateEvaluator(predicate string) (pre *PredicateEvaluator, err error) {
 	var lexr = NewPredicateLexer(predicate)
 	pre = new(PredicateEvaluator)
-	fmt.Println("===== ", predicate)
+	log.Println("==== NewPredicate: ", predicate)
 	pre.tokens, err = parseTokens(lexr.items)
 	return
 }
@@ -531,6 +570,10 @@ func lexBareString(l *lexer) stateFn {
 	switch l.buffer() {
 	case "div", "idiv", "mod":
 		l.emit(itemArithmeticOperator)
+	case "union":
+		l.emit(itemUnionOperator)
+	case "eq", "ne", "lt", "le", "gt", "ge":
+		l.emit(itemComparisonOperator)
 	default:
 		l.emit(itemBareString)
 	}
@@ -621,7 +664,7 @@ func (pp *PredicateParser) errorf(format string, args ...interface{}) bool {
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (pp *PredicateParser) parseToken(it item) bool {
 	str := fmt.Sprintf("  parseToken(%s,%v)", it.typ, it.value)
-	fmt.Printf("%-35s %30s %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
+	log.Printf("%-35s %30s %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
 	switch it.typ {
 	case itemError:
 		return pp.errorf(it.value)
@@ -641,7 +684,7 @@ func (pp *PredicateParser) parseToken(it item) bool {
 			if pp.opStack.empty() || !isOperatorItem(pp.opStack.top()) {
 				break
 			}
-			fmt.Printf("        precedence: %s[%d] <=> %s[%d]\n", it.value, itemPrec, pp.opStack.top().value, precedence(pp.opStack.top().value))
+			log.Printf("        precedence: %s[%d] <=> %s[%d]\n", it.value, itemPrec, pp.opStack.top().value, precedence(pp.opStack.top().value))
 			if itemPrec > precedence(pp.opStack.top().value) {
 				break
 			}
@@ -713,7 +756,7 @@ func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathEr
 // evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
 func (pre *PredicateEvaluator) eval() (result bool) {
 	var results []Equaler
-	fmt.Printf("eval()  %v\n", pre.Tokens)
+	log.Printf("eval()  %v\n", pre.Tokens)
 Loop:
 	for !pre.Tokens.empty() && pre.Error == nil {
 		switch pre.Tokens.top().typ {
@@ -824,17 +867,17 @@ func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
 		return BooleanType(false)
 	}
 	switch op.value {
-	case "=":
+	case "=", "eq":
 		result = lhs.Equal(rhs)
-	case "!=":
+	case "!=", "ne":
 		result = !lhs.Equal(rhs)
-	case "<":
+	case "<", "lt":
 		result = lhs.LessThan(rhs)
-	case ">":
+	case ">", "gt":
 		result = lhs.GreaterThan(rhs)
-	case "<=":
+	case "<=", "le":
 		result = lhs.LessThan(rhs) || lhs.Equal(rhs)
-	case ">=":
+	case ">=", "ge":
 		result = lhs.GreaterThan(rhs) || lhs.Equal(rhs)
 	default:
 		pre.errorf("unknown comparison operator: %s", op.value)
@@ -926,6 +969,13 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 	switch item.value {
 	case "@name":
 		return StringType(pre.AtomPtr.Name)
+	case "@name_int32":
+		name, err := strconv.ParseUint(pre.AtomPtr.Name, 0, 32)
+		if err != nil {
+			pre.errorf("invalid atom @name_int32: %s", pre.AtomPtr.Name)
+			return
+		}
+		return Uint64Type(name)
 	case "@type":
 		return StringType(pre.AtomPtr.Type())
 	case "@data":
@@ -1049,8 +1099,10 @@ func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
 	}
 	switch item.value {
 	case "position":
+		log.Printf(`  evalFunctionNumeric("%s") = %d`, item.value, pre.Position)
 		return Uint64Type(pre.Position)
 	case "last", "count":
+		log.Printf(`  evalFunctionNumeric("%s") = %d`, item.value, pre.Count)
 		return Uint64Type(pre.Count)
 	default:
 		pre.errorf("unknown numeric function: %s", item.value)
@@ -1380,6 +1432,7 @@ func (v Uint64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
 	panic(fmt.Sprintf("integer division not supported for type %T value'%[1]v'", other))
 }
 func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
+	fmt.Println("Uint64Typ::Mod", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(math.Mod(float64(v), float64(o)))

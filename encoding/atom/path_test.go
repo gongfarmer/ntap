@@ -122,6 +122,16 @@ ROOT:CONT:
 		SI_P:SI64:15
 		FP_P:FP64:15.5
 		FP_N:FP64:-15.5
+		UINT:UI32:1
+		UINT:UI32:2
+		UINT:UI32:3
+		UINT:UI32:4
+		UINT:UI32:5
+		UINT:UI32:6
+		UINT:UI32:7
+		UINT:UI32:8
+		UINT:UI32:9
+		UINT:UI32:10
 END
 `
 
@@ -424,6 +434,20 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[SI_N div FP_N = 0.64516129032258064516]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N div SI_N = 1.55]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N div UI_1 = FP_N]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT/UINT[position() le last() div 2]", []string{
+			"UINT:UI32:1",
+			"UINT:UI32:2",
+			"UINT:UI32:3",
+			"UINT:UI32:4",
+			"UINT:UI32:5",
+		}, nil},
+		PathTest{TestAtom2, "/ROOT/UINT[position() > last() div 2]", []string{
+			"UINT:UI32:6",
+			"UINT:UI32:7",
+			"UINT:UI32:8",
+			"UINT:UI32:9",
+			"UINT:UI32:10",
+		}, nil},
 
 		// integer division
 		PathTest{TestAtom2, "/ROOT[10 idiv 2 = 5.0]", strings.Split("ROOT:CONT:", " "), nil},
@@ -442,7 +466,7 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N idiv 4 = -3]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N idiv UI_1 = -15]", []string{"ROOT:CONT:"}, nil},
 
-		// mod
+		// modulus
 		PathTest{TestAtom2, "/ROOT[10 mod 2 = 0.0]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[10 mod 3 = 1.0]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[10 mod UI_1 = 0]", strings.Split("ROOT:CONT:", " "), nil},
@@ -458,35 +482,46 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod 5 = -0.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod 4 = -3.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtomGINF, "//AVAL/*[@name_int32 mod 2 = 0]", []string{
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+		}, nil},
 
-		// Test predicate union operator
+		// Test predicate intersection (multiple predicates)
+		PathTest{TestAtom2, "/ROOT[position() = 1][@name=ROOT]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtomGINF, "//*/AVAL/*[@type=UI32][@data<10]", []string{
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2"}, nil},
+		PathTest{TestAtom2, "/ROOT[position() = 1][]", []string{}, errInvalidPredicate(`empty predicate in "/ROOT[position() = 1][]"`)},
+		PathTest{TestAtom2, "/ROOT [ position() = 1 ] [ 1 ] ", []string{"ROOT:CONT:"}, nil},
+
+		// predicate union operator
 		PathTest{TestAtom2, "/ROOT[position() = 1]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[true = false]", []string{}, nil},
 		PathTest{TestAtom2, "/ROOT[position() = 1 | true = false]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[true = false | position() = 1]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[ right = wrong | (dogs = cats) | position()=1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[position() = 1 union true = false]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[true = false union position() = 1]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[ (position() = 1) | (dogs = cats) | right = wrong]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[ | position() = 1]", []string{}, errInvalidPredicate(`| has no left-hand-side value in "/ROOT[ | position() = 1]"`)},
 		PathTest{TestAtom2, "/ROOT[ position() = 1 |]", []string{}, errInvalidPredicate(`| has no right-hand-side value in "/ROOT[ position() = 1 |]"`)},
+		PathTest{TestAtom2, "/ROOT[ position() = 1 | ()]", []string{}, errInvalidPredicate(`| has no right-hand-side value in "/ROOT[ position() = 1 | ()]"`)},
+		//		PathTest{TestAtomGINF, `//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{
+		//			"0x00000000:UI32:2",
+		//			"0x00000001:UI32:908767",
+		//			"0x00000000:UI32:2",
+		//			"0x00000001:UI64:1484722540084888",
+		//			"0x00000000:UI32:2",
+		//			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+		//			"0x00000000:UI32:2",
+		//			`0x00000001:CSTR:"10.4.0"`,
+		//		}, nil},
 
-		// Test multiple predicates (predicate intersection)
-		//		PathTest{TestAtom2, "/ROOT[position() = 1]", []string{"ROOT:CONT:"}, nil},
-		//		PathTest{TestAtom2, "/ROOT[true = false]", []string{}, nil},
-		//		PathTest{TestAtom2, "/ROOT[position() = 1][true = false]", []string{"ROOT:CONT:"}, nil},
-		//		PathTest{TestAtom2, "/ROOT[true = false | position() = 1]", []string{"ROOT:CONT:"}, nil},
-
-		// 		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
-		// 		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
-		// 		PathTest{"CN1A/DOGS[@data>=2]", []string{
-		// 			`DOGS:UI32:2`,
-		// 			`DOGS:UI32:3`}, nil,
-		// 		},
-		// 		PathTest{"CN1A/*[@data<2]", []string{`DOGS:UI32:1`, `CATS:UI32:1`}, nil},
-		//
-		// 		PathTest{"THER/E IS/NOTH/INGH/ERE.", zero, fmt.Errorf("atom 'ROOT' has no container child named 'THER'")},
-		// 		PathTest{"CN1A/CN2A/CN3A/LF4B/LEAF", zero, fmt.Errorf("atom 'ROOT/CN1A/CN2A/CN3A' has no container child named 'LF4B'")},
-
-		// 		// FIXME what if ] is part of the name?  use delimiters? require hex specificiation?  require 4 chars or hex?
 	}
 	runPathTests(t, tests)
 }
