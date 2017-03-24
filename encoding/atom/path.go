@@ -274,7 +274,6 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 
 	// apply predicate to determine which elements to keep
 	pre, e := NewPredicateEvaluator(predicate)
-	fmt.Printf("NEWF \"%s\" => %v\n", predicate, pre.tokens)
 	if e != nil {
 		return
 	}
@@ -327,7 +326,6 @@ func NewPredicateEvaluator(predicate string) (pre *PredicateEvaluator, err error
 // once, because the predicate may refer to individual child atoms by name,
 // requiring them to be evaluated against every other candidate.
 func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
-	fmt.Println("Start Evaluate with ", pre.tokens)
 	pre.Atoms = candidates
 	pre.Count = len(candidates)
 	for i, atomPtr := range candidates {
@@ -341,7 +339,7 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 		if ok {
 			atoms = append(atoms, atomPtr)
 		}
-		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", ok, i, pre.Count, pre.AtomPtr.Name, pre.AtomPtr.Type(), pre.Tokens)
+		//		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", ok, i, pre.Count, pre.AtomPtr.Name, pre.AtomPtr.Type(), pre.Tokens)
 	}
 	return
 }
@@ -352,7 +350,6 @@ func (pre *PredicateEvaluator) getChildValue(atomName string) (v Comparer, ok bo
 			continue
 		}
 		v = atomValueToComparerType(a)
-		fmt.Printf("  getChildValue(%s) := %v.(%[2]T)\n", atomName, v)
 		ok = true
 		break
 	}
@@ -621,7 +618,6 @@ func (pp *PredicateParser) errorf(format string, args ...interface{}) bool {
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (pp *PredicateParser) parseToken(it item) bool {
-	fmt.Println("parse item ", it.value, it.typ)
 	switch it.typ {
 	case itemError:
 		return pp.errorf(it.value)
@@ -707,7 +703,6 @@ func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathEr
 func (pre *PredicateEvaluator) eval() (result bool) {
 	var results []Equaler
 	for !pre.Tokens.empty() && pre.Error == nil {
-		fmt.Println("EVAL TOKEN TYPE: ", pre.Tokens.top().typ)
 		switch pre.Tokens.top().typ {
 		case itemBooleanOperator:
 			results = append(results, pre.evalBooleanOperator())
@@ -727,7 +722,6 @@ func (pre *PredicateEvaluator) eval() (result bool) {
 			break // FIXME want break for, but this is just break out of switch
 		}
 	}
-	fmt.Println("EVAL() results: ", results, len(results), pre.Error)
 	if pre.Error != nil {
 		return
 	}
@@ -755,7 +749,6 @@ func (pre *PredicateEvaluator) eval() (result bool) {
 		pre.errorf("result '%v' has unknown type %[1]T", results[0])
 		return
 	}
-	fmt.Println("EVAL() what am I doing over here???")
 	// calculate a boolean value from op and vars
 	return
 }
@@ -837,7 +830,6 @@ func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
 	}
 	switch op.value {
 	case "=":
-		fmt.Println(lhs, rhs)
 		result = lhs.Equal(rhs)
 	case "!=":
 		result = !lhs.Equal(rhs)
@@ -907,12 +899,9 @@ func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 		result = Float64Type(v)
 	case itemBareString:
 		t := pre.Tokens.pop()
-		if v, ok := pre.getChildValue(t.value); ok {
-			fmt.Println("IBARESTRING converted to atom value ", v)
-			// string was an Atom name.  Substitute the atom value.
+		if v, ok := pre.getChildValue(t.value); ok { // string is Atom name.  Substitute atom value.
 			result = v
 		} else {
-			fmt.Println("IBARESTRING failed to convert to atom value ", t.value)
 			result = StringType(t.value)
 		}
 	case itemString:
@@ -928,7 +917,6 @@ func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 		return
 	}
 	if err != nil {
-		fmt.Println("got error ", err)
 		pre.errorf("failed to convert '%s' to comparable value")
 		return
 	}
@@ -1083,7 +1071,6 @@ func (v Uint64Type) Equal(other Equaler) bool {
 	}
 }
 func (v Uint64Type) LessThan(other Comparer) bool {
-	fmt.Println("UINT64 LessThan", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) < o
@@ -1105,7 +1092,6 @@ func (v Uint64Type) LessThan(other Comparer) bool {
 	return false
 }
 func (v Uint64Type) GreaterThan(other Comparer) bool {
-	fmt.Println("UINT64 GreaterThan", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) > o
@@ -1178,7 +1164,6 @@ func (v StringType) Equal(other Equaler) bool {
 	return false
 }
 func (v StringType) LessThan(other Comparer) bool {
-	fmt.Println("StringType LessThan", v, other)
 	str := string(v)
 	if x, e := strconv.ParseFloat(str, 64); e == nil {
 		return Float64Type(x).LessThan(other)
@@ -1309,7 +1294,6 @@ func (v Uint64Type) Multiply(other Arithmeticker) Arithmeticker {
 	}
 }
 func (v Uint64Type) Divide(other Arithmeticker) Arithmeticker {
-	fmt.Println("UI64::Divide", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(float64(v) / float64(o))
@@ -1425,7 +1409,6 @@ func (v Int64Type) Mod(other Arithmeticker) Arithmeticker {
 	panic(fmt.Sprintf("modulus not supported for type %T value '%[1]v'", other))
 }
 func (v BooleanType) Equal(other Equaler) bool {
-	fmt.Println("EQUALERBOOL")
 	switch o := other.(type) {
 	case BooleanType:
 		return bool(v) == bool(o)
