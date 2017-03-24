@@ -459,6 +459,8 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod 4 = -3.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
 
+		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5 | @name='LEAF']", []string{"ROOT:CONT:"}, nil},
+
 		// 		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
 		// 		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
 		// 		PathTest{"CN1A/DOGS[@data>=2]", []string{

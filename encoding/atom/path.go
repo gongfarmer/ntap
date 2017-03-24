@@ -98,6 +98,7 @@ const (
 	itemArithmeticOperator = "iArithmeticOp"
 	itemBooleanOperator    = "iBooleanOp"
 	itemComparisonOperator = "iCompareOp"
+	itemSetOperator        = "iSetOperator"
 	itemOperator           = "iOperator"
 	itemFunctionBool       = "iFunctionBool"
 	itemFunctionNumeric    = "iFunctionNum"
@@ -412,6 +413,8 @@ func lexPredicate(l *lexer) stateFn {
 			l.emit(itemLeftParen)
 		case r == ')':
 			l.emit(itemRightParen)
+		case r == '|':
+			l.emit(itemSetOperator)
 		case r == '+', r == '*':
 			l.emit(itemArithmeticOperator)
 		case strings.ContainsRune(numericChars, r):
@@ -625,7 +628,7 @@ func (pp *PredicateParser) parseToken(it item) bool {
 		pp.outputQueue.push(&it)
 	case itemFunctionBool:
 		pp.opStack.push(&it)
-	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
+	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemSetOperator:
 		itemPrec := precedence(it.value)
 		for {
 			if pp.opStack.empty() || !isOperatorItem(pp.opStack.top()) {
@@ -668,7 +671,7 @@ func (pp *PredicateParser) parseToken(it item) bool {
 
 func isOperatorItem(it *item) bool {
 	switch it.typ {
-	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
+	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemSetOperator:
 		return true
 	}
 	return false
@@ -704,6 +707,8 @@ func (pre *PredicateEvaluator) eval() (result bool) {
 	var results []Equaler
 	for !pre.Tokens.empty() && pre.Error == nil {
 		switch pre.Tokens.top().typ {
+		case itemSetOperator:
+			results = append(results, pre.evalSetOperator())
 		case itemBooleanOperator:
 			results = append(results, pre.evalBooleanOperator())
 		case itemComparisonOperator:
