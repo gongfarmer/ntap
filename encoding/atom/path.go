@@ -98,7 +98,7 @@ const (
 	itemArithmeticOperator = "iArithmeticOp"
 	itemBooleanOperator    = "iBooleanOp"
 	itemComparisonOperator = "iCompareOp"
-	itemSetOperator        = "iSetOperator"
+	itemUnionOperator      = "iUnionOperator"
 	itemOperator           = "iOperator"
 	itemFunctionBool       = "iFunctionBool"
 	itemFunctionNumeric    = "iFunctionNum"
@@ -205,9 +205,8 @@ func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
 	return
 }
 
-// getAtomsAnywhere searches the entire tree for matches to the given path that
-// ppear at any level.
-// must return no atoms on error
+// getAtomsAnywhere finds matches for the given path that appear at any level
+// in the tree.  It returns no atoms on error.
 func getAtomsAnywhere(a *Atom, pathParts []string, index int) (atoms []*Atom, e error) {
 	return getAtomsAtPath(a.AtomList(), pathParts, 0)
 }
@@ -316,6 +315,7 @@ func splitLocationStep(pathRaw string) (pathTest, predicate string, e error) {
 func NewPredicateEvaluator(predicate string) (pre *PredicateEvaluator, err error) {
 	var lexr = NewPredicateLexer(predicate)
 	pre = new(PredicateEvaluator)
+	fmt.Println("===== ", predicate)
 	pre.tokens, err = parseTokens(lexr.items)
 	return
 }
@@ -340,7 +340,6 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 		if ok {
 			atoms = append(atoms, atomPtr)
 		}
-		//		fmt.Printf(" %t => filter(%2d/%d, %s:%s) on %v\n", ok, i, pre.Count, pre.AtomPtr.Name, pre.AtomPtr.Type(), pre.Tokens)
 	}
 	return
 }
@@ -414,7 +413,7 @@ func lexPredicate(l *lexer) stateFn {
 		case r == ')':
 			l.emit(itemRightParen)
 		case r == '|':
-			l.emit(itemSetOperator)
+			l.emit(itemUnionOperator)
 		case r == '+', r == '*':
 			l.emit(itemArithmeticOperator)
 		case strings.ContainsRune(numericChars, r):
@@ -621,6 +620,8 @@ func (pp *PredicateParser) errorf(format string, args ...interface{}) bool {
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (pp *PredicateParser) parseToken(it item) bool {
+	str := fmt.Sprintf("  parseToken(%s,%v)", it.typ, it.value)
+	fmt.Printf("%-35s %30s %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
 	switch it.typ {
 	case itemError:
 		return pp.errorf(it.value)
@@ -628,12 +629,19 @@ func (pp *PredicateParser) parseToken(it item) bool {
 		pp.outputQueue.push(&it)
 	case itemFunctionBool:
 		pp.opStack.push(&it)
-	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemSetOperator:
+	case itemUnionOperator:
+		for ; !pp.opStack.empty(); pp.outputQueue.push(pp.opStack.pop()) {
+			// This sub-predicate is completed. Empty the operator stack.
+			// A new sub-predicate begins after the | operator.
+		}
+		pp.outputQueue.push(&it)
+	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
 		itemPrec := precedence(it.value)
 		for {
 			if pp.opStack.empty() || !isOperatorItem(pp.opStack.top()) {
 				break
 			}
+			fmt.Printf("        precedence: %s[%d] <=> %s[%d]\n", it.value, itemPrec, pp.opStack.top().value, precedence(pp.opStack.top().value))
 			if itemPrec > precedence(pp.opStack.top().value) {
 				break
 			}
@@ -671,7 +679,7 @@ func (pp *PredicateParser) parseToken(it item) bool {
 
 func isOperatorItem(it *item) bool {
 	switch it.typ {
-	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemSetOperator:
+	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemUnionOperator:
 		return true
 	}
 	return false
@@ -705,10 +713,16 @@ func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathEr
 // evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
 func (pre *PredicateEvaluator) eval() (result bool) {
 	var results []Equaler
+	fmt.Printf("eval()  %v\n", pre.Tokens)
+Loop:
 	for !pre.Tokens.empty() && pre.Error == nil {
 		switch pre.Tokens.top().typ {
-		case itemSetOperator:
-			results = append(results, pre.evalSetOperator())
+		case itemUnionOperator:
+			result = pre.evalUnionOperator(results)
+			if result {
+				return true // left side evaluated true, no need to evaluate right side
+			}
+			results = results[:0] // discard negative left-side evaluation result
 		case itemBooleanOperator:
 			results = append(results, pre.evalBooleanOperator())
 		case itemComparisonOperator:
@@ -724,37 +738,13 @@ func (pre *PredicateEvaluator) eval() (result bool) {
 		default:
 			t := pre.Tokens.top()
 			pre.errorf("unrecognized token '%v'", t.value)
-			break // FIXME want break for, but this is just break out of switch
+			break Loop
 		}
 	}
-	if pre.Error != nil {
-		return
+	result, err := pre.evalResults(results)
+	if err != nil {
+		pre.errorf(err.Error())
 	}
-	// verify that evaluation resulted in exactly 1 value
-	switch len(results) {
-	case 0:
-		pre.errorf("no result")
-		return
-	case 1:
-	default:
-		pre.errorf("unparsed values '%v'", results)
-		return
-	}
-	// verify that evaluation resulted in a usable type
-	switch r := results[0].(type) {
-	case BooleanType:
-		return bool(r)
-	case Int64Type:
-		return r.Equal(Int64Type(pre.Position))
-	case Uint64Type:
-		return r.Equal(Uint64Type(pre.Position))
-	case Float64Type:
-		return r.Equal(Float64Type(pre.Position))
-	default:
-		pre.errorf("result '%v' has unknown type %[1]T", results[0])
-		return
-	}
-	// calculate a boolean value from op and vars
 	return
 }
 func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
@@ -904,8 +894,8 @@ func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 		result = Float64Type(v)
 	case itemBareString:
 		t := pre.Tokens.pop()
-		if v, ok := pre.getChildValue(t.value); ok { // string is Atom name.  Substitute atom value.
-			result = v
+		if v, ok := pre.getChildValue(t.value); ok {
+			result = v // string is Atom name, substitute atom value.
 		} else {
 			result = StringType(t.value)
 		}
@@ -918,7 +908,8 @@ func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 	case itemArithmeticOperator:
 		result = pre.evalArithmeticOperator()
 	default:
-		pre.errorf("expected comparable type, got %s", pre.Tokens.top().typ)
+		t := pre.Tokens.pop()
+		pre.errorf("expected comparable type, got %s(%v)", t.typ, t.value)
 		return
 	}
 	if err != nil {
@@ -981,6 +972,74 @@ func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
 		pre.errorf("unknown boolean function: %s", item.value)
 	}
 	return BooleanType(result)
+}
+
+// evalUnionOperator takes the predicate result so far, evaluates it as a boolean
+// returns its value.
+// Returns error if the results so far do not evaluate to boolean.
+func (pre *PredicateEvaluator) evalUnionOperator(results []Equaler) (result bool) {
+
+	// consume union operator
+	op := pre.Tokens.pop()
+	if op.typ != itemUnionOperator {
+		pre.errorf("expected union operator, received type %s", op.typ)
+	}
+
+	// operator requires expressions on both sides, so error if this is the first token
+	if pre.tokens[0].typ == itemUnionOperator {
+		pre.errorf("| has no left-hand-side value")
+		return false
+	}
+
+	// evaluate results so far, same as if predicate was fully evaluated
+	var err error
+	result, err = pre.evalResults(results)
+	if err != nil {
+		// reword error message to include reference to union operator
+		errString := err.Error()
+		switch {
+		case errString == "no result":
+			pre.errorf("| has no right-hand-side value")
+		case strings.Contains(errString, "unparsed values "):
+			pre.errorf("| has multiple right-hand-side values")
+		case strings.Contains(errString, "unknown type"):
+			pre.errorf(strings.Join([]string{"| expects boolean,", errString}, " "))
+		default:
+			pre.errorf(errString)
+		}
+	}
+	return
+}
+
+func (pre *PredicateEvaluator) evalResults(results []Equaler) (result bool, err error) {
+	if pre.Error != nil {
+		return
+	}
+	// verify that evaluation resulted in exactly 1 value
+	switch len(results) {
+	case 0:
+		err = fmt.Errorf("no result")
+		return
+	case 1:
+	default:
+		err = fmt.Errorf("unparsed values '%v'", results)
+		return
+	}
+	// verify that evaluation resulted in a usable type
+	switch r := results[0].(type) {
+	case BooleanType:
+		result = bool(r)
+	case Int64Type:
+		result = r.Equal(Int64Type(pre.Position))
+	case Uint64Type:
+		result = r.Equal(Uint64Type(pre.Position))
+	case Float64Type:
+		result = r.Equal(Float64Type(pre.Position))
+	default:
+		err = fmt.Errorf("result '%v' has unknown type %[1]T", results[0])
+		return
+	}
+	return
 }
 func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
 	item := pre.Tokens.pop()
@@ -1437,9 +1496,9 @@ func isNumericItem(it itemEnum) bool {
 	return it == itemInteger || it == itemFloat
 }
 
-// These values are from the XPath 3.1 operator precdence table at
+// These values are from the XPath 3.1 operator precedence table at
 //   https://www.w3.org/TR/xpath-3/#id-precedence-order
-// Not all of these operators are implemented here.
+// Not all of these operators are actually implemented.
 func precedence(op string) (value int) {
 	switch op {
 	case ",":

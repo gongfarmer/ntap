@@ -459,7 +459,21 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod 4 = -3.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
 
-		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5 | @name='LEAF']", []string{"ROOT:CONT:"}, nil},
+		// Test predicate union operator
+		PathTest{TestAtom2, "/ROOT[position() = 1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[true = false]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[position() = 1 | true = false]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[true = false | position() = 1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[ right = wrong | (dogs = cats) | position()=1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[ (position() = 1) | (dogs = cats) | right = wrong]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[ | position() = 1]", []string{}, errInvalidPredicate(`| has no left-hand-side value in "/ROOT[ | position() = 1]"`)},
+		PathTest{TestAtom2, "/ROOT[ position() = 1 |]", []string{}, errInvalidPredicate(`| has no right-hand-side value in "/ROOT[ position() = 1 |]"`)},
+
+		// Test multiple predicates (predicate intersection)
+		//		PathTest{TestAtom2, "/ROOT[position() = 1]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[true = false]", []string{}, nil},
+		//		PathTest{TestAtom2, "/ROOT[position() = 1][true = false]", []string{"ROOT:CONT:"}, nil},
+		//		PathTest{TestAtom2, "/ROOT[true = false | position() = 1]", []string{"ROOT:CONT:"}, nil},
 
 		// 		PathTest{"*[not(@type=CONT)]", []string{"DOGS:UI32:1", "DOGS:UI32:2", "DOGS:UI32:3", "CATS:UI32:1"}, nil},
 		// 		PathTest{"CN1A[not(@type=CONT) and not(@name=DOGS)]", []string{"CATS:UI32:1"}, nil},
