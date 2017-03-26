@@ -98,6 +98,8 @@ const (
 	itemRightParen         = "iParenR"
 	itemArithmeticOperator = "iArithmeticOp"
 	itemBooleanOperator    = "iBooleanOp"
+	itemBooleanLiteral     = "iBooleanLiteral"
+	itemEqualityOperator   = "iEqualsOp"
 	itemComparisonOperator = "iCompareOp"
 	itemUnionOperator      = "iUnionOperator"
 	itemOperator           = "iOperator"
@@ -204,6 +206,7 @@ type PredicateParser struct {
 // }
 
 func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
+	log.Printf("AtomsAtPath(\"%s\")\n", path_raw)
 	path := strings.TrimSpace(path_raw)
 	switch {
 	case path == "/":
@@ -256,29 +259,35 @@ func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []
 }
 
 func doLocationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) {
-	pathTest, predicates, e := splitLocationStep(pathPart)
+	pathsToUnion, e := splitLocationStepOnUnions(pathPart)
+	log.Printf("  splitLocationStepOnUnions(\"%s\") := %v, %v\n", pathPart, pathsToUnion, e)
 	if e != nil {
 		return
 	}
 
-	// collect atoms that match the path test
-	atoms, e = doPathTest(candidates, pathTest)
-	if e != nil {
-		return atoms, e
-	}
+	for _, pathinfo := range pathsToUnion {
 
-	// cull those that don't satisfy all predicates
-	for _, p := range predicates {
-		atoms, e = doPredicate(atoms, p)
+		// collect atoms that match the path test
+		moreAtoms, e := doPathTest(candidates, pathinfo[0])
 		if e != nil {
-			return
+			return atoms, e
 		}
+
+		// cull those that don't satisfy all predicates
+		for _, p := range pathinfo[1:] {
+			moreAtoms, e = doPredicate(moreAtoms, p)
+			if e != nil {
+				return nil, e
+			}
+		}
+		atoms = append(atoms, moreAtoms...)
 	}
 	return
 }
 
 // pathTest builds a list of atoms whose name matches the path test string.
 func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
+	log.Printf("  doPathTest(%d candidates, \"%s\")", len(candidates), pathTest)
 	if pathTest == "" {
 		return atoms, errInvalidPath("")
 	}
@@ -290,13 +299,13 @@ func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
 			atoms = append(atoms, a)
 		}
 	}
-	log.Printf("pathTest(%s) got atoms %v\n", pathTest, atoms)
 	return
 }
 
 // doPredicate takes a list of atoms and filters out the ones that do not
 // satisfy the predicate.
 func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) {
+	log.Printf("  doPredicate(%d candidates, \"%s\")\n", len(candidates), predicate)
 	if predicate == "" {
 		e = errInvalidPredicate("empty predicate")
 		return
@@ -310,7 +319,10 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 		if e != nil {
 			return []*Atom{}, e
 		}
+		log.Printf("  doPredicate:  %d candidates %v", len(candidates), candidates)
+
 		results, e := pre.Evaluate(candidates)
+		log.Printf("  doPredicate:  pre.Evaluate(candidates) returns %d atoms", len(results))
 		if e != nil {
 			return []*Atom{}, e
 		}
@@ -325,18 +337,32 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 // Example:
 //   "CN1A[@type=UI32]" => "CN1A", ["@type=UI32"]
 //   "CN1A[@name=ROOT][@type=UI32][3]" => "CN1A", ["@name=ROOT","@type=UI32","3"]
-func splitLocationStep(pathRaw string) (pathTest string, predicates []string, e error) {
+func splitLocationStepOnUnions(pathRaw string) (pathinfo [][]string, e error) {
+	path := strings.Replace(pathRaw, "union", "|", -1) // treat "union" same as "|"
+	for _, str := range strings.Split(path, "|") {
+		if step, e := splitPathAndPredicate(str); e != nil {
+			return nil, e
+		} else {
+			pathinfo = append(pathinfo, step)
+		}
+	}
+	return
+}
+
+// splitPathAndPredicate returns a string slice where the first element is the
+// path, and the remaining 0-N elements are predicates to apply to that path.
+func splitPathAndPredicate(pathRaw string) (pathinfo []string, e error) {
+	// find path, make it the first element in the slice
 	path := strings.TrimSpace(pathRaw)
 	i_start := strings.IndexByte(path, '[')
 	if i_start == -1 {
-		pathTest = path
 		if strings.HasSuffix(path, "]") {
 			// predicate terminator without predicate start
 			e = errInvalidPredicate("mismatched square brackets")
 		}
-		return
+		return append(pathinfo, path), nil
 	}
-	pathTest = strings.TrimSpace(path[:i_start])
+	pathinfo = append(pathinfo, strings.TrimSpace(path[:i_start]))
 	// there's at least one predicate if we get here
 
 	// collect each predicate delimited by [ ... ]
@@ -347,7 +373,7 @@ func splitLocationStep(pathRaw string) (pathTest string, predicates []string, e 
 			break
 		}
 		// strip ] and any preceding whitespace
-		predicates = append(predicates, strings.TrimSpace(trimmed[:len(trimmed)-1]))
+		pathinfo = append(pathinfo, strings.TrimSpace(trimmed[:len(trimmed)-1]))
 	}
 
 	// Already verified that there's nothing after the last ], so done
@@ -362,7 +388,6 @@ func splitLocationStep(pathRaw string) (pathTest string, predicates []string, e 
 func NewPredicateEvaluator(predicate string) (pre *PredicateEvaluator, err error) {
 	var lexr = NewPredicateLexer(predicate)
 	pre = new(PredicateEvaluator)
-	log.Println("==== NewPredicate: ", predicate)
 	pre.tokens, err = parseTokens(lexr.items)
 	return
 }
@@ -380,7 +405,15 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 		pre.Position = i + 1 // XPath convention, indexing starts at 1
 		pre.AtomPtr = atomPtr
 		pre.Tokens = pre.tokens
-		ok := pre.eval()
+
+		// eval candidate atoms against path+predicate(s)
+		log.Printf("    eval() with Tokens(%v)", pre.tokens)
+		results := pre.eval()
+		ok, err := pre.evalResultsToBool(results)
+		if err != nil {
+			pre.errorf(err.Error())
+		}
+		log.Printf("    eval() returned %t and err %v", ok, pre.Error)
 		if pre.Error != nil {
 			return nil, pre.Error
 		}
@@ -475,9 +508,7 @@ func lexPredicate(l *lexer) stateFn {
 			lexComparisonOperator(l)
 		case strings.ContainsRune(alphaNumericChars, r):
 			l.acceptRun(alphabetLowerCase)
-			if l.buffer() == "or" || l.buffer() == "and" {
-				l.emit(itemBooleanOperator)
-			} else if l.peek() == '(' {
+			if l.peek() == '(' {
 				lexFunctionCall(l)
 			} else {
 				lexBareString(l)
@@ -505,7 +536,11 @@ func lexAtomAttribute(l *lexer) stateFn {
 
 func lexComparisonOperator(l *lexer) stateFn {
 	l.acceptRun("=<>!")
-	l.emit(itemComparisonOperator)
+	if l.buffer() == "=" || l.buffer() == "!=" {
+		l.emit(itemEqualityOperator)
+	} else {
+		l.emit(itemComparisonOperator)
+	}
 	return lexPredicate
 }
 
@@ -517,6 +552,8 @@ func lexFunctionCall(l *lexer) stateFn {
 
 	// determine function return type
 	switch l.buffer() {
+	case "true", "false":
+		l.emit(itemBooleanLiteral)
 	case "not":
 		l.emit(itemFunctionBool)
 	case "count", "position", "last":
@@ -576,12 +613,16 @@ func lexDelimitedString(l *lexer) stateFn {
 func lexBareString(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
 	switch l.buffer() {
-	case "div", "idiv", "mod":
-		l.emit(itemArithmeticOperator)
 	case "union":
 		l.emit(itemUnionOperator)
-	case "eq", "ne", "lt", "le", "gt", "ge":
+	case "eq", "ne":
+		l.emit(itemEqualityOperator)
+	case "lt", "le", "gt", "ge":
 		l.emit(itemComparisonOperator)
+	case "div", "idiv", "mod":
+		l.emit(itemArithmeticOperator)
+	case "or", "and":
+		l.emit(itemBooleanOperator)
 	default:
 		l.emit(itemBareString)
 	}
@@ -641,6 +682,8 @@ func (pp *PredicateParser) receiveTokens() {
 	for {
 		it := pp.readItem()
 		ok := pp.parseToken(it)
+		str := fmt.Sprintf("parseToken(%s,%v)", it.typ, it.value)
+		log.Printf("    %-35s %30s %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
 		if it.typ == itemEOF || !ok {
 			break
 		}
@@ -671,28 +714,22 @@ func (pp *PredicateParser) errorf(format string, args ...interface{}) bool {
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (pp *PredicateParser) parseToken(it item) bool {
-	str := fmt.Sprintf("  parseToken(%s,%v)", it.typ, it.value)
-	log.Printf("%-35s %30s %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
+	log.Printf("      parseToken %q[%s] precedence=%d", it.value, it.typ, precedence(it.value))
 	switch it.typ {
 	case itemError:
 		return pp.errorf(it.value)
-	case itemInteger, itemHex, itemFloat, itemBareString, itemString, itemVariable, itemFunctionNumeric:
+	case itemInteger, itemHex, itemFloat, itemBareString, itemString, itemVariable, itemFunctionNumeric, itemBooleanLiteral:
 		pp.outputQueue.push(&it)
 	case itemFunctionBool:
 		pp.opStack.push(&it)
 	case itemUnionOperator:
-		for ; !pp.opStack.empty(); pp.outputQueue.push(pp.opStack.pop()) {
-			// This sub-predicate is completed. Empty the operator stack.
-			// A new sub-predicate begins after the | operator.
-		}
-		pp.outputQueue.push(&it)
-	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator:
+		pp.err = errInvalidPredicate("union operator not allowed within predicate, use 'or' instead")
+	case itemComparisonOperator, itemArithmeticOperator, itemEqualityOperator, itemBooleanOperator:
 		itemPrec := precedence(it.value)
 		for {
 			if pp.opStack.empty() || !isOperatorItem(pp.opStack.top()) {
 				break
 			}
-			log.Printf("        precedence: %s[%d] <=> %s[%d]\n", it.value, itemPrec, pp.opStack.top().value, precedence(pp.opStack.top().value))
 			if itemPrec > precedence(pp.opStack.top().value) {
 				break
 			}
@@ -723,14 +760,14 @@ func (pp *PredicateParser) parseToken(it item) bool {
 		}
 		return false
 	default:
-		return pp.errorf("unexpected item %s", it.value)
+		return pp.errorf("unexpected item %q [%s]", it.value, it.typ)
 	}
 	return true
 }
 
 func isOperatorItem(it *item) bool {
 	switch it.typ {
-	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemUnionOperator:
+	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemUnionOperator, itemEqualityOperator:
 		return true
 	}
 	return false
@@ -762,20 +799,14 @@ func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathEr
 }
 
 // evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
-func (pre *PredicateEvaluator) eval() (result bool) {
-	var results []Equaler
-	log.Printf("eval()  %v\n", pre.Tokens)
+func (pre *PredicateEvaluator) eval() (results []Equaler) {
 Loop:
 	for !pre.Tokens.empty() && pre.Error == nil {
 		switch pre.Tokens.top().typ {
-		case itemUnionOperator:
-			result = pre.evalUnionOperator(results)
-			if result {
-				return true // left side evaluated true, no need to evaluate right side
-			}
-			results = results[:0] // discard negative left-side evaluation result
 		case itemBooleanOperator:
 			results = append(results, pre.evalBooleanOperator())
+		case itemEqualityOperator:
+			results = append(results, pre.evalEqualityOperator())
 		case itemComparisonOperator:
 			results = append(results, pre.evalComparisonOperator())
 		case itemArithmeticOperator:
@@ -786,20 +817,27 @@ Loop:
 			results = append(results, pre.evalFunctionBool())
 		case itemFunctionNumeric:
 			results = append(results, pre.evalFunctionNumeric())
+		case itemBooleanLiteral:
+			results = append(results, pre.evalBooleanLiteral())
 		default:
 			t := pre.Tokens.top()
 			pre.errorf("unrecognized token '%v'", t.value)
 			break Loop
 		}
 	}
-	result, err := pre.evalResults(results)
-	if err != nil {
-		pre.errorf(err.Error())
-	}
 	return
 }
 func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
+	if len(pre.Tokens) == 0 {
+		pre.errorf("operator '%s' expects boolean argument, got nothing", pre.tokens[len(pre.tokens)-1].value)
+		return
+	}
+	log.Printf("    evalBoolean() %v,%v", pre.Tokens.top().typ, pre.Tokens.top().value)
 	switch pre.Tokens.top().typ {
+	case itemBooleanLiteral:
+		result = pre.evalBooleanLiteral()
+	case itemEqualityOperator:
+		result = pre.evalEqualityOperator()
 	case itemBooleanOperator:
 		result = pre.evalBooleanOperator()
 	case itemComparisonOperator:
@@ -814,22 +852,48 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 	// calculate a boolean value from op and vars
 	return
 }
-func (pre *PredicateEvaluator) evalBooleanOperator() Equaler {
+func (pre *PredicateEvaluator) evalBooleanLiteral() BooleanType {
+	t := pre.Tokens.pop()
+	if t.typ != itemBooleanLiteral {
+		pre.errorf("expected boolean literal, received type %s", t.typ)
+		return BooleanType(false)
+	}
+	switch t.value {
+	case "true":
+		return BooleanType(true)
+	case "false":
+		return BooleanType(false)
+	default:
+		pre.errorf("unknown boolean literal %s", t.value)
+	}
+	return BooleanType(false)
+}
+
+func (pre *PredicateEvaluator) evalBooleanOperator() BooleanType {
 	op := pre.Tokens.pop()
 	if op.typ != itemBooleanOperator {
 		pre.errorf("expected boolean operator, received type %s", op.typ)
 	}
-	True := BooleanType(true)
+	results := []Equaler{pre.evalBoolean(), pre.evalBoolean()}
+	if len(results) != 2 {
+		pre.errorf("boolean '%s' expected 2 results to compare, got %d", op.value, len(results))
+		return BooleanType(false)
+	}
+	tru := BooleanType(true)
 	var result bool
 	switch op.value {
 	case "and":
-		result = pre.evalBoolean().Equal(True) && pre.evalBoolean().Equal(True)
+		result = results[0] == tru && results[1] == tru
 	case "or":
-		result = pre.evalBoolean().Equal(True) || pre.evalBoolean().Equal(True)
+		result = results[0] == tru || results[1] == tru
 	default:
 		pre.errorf("unknown boolean operator: %s", op.value)
 	}
 	return BooleanType(result)
+}
+
+func (pre *PredicateEvaluator) True(v Equaler) bool {
+	return v.Equal(BooleanType(true))
 }
 
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
@@ -862,6 +926,29 @@ func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
 	}
 	return result
 }
+func (pre *PredicateEvaluator) evalEqualityOperator() Equaler {
+	var result bool
+	op := pre.Tokens.pop()
+	if op.typ != itemEqualityOperator {
+		pre.errorf("expected itemEqualityOperator, received type %s", op.typ)
+		return BooleanType(false)
+	}
+	rhs := pre.evalEqualer()
+	lhs := pre.evalEqualer()
+	if pre.Error != nil {
+		return BooleanType(false)
+	}
+	switch op.value {
+	case "=", "eq":
+		result = lhs.Equal(rhs)
+	case "!=", "ne":
+		result = !lhs.Equal(rhs)
+	default:
+		pre.errorf("unknown equality operator: %s", op.value)
+		result = false
+	}
+	return BooleanType(result)
+}
 func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
 	var result bool
 	op := pre.Tokens.pop()
@@ -875,10 +962,6 @@ func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
 		return BooleanType(false)
 	}
 	switch op.value {
-	case "=", "eq":
-		result = lhs.Equal(rhs)
-	case "!=", "ne":
-		result = !lhs.Equal(rhs)
 	case "<", "lt":
 		result = lhs.LessThan(rhs)
 	case ">", "gt":
@@ -932,7 +1015,51 @@ func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 	}
 	return result
 }
+func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
+	log.Printf("    evalEqualer(), Tokens=%v", pre.Tokens)
+	var err error
+	switch pre.Tokens.top().typ {
+	case itemInteger, itemHex:
+		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
+		err = e
+		result = Int64Type(v)
+	case itemFloat:
+		v, e := strconv.ParseFloat(pre.Tokens.pop().value, 64)
+		err = e
+		result = Float64Type(v)
+	case itemBooleanLiteral:
+		result = pre.evalBooleanLiteral()
+	case itemBareString:
+		t := pre.Tokens.pop()
+		if v, ok := pre.getChildValue(t.value); ok {
+			result = v // string is Atom name, substitute atom value.
+		} else {
+			result = StringType(t.value)
+		}
+	case itemString:
+		result = StringType(pre.Tokens.pop().value)
+	case itemVariable:
+		result = pre.evalVariable()
+	case itemFunctionNumeric:
+		result = pre.evalFunctionNumeric()
+	case itemArithmeticOperator:
+		result = pre.evalArithmeticOperator()
+	default:
+		t := pre.Tokens.pop()
+		pre.errorf("expected Equaler type, got %q [%s])", t.value, t.typ)
+		return
+	}
+	if err != nil {
+		pre.errorf("failed to convert '%s' to Equaler value")
+		return
+	}
+	return result
+}
+
+// FIXME: this near-duplicates evalEqualer.
+// have it call evalEqualer and then error out on non-Compararer types?
 func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
+	log.Printf("    evalComparable(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.Tokens.top().typ {
 	case itemInteger, itemHex:
@@ -1051,7 +1178,7 @@ func (pre *PredicateEvaluator) evalUnionOperator(results []Equaler) (result bool
 
 	// evaluate results so far, same as if predicate was fully evaluated
 	var err error
-	result, err = pre.evalResults(results)
+	result, err = pre.evalResultsToBool(results)
 	if err != nil {
 		// reword error message to include reference to union operator
 		errString := err.Error()
@@ -1069,7 +1196,7 @@ func (pre *PredicateEvaluator) evalUnionOperator(results []Equaler) (result bool
 	return
 }
 
-func (pre *PredicateEvaluator) evalResults(results []Equaler) (result bool, err error) {
+func (pre *PredicateEvaluator) evalResultsToBool(results []Equaler) (result bool, err error) {
 	if pre.Error != nil {
 		return
 	}
@@ -1107,10 +1234,10 @@ func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
 	}
 	switch item.value {
 	case "position":
-		log.Printf(`  evalFunctionNumeric("%s") = %d`, item.value, pre.Position)
+		log.Printf(`    evalFunctionNumeric("%s") = %d`, item.value, pre.Position)
 		return Uint64Type(pre.Position)
 	case "last", "count":
-		log.Printf(`  evalFunctionNumeric("%s") = %d`, item.value, pre.Count)
+		log.Printf(`    evalFunctionNumeric("%s") = %d`, item.value, pre.Count)
 		return Uint64Type(pre.Count)
 	default:
 		pre.errorf("unknown numeric function: %s", item.value)
@@ -1601,7 +1728,8 @@ func precedence(op string) (value int) {
 	case "/", "//":
 		value = 19
 	default:
-		panic(fmt.Sprintf("unknown operator: %s", op))
+		value = 0
+		//		panic(fmt.Sprintf("unknown operator: %s", op))
 	}
 	return value
 }

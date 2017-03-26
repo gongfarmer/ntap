@@ -333,6 +333,10 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_P = FP_P]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N = FP_N]", []string{"ROOT:CONT:"}, nil},
 
+		// test boolean literals
+		PathTest{TestAtom2, "/ROOT[true()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[false()]", []string{}, nil},
+
 		// === Comparison Operator testing.
 		// For all possible combinations of 2 types, test the pair twice
 		// so that they switch being the left-hand-side/right-hand-side.
@@ -502,19 +506,26 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[position() = 1][]", []string{}, errInvalidPredicate(`empty predicate in "/ROOT[position() = 1][]"`)},
 		PathTest{TestAtom2, "/ROOT [ position() = 1 ] [ 1 ] ", []string{"ROOT:CONT:"}, nil},
 
-		// predicate union operator
+		// "and", "or" operators
 		PathTest{TestAtom2, "/ROOT[position() = 1]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[true = false]", []string{}, nil},
-		PathTest{TestAtom2, "/ROOT[position() = 1 | true = false]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[true = false | position() = 1]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[ right = wrong | (dogs = cats) | position()=1]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[position() = 1 union true = false]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[true = false union position() = 1]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[ (position() = 1) | (dogs = cats) | right = wrong]", []string{"ROOT:CONT:"}, nil},
-		PathTest{TestAtom2, "/ROOT[ | position() = 1]", []string{}, errInvalidPredicate(`| has no left-hand-side value in "/ROOT[ | position() = 1]"`)},
-		PathTest{TestAtom2, "/ROOT[ position() = 1 |]", []string{}, errInvalidPredicate(`| has no right-hand-side value in "/ROOT[ position() = 1 |]"`)},
-		PathTest{TestAtom2, "/ROOT[ position() = 1 | ()]", []string{}, errInvalidPredicate(`| has no right-hand-side value in "/ROOT[ position() = 1 | ()]"`)},
-		PathTest{TestAtomGINF, `[//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{
+		PathTest{TestAtom2, "/ROOT[true() = false()]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[true() or false()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[true() or true()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[false()  or  true()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[false()  or  false()]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[true() and true()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[true() and false()]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[false() and true()]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[false() and false()]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[false() and false() or true()]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[false() or false() and true()]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[ position() = 0 or position() = 1]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[ or position() = 1]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ or position() = 1]"`)},
+		PathTest{TestAtom2, "/ROOT[ position() = 1 or]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or]"`)},
+		PathTest{TestAtom2, "/ROOT[ position() = 1 or ()]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or ()]"`)},
+
+		// union operator
+		PathTest{TestAtomGINF, `//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{
 			"0x00000000:UI32:2",
 			"0x00000001:UI32:908767",
 			"0x00000000:UI32:2",
