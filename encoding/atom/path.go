@@ -1,7 +1,7 @@
 package atom
 
 // AtomsAtPath returns a slice of all Atom descendants at the given path.
-// If no atom is found, it returns an error message that describes which path
+// If no atom is found, tk returns an error message that describes which path
 // part doesn't exist.
 //
 // Requirements for Path definition wildcards:
@@ -57,7 +57,7 @@ package atom
 // Currently, the user-provided path is matched only against what is stored as
 // the Name field, which is one or the other.
 
-/// struct stackItem {
+/// struct stackToken {
 /// type {func,numeric,string,operator,keyword}
 /// goal {position, attribute}
 /// value {func, numeric, string, operator, keyword}
@@ -81,10 +81,10 @@ package atom
 */
 
 // parsing objective: a single func which can take in an atom and position, and
-// return a bool indicating whether to keep it.
+// return a bool indicating whether to keep tk.
 // future: some XPATH specifiers affect the result by specifying output format.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-// this is good because it handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
+// this is good because tk handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
 import (
 	"fmt"
 	"io/ioutil"
@@ -95,31 +95,35 @@ import (
 )
 
 const (
-	// Operators must end with string "Operator".. it is how they are identified as
+	// Operators must end with string "Operator".. tk is how they are identified as
 	// Operator tokens by the parser
-	itemLeftParen          = "iParenL"
-	itemRightParen         = "iParenR"
-	itemPredicateStart     = "iPredStart"
-	itemPredicateEnd       = "iPredEnd"
-	itemPathTest           = "iPathTest"
-	itemAxisOperator       = "iAxisOperator" // "/" or "//" which precedes pathTest
-	itemArithmeticOperator = "iArithmeticOperator"
-	itemBooleanOperator    = "iBooleanOperator"
-	itemBooleanLiteral     = "iBooleanLiteral"
-	itemEqualityOperator   = "iEqualsOperator"
-	itemNodeTest           = "iNodeTest"
-	itemComparisonOperator = "iCompareOperator"
-	itemUnionOperator      = "iUnionOperator"
-	itemStepSeparator      = "itemStepSeparator"
-	itemOperator           = "iOperator"
-	itemFunctionBool       = "iFunctionBool"
-	itemFunctionNumeric    = "iFunctionNum"
-	itemVariable           = "iVar"
-	itemInteger            = "iInt"
-	itemFloat              = "iFloat"
-	itemBareString         = "iBareString"
-	itemHex                = "iHex"
+	tokenLeftParen          = "tknParenL"
+	tokenRightParen         = "tknParenR"
+	tokenPredicateStart     = "tknPredStart"
+	tokenPredicateEnd       = "tknPredEnd"
+	tokenPathTest           = "tknPathTest"
+	tokenAxisOperator       = "tknAxisOperator" // "/" or "//" which precedes pathTest
+	tokenArithmeticOperator = "tknArithmeticOperator"
+	tokenBooleanOperator    = "tknBooleanOperator"
+	tokenBooleanLiteral     = "tknBooleanLiteral"
+	tokenEqualityOperator   = "tknEqualsOperator"
+	tokenNodeTest           = "tknNodeTest"
+	tokenComparisonOperator = "tknCompareOperator"
+	tokenUnionOperator      = "tknUnionOperator"
+	tokenStepSeparator      = "tknStepSeparator"
+	tokenOperator           = "tknOperator"
+	tokenFunctionBool       = "tknFunctionBool"
+	tokenFunctionNumeric    = "tknFunctionNum"
+	tokenVariable           = "tknVar"
+	tokenInteger            = "tknInt"
+	tokenFloat              = "tknFloat"
+	tokenBareString         = "tknBareString"
+	tokenHex                = "tknHex"
 )
+
+type Node struct {
+	id int
+}
 
 func errInvalidPath(msg string) error {
 	if msg == "" {
@@ -134,46 +138,46 @@ func errInvalidPredicate(msg string) error {
 	return fmt.Errorf("invalid predicate: %s", msg)
 }
 
-type itemList []*item
+type tokenList []*token
 type PathError error
 
-func (s *itemList) push(it *item) {
-	*s = append(*s, it)
+func (s *tokenList) push(tk *token) {
+	*s = append(*s, tk)
 }
 
-// remove and return the first list item
-func (s *itemList) shift() (it *item) {
+// remove and return the first list token
+func (s *tokenList) shift() (tk *token) {
 	if len(*s) == 0 {
 		return nil
 	}
-	it, *s = (*s)[0], (*s)[1:]
+	tk, *s = (*s)[0], (*s)[1:]
 	return
 }
 
-// pop an item off the stack and return it.
+// pop an token off the stack and return tk.
 // Return ok=false if stack is empty.
-func (s *itemList) pop() (it *item) {
+func (s *tokenList) pop() (tk *token) {
 	size := len(*s)
 	ok := size > 0
 	if !ok {
 		return
 	}
-	it = (*s)[size-1]  // get item from stack top
+	tk = (*s)[size-1]  // get token from stack top
 	*s = (*s)[:size-1] // resize stack
 	return
 }
 
-// pop the stack only if the top item has the specified type.
-// Return ok=true if an item is popped.
-func (s *itemList) popType(typ itemEnum) (it *item, ok bool) {
+// pop the stack only if the top token has the specified type.
+// Return ok=true if an token is popped.
+func (s *tokenList) popType(typ tokenEnum) (tk *token, ok bool) {
 	if s.empty() || s.top().typ != typ {
 		return
 	}
 	return s.pop(), true
 }
 
-// peek at the top item on the stack without removing it.
-func (s itemList) top() (it *item) {
+// peek at the top token on the stack without removing tk.
+func (s tokenList) top() (tk *token) {
 	if len(s) == 0 {
 		return nil
 	}
@@ -181,16 +185,16 @@ func (s itemList) top() (it *item) {
 }
 
 // empty returns true if the list is empty.
-func (s *itemList) empty() bool {
+func (s *tokenList) empty() bool {
 	return len(*s) == 0
 }
 
 // PathParser is a parser for interpreting predicate tokens.
 type PathParser struct {
-	outputQueue itemList    // items ordered for evaluation
-	opStack     itemList    // holds operators until their operands reach output queue
-	items       <-chan item // items received from lexer
-	err         PathError   // indicates parsing succeeded or describes what failed
+	outputQueue tokenList    // tokens ordered for evaluation
+	opStack     tokenList    // holds operators until their operands reach output queue
+	tokens      <-chan token // tokens received from lexer
+	err         PathError    // indicates parsing succeeded or describes what failed
 }
 
 type AtomPath struct {
@@ -210,6 +214,9 @@ func NewAtomPath(path string) (ap *AtomPath, e error) {
 	pe, e = NewPathEvaluator(path)
 	if e != nil {
 		return
+	}
+	for i, tk := range pe.Tokens {
+		fmt.Printf("%3d.  %15s  [%s]\n", i, tk.value, tk.typ)
 	}
 
 	ap = &AtomPath{
@@ -257,7 +264,7 @@ func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 }
 
 func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
-	return ap.Evaluator.Evaluate([]*Atom{root})
+	return ap.Evaluator.Evaluate(root)
 }
 
 // getAtomsAnywhere finds matches for the given path that appear at any level
@@ -382,7 +389,7 @@ func splitPathOnUnions(pathRaw string) (pathinfo [][]string, e error) {
 // splitPathAndPredicate returns a string slice where the first element is the
 // path, and the remaining 0-N elements are predicates to apply to that path.
 func splitPathAndPredicate(pathRaw string) (pathinfo []string, e error) {
-	// find path, make it the first element in the slice
+	// find path, make tk the first element in the slice
 	path := strings.TrimSpace(pathRaw)
 	i_start := strings.IndexByte(path, '[')
 	if i_start == -1 {
@@ -413,7 +420,7 @@ func splitPathAndPredicate(pathRaw string) (pathinfo []string, e error) {
 // NewPathEvaluator reads the path
 func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 	var lexr = NewPathLexer(path)
-	var pp = PathParser{items: lexr.items}
+	var pp = PathParser{tokens: lexr.tokens}
 	pp.receiveTokens()
 	pe = &PathEvaluator{
 		Tokens: pp.outputQueue,
@@ -421,7 +428,7 @@ func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 	return pe, pp.err
 }
 
-// lexer - identifies tokens(aka items) in the atom path definition.
+// lexer - identifies tokens(aka tokens) in the atom path definition.
 // Path lexing is done by the same lexer used for Atom Text format lexing.
 // They use very different parsers though.
 
@@ -429,14 +436,14 @@ func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 func NewPredicateEvaluator(predicate string) (pre *PredicateEvaluator, err error) {
 	var lexr = NewPredicateLexer(predicate)
 	pre = new(PredicateEvaluator)
-	pre.tokens, err = parseTokens(lexr.items)
+	pre.tokens, err = parseTokens(lexr.tokens)
 	return
 }
 
 // Evaluate filters a list of atoms against the predicate conditions, returning
 // the atoms that satisfy the predicate.
 //
-// The candidate atoms must all be made available to the PredicaetEvaluator at
+// The candidate atoms must all be made available to the PredicateEvaluator at
 // once, because the predicate may refer to individual child atoms by name,
 // requiring them to be evaluated against every other candidate.
 func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
@@ -497,8 +504,8 @@ func atomValueToComparerType(a *Atom) (v Comparer) {
 
 func NewPathLexer(path string) *lexer {
 	l := &lexer{
-		input: path,
-		items: make(chan item),
+		input:  path,
+		tokens: make(chan token),
 	}
 	go l.run(lexPath)
 	return l
@@ -506,14 +513,14 @@ func NewPathLexer(path string) *lexer {
 
 func NewPredicateLexer(predicate string) *lexer {
 	l := &lexer{
-		input: predicate,
-		items: make(chan item),
+		input:  predicate,
+		tokens: make(chan token),
 	}
 	go l.run(lexPredicate)
 	return l
 }
 
-// FIXME this is kinda crazy because these return stateFn but don't use it
+// FIXME this is kinda crazy because these return stateFn but don't use tk
 func lexPath(l *lexer) stateFn {
 	if l.bufferSize() != 0 {
 		l.errorf(fmt.Sprintf(`could not parse "%s"`, l.buffer()))
@@ -524,23 +531,23 @@ func lexPath(l *lexer) stateFn {
 	case isSpace(r):
 		l.ignore()
 	case r == eof:
-		l.emit(itemEOF)
+		l.emit(tokenEOF)
 		break
 	case r == '*':
-		l.emit(itemNodeTest)
+		l.emit(tokenNodeTest)
 	case r == '|':
-		l.emit(itemUnionOperator)
+		l.emit(tokenUnionOperator)
 	case r == '/':
 		lexStepSeparatorOrAxis(l)
 	case r == '[':
-		l.emit(itemPredicateStart)
+		l.emit(tokenPredicateStart)
 		return lexPredicate
 	case r == ']':
-		l.emit(itemPredicateEnd)
+		l.emit(tokenPredicateEnd)
 	case r == '(':
-		l.emit(itemLeftParen)
+		l.emit(tokenLeftParen)
 	case r == ')':
-		l.emit(itemRightParen)
+		l.emit(tokenRightParen)
 	case strings.ContainsRune(alphaNumericChars, r):
 		l.acceptRun(alphabetLowerCase)
 		if l.peek() == '(' {
@@ -551,7 +558,7 @@ func lexPath(l *lexer) stateFn {
 	default:
 		return l.errorf("lexPath cannot parse %q", r)
 	}
-	if l.prevItemType == itemError {
+	if l.prevTokenType == tokenError {
 		return nil
 	}
 	return lexPath
@@ -567,32 +574,32 @@ func lexPredicate(l *lexer) stateFn {
 	case isSpace(r):
 		l.ignore()
 	case r == eof:
-		l.emit(itemEOF)
+		l.emit(tokenEOF)
 		break
 	case r == '@':
 		lexAtomAttribute(l)
 	case r == '"', r == '\'':
 		lexDelimitedString(l)
 	case r == '[':
-		l.emit(itemPredicateStart)
+		l.emit(tokenPredicateStart)
 	case r == ']':
-		l.emit(itemPredicateEnd)
+		l.emit(tokenPredicateEnd)
 		return lexPath
 	case r == '(':
-		l.emit(itemLeftParen)
+		l.emit(tokenLeftParen)
 	case r == ')':
-		l.emit(itemRightParen)
+		l.emit(tokenRightParen)
 	case r == '|':
 		return l.errorf("union not permitted within predicate")
 	case r == '+', r == '*':
-		l.emit(itemArithmeticOperator)
+		l.emit(tokenArithmeticOperator)
 	case strings.ContainsRune(numericChars, r):
 		lexNumberInPath(l)
 	case r == '-':
-		if strings.ContainsRune(numericChars, rune(l.peek())) && !isNumericItem(l.prevItemType) {
+		if strings.ContainsRune(numericChars, rune(l.peek())) && !isNumericToken(l.prevTokenType) {
 			lexNumberInPath(l)
 		} else {
-			l.emit(itemArithmeticOperator)
+			l.emit(tokenArithmeticOperator)
 		}
 	case strings.ContainsRune("=<>!", r):
 		lexComparisonOperator(l)
@@ -615,16 +622,16 @@ func lexStepSeparatorOrAxis(l *lexer) stateFn {
 		panic(`lexStepSeparatorOrAxis called without leading "/"`)
 	}
 	if l.accept("/") {
-		l.emit(itemAxisOperator)
+		l.emit(tokenAxisOperator)
 	} else {
-		l.emit(itemStepSeparator) // still might be axis, parser must decide
+		l.emit(tokenStepSeparator) // still might be axis, parser must decide
 	}
 	return lexNodeTest
 }
 
 func lexNodeTest(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
-	l.emit(itemNodeTest)
+	l.emit(tokenNodeTest)
 	if l.peek() == '/' {
 		l.accept("/")
 		return lexStepSeparatorOrAxis
@@ -639,16 +646,16 @@ func lexAtomAttribute(l *lexer) stateFn {
 		panic("lexAtomAttribute called without leading attribute sigil @")
 	}
 	l.acceptRun(alphaNumericChars)
-	l.emit(itemVariable)
+	l.emit(tokenVariable)
 	return lexPredicate
 }
 
 func lexComparisonOperator(l *lexer) stateFn {
 	l.acceptRun("=<>!")
 	if l.buffer() == "=" || l.buffer() == "!=" {
-		l.emit(itemEqualityOperator)
+		l.emit(tokenEqualityOperator)
 	} else {
-		l.emit(itemComparisonOperator)
+		l.emit(tokenComparisonOperator)
 	}
 	return lexPredicate
 }
@@ -662,13 +669,13 @@ func lexFunctionCall(l *lexer) stateFn {
 	// determine function return type
 	switch l.buffer() {
 	case "true", "false":
-		l.emit(itemBooleanLiteral)
+		l.emit(tokenBooleanLiteral)
 	case "not":
-		l.emit(itemFunctionBool)
+		l.emit(tokenFunctionBool)
 	case "count", "position", "last":
-		l.emit(itemFunctionNumeric)
+		l.emit(tokenFunctionNumeric)
 	case "name", "type", "data":
-		l.emit(itemVariable)
+		l.emit(tokenVariable)
 	default:
 		return l.errorf(`unrecognized function "%s"`, l.buffer())
 	}
@@ -710,7 +717,7 @@ func lexDelimitedString(l *lexer) stateFn {
 
 	// discard delimiter and emit string value
 	l.backup()
-	l.emit(itemString)
+	l.emit(tokenString)
 	l.next()
 	l.ignore()
 
@@ -725,17 +732,17 @@ func lexBareString(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
 	switch l.buffer() {
 	case "union":
-		l.emit(itemUnionOperator)
+		l.emit(tokenUnionOperator)
 	case "eq", "ne":
-		l.emit(itemEqualityOperator)
+		l.emit(tokenEqualityOperator)
 	case "lt", "le", "gt", "ge":
-		l.emit(itemComparisonOperator)
+		l.emit(tokenComparisonOperator)
 	case "div", "idiv", "mod":
-		l.emit(itemArithmeticOperator)
+		l.emit(tokenArithmeticOperator)
 	case "or", "and":
-		l.emit(itemBooleanOperator)
+		l.emit(tokenBooleanOperator)
 	default:
-		l.emit(itemBareString)
+		l.emit(tokenBareString)
 	}
 	return lexPredicate
 }
@@ -749,7 +756,7 @@ func lexNumberInPath(l *lexer) stateFn {
 		}
 	}
 	digits := "0123456789"
-	if (l.buffer() == "0" || l.accept("0")) && l.accept("xX") { // Is it hex?
+	if (l.buffer() == "0" || l.accept("0")) && l.accept("xX") { // Is tk hex?
 		isHex = true
 		digits = hexDigits
 	}
@@ -770,19 +777,19 @@ func lexNumberInPath(l *lexer) stateFn {
 
 	switch {
 	case isFloatingPoint:
-		l.emit(itemFloat)
+		l.emit(tokenFloat)
 	case isHex:
-		l.emit(itemHex)
+		l.emit(tokenHex)
 	default:
-		l.emit(itemInteger)
+		l.emit(tokenInteger)
 	}
 	return lexPredicate
 }
 
 // parseTokens translates stream of tokens emitted by the lexer into a
 // function that can evaluate whether an atom gets filtered.
-func parseTokens(ch <-chan item) (tokens itemList, e error) {
-	var pp = PathParser{items: ch}
+func parseTokens(ch <-chan token) (tokens tokenList, e error) {
+	var pp = PathParser{tokens: ch}
 	pp.receiveTokens()
 	return pp.outputQueue, pp.err
 }
@@ -790,27 +797,42 @@ func parseTokens(ch <-chan item) (tokens itemList, e error) {
 // receiveTokens gets tokens from the lexer and sends them to the parser
 // for parsing.
 func (pp *PathParser) receiveTokens() {
+	var ok, inPredicate bool
 	for {
-		it := pp.readItem()
-		ok := pp.parseToken(it)
-		str := fmt.Sprintf("parseToken(%s,%v)", it.typ, it.value)
+		tk := pp.readToken()
+		switch tk.typ {
+		case tokenPredicateStart:
+			// create predicate parser
+			inPredicate = true
+		case tokenPredicateEnd:
+			ok = pp.parsePredicateToken(tk)
+			// create predicate object, send to ???
+			inPredicate = false
+		default:
+			if inPredicate {
+				ok = pp.parsePredicateToken(tk)
+			} else {
+				ok = pp.parsePathToken(tk)
+			}
+		}
+		str := fmt.Sprintf("parsePathToken(%s,%v)", tk.typ, tk.value)
 		log.Printf("    %-35s %30s %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
-		if it.typ == itemEOF || !ok {
+		if tk.typ == tokenEOF || !ok {
 			break
 		}
 	}
 }
 
-// read next time from item channel, and return it.
-func (pp *PathParser) readItem() (it item) {
+// read next time from token channel, and return tk.
+func (pp *PathParser) readToken() (tk token) {
 	var ok bool
 	select {
-	case it, ok = <-pp.items:
+	case tk, ok = <-pp.tokens:
 		if !ok {
-			it = item{typ: itemEOF, value: "EOF"}
+			tk = token{typ: tokenEOF, value: "EOF"}
 		}
 	}
-	return it
+	return tk
 }
 
 // errorf sets the error field in the parser, and indicates that parsing should
@@ -824,87 +846,262 @@ func (pp *PathParser) errorf(format string, args ...interface{}) bool {
 // in the path string, and queues them into evaluation order.
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-func (pp *PathParser) parseToken(it item) bool {
-	log.Printf("      parseToken %q[%s] precedence=%d", it.value, it.typ, precedence(it.value))
-	switch it.typ {
-	case itemError:
-		return pp.errorf(it.value)
-	case itemInteger, itemHex, itemFloat, itemBareString, itemString, itemVariable, itemFunctionNumeric, itemBooleanLiteral:
-		pp.outputQueue.push(&it)
-	case itemFunctionBool, itemPredicateStart, itemNodeTest:
-		pp.opStack.push(&it)
-	case itemComparisonOperator, itemArithmeticOperator, itemEqualityOperator, itemBooleanOperator, itemAxisOperator:
-		itemPrec := precedence(it.value)
+func (pp *PathParser) parsePathToken(tk token) bool {
+	log.Printf("      parsePathToken %q[%s] precedence=%d", tk.value, tk.typ, precedence(tk.value))
+	switch tk.typ {
+	case tokenError:
+		return pp.errorf(tk.value)
+	case tokenInteger, tokenHex, tokenFloat, tokenBareString, tokenString, tokenVariable, tokenFunctionNumeric, tokenBooleanLiteral:
+		pp.outputQueue.push(&tk)
+	case tokenFunctionBool, tokenPredicateStart, tokenNodeTest:
+		pp.opStack.push(&tk)
+	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator:
+		tokenPrec := precedence(tk.value)
 		for {
-			if pp.opStack.empty() || !isOperatorItem(pp.opStack.top()) {
+			if pp.opStack.empty() || !isOperatorToken(pp.opStack.top()) {
 				break
 			}
-			if itemPrec > precedence(pp.opStack.top().value) {
+			if tokenPrec > precedence(pp.opStack.top().value) {
 				break
 			}
 			pp.outputQueue.push(pp.opStack.pop())
 		}
-		pp.opStack.push(&it)
-	case itemLeftParen:
-		pp.opStack.push(&it)
-	case itemRightParen:
+		pp.opStack.push(&tk)
+	case tokenLeftParen:
+		pp.opStack.push(&tk)
+	case tokenRightParen:
 		for {
 			if pp.opStack.empty() {
 				return pp.errorf("mismatched parentheses")
 			}
-			if pp.opStack.top().typ == itemLeftParen {
+			if pp.opStack.top().typ == tokenLeftParen {
 				pp.opStack.pop()
 				break
 			}
 			op := pp.opStack.pop()
 			pp.outputQueue.push(op)
 		}
-	case itemPredicateEnd:
-		pp.outputQueue.push(&it)
+	case tokenPredicateEnd:
 		for {
 			if pp.opStack.empty() {
 				return pp.errorf("mismatched predicate start/end")
 			}
-			if pp.opStack.top().typ == itemPredicateStart {
-				pp.outputQueue.push(pp.opStack.pop())
+			if pp.opStack.top().typ == tokenPredicateStart {
+				pp.opStack.pop()
 				break
 			}
 			pp.outputQueue.push(pp.opStack.pop())
 		}
-	case itemUnionOperator:
+	case tokenUnionOperator:
 		for {
-			if pp.opStack.top().typ == itemLeftParen || pp.opStack.empty() {
+			if pp.opStack.top().typ == tokenLeftParen || pp.opStack.empty() {
 				break
 			}
 			pp.outputQueue.push(pp.opStack.pop())
 		}
-		pp.opStack.push(&it)
-	case itemEOF:
+		pp.opStack.push(&tk)
+	case tokenEOF:
 		for !pp.opStack.empty() {
 			op := pp.opStack.pop()
-			if op.typ == itemLeftParen || op.typ == itemRightParen {
+			if op.typ == tokenLeftParen || op.typ == tokenRightParen {
 				return pp.errorf("mismatched parentheses")
 			}
 			pp.outputQueue.push(op)
 		}
 		return false
 	default:
-		return pp.errorf("unexpected item %q [%s]", it.value, it.typ)
+		return pp.errorf("unexpected token %q [%s]", tk.value, tk.typ)
+	}
+	return true
+}
+func (pp *PathParser) parsePredicateTokens(tk token) bool {
+	log.Printf("      parsePathToken %q[%s] precedence=%d", tk.value, tk.typ, precedence(tk.value))
+	switch tk.typ {
+	case tokenError:
+		return pp.errorf(tk.value)
+	case tokenInteger, tokenHex, tokenFloat, tokenBareString, tokenString, tokenVariable, tokenFunctionNumeric, tokenBooleanLiteral:
+		pp.outputQueue.push(&tk)
+	case tokenFunctionBool, tokenPredicateStart, tokenNodeTest:
+		pp.opStack.push(&tk)
+	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator:
+		tokenPrec := precedence(tk.value)
+		for {
+			if pp.opStack.empty() || !isOperatorToken(pp.opStack.top()) {
+				break
+			}
+			if tokenPrec > precedence(pp.opStack.top().value) {
+				break
+			}
+			pp.outputQueue.push(pp.opStack.pop())
+		}
+		pp.opStack.push(&tk)
+	case tokenLeftParen:
+		pp.opStack.push(&tk)
+	case tokenRightParen:
+		for {
+			if pp.opStack.empty() {
+				return pp.errorf("mismatched parentheses")
+			}
+			if pp.opStack.top().typ == tokenLeftParen {
+				pp.opStack.pop()
+				break
+			}
+			op := pp.opStack.pop()
+			pp.outputQueue.push(op)
+		}
+	case tokenPredicateEnd:
+		for {
+			if pp.opStack.empty() {
+				return pp.errorf("mismatched predicate start/end")
+			}
+			if pp.opStack.top().typ == tokenPredicateStart {
+				pp.opStack.pop()
+				break
+			}
+			pp.outputQueue.push(pp.opStack.pop())
+		}
+	case tokenUnionOperator:
+		for {
+			if pp.opStack.top().typ == tokenLeftParen || pp.opStack.empty() {
+				break
+			}
+			pp.outputQueue.push(pp.opStack.pop())
+		}
+		pp.opStack.push(&tk)
+	case tokenEOF:
+		for !pp.opStack.empty() {
+			op := pp.opStack.pop()
+			if op.typ == tokenLeftParen || op.typ == tokenRightParen {
+				return pp.errorf("mismatched parentheses")
+			}
+			pp.outputQueue.push(op)
+		}
+		return false
+	default:
+		return pp.errorf("unexpected token %q [%s]", tk.value, tk.typ)
 	}
 	return true
 }
 
-func isOperatorItem(it *item) bool {
-	return strings.HasSuffix(string(it.typ), "Operator")
+func isOperatorToken(tk *token) bool {
+	return strings.HasSuffix(string(tk.typ), "Operator")
 }
 
 type PathEvaluator struct {
-	Tokens itemList // path criteria, as a list of tokens
-	Error  error    // evaluation status, nil on success
+	tokens      tokenList // path criteria
+	Tokens      tokenList // remaining path criteria list, consumed during each evaluation
+	Error       error     // evaluation status, nil on success
+	Position    int
+	AtomPtr     *Atom
+	ContextNode *Atom
 }
 
-func (pe *PathEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
+func (pe *PathEvaluator) Evaluate(a *Atom) (atoms []*Atom, e error) {
+	pe.Atoms = append(pre.Atoms, a)
+	pe.Count = len(candidates) // FIXME does this change over time?
+	pe.ContextNode = a         // FIXME does this change over time?
+	pe.eval()
+
 	return
+}
+
+// eval() is the top-level evaluation function.  It accepts every token that
+// can appear as the first token in the evaluation list.
+// Return value is a []Node, but it may contain just a single node.
+func (pe *PathEvaluator) eval() (nodes []Node) {
+	return pe.evalNodeSet() // is this all that's needed here?
+}
+
+// Done returns true if this PathEvaluator is done processing.
+// Completion can occur due to normal consumption of all tokens (success case)
+// or due to an error state.
+func (pe *PathEvaluator) Done() bool {
+	return pe.Error != nil || len(pe.Tokens) == 0
+}
+
+// TopType returns the tokenType of the next Token in the PathEvalator's Token stack
+func (pe *PathEvaluator) TopType() tokenEnum {
+	if len(pe.Tokens) == 0 {
+		return ""
+	}
+	return pe.Tokens.peek().typ
+}
+
+func (pe *PathEvaluator) evalUnionOperator() {
+	// consume union operator
+	op := pe.Tokens.pop()
+	if op.typ != tokenUnionOperator {
+		pe.errorf("expected union operator, received type %s", op.typ)
+		return
+	}
+
+	// FIXME uniqueness, avoid duplicates
+	return append(pe.evalNodeSet(), pe.evalNodeSet()...)
+}
+func (pe *PathEvaluator) evalAxisOperator() Axis {
+	tk := pe.Tokens.pop()
+	if tk.typ != tokenAxisOperator {
+		pe.errorf("expected axis operator, got '%v' [%[1]T]", tk.value)
+		return
+	}
+	switch tk.value {
+	case "//":
+		return pe.ContextNode.AtomList()
+	case "/":
+		return []Node{pe.ContextNode}
+	}
+
+	// same as / for this implementation..
+	// because atoms don't know their parent, cannot refer to a higher-level
+	// atom in the tree.  This should be corrected, perhaps Node object
+	// should add parent awareness.
+	return []Node{pe.ContextNode}
+}
+
+func (pe *PathEvaluator) evalNodeTest(nodes []Node) []Node {
+	// Get node test token
+	tkNodeTest := pe.Tokens.pop()
+	if tkNodeTest.typ != tokenNodeTest {
+		pe.errorf("expected node test, got '%v' [%[1]T]", tkNodeTest.value)
+		return
+	}
+
+	// Filter the NodeSet by name against the node test
+	results := nodes[:0] // overwite nodes list while filtering to avoid allocation
+	for _, n := range nodes {
+		if n.Name() == tkNodeTest.value {
+			results = append(results, n)
+		}
+	}
+	return results
+}
+
+func (pe *PathEvaluator) evalNodeSet() (nodes []Node) {
+	if pe.Done() {
+		return
+	}
+	if pe.TopType() == tokenPredicateStart {
+		return pe.evalPredicate()
+	}
+	if pe.TopType() == tokenUnionOperator {
+		return pe.evalUnionOperator()
+	}
+	if pe.TopType() == tokenAxisOperator {
+		nodes = pe.evalAxisOperator()
+	} else {
+		// No axis operator given, so use context node
+		nodes = append(nodes, pe.ContextNode)
+	}
+	// this part is mandatory
+	if pe.TopType() != tokenNodeTest {
+		return pe.errorf("NodeSet lacks node test")
+	}
+	nodes = pe.evalNodeTest(nodes) // may be nil in which case returns .
+
+	return
+}
+
+func (pe *PathEvaluator) evalPredicate() []Node {
 }
 
 // PredicateEvaluator determines which candidate atoms satisfy the
@@ -916,14 +1113,14 @@ func (pe *PathEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
 //    /ROOT[@name=NONE]
 //		/ROOT/UI_1[@data < 2]
 type PredicateEvaluator struct {
-	tokens itemList // predicate criteria, as a list of tokens
-	Error  error    // evaluation status, nil on success
+	tokens tokenList // predicate criteria, as a list of tokens
+	Error  error     // evaluation status, nil on success
 
-	Tokens   itemList // Copy of tokens to consume during evaluation
-	Atoms    []*Atom  // Atoms being evaluated
-	AtomPtr  *Atom    // Atom currently being evaluated from the atom list
-	Position int      // index of the atom in the atom list, starts from 1
-	Count    int      // number of atoms in the atom list
+	Tokens   tokenList // Copy of tokens to consume during evaluation
+	Atoms    []*Atom   // Atoms being evaluated
+	AtomPtr  *Atom     // Atom currently being evaluated from the atom list
+	Position int       // index of the atom in the atom list, starts from 1
+	Count    int       // number of atoms in the atom list
 }
 
 func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathError {
@@ -937,21 +1134,23 @@ func (pre *PredicateEvaluator) eval() (results []Equaler) {
 Loop:
 	for !pre.Tokens.empty() && pre.Error == nil {
 		switch pre.Tokens.top().typ {
-		case itemBooleanOperator:
+		case tokenUnionOperator:
+			results = append(results, pre.evalUnionOperator)
+		case tokenBooleanOperator:
 			results = append(results, pre.evalBooleanOperator())
-		case itemEqualityOperator:
+		case tokenEqualityOperator:
 			results = append(results, pre.evalEqualityOperator())
-		case itemComparisonOperator:
+		case tokenComparisonOperator:
 			results = append(results, pre.evalComparisonOperator())
-		case itemArithmeticOperator:
+		case tokenArithmeticOperator:
 			results = append(results, pre.evalArithmeticOperator())
-		case itemInteger, itemHex:
+		case tokenInteger, tokenHex:
 			results = append(results, pre.evalNumber())
-		case itemFunctionBool:
+		case tokenFunctionBool:
 			results = append(results, pre.evalFunctionBool())
-		case itemFunctionNumeric:
+		case tokenFunctionNumeric:
 			results = append(results, pre.evalFunctionNumeric())
-		case itemBooleanLiteral:
+		case tokenBooleanLiteral:
 			results = append(results, pre.evalBooleanLiteral())
 		default:
 			t := pre.Tokens.top()
@@ -968,15 +1167,15 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 	}
 	log.Printf("    evalBoolean() %v,%v", pre.Tokens.top().typ, pre.Tokens.top().value)
 	switch pre.Tokens.top().typ {
-	case itemBooleanLiteral:
+	case tokenBooleanLiteral:
 		result = pre.evalBooleanLiteral()
-	case itemEqualityOperator:
+	case tokenEqualityOperator:
 		result = pre.evalEqualityOperator()
-	case itemBooleanOperator:
+	case tokenBooleanOperator:
 		result = pre.evalBooleanOperator()
-	case itemComparisonOperator:
+	case tokenComparisonOperator:
 		result = pre.evalComparisonOperator().(Equaler)
-	case itemFunctionBool:
+	case tokenFunctionBool:
 		result = pre.evalFunctionBool()
 	default:
 		t := pre.Tokens.top()
@@ -988,7 +1187,7 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 }
 func (pre *PredicateEvaluator) evalBooleanLiteral() BooleanType {
 	t := pre.Tokens.pop()
-	if t.typ != itemBooleanLiteral {
+	if t.typ != tokenBooleanLiteral {
 		pre.errorf("expected boolean literal, received type %s", t.typ)
 		return BooleanType(false)
 	}
@@ -1005,7 +1204,7 @@ func (pre *PredicateEvaluator) evalBooleanLiteral() BooleanType {
 
 func (pre *PredicateEvaluator) evalBooleanOperator() BooleanType {
 	op := pre.Tokens.pop()
-	if op.typ != itemBooleanOperator {
+	if op.typ != tokenBooleanOperator {
 		pre.errorf("expected boolean operator, received type %s", op.typ)
 	}
 	results := []Equaler{pre.evalBoolean(), pre.evalBoolean()}
@@ -1033,8 +1232,8 @@ func (pre *PredicateEvaluator) True(v Equaler) bool {
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
 func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
 	op := pre.Tokens.pop()
-	if op.typ != itemArithmeticOperator {
-		pre.errorf("expected itemArithmeticOperator, received type %s", op.typ)
+	if op.typ != tokenArithmeticOperator {
+		pre.errorf("expected tokenArithmeticOperator, received type %s", op.typ)
 	}
 	rhs := pre.evalNumber()
 	lhs := pre.evalNumber()
@@ -1063,8 +1262,8 @@ func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
 func (pre *PredicateEvaluator) evalEqualityOperator() Equaler {
 	var result bool
 	op := pre.Tokens.pop()
-	if op.typ != itemEqualityOperator {
-		pre.errorf("expected itemEqualityOperator, received type %s", op.typ)
+	if op.typ != tokenEqualityOperator {
+		pre.errorf("expected tokenEqualityOperator, received type %s", op.typ)
 		return BooleanType(false)
 	}
 	rhs := pre.evalEqualer()
@@ -1086,8 +1285,8 @@ func (pre *PredicateEvaluator) evalEqualityOperator() Equaler {
 func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
 	var result bool
 	op := pre.Tokens.pop()
-	if op.typ != itemComparisonOperator {
-		pre.errorf("expected itemComparisonOperator, received type %s", op.typ)
+	if op.typ != tokenComparisonOperator {
+		pre.errorf("expected tokenComparisonOperator, received type %s", op.typ)
 		return BooleanType(false)
 	}
 	rhs := pre.evalComparable()
@@ -1114,27 +1313,27 @@ func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 	var err error
 	ok := true
 	switch pre.Tokens.top().typ {
-	case itemInteger, itemHex:
+	case tokenInteger, tokenHex:
 		v, err := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		if err != nil {
 			pre.errorf(err.Error())
 			return
 		}
 		result = Int64Type(v)
-	case itemFloat:
+	case tokenFloat:
 		v, err := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		if err != nil {
 			pre.errorf(err.Error())
 			return
 		}
 		result = Float64Type(v)
-	case itemFunctionNumeric:
+	case tokenFunctionNumeric:
 		result = pre.evalFunctionNumeric()
-	case itemVariable:
+	case tokenVariable:
 		result, ok = pre.evalVariable().(Arithmeticker)
-	case itemArithmeticOperator:
+	case tokenArithmeticOperator:
 		result = pre.evalArithmeticOperator()
-	case itemBareString:
+	case tokenBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
 			result = v.(Arithmeticker)
@@ -1153,30 +1352,30 @@ func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
 	log.Printf("    evalEqualer(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.Tokens.top().typ {
-	case itemInteger, itemHex:
+	case tokenInteger, tokenHex:
 		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		err = e
 		result = Int64Type(v)
-	case itemFloat:
+	case tokenFloat:
 		v, e := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		err = e
 		result = Float64Type(v)
-	case itemBooleanLiteral:
+	case tokenBooleanLiteral:
 		result = pre.evalBooleanLiteral()
-	case itemBareString:
+	case tokenBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
 			result = v // string is Atom name, substitute atom value.
 		} else {
 			result = StringType(t.value)
 		}
-	case itemString:
+	case tokenString:
 		result = StringType(pre.Tokens.pop().value)
-	case itemVariable:
+	case tokenVariable:
 		result = pre.evalVariable()
-	case itemFunctionNumeric:
+	case tokenFunctionNumeric:
 		result = pre.evalFunctionNumeric()
-	case itemArithmeticOperator:
+	case tokenArithmeticOperator:
 		result = pre.evalArithmeticOperator()
 	default:
 		t := pre.Tokens.pop()
@@ -1191,33 +1390,33 @@ func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
 }
 
 // FIXME: this near-duplicates evalEqualer.
-// have it call evalEqualer and then error out on non-Compararer types?
+// have tk call evalEqualer and then error out on non-Compararer types?
 func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 	log.Printf("    evalComparable(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.Tokens.top().typ {
-	case itemInteger, itemHex:
+	case tokenInteger, tokenHex:
 		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		err = e
 		result = Int64Type(v)
-	case itemFloat:
+	case tokenFloat:
 		v, e := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		err = e
 		result = Float64Type(v)
-	case itemBareString:
+	case tokenBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
 			result = v // string is Atom name, substitute atom value.
 		} else {
 			result = StringType(t.value)
 		}
-	case itemString:
+	case tokenString:
 		result = StringType(pre.Tokens.pop().value)
-	case itemVariable:
+	case tokenVariable:
 		result = pre.evalVariable()
-	case itemFunctionNumeric:
+	case tokenFunctionNumeric:
 		result = pre.evalFunctionNumeric()
-	case itemArithmeticOperator:
+	case tokenArithmeticOperator:
 		result = pre.evalArithmeticOperator()
 	default:
 		t := pre.Tokens.pop()
@@ -1231,11 +1430,11 @@ func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 	return result
 }
 func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
-	item := pre.Tokens.pop()
-	if item.typ != itemVariable {
-		pre.errorf("expected itemVariable, received type %s", item.typ)
+	token := pre.Tokens.pop()
+	if token.typ != tokenVariable {
+		pre.errorf("expected tokenVariable, received type %s", token.typ)
 	}
-	switch item.value {
+	switch token.value {
 	case "@name":
 		return StringType(pre.AtomPtr.Name)
 	case "@name_int32":
@@ -1249,7 +1448,7 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 		return StringType(pre.AtomPtr.Type())
 	case "@data":
 	default:
-		pre.errorf("unknown variable: %s", item.value)
+		pre.errorf("unknown variable: %s", token.value)
 		return
 	}
 
@@ -1265,7 +1464,7 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 		v, _ := pre.AtomPtr.Value.Uint()
 		result = Uint64Type(v)
 	case pre.AtomPtr.Value.IsBool():
-		v, _ := pre.AtomPtr.Value.Uint() // use UINT since it's represented as 0/1
+		v, _ := pre.AtomPtr.Value.Uint() // use UINT since tk's represented as 0/1
 		result = Uint64Type(v)
 	default:
 		v, _ := pre.AtomPtr.Value.String()
@@ -1275,11 +1474,11 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 }
 func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
 	var result bool
-	item := pre.Tokens.pop()
-	if item.typ != itemFunctionBool {
-		pre.errorf("expected itemFunctionBool, received type %s", item.typ)
+	token := pre.Tokens.pop()
+	if token.typ != tokenFunctionBool {
+		pre.errorf("expected tokenFunctionBool, received type %s", token.typ)
 	}
-	switch item.value {
+	switch token.value {
 	case "not":
 		r := pre.evalBoolean()
 		if r == nil {
@@ -1288,24 +1487,22 @@ func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
 			result = r.Equal(BooleanType(false))
 		}
 	default:
-		pre.errorf("unknown boolean function: %s", item.value)
+		pre.errorf("unknown boolean function: %s", token.value)
 	}
 	return BooleanType(result)
 }
 
-// evalUnionOperator takes the predicate result so far, evaluates it as a boolean
-// returns its value.
-// Returns error if the results so far do not evaluate to boolean.
+// evalUnionOperator consumes two nodesets and returns their set union.
 func (pre *PredicateEvaluator) evalUnionOperator(results []Equaler) (result bool) {
 
 	// consume union operator
 	op := pre.Tokens.pop()
-	if op.typ != itemUnionOperator {
+	if op.typ != tokenUnionOperator {
 		pre.errorf("expected union operator, received type %s", op.typ)
 	}
 
 	// operator requires expressions on both sides, so error if this is the first token
-	if pre.tokens[0].typ == itemUnionOperator {
+	if pre.tokens[0].typ == tokenUnionOperator {
 		pre.errorf("| has no left-hand-side value")
 		return false
 	}
@@ -1361,20 +1558,20 @@ func (pre *PredicateEvaluator) evalResultsToBool(results []Equaler) (result bool
 	return
 }
 func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
-	item := pre.Tokens.pop()
-	if item.typ != itemFunctionNumeric {
-		pre.errorf("expected itemFunctionNumeric, received type %s", item.typ)
+	token := pre.Tokens.pop()
+	if token.typ != tokenFunctionNumeric {
+		pre.errorf("expected tokenFunctionNumeric, received type %s", token.typ)
 		return
 	}
-	switch item.value {
+	switch token.value {
 	case "position":
-		log.Printf(`    evalFunctionNumeric("%s") = %d`, item.value, pre.Position)
+		log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Position)
 		return Uint64Type(pre.Position)
 	case "last", "count":
-		log.Printf(`    evalFunctionNumeric("%s") = %d`, item.value, pre.Count)
+		log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Count)
 		return Uint64Type(pre.Count)
 	default:
-		pre.errorf("unknown numeric function: %s", item.value)
+		pre.errorf("unknown numeric function: %s", token.value)
 	}
 	return
 }
@@ -1814,8 +2011,8 @@ func (v BooleanType) Equal(other Equaler) bool {
 		return false
 	}
 }
-func isNumericItem(it itemEnum) bool {
-	return it == itemInteger || it == itemFloat
+func isNumericToken(tk tokenEnum) bool {
+	return tk == tokenInteger || tk == tokenFloat
 }
 
 // These values are from the XPath 3.1 operator precedence table at
@@ -1858,7 +2055,7 @@ func precedence(op string) (value int) {
 	case "!":
 		value = 17
 	case "/", "//":
-		value = 18
+		value = 17
 	case "[", "]":
 		value = 18
 	default:
@@ -1893,6 +2090,45 @@ func precedence(op string) (value int) {
 		2
 ]
 
+(//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]
+  0.            @name  [iVar]
+  1.       0x00000000  [iString]
+  2.                ]  [iPredEnd]
+  3.                =  [iEqualsOperator]
+  4.                [  [iPredStart]
+  5.                *  [iNodeTest]
+  6.               //  [iAxisOperator]
+  7.            @name  [iVar]
+  8.       0x00000001  [iString]
+  9.                ]  [iPredEnd]
+ 10.                =  [iEqualsOperator]
+ 11.                [  [iPredStart]
+ 12.                *  [iNodeTest]
+ 13.               //  [iAxisOperator]
+ 14.                |  [iUnionOperator]
+ 15.             data  [iVar]
+ 16.                2  [iInt]
+ 17.                ]  [iPredEnd]
+ 18.                =  [iEqualsOperator]
+ 19.                [  [iPredStart]
 
-["*" "@name" "0x00000000" "=" "//" "*" "@name" "0x00000001" "=" "//" "|" "data" "2" "="]
+
+
+["@name" "0x00000000" "]" "=" "[" "*" "//" "@name" "0x00000001" "]" "=" "[" "*" "//" "|" "data" "2" "]" "=" "["]
+
+*/
+
+/*
+type Node struct {
+	a NodeMimicker
+}
+interface NodeMimic {
+	Id() // unique id, or ???
+	Children()
+	Type()
+	Name()
+	Data()
+	Descendants() // flat list of all descendants in hierarchical order
+	String()
+}
 */
