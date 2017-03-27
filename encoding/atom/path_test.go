@@ -535,6 +535,14 @@ func TestAtomsAtPath(t *testing.T) {
 			"0x00000000:UI32:2",
 			`0x00000001:CSTR:"10.4.0"`,
 		}, nil},
+	} // DEBUG
+	tests = []PathTest{ // DEBUG
+		PathTest{TestAtomGINF, `(//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]`, []string{
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+		}, nil},
 	}
 	runPathTests(t, tests)
 }

@@ -87,6 +87,7 @@ package atom
 // this is good because it handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math"
 	"strconv"
@@ -94,14 +95,22 @@ import (
 )
 
 const (
+	// Operators must end with string "Operator".. it is how they are identified as
+	// Operator tokens by the parser
 	itemLeftParen          = "iParenL"
 	itemRightParen         = "iParenR"
-	itemArithmeticOperator = "iArithmeticOp"
-	itemBooleanOperator    = "iBooleanOp"
+	itemPredicateStart     = "iPredStart"
+	itemPredicateEnd       = "iPredEnd"
+	itemPathTest           = "iPathTest"
+	itemAxisOperator       = "iAxisOperator" // "/" or "//" which precedes pathTest
+	itemArithmeticOperator = "iArithmeticOperator"
+	itemBooleanOperator    = "iBooleanOperator"
 	itemBooleanLiteral     = "iBooleanLiteral"
-	itemEqualityOperator   = "iEqualsOp"
-	itemComparisonOperator = "iCompareOp"
+	itemEqualityOperator   = "iEqualsOperator"
+	itemNodeTest           = "iNodeTest"
+	itemComparisonOperator = "iCompareOperator"
 	itemUnionOperator      = "iUnionOperator"
+	itemStepSeparator      = "itemStepSeparator"
 	itemOperator           = "iOperator"
 	itemFunctionBool       = "iFunctionBool"
 	itemFunctionNumeric    = "iFunctionNum"
@@ -176,58 +185,79 @@ func (s *itemList) empty() bool {
 	return len(*s) == 0
 }
 
-// PredicateParser is a parser for interpreting predicate tokens.
-type PredicateParser struct {
+// PathParser is a parser for interpreting predicate tokens.
+type PathParser struct {
 	outputQueue itemList    // items ordered for evaluation
 	opStack     itemList    // holds operators until their operands reach output queue
 	items       <-chan item // items received from lexer
 	err         PathError   // indicates parsing succeeded or describes what failed
 }
 
-// func New(out io.Writer, prefix string, flag int) *Logger
-//     New creates a new Logger. The out variable sets the destination to which
-// 		    log data will be written. The prefix appears at the beginning of each
-// 				    generated log line. The flag argument defines the logging properties.
-//
-//
-// type AtomPath struct {
-// 	Path string
-// 	Log log.Logger
-// 	Evaluator PathErr
-// }
-//
-// func NewAtomPath(path_raw string) {
-// 	path := strings.TrimSpace(path_raw)
-// 	logger := log.New(ioutil.Discard,
-//
-// }
-//
-// func (ap* AtomPath) SetLogger(l log.Logger) {
-// }
+type AtomPath struct {
+	Path      string
+	Log       *log.Logger
+	Evaluator *PathEvaluator
+	err       error
+}
 
-func (a *Atom) AtomsAtPath(path_raw string) (atoms []*Atom, e error) {
-	log.Printf("AtomsAtPath(\"%s\")\n", path_raw)
-	path := strings.TrimSpace(path_raw)
-	switch {
-	case path == "/":
-		atoms, e = []*Atom{a}, nil
-	case strings.HasPrefix(path, "//"):
-		pathParts := strings.Split(path[2:], "/")
-		atoms, e = getAtomsAnywhere(a, pathParts, 0)
-	case strings.HasPrefix(path, "/"):
-		pathParts := strings.Split(path[1:], "/")
-		atoms, e = getAtomsAtPath([]*Atom{a}, pathParts, 0)
-	case path == "":
-		e = errInvalidPath("")
-	default:
-		pathParts := strings.Split(path, "/")
-		atoms, e = getAtomsAtPath([]*Atom{a}, pathParts, 0)
-	}
+// NewAtomPath creates an AtomPath object for the given path string.  It
+// performs all lexing and parsing steps, so that evaluating data sets against
+// the path will have as little overhead as possible.
+func NewAtomPath(path string) (ap *AtomPath, e error) {
+	log.Printf("NewAtomPath(%q)", path)
+
+	var pe *PathEvaluator
+	pe, e = NewPathEvaluator(path)
 	if e != nil {
-		// include path expression in error message
-		e = fmt.Errorf(fmt.Sprint(e.Error(), ` in "`, path, `"`))
+		return
+	}
+
+	ap = &AtomPath{
+		Path:      strings.TrimSpace(path),
+		Log:       log.New(ioutil.Discard, "", log.LstdFlags),
+		Evaluator: pe,
+		err:       nil,
 	}
 	return
+}
+
+// AtomPath contains an array of 1-N {pathStep, [predicate]...}
+// predicates are stored as PredicateEvaluator objects
+// also store starting piece: // or / if any
+// Union operators are stored as AtomUnion objects which store lists of |, (, ) and atomUnion
+
+// return a set of
+/*
+(//*[true()] | //*[false()])[data() = 2] | /root/down/two
+(
+	//*[true()] # AtomPath
+	|
+	//*[false()] # AtomPath
+)
+[data() = 2] # AtomPath | /root/down/two # AtomPath
+
+*/
+// (//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]
+
+// step 1: break down path by union operators
+// step 2: for each piece:
+// step 2a.  consume start of string, / or //, to get starting set for this piece
+// step 2b.  split remainder on /, get pathstep and predicates for each
+
+func (ap *AtomPath) SetLogger(l *log.Logger) {
+	ap.Log = l
+}
+
+func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
+	atomPath, e := NewAtomPath(path)
+	if e != nil {
+		return nil, e
+	}
+	return atomPath.GetAtoms(a)
+}
+
+func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
+	return ap.Evaluator.Evaluate([]*Atom{root})
 }
 
 // getAtomsAnywhere finds matches for the given path that appear at any level
@@ -259,8 +289,8 @@ func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []
 }
 
 func doLocationStep(candidates []*Atom, pathPart string) (atoms []*Atom, e error) {
-	pathsToUnion, e := splitLocationStepOnUnions(pathPart)
-	log.Printf("  splitLocationStepOnUnions(\"%s\") := %v, %v\n", pathPart, pathsToUnion, e)
+	pathsToUnion, e := splitPathOnUnions(pathPart)
+	log.Printf("  splitPathOnUnions(\"%s\") := %v, %v\n", pathPart, pathsToUnion, e)
 	if e != nil {
 		return
 	}
@@ -337,7 +367,7 @@ func doPredicate(candidates []*Atom, predicate string) (atoms []*Atom, e error) 
 // Example:
 //   "CN1A[@type=UI32]" => "CN1A", ["@type=UI32"]
 //   "CN1A[@name=ROOT][@type=UI32][3]" => "CN1A", ["@name=ROOT","@type=UI32","3"]
-func splitLocationStepOnUnions(pathRaw string) (pathinfo [][]string, e error) {
+func splitPathOnUnions(pathRaw string) (pathinfo [][]string, e error) {
 	path := strings.Replace(pathRaw, "union", "|", -1) // treat "union" same as "|"
 	for _, str := range strings.Split(path, "|") {
 		if step, e := splitPathAndPredicate(str); e != nil {
@@ -378,6 +408,17 @@ func splitPathAndPredicate(pathRaw string) (pathinfo []string, e error) {
 
 	// Already verified that there's nothing after the last ], so done
 	return
+}
+
+// NewPathEvaluator reads the path
+func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
+	var lexr = NewPathLexer(path)
+	var pp = PathParser{items: lexr.items}
+	pp.receiveTokens()
+	pe = &PathEvaluator{
+		Tokens: pp.outputQueue,
+		Error:  pp.err}
+	return pe, pp.err
 }
 
 // lexer - identifies tokens(aka items) in the atom path definition.
@@ -454,6 +495,15 @@ func atomValueToComparerType(a *Atom) (v Comparer) {
 	return
 }
 
+func NewPathLexer(path string) *lexer {
+	l := &lexer{
+		input: path,
+		items: make(chan item),
+	}
+	go l.run(lexPath)
+	return l
+}
+
 func NewPredicateLexer(predicate string) *lexer {
 	l := &lexer{
 		input: predicate,
@@ -463,65 +513,124 @@ func NewPredicateLexer(predicate string) *lexer {
 	return l
 }
 
-// lexPredicate splits the filter into tokens.
-// The filter is everything within the [].
-// Example:  for path "CN1A[not(@type=CONT) and not(@name=DOGS)]",
-// This function would be extracting tokens from this string:
-//     not(@type=CONT) and not(@name=DOGS)
-// it should find the following 13 tokens:
-//     not ( @type = CONT ) and not ( @name = DOGS )
 // FIXME this is kinda crazy because these return stateFn but don't use it
+func lexPath(l *lexer) stateFn {
+	if l.bufferSize() != 0 {
+		l.errorf(fmt.Sprintf(`could not parse "%s"`, l.buffer()))
+		return nil
+	}
+	r := l.next()
+	switch {
+	case isSpace(r):
+		l.ignore()
+	case r == eof:
+		l.emit(itemEOF)
+		break
+	case r == '*':
+		l.emit(itemNodeTest)
+	case r == '|':
+		l.emit(itemUnionOperator)
+	case r == '/':
+		lexStepSeparatorOrAxis(l)
+	case r == '[':
+		l.emit(itemPredicateStart)
+		return lexPredicate
+	case r == ']':
+		l.emit(itemPredicateEnd)
+	case r == '(':
+		l.emit(itemLeftParen)
+	case r == ')':
+		l.emit(itemRightParen)
+	case strings.ContainsRune(alphaNumericChars, r):
+		l.acceptRun(alphabetLowerCase)
+		if l.peek() == '(' {
+			lexFunctionCall(l)
+		} else {
+			lexBareString(l)
+		}
+	default:
+		return l.errorf("lexPath cannot parse %q", r)
+	}
+	if l.prevItemType == itemError {
+		return nil
+	}
+	return lexPath
+}
+
 func lexPredicate(l *lexer) stateFn {
-	for {
-		if l.bufferSize() != 0 {
-			l.errorf(fmt.Sprintf(`could not parse "%s"`, l.buffer()))
-			return nil
-		}
-		r := l.next()
-		switch {
-		case isSpace(r):
-			l.ignore()
-		case r == eof:
-			l.emit(itemEOF)
-			break
-		case r == '@':
-			lexAtomAttribute(l)
-		case r == '"', r == '\'':
-			lexDelimitedString(l)
-		case r == '(':
-			l.emit(itemLeftParen)
-		case r == ')':
-			l.emit(itemRightParen)
-		case r == '|':
-			l.emit(itemUnionOperator)
-		case r == '+', r == '*':
-			l.emit(itemArithmeticOperator)
-		case strings.ContainsRune(numericChars, r):
+	if l.bufferSize() != 0 {
+		l.errorf(fmt.Sprintf(`could not parse "%s"`, l.buffer()))
+		return nil
+	}
+	r := l.next()
+	switch {
+	case isSpace(r):
+		l.ignore()
+	case r == eof:
+		l.emit(itemEOF)
+		break
+	case r == '@':
+		lexAtomAttribute(l)
+	case r == '"', r == '\'':
+		lexDelimitedString(l)
+	case r == '[':
+		l.emit(itemPredicateStart)
+	case r == ']':
+		l.emit(itemPredicateEnd)
+		return lexPath
+	case r == '(':
+		l.emit(itemLeftParen)
+	case r == ')':
+		l.emit(itemRightParen)
+	case r == '|':
+		return l.errorf("union not permitted within predicate")
+	case r == '+', r == '*':
+		l.emit(itemArithmeticOperator)
+	case strings.ContainsRune(numericChars, r):
+		lexNumberInPath(l)
+	case r == '-':
+		if strings.ContainsRune(numericChars, rune(l.peek())) && !isNumericItem(l.prevItemType) {
 			lexNumberInPath(l)
-		case r == '-':
-			if strings.ContainsRune(numericChars, rune(l.peek())) && !isNumericItem(l.prevItemType) {
-				lexNumberInPath(l)
-			} else {
-				l.emit(itemArithmeticOperator)
-			}
-		case strings.ContainsRune("=<>!", r):
-			lexComparisonOperator(l)
-		case strings.ContainsRune(alphaNumericChars, r):
-			l.acceptRun(alphabetLowerCase)
-			if l.peek() == '(' {
-				lexFunctionCall(l)
-			} else {
-				lexBareString(l)
-			}
-		default:
-			return l.errorf("invalid predicate: %s", l.input)
+		} else {
+			l.emit(itemArithmeticOperator)
 		}
-		if l.prevItemType == itemError {
-			return nil
+	case strings.ContainsRune("=<>!", r):
+		lexComparisonOperator(l)
+	case strings.ContainsRune(alphaNumericChars, r):
+		l.acceptRun(alphabetLowerCase)
+		if l.peek() == '(' {
+			lexFunctionCall(l)
+		} else {
+			lexBareString(l)
 		}
+	default:
+		return l.errorf("lexPredicate cannot parse %q", r)
 	}
 
-	return nil
+	return lexPredicate
+}
+
+func lexStepSeparatorOrAxis(l *lexer) stateFn {
+	if l.first() != '/' {
+		panic(`lexStepSeparatorOrAxis called without leading "/"`)
+	}
+	if l.accept("/") {
+		l.emit(itemAxisOperator)
+	} else {
+		l.emit(itemStepSeparator) // still might be axis, parser must decide
+	}
+	return lexNodeTest
+}
+
+func lexNodeTest(l *lexer) stateFn {
+	l.acceptRun(alphaNumericChars)
+	l.emit(itemNodeTest)
+	if l.peek() == '/' {
+		l.accept("/")
+		return lexStepSeparatorOrAxis
+	} else {
+		return lexPath
+	}
 }
 
 // lexAtomAttribute accepts @name, @type or @data.  The @ is already read.
@@ -558,6 +667,8 @@ func lexFunctionCall(l *lexer) stateFn {
 		l.emit(itemFunctionBool)
 	case "count", "position", "last":
 		l.emit(itemFunctionNumeric)
+	case "name", "type", "data":
+		l.emit(itemVariable)
 	default:
 		return l.errorf(`unrecognized function "%s"`, l.buffer())
 	}
@@ -671,14 +782,14 @@ func lexNumberInPath(l *lexer) stateFn {
 // parseTokens translates stream of tokens emitted by the lexer into a
 // function that can evaluate whether an atom gets filtered.
 func parseTokens(ch <-chan item) (tokens itemList, e error) {
-	var pp = PredicateParser{items: ch}
+	var pp = PathParser{items: ch}
 	pp.receiveTokens()
 	return pp.outputQueue, pp.err
 }
 
 // receiveTokens gets tokens from the lexer and sends them to the parser
 // for parsing.
-func (pp *PredicateParser) receiveTokens() {
+func (pp *PathParser) receiveTokens() {
 	for {
 		it := pp.readItem()
 		ok := pp.parseToken(it)
@@ -691,7 +802,7 @@ func (pp *PredicateParser) receiveTokens() {
 }
 
 // read next time from item channel, and return it.
-func (pp *PredicateParser) readItem() (it item) {
+func (pp *PathParser) readItem() (it item) {
 	var ok bool
 	select {
 	case it, ok = <-pp.items:
@@ -704,7 +815,7 @@ func (pp *PredicateParser) readItem() (it item) {
 
 // errorf sets the error field in the parser, and indicates that parsing should
 // stop by returning false.
-func (pp *PredicateParser) errorf(format string, args ...interface{}) bool {
+func (pp *PathParser) errorf(format string, args ...interface{}) bool {
 	pp.err = errInvalidPredicate(fmt.Sprintf(format, args...))
 	return false
 }
@@ -713,18 +824,16 @@ func (pp *PredicateParser) errorf(format string, args ...interface{}) bool {
 // in the path string, and queues them into evaluation order.
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-func (pp *PredicateParser) parseToken(it item) bool {
+func (pp *PathParser) parseToken(it item) bool {
 	log.Printf("      parseToken %q[%s] precedence=%d", it.value, it.typ, precedence(it.value))
 	switch it.typ {
 	case itemError:
 		return pp.errorf(it.value)
 	case itemInteger, itemHex, itemFloat, itemBareString, itemString, itemVariable, itemFunctionNumeric, itemBooleanLiteral:
 		pp.outputQueue.push(&it)
-	case itemFunctionBool:
+	case itemFunctionBool, itemPredicateStart, itemNodeTest:
 		pp.opStack.push(&it)
-	case itemUnionOperator:
-		pp.err = errInvalidPredicate("union operator not allowed within predicate, use 'or' instead")
-	case itemComparisonOperator, itemArithmeticOperator, itemEqualityOperator, itemBooleanOperator:
+	case itemComparisonOperator, itemArithmeticOperator, itemEqualityOperator, itemBooleanOperator, itemAxisOperator:
 		itemPrec := precedence(it.value)
 		for {
 			if pp.opStack.empty() || !isOperatorItem(pp.opStack.top()) {
@@ -750,6 +859,26 @@ func (pp *PredicateParser) parseToken(it item) bool {
 			op := pp.opStack.pop()
 			pp.outputQueue.push(op)
 		}
+	case itemPredicateEnd:
+		pp.outputQueue.push(&it)
+		for {
+			if pp.opStack.empty() {
+				return pp.errorf("mismatched predicate start/end")
+			}
+			if pp.opStack.top().typ == itemPredicateStart {
+				pp.outputQueue.push(pp.opStack.pop())
+				break
+			}
+			pp.outputQueue.push(pp.opStack.pop())
+		}
+	case itemUnionOperator:
+		for {
+			if pp.opStack.top().typ == itemLeftParen || pp.opStack.empty() {
+				break
+			}
+			pp.outputQueue.push(pp.opStack.pop())
+		}
+		pp.opStack.push(&it)
 	case itemEOF:
 		for !pp.opStack.empty() {
 			op := pp.opStack.pop()
@@ -766,11 +895,16 @@ func (pp *PredicateParser) parseToken(it item) bool {
 }
 
 func isOperatorItem(it *item) bool {
-	switch it.typ {
-	case itemComparisonOperator, itemArithmeticOperator, itemBooleanOperator, itemUnionOperator, itemEqualityOperator:
-		return true
-	}
-	return false
+	return strings.HasSuffix(string(it.typ), "Operator")
+}
+
+type PathEvaluator struct {
+	Tokens itemList // path criteria, as a list of tokens
+	Error  error    // evaluation status, nil on success
+}
+
+func (pe *PathEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
+	return
 }
 
 // PredicateEvaluator determines which candidate atoms satisfy the
@@ -1719,17 +1853,46 @@ func precedence(op string) (value int) {
 		value = 14
 	case "cast as":
 		value = 15
-	case "=>":
-		value = 16
 	//		case "-", "+": // unary operators
-	//			value = 17
+	//			value = 16
 	case "!":
-		value = 18
+		value = 17
 	case "/", "//":
-		value = 19
+		value = 18
+	case "[", "]":
+		value = 18
 	default:
 		value = 0
 		//		panic(fmt.Sprintf("unknown operator: %s", op))
 	}
 	return value
 }
+
+/*
+(//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]
+
+|
+  //
+	*
+	[
+	  =
+		  @name
+			"0x00000000"
+	]
+
+  //
+	*
+	[
+	  =
+	    @name
+		  "0x00000001"
+	]
+[
+	=
+		data()
+		2
+]
+
+
+["*" "@name" "0x00000000" "=" "//" "*" "@name" "0x00000001" "=" "//" "|" "data" "2" "="]
+*/
