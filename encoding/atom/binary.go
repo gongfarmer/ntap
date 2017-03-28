@@ -161,7 +161,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 			return atoms, err
 		}
 		var a = Atom{
-			Name: name,
+			name: name,
 			typ:  adeType,
 			data: data,
 		}
@@ -175,7 +175,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		}
 
 		// push container onto stack
-		if a.Type() == CONT {
+		if a.typ == CONT {
 			endPos := bytesRead + h.Size - headerSize
 			containers.Push(cont{&a, endPos})
 		}
@@ -273,7 +273,7 @@ func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	// create members for atom header
 	var name, typ [4]byte
 	var buf []byte
-	if err = FC32StringToBytes(a.Name, &buf); err != nil {
+	if err = FC32StringToBytes(a.name, &buf); err != nil {
 		return
 	}
 	copy(name[:], buf)

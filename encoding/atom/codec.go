@@ -166,8 +166,8 @@ func errZeroDenominator(typ string, v string) (e error) {
 func NewCodec(a *Atom) *Codec {
 	c := Codec{
 		Atom:    a,
-		Decoder: decoderByType[a.Type()],
-		Encoder: encoderByType[a.Type()],
+		Decoder: decoderByType[a.typ],
+		Encoder: encoderByType[a.typ],
 	}
 	return &c
 }

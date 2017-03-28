@@ -22,16 +22,23 @@ var _ encoding.TextMarshaler = &Atom{}
 
 // Atom represents a single ADE atom, which may be a container containing other atoms.
 type Atom struct {
-	Name     string
+	name     string
 	typ      ADEType
 	data     []byte
 	Value    *Codec
 	Children []*Atom
 }
 
+// Name returns a copy of the atoms's name.
+// If printable, it's 4 printable chars.  Otherwise, it's
+// a hex string preceded by 0x.
+func (a *Atom) Name() string {
+	return string(a.name)
+}
+
 // Type returns a copy of the atoms's ADE data type.
-func (a *Atom) Type() ADEType {
-	return a.typ
+func (a *Atom) Type() string {
+	return string(a.typ)
 }
 
 // AtomAtPath returns the single Atom descendant at the given path, or nil if none.
@@ -45,7 +52,7 @@ func (a *Atom) Type() ADEType {
 // previous memory allocated for data.
 // It also empties the list of child atoms.
 func (a *Atom) Zero() {
-	a.Name = ""
+	a.name = ""
 	a.SetType(NULL)
 	a.Children = []*Atom{}
 }
@@ -87,12 +94,16 @@ func (a *Atom) ZeroData() {
 // String returns the atom's text description in ADE ContainerText format.
 // This is a single line, it doesn't include a list of child atoms.
 func (a Atom) String() string {
-	if a.Type() == CONT {
-		return fmt.Sprintf("%s:%s:", a.Name, a.Type())
+	if a.typ == CONT {
+		return fmt.Sprintf("%s:%s:", a.name, a.Type())
 	} else {
 		str, _ := a.Value.StringDelimited()
-		return fmt.Sprintf("%s:%s:%s", a.Name, a.Type(), str)
+		return fmt.Sprintf("%s:%s:%s", a.name, a.Type(), str)
 	}
+}
+
+func (a Atom) DataString() string {
+	return a.Value.String()
 }
 
 // AddChild makes the Atom pointed to by the argument a child of this Atom.
@@ -114,14 +125,15 @@ func (a *Atom) NumChildren() int {
 	return len(a.Children)
 }
 
-// AtomList returns a list of pointers to every Atom in hierarchical order.
-func (a *Atom) AtomList() []*Atom {
-	return a.getAtomList(new([]*Atom))
+// Descendants returns a list of pointers to every Atom in hierarchical order.
+// Starts with self.
+func (a *Atom) Descendants() []*Atom {
+	return a.getDescendants(new([]*Atom))
 }
-func (a *Atom) getAtomList(list *([]*Atom)) []*Atom {
+func (a *Atom) getDescendants(list *([]*Atom)) []*Atom {
 	*list = append(*list, a)
 	for _, child := range a.Children {
-		child.getAtomList(list)
+		child.getDescendants(list)
 	}
 	return *list
 }
