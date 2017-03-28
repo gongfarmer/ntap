@@ -295,7 +295,7 @@ func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	}
 
 	// write children
-	for _, child := range a.Children {
+	for _, child := range a.children {
 		err = child.BinaryWrite(w)
 		if err != nil {
 			return
@@ -308,7 +308,7 @@ func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 // Len returns the length this atom would have when encoded as binary bytes.
 func (a *Atom) Len() (length uint32) {
 	length = uint32(headerSize + len(a.data))
-	for _, child := range a.Children {
+	for _, child := range a.children {
 		length += child.Len()
 	}
 	return

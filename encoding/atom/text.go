@@ -57,9 +57,9 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	}
 	fmt.Fprintln(&output, s)
 
-	if a.Type() == CONT {
+	if a.typ == CONT {
 		// write children
-		for _, childPtr := range a.Children {
+		for _, childPtr := range a.children {
 			buf := atomToTextBuffer(childPtr, depth+1)
 			output.Write(buf.Bytes())
 		}
@@ -836,7 +836,7 @@ func parseAtomName(p *parser) parseFunc {
 	tk := readToken(p)
 	switch tk.typ {
 	case tokenAtomName:
-		p.theAtom.Name = tk.value // may be hex.. either way, store as string for now
+		p.theAtom.name = tk.value // may be hex.. either way, store as string for now
 	case tokenError:
 		return p.errorf(tk.value)
 	case tokenEOF:
@@ -888,7 +888,7 @@ func parseAtomType(p *parser) parseFunc {
 	}
 
 	// If container, make tk the currently open container
-	if p.theAtom.Type() == CONT {
+	if p.theAtom.typ == CONT {
 		p.containers.push(p.theAtom)
 	}
 
@@ -896,7 +896,7 @@ func parseAtomType(p *parser) parseFunc {
 }
 
 func parseAtomData(p *parser) parseFunc {
-	parseFunc := parseType[p.theAtom.Type()]
+	parseFunc := parseType[p.theAtom.typ]
 	if parseFunc == nil {
 		panic(fmt.Sprintf("no data parse function defined for type %s", p.theAtom.Type()))
 	}

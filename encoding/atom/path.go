@@ -122,43 +122,32 @@ const (
 	tokenHex                = "tknHex"
 )
 
-// An Element represents a single Atom in the tree.
-// Atoms are Elements. Atom names, types and data are not Elements.
-type Element interface {
-	//	Id() // unique id, or ???
-	Name()
-	Type()
-	DataString()
-	Children()
-	//	Descendants() // flat list of all descendants in hierarchical order (FIXME includes self?)
-}
-
-// FIXME: maybe this is too many allocations, if we have to convert the entire
-// nodeset into these for each path evaluation
-// Consider changing the Atom type itself to confirm to the interface as much
-// as possible,  which is a long way.
-// Maybe convert to this type only when necessary, eg. to add new capabilities
-// like id() or parent()
-// AtomicElement makes the Atom type implement the Element interface
-type AtomicElement struct {
-	AtomPtr *Atom
-}
-
-func (ae AtomicElement) Name() string {
-	return ae.AtomPtr.Name()
-}
-func (ae AtomicElement) Type() string {
-	return ae.AtomPtr.Type()
-}
-func (ae AtomicElement) DataString() string {
-	return ae.AtomPtr.DataString()
-}
-func (ae AtomicElement) String() string {
-	return ae.AtomPtr.String()
-}
-func (ae AtomicElement) Children() string {
-	return ae.AtomPtr.Children
-}
+// // FIXME: maybe this is too many allocations, if we have to convert the entire
+// // nodeset into these for each path evaluation
+// // Consider changing the Atom type itself to confirm to the interface as much
+// // as possible,  which is a long way.
+// // Maybe convert to this type only when necessary, eg. to add new capabilities
+// // like id() or parent()
+// // AtomicElement makes the Atom type implement the Element interface
+// type AtomicElement struct {
+// 	AtomPtr *Atom
+// }
+//
+// func (ae AtomicElement) Name() string {
+// 	return ae.AtomPtr.Name()
+// }
+// func (ae AtomicElement) Type() string {
+// 	return ae.AtomPtr.Type()
+// }
+// func (ae AtomicElement) DataString() string {
+// 	return ae.AtomPtr.DataString()
+// }
+// func (ae AtomicElement) String() string {
+// 	return ae.AtomPtr.String()
+// }
+// func (ae AtomicElement) Children() []*Element {
+// 	return []*Element(ae.AtomPtr.children)
+// }
 
 // FIXME define type AtomicElement, which embeds an Atom and adds parent ptr and unique id? Is embedded type a copy or a reference?  Must be a copy since it should take up full width.  Could add atomPtr field instead of embedding.
 
@@ -220,7 +209,7 @@ func (s *tokenList) popType(typ tokenEnum) (tk *token, ok bool) {
 	return s.pop(), true
 }
 
-// peek at the top token on the stack without removing tk.
+// peek at the top token on the stack, without removing the token.
 func (s tokenList) peek() (tk *token) {
 	if len(s) == 0 {
 		return nil
@@ -228,6 +217,7 @@ func (s tokenList) peek() (tk *token) {
 	return s[len(s)-1]
 }
 
+// return the type of the top token on the stack.
 func (s tokenList) nextType() tokenEnum {
 	if len(s) == 0 {
 		return tokenEnum("")
@@ -311,17 +301,16 @@ func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	if e != nil {
 		return nil, e
 	}
-	return atomPath.GetAtoms(a)
+
+	atoms, e = atomPath.GetAtoms(a)
+	if e != nil {
+		return
+	}
+	return
 }
 
 func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
 	return ap.Evaluator.Evaluate(root)
-}
-
-// getAtomsAnywhere finds matches for the given path that appear at any level
-// in the tree.  It returns no atoms on error.
-func getAtomsAnywhere(a *Atom, pathParts []string, index int) (atoms []*Atom, e error) {
-	return getAtomsAtPath(a.AtomList(), pathParts, 0)
 }
 
 // must return no atoms on error
@@ -341,7 +330,7 @@ func getAtomsAtPath(candidates []*Atom, pathParts []string, index int) (atoms []
 	// search child atoms for the rest of the path
 	var nextCandidates [](*Atom)
 	for _, a := range theCandidates {
-		nextCandidates = append(nextCandidates, a.Children...)
+		nextCandidates = append(nextCandidates, a.children...)
 	}
 	return getAtomsAtPath(nextCandidates, pathParts, index+1)
 }
@@ -383,7 +372,7 @@ func doPathTest(candidates []*Atom, pathTest string) (atoms []*Atom, e error) {
 		return candidates, nil
 	}
 	for _, a := range candidates {
-		if a.Name == pathTest {
+		if a.name == pathTest {
 			atoms = append(atoms, a)
 		}
 	}
@@ -524,8 +513,8 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 }
 
 func (pre *PredicateEvaluator) getChildValue(atomName string) (v Comparer, ok bool) {
-	for _, a := range pre.AtomPtr.Children {
-		if a.Name != atomName {
+	for _, a := range pre.AtomPtr.children {
+		if a.name != atomName {
 			continue
 		}
 		v = atomValueToComparerType(a)
@@ -682,8 +671,7 @@ func lexStepSeparatorOrAxis(l *lexer) stateFn {
 func lexElementTest(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
 	l.emit(tokenElementTest)
-	if l.peek() == '/' {
-		l.accept("/")
+	if l.accept("/") {
 		return lexStepSeparatorOrAxis
 	} else {
 		return lexPath
@@ -1026,10 +1014,10 @@ func isOperatorToken(tk *token) bool {
 }
 
 type PathEvaluator struct {
-	tokens         tokenList // path criteria
-	Tokens         tokenList // remaining path criteria list, consumed during each evaluation
+	tokens         tokenList // path criteria, does not change after creation
+	Tokens         tokenList // path criteria, consumed during each evaluation
 	Error          error     // evaluation status, nil on success
-	ContextElement *Atom
+	ContextAtomPtr *Atom
 }
 
 // errorf sets the error field in the parser, and indicates that parsing should
@@ -1039,17 +1027,17 @@ func (pe *PathEvaluator) errorf(format string, args ...interface{}) bool {
 	return false
 }
 
-func (pe *PathEvaluator) Evaluate(a *Atom) (atoms []*Atom, e error) {
-	pe.ContextElement = a // FIXME does this change over time?
-	elements := pe.eval()
-
+func (pe *PathEvaluator) Evaluate(atom *Atom) (result []*Atom, e error) {
+	pe.ContextAtomPtr = atom // FIXME does this change over time?
+	result = pe.eval()
+	e = pe.Error
 	return
 }
 
 // eval() is the top-level evaluation function.  It accepts every token that
 // can appear as the first token in the evaluation list.
-// Return value is a []Element, but it may contain just a single node.
-func (pe *PathEvaluator) eval() (elements []Element) {
+// Return value is a slice of Atoms, but it may contain just a single node.
+func (pe *PathEvaluator) eval() (atoms []*Atom) {
 	return pe.evalElementSet() // is this all that's needed here?
 }
 
@@ -1068,7 +1056,7 @@ func (pe *PathEvaluator) NextTokenType() tokenEnum {
 	return pe.Tokens.nextType()
 }
 
-func (pe *PathEvaluator) evalUnionOperator() []Element {
+func (pe *PathEvaluator) evalUnionOperator() []*Atom {
 	// consume union operator
 	op := pe.Tokens.pop()
 	if op.typ != tokenUnionOperator {
@@ -1079,7 +1067,7 @@ func (pe *PathEvaluator) evalUnionOperator() []Element {
 	// FIXME uniqueness, avoid duplicates
 	return append(pe.evalElementSet(), pe.evalElementSet()...)
 }
-func (pe *PathEvaluator) evalAxisOperator() []Element {
+func (pe *PathEvaluator) evalAxisOperator() []*Atom {
 	tk := pe.Tokens.pop()
 	if tk.typ != tokenAxisOperator {
 		pe.errorf("expected axis operator, got '%v' [%[1]T]", tk.value)
@@ -1087,19 +1075,19 @@ func (pe *PathEvaluator) evalAxisOperator() []Element {
 	}
 	switch tk.value {
 	case "//":
-		return pe.ContextElement.AtomList()
+		return pe.ContextAtomPtr.Descendants()
 	case "/":
-		return []Element{pe.ContextElement}
+		return []*Atom{pe.ContextAtomPtr}
 	}
 
 	// same as / for this implementation..
-	// because atoms don't know their parent, cannot refer to a higher-level
-	// atom in the tree.  This should be corrected, perhaps Element object
-	// should add parent awareness.
-	return []Element{pe.ContextElement}
+	// because atoms don't know their parent, it's not possible to refer to a
+	// higher-level atom in the tree.  This should be corrected, perhaps Element
+	// object should add parent awareness.
+	return []*Atom{pe.ContextAtomPtr}
 }
 
-func (pe *PathEvaluator) evalElementTest(elements []Element) []Element {
+func (pe *PathEvaluator) evalElementTest(atoms []*Atom) []*Atom {
 	// Get node test token
 	tkElementTest := pe.Tokens.pop()
 	if tkElementTest.typ != tokenElementTest {
@@ -1107,17 +1095,17 @@ func (pe *PathEvaluator) evalElementTest(elements []Element) []Element {
 		return nil
 	}
 
-	// Filter the ElementSet by name against the node test
-	results := elements[:0] // overwite elements list while filtering to avoid allocation
-	for _, n := range elements {
-		if n.Name() == tkElementTest.value {
-			results = append(results, n)
+	// Filter the ElementPtrSlice by name against the node test
+	results := atoms[:0] // overwite elements list while filtering to avoid allocation
+	for _, elt := range atoms {
+		if (*elt).Name() == tkElementTest.value {
+			results = append(results, elt)
 		}
 	}
 	return results
 }
 
-func (pe *PathEvaluator) evalElementSet() (elements []Element) {
+func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 	if pe.Done() {
 		return
 	}
@@ -1128,16 +1116,17 @@ func (pe *PathEvaluator) evalElementSet() (elements []Element) {
 		return pe.evalUnionOperator()
 	}
 	if pe.NextTokenType() == tokenAxisOperator {
-		elements = pe.evalAxisOperator()
+		atoms = pe.evalAxisOperator()
 	} else {
 		// No axis operator given, so use context node
-		elements = append(elements, pe.ContextElement)
+		atoms = append(atoms, pe.ContextAtomPtr)
 	}
 	// this part is mandatory
 	if pe.NextTokenType() != tokenElementTest {
-		return pe.errorf("ElementSet lacks node test")
+		pe.errorf("ElementPtrSlice lacks node test")
+		return
 	}
-	elements = pe.evalElementTest(elements) // may be nil in which case returns .
+	atoms = pe.evalElementTest(atoms) // may be nil in which case returns .
 
 	return
 }
@@ -1145,7 +1134,7 @@ func (pe *PathEvaluator) evalElementSet() (elements []Element) {
 // read predicate tokens.
 // read nodeset.
 // for each Element in the NodeSet, make a predicateEvaluator and apply predicate.
-func (pe *PathEvaluator) evalPredicate() []Element {
+func (pe *PathEvaluator) evalPredicate() []*Atom {
 	// read predicate tokens
 	var predicateTokens tokenList
 	for predicateTokens.nextType() != tokenPredicateStart && !predicateTokens.empty() {
@@ -1153,13 +1142,13 @@ func (pe *PathEvaluator) evalPredicate() []Element {
 	}
 
 	// evaluate element set by predicate
-	pe := PredicateEvaluator{
+	pre := PredicateEvaluator{
 		tokens: predicateTokens,
 		Error:  nil,
 		Atoms:  pe.evalElementSet(), // read element set
 	}
 
-	return pe.evalPredicate()
+	return pre.evalPredicate()
 }
 
 // PredicateEvaluator determines which candidate atoms satisfy the
@@ -1185,6 +1174,14 @@ func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathEr
 	msg := fmt.Sprintf(format, args...)
 	pre.Error = PathError(errInvalidPredicate(msg))
 	return pre.Error
+}
+
+// NextTokenType returns the tokenType of the next Token in the PathEvalator's Token stack
+func (pre *PredicateEvaluator) NextTokenType() tokenEnum {
+	if len(pre.Tokens) == 0 {
+		return ""
+	}
+	return pre.Tokens.nextType()
 }
 
 // evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
@@ -1494,9 +1491,9 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 	}
 	switch token.value {
 	case "@name":
-		return StringType(pre.AtomPtr.Name)
+		return StringType(pre.AtomPtr.Name())
 	case "@name_int32":
-		name, err := strconv.ParseUint(pre.AtomPtr.Name, 0, 32)
+		name, err := strconv.ParseUint(pre.AtomPtr.name, 0, 32)
 		if err != nil {
 			pre.errorf("invalid atom @name_int32: %s", pre.AtomPtr.Name)
 			return

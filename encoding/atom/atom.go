@@ -25,20 +25,25 @@ type Atom struct {
 	name     string
 	typ      ADEType
 	data     []byte
+	children []*Atom
 	Value    *Codec
-	Children []*Atom
 }
 
 // Name returns a copy of the atoms's name.
 // If printable, it's 4 printable chars.  Otherwise, it's
 // a hex string preceded by 0x.
-func (a *Atom) Name() string {
+func (a Atom) Name() string {
 	return string(a.name)
 }
 
 // Type returns a copy of the atoms's ADE data type.
-func (a *Atom) Type() string {
+func (a Atom) Type() string {
 	return string(a.typ)
+}
+
+// Children returns a slice of this Atom's child atoms
+func (a Atom) Children() []*Atom {
+	return a.children
 }
 
 // AtomAtPath returns the single Atom descendant at the given path, or nil if none.
@@ -54,7 +59,7 @@ func (a *Atom) Type() string {
 func (a *Atom) Zero() {
 	a.name = ""
 	a.SetType(NULL)
-	a.Children = []*Atom{}
+	a.children = []*Atom{}
 }
 
 // SetType sets the type of an Atom object, and handles updating the Codec and
@@ -102,17 +107,13 @@ func (a Atom) String() string {
 	}
 }
 
-func (a Atom) DataString() string {
-	return a.Value.String()
-}
-
 // AddChild makes the Atom pointed to by the argument a child of this Atom.
 // Returns false when called on non-container Atoms.
 func (a *Atom) AddChild(child *Atom) bool {
 	if a.typ != CONT {
 		return false
 	}
-	a.Children = append(a.Children, child)
+	a.children = append(a.children, child)
 	return true
 }
 
@@ -122,7 +123,7 @@ func (a *Atom) NumChildren() int {
 	if a.typ != CONT {
 		return -1
 	}
-	return len(a.Children)
+	return len(a.children)
 }
 
 // Descendants returns a list of pointers to every Atom in hierarchical order.
@@ -132,7 +133,7 @@ func (a *Atom) Descendants() []*Atom {
 }
 func (a *Atom) getDescendants(list *([]*Atom)) []*Atom {
 	*list = append(*list, a)
-	for _, child := range a.Children {
+	for _, child := range a.children {
 		child.getDescendants(list)
 	}
 	return *list
