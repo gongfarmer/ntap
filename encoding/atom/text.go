@@ -50,10 +50,10 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	}
 
 	// write atom name,type,data
-	fmt.Fprintf(&output, "%s:%s:", a.Name, a.Type())
+	fmt.Fprintf(&output, "%s:%s:", a.Name(), a.Type())
 	s, err := a.Value.StringDelimited()
 	if err != nil {
-		panic(fmt.Errorf("conversion of atom to text failed for atom '%s:%s': %s", a.Name, a.Type(), err))
+		panic(fmt.Errorf("conversion of atom to text failed for atom '%s:%s': %s", a.Name(), a.Type(), err))
 	}
 	fmt.Fprintln(&output, s)
 
@@ -868,7 +868,7 @@ func parseAtomType(p *parser) parseFunc {
 		return p.errorf(tk.value)
 	}
 	if tk.typ == tokenEOF {
-		return p.errorf("end of input while parsing atom %s", p.theAtom.Name)
+		return p.errorf("end of input while parsing atom %s", p.theAtom.Name())
 	}
 
 	// verify token type
