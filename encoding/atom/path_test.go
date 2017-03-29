@@ -521,22 +521,21 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[false() or false() and true()]", []string{}, nil},
 		PathTest{TestAtom2, "/ROOT[ position() = 0 or position() = 1]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[ or position() = 1]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ or position() = 1]"`)},
-		PathTest{TestAtom2, "/ROOT[ position() = 1 or]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or]"`)},
-		PathTest{TestAtom2, "/ROOT[ position() = 1 or ()]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or ()]"`)},
-
-		// union operator
-		PathTest{TestAtomGINF, `//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{
-			"0x00000000:UI32:2",
-			"0x00000001:UI32:908767",
-			"0x00000000:UI32:2",
-			"0x00000001:UI64:1484722540084888",
-			"0x00000000:UI32:2",
-			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
-			"0x00000000:UI32:2",
-			`0x00000001:CSTR:"10.4.0"`,
-		}, nil},
 	} // DEBUG
 	tests = []PathTest{ // DEBUG
+		PathTest{TestAtom2, "/ROOT[ position() = 1 or]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or]"`)},
+		PathTest{TestAtom2, "/ROOT[ position() = 1 or ()]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or ()]"`)},
+		// test union operator
+		PathTest{TestAtomGINF, `//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{
+			"0x00000001:UI32:908767",
+			"0x00000001:UI64:1484722540084888",
+			`0x00000001:CSTR:"{OID='2.16.124.113590.3.1.3.3.1'}"`,
+			`0x00000001:CSTR:"10.4.0"`,
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+			"0x00000000:UI32:2",
+		}, nil},
 		PathTest{TestAtomGINF, `(//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]`, []string{
 			"0x00000000:UI32:2",
 			"0x00000000:UI32:2",

@@ -160,9 +160,9 @@ type Node interface {
 
 func errInvalidPath(msg string) error {
 	if msg == "" {
-		return fmt.Errorf("invalid path test: <empty>")
+		return fmt.Errorf("invalid path: <empty>")
 	}
-	return fmt.Errorf("invalid path test: %s", msg)
+	return fmt.Errorf("invalid path: %s", msg)
 }
 func errInvalidPredicate(msg string) error {
 	if msg == "" {
@@ -372,6 +372,7 @@ func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 	var pp = PathParser{tokens: lexr.tokens}
 	pp.receiveTokens()
 	pe = &PathEvaluator{
+		Path:   path,
 		tokens: pp.outputQueue,
 		Error:  pp.err}
 	return pe, pp.err
@@ -408,12 +409,9 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 		log.Printf("    eval() with Tokens(%v)", pre.tokens)
 		results := pre.eval()
 		ok, err := pre.evalResultsToBool(results)
-		if err != nil {
-			pre.errorf(err.Error())
-		}
 		log.Printf("    eval() returned %t and err %v", ok, pre.Error)
-		if pre.Error != nil {
-			return nil, pre.Error
+		if err != nil {
+			return nil, err
 		}
 		if ok {
 			atoms = append(atoms, atomPtr)
@@ -569,7 +567,11 @@ func lexStepSeparatorOrAxis(l *lexer) stateFn {
 	if l.accept("/") {
 		l.emit(tokenAxisOperator)
 	} else {
-		l.emit(tokenStepSeparator) // still might be axis, parser must decide
+		if l.prevTokenType == tokenNodeTest || l.prevTokenType == tokenPredicateEnd {
+			l.emit(tokenStepSeparator)
+		} else {
+			l.emit(tokenAxisOperator)
+		}
 	}
 	return lexNodeTest
 }
@@ -578,7 +580,8 @@ func lexNodeTest(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
 	l.emit(tokenNodeTest)
 	if l.accept("/") {
-		return lexStepSeparatorOrAxis
+		l.emit(tokenStepSeparator)
+		return lexNodeTest
 	} else {
 		return lexPath
 	}
@@ -769,7 +772,7 @@ func (pp *PathParser) readToken() (tk token) {
 // errorf sets the error field in the parser, and indicates that parsing should
 // stop by returning false.
 func (pp *PathParser) errorf(format string, args ...interface{}) bool {
-	pp.err = errInvalidPredicate(fmt.Sprintf(format, args...))
+	pp.err = errInvalidPath(fmt.Sprintf(format, args...))
 	return false
 }
 
@@ -847,6 +850,7 @@ func isOperatorToken(tk *token) bool {
 }
 
 type PathEvaluator struct {
+	Path           string
 	tokens         tokenList // path criteria, does not change after creation
 	Tokens         tokenList // path criteria, consumed during each evaluation
 	Error          error     // evaluation status, nil on success
@@ -856,8 +860,17 @@ type PathEvaluator struct {
 // errorf sets the error field in the parser, and indicates that parsing should
 // stop by returning false.
 func (pe *PathEvaluator) errorf(format string, args ...interface{}) bool {
-	pe.Error = errInvalidPredicate(fmt.Sprintf(format, args...))
+	pe.Error = errInvalidPath(strings.Join([]string{
+		fmt.Sprintf(format, args...),
+		fmt.Sprintf(" in %q", pe.Path),
+	}, ""))
 	return false
+}
+func (pe *PathEvaluator) addPathToError(err error) error {
+	return fmt.Errorf(strings.Join([]string{
+		err.Error(),
+		fmt.Sprintf(" in %q", pe.Path),
+	}, ""))
 }
 
 func (pe *PathEvaluator) Evaluate(atom *Atom) (result []*Atom, e error) {
@@ -904,7 +917,7 @@ func (pe *PathEvaluator) evalUnionOperator() []*Atom {
 }
 func (pe *PathEvaluator) evalAxisOperator() []*Atom {
 	tk := pe.Tokens.pop()
-	if tk.typ != tokenAxisOperator {
+	if tk.typ != tokenAxisOperator && tk.typ != tokenStepSeparator {
 		pe.errorf("expected axis operator, got '%v' [%[1]T]", tk.value)
 		return nil
 	}
@@ -959,7 +972,7 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 		log.Println("Got union operator")
 		return pe.evalUnionOperator()
 	}
-	if pe.NextTokenType() == tokenAxisOperator {
+	if pe.NextTokenType() == tokenAxisOperator || pe.NextTokenType() == tokenStepSeparator {
 		log.Println("Got axis operator")
 		atoms = pe.evalAxisOperator()
 	} else {
@@ -1006,7 +1019,7 @@ func (pe *PathEvaluator) evalPredicate() []*Atom {
 
 	atoms, err := pre.Evaluate(pe.evalElementSet())
 	if err != nil {
-		pe.errorf(err.Error())
+		pe.Error = pe.addPathToError(err)
 	}
 	return atoms
 }
@@ -1186,6 +1199,7 @@ func (pre *PredicateEvaluator) evalEqualityOperator() Equaler {
 	if pre.Error != nil {
 		return BooleanType(false)
 	}
+	log.Printf("  evalEqualityOperator() %v = %v", lhs, rhs)
 	switch op.value {
 	case "=", "eq":
 		result = lhs.Equal(rhs)
@@ -1445,7 +1459,7 @@ func (pre *PredicateEvaluator) evalUnionOperator(results []Equaler) (result bool
 
 func (pre *PredicateEvaluator) evalResultsToBool(results []Equaler) (result bool, err error) {
 	if pre.Error != nil {
-		return
+		return false, pre.Error
 	}
 	// verify that evaluation resulted in exactly 1 value
 	switch len(results) {
