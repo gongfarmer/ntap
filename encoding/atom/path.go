@@ -100,15 +100,14 @@ const (
 	// Operator tokens by the parser
 	tokenLeftParen          = "tknParenL"
 	tokenRightParen         = "tknParenR"
-	tokenPredicateStart     = "tknPredStart"
-	tokenPredicateEnd       = "tknPredEnd"
-	tokenPathTest           = "tknPathTest"
+	tokenPredicateStart     = "tknPredStartOperator"
+	tokenPredicateEnd       = "tknPredEndOperator"
 	tokenAxisOperator       = "tknAxisOperator" // "/" or "//" which precedes pathTest
 	tokenArithmeticOperator = "tknArithmeticOperator"
 	tokenBooleanOperator    = "tknBooleanOperator"
 	tokenBooleanLiteral     = "tknBooleanLiteral"
 	tokenEqualityOperator   = "tknEqualsOperator"
-	tokenNodeTest           = "tknNodeTestOperator"
+	tokenNodeTest           = "tknNodeTest"
 	tokenComparisonOperator = "tknCompareOperator"
 	tokenUnionOperator      = "tknUnionOperator"
 	tokenStepSeparator      = "tknStepSeparator"
@@ -383,12 +382,6 @@ func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 // They use very different parsers though.
 
 // NewPredicateEvaluator reads the predicate from a string by sending
-func NewPredicateEvaluator(predicate string) (pre *PredicateEvaluator, err error) {
-	var lexr = NewPredicateLexer(predicate)
-	pre = new(PredicateEvaluator)
-	pre.tokens, err = parseTokens(lexr.tokens)
-	return
-}
 
 // Evaluate filters a list of atoms against the predicate conditions, returning
 // the atoms that satisfy the predicate.
@@ -494,12 +487,7 @@ func lexPath(l *lexer) stateFn {
 	case r == ')':
 		l.emit(tokenRightParen)
 	case strings.ContainsRune(alphaNumericChars, r):
-		l.acceptRun(alphabetLowerCase)
-		if l.peek() == '(' {
-			lexFunctionCall(l)
-		} else {
-			lexBareString(l)
-		}
+		lexBareStringInPath(l)
 	default:
 		return l.errorf("lexPath cannot parse %q", r)
 	}
@@ -547,12 +535,7 @@ func lexPredicate(l *lexer) stateFn {
 	case strings.ContainsRune("=<>!", r):
 		lexComparisonOperator(l)
 	case strings.ContainsRune(alphaNumericChars, r):
-		l.acceptRun(alphabetLowerCase)
-		if l.peek() == '(' {
-			lexFunctionCall(l)
-		} else {
-			lexBareString(l)
-		}
+		lexBareStringInPredicate(l)
 	default:
 		return l.errorf("lexPredicate cannot parse %q", r)
 	}
@@ -577,8 +560,14 @@ func lexStepSeparatorOrAxis(l *lexer) stateFn {
 }
 
 func lexNodeTest(l *lexer) stateFn {
-	l.acceptRun(alphaNumericChars)
-	l.emit(tokenNodeTest)
+	if l.acceptRun(alphaNumericChars) > 0 {
+		l.emit(tokenNodeTest)
+	} else if l.accept("*") {
+		l.emit(tokenNodeTest)
+	} else {
+		l.errorf("expected node test, found none")
+		return nil
+	}
 	if l.accept("/") {
 		l.emit(tokenStepSeparator)
 		return lexNodeTest
@@ -613,10 +602,15 @@ func lexFunctionCall(l *lexer) stateFn {
 		return l.errorf("invalid function call prefix: %s", l.input)
 	}
 
-	// determine function return type
-	switch l.buffer() {
+	// Warning: if any functions are added with names containing something besides lower
+	// case chars, then update lexBareString to accept those chars as well
+	switch l.buffer() { // determine function return type
 	case "not":
 		l.emit(tokenFunctionBool)
+	case "true", "false":
+		// don't make this a real function.  It consumes no arguments so it needs
+		// to be parsed exactly as a literal
+		l.emit(tokenBooleanLiteral)
 	case "count", "position", "last":
 		l.emit(tokenFunctionNumeric)
 	case "name", "type", "data":
@@ -669,15 +663,30 @@ func lexDelimitedString(l *lexer) stateFn {
 	return lexPredicate
 }
 
+func lexBareStringInPath(l *lexer) stateFn {
+	l.acceptRun(alphaNumericChars)
+	if l.peek() == '(' {
+		return lexFunctionCall(l)
+	}
+	switch l.buffer() {
+	case "union":
+		l.emit(tokenUnionOperator)
+	default:
+		l.emit(tokenNodeTest)
+	}
+	return lexPath
+}
+
 // lexBareString accepts a non-delimited string of alphanumeric characters.
 // This has more restrictions than a delimited string but is simple and fast to
 // parse.
 // Doesn't handle any escaping, use delimited strings for anything non-trivial.
-func lexBareString(l *lexer) stateFn {
+func lexBareStringInPredicate(l *lexer) stateFn {
 	l.acceptRun(alphaNumericChars)
+	if l.peek() == '(' {
+		return lexFunctionCall(l)
+	}
 	switch l.buffer() {
-	case "union":
-		l.emit(tokenUnionOperator)
 	case "eq", "ne":
 		l.emit(tokenEqualityOperator)
 	case "lt", "le", "gt", "ge":
@@ -686,8 +695,7 @@ func lexBareString(l *lexer) stateFn {
 		l.emit(tokenArithmeticOperator)
 	case "or", "and":
 		l.emit(tokenBooleanOperator)
-	case "true", "false":
-		l.emit(tokenBooleanLiteral)
+
 	default:
 		l.emit(tokenBareString)
 	}
@@ -781,7 +789,7 @@ func (pp *PathParser) errorf(format string, args ...interface{}) bool {
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (pp *PathParser) parseToken(tk token) bool {
-	log.Printf("      parseToken %q {%s} precedence=%d", tk.value, tk.typ, precedence(tk))
+	log.Printf("      parseToken %q {%s} ", tk.value, tk.typ)
 	switch tk.typ {
 	case tokenError:
 		return pp.errorf(tk.value)
@@ -790,18 +798,15 @@ func (pp *PathParser) parseToken(tk token) bool {
 	case tokenPredicateStart:
 		pp.pushOperatorsToOutputUntil(func(t token) bool {
 			// want predicate delimiter tokens to precede axis+node test in stack order
-			return t.typ != tokenAxisOperator && t.typ != tokenNodeTest
+			return (t.typ != tokenAxisOperator) && (t.typ != tokenNodeTest) && (t.typ != tokenStepSeparator)
 		})
 		// push to both.  Only the output queue copy will be kept.
 		pp.outputQueue.push(&tk)
 		pp.opStack.push(&tk)
 	case tokenFunctionBool, tokenNodeTest:
 		pp.opStack.push(&tk)
-	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator:
-		p := precedence(tk)
-		pp.pushOperatorsToOutputUntil(func(t token) bool {
-			return !isOperatorToken(&t) || p > precedence(t)
-		})
+	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator, tokenStepSeparator:
+		pp.pushOperatorsToOutput(tk)
 		pp.opStack.push(&tk)
 	case tokenLeftParen:
 		pp.opStack.push(&tk)
@@ -811,7 +816,7 @@ func (pp *PathParser) parseToken(tk token) bool {
 	case tokenPredicateEnd:
 		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenPredicateStart })
 		pp.opStack.pop() // discard PredicateStart from opstack. There's already one on the output queue, so no push()
-		pp.opStack.push(&tk)
+		pp.outputQueue.push(&tk)
 	case tokenUnionOperator:
 		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
 		pp.opStack.push(&tk)
@@ -836,11 +841,43 @@ func (pp *PathParser) parseToken(tk token) bool {
 // The failed end token is left on the operator stack.
 func (pp *PathParser) pushOperatorsToOutputUntil(test func(t token) bool) {
 	for {
-		if pp.opStack.empty() || test(*pp.opStack.peek()) {
+		if pp.opStack.empty() {
+			break
+		}
+		nextToken := (*pp).opStack.peek()
+		if test(*nextToken) {
 			break
 		}
 		pp.outputQueue.push(pp.opStack.pop())
 	}
+}
+
+// pushOperatorsToOutput implements this part of the Shunting-yard algorithm:
+
+//  while there is an operator token o2, at the top of the operator stack and either
+//    o1 is left-associative and its precedence is less than or equal to that of o2, or
+//    o1 is right associative, and has precedence less than that of o2,
+//        pop o2 off the operator stack, onto the output queue;
+func (pp *PathParser) pushOperatorsToOutput(tk token) {
+	tPrec, tAssoc := operatorOrder(tk)
+	for {
+		if pp.opStack.empty() {
+			break
+		}
+
+		nextToken := pp.opStack.peek()
+		if !isOperatorToken(nextToken) {
+			break
+		}
+		p, _ := operatorOrder(*nextToken)
+		log.Println("        opStack before: ", pp.opStack)
+		if (tAssoc == assocLeft && tPrec <= p) || (tAssoc == assocRight && tPrec < p) {
+			pp.outputQueue.push(pp.opStack.pop())
+		} else {
+			break
+		}
+	}
+	log.Println("        opStack after: ", pp.opStack)
 }
 
 // func (pp *PathParser) parsePredicateTokens(tk token) bool {
@@ -936,13 +973,13 @@ func (pe *PathEvaluator) evalAxisOperator() []*Atom {
 }
 
 func (pe *PathEvaluator) evalNodeTest(atoms []*Atom) []*Atom {
-	log.Println("evalNodeTest() ", atoms)
 	// Get node test token
 	tkNodeTest := pe.Tokens.pop()
 	if tkNodeTest.typ != tokenNodeTest {
 		pe.errorf("expected node test, got '%v' [%[1]T]", tkNodeTest.value)
 		return nil
 	}
+	log.Printf("evalNodeTest(%q) %v", tkNodeTest.value, atoms)
 
 	if tkNodeTest.value == "*" {
 		return atoms
@@ -980,12 +1017,6 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 		// No axis operator given, so use context node
 		atoms = append(atoms, pe.ContextAtomPtr)
 	}
-	// this part is mandatory
-	if pe.NextTokenType() != tokenNodeTest {
-		log.Println("Got node type operator")
-		pe.errorf("element set lacks node test")
-		return
-	}
 	atoms = pe.evalNodeTest(atoms) // may be nil in which case returns .
 
 	return
@@ -1006,17 +1037,23 @@ func (pe *PathEvaluator) evalPredicate() []*Atom {
 	// read predicate tokens
 	var predicateTokens tokenList
 	for pe.NextTokenType() != tokenPredicateStart && !pe.Tokens.empty() {
-
 		log.Println("evalPredicate(): add token to predicate:", pe.NextTokenType())
 		predicateTokens.unshift(pe.Tokens.pop())
 	}
 	pe.Tokens.pop() // discard predicate start token
+
+	// check for predicate with no tokens
+	if len(predicateTokens) == 0 {
+		pe.Error = pe.addPathToError(errInvalidPredicate("empty predicate"))
+		return nil
+	}
 
 	// evaluate element set by predicate
 	pre := PredicateEvaluator{
 		tokens: predicateTokens,
 	}
 
+	// handle results
 	atoms, err := pre.Evaluate(pe.evalElementSet())
 	if err != nil {
 		pe.Error = pe.addPathToError(err)
@@ -1089,8 +1126,8 @@ Loop:
 	return
 }
 func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
-	if len(pre.Tokens) == 0 {
-		pre.errorf("operator '%s' expects boolean argument, got nothing", pre.tokens[len(pre.tokens)-1].value)
+	if pre.Tokens.empty() {
+		pre.errorf("expect boolean value, got nothing")
 		return
 	}
 	log.Printf("    evalBoolean() %v,%v", pre.NextTokenType(), pre.Tokens.peek().value)
@@ -1136,10 +1173,6 @@ func (pre *PredicateEvaluator) evalBooleanOperator() BooleanType {
 		pre.errorf("expected boolean operator, received type %s", op.typ)
 	}
 	results := []Equaler{pre.evalBoolean(), pre.evalBoolean()}
-	if len(results) != 2 {
-		pre.errorf("boolean '%s' expected 2 results to compare, got %d", op.value, len(results))
-		return BooleanType(false)
-	}
 	tru := BooleanType(true)
 	var result bool
 	switch op.value {
@@ -1300,6 +1333,8 @@ func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
 		}
 	case tokenString:
 		result = StringType(pre.Tokens.pop().value)
+	case tokenEqualityOperator:
+		result = pre.evalEqualityOperator()
 	case tokenVariable:
 		result = pre.evalVariable()
 	case tokenFunctionNumeric:
@@ -1408,6 +1443,10 @@ func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
 		pre.errorf("expected tokenFunctionBool, received type %s", token.typ)
 	}
 	switch token.value {
+	case "true":
+		result = true
+	case "false":
+		result = false
 	case "not":
 		r := pre.evalBoolean()
 		if r == nil {
@@ -1945,126 +1984,57 @@ func isNumericToken(tk tokenEnum) bool {
 	return tk == tokenInteger || tk == tokenFloat
 }
 
+type associativity int
+
+const (
+	assocNone associativity = iota
+	assocLeft
+	assocRight
+)
+
 // These values are from the XPath 3.1 operator precedence table at
 //   https://www.w3.org/TR/xpath-3/#id-precedence-order
-// Not all of these operators are actually implemented.
-func precedence(tk token) (value int) {
+// Not all of these operators are actually implemented here.
+func operatorOrder(tk token) (int, associativity) {
 	switch tk.value {
 	case ",":
-		value = 1
+		return 1, assocNone
 	case "for", "some", "let", "every", "if":
-		value = 2
+		return 2, assocNone
 	case "or":
-		value = 3
+		return 3, assocNone
 	case "and":
-		value = 4
+		return 5, assocNone
 	case "eq", "ne", "lt", "le", "gt", "ge", "=", "!=", "<", "<=", ">", ">=", "is", "<<", ">>":
-		value = 5
-	case "||":
-		value = 6
+		return 5, assocNone
+	case "||": // string concatenate
+		return 6, assocLeft
 	case "to":
-		value = 7
+		return 7, assocNone
 	case "+", "-": // binary operators
-		value = 8
-	case "div", "idiv", "mod":
-		value = 9
-	case "*":
-		if tk.typ == tokenArithmeticOperator {
-			value = 9
-		} else {
-			value = 16 // node test operator
-		}
+		return 8, assocLeft
+	case "*", "div", "idiv", "mod":
+		return 9, assocLeft
 	case "union", "|":
-		value = 10
+		return 10, assocNone
 	case "intersect", "except":
-		value = 11
+		return 11, assocLeft
 	case "instance of":
-		value = 12
+		return 12, assocNone
 	case "treat as":
-		value = 13
+		return 13, assocNone
 	case "castable as":
-		value = 14
-	case "[", "]": // needs lower precedence that node test and axis operators
-		value = 20
+		return 14, assocNone
 	case "cast as":
-		value = 15
-	//		case "-", "+": // unary operators
-	//			value = 16
+		return 15, assocNone
+	case "=>":
+		return 16, assocLeft
 	case "!":
-		value = 17
+		return 18, assocLeft
 	case "/", "//":
-		value = 19
-	default:
-		value = 0
-		//		panic(fmt.Sprintf("unknown operator: %s", op))
+		return 19, assocLeft
+	case "[", "]":
+		return 20, assocLeft
 	}
-	return value
+	return -1, assocNone
 }
-
-/*
-(//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]
-
-|
-  //
-	*
-	[
-	  =
-		  @name
-			"0x00000000"
-	]
-
-  //
-	*
-	[
-	  =
-	    @name
-		  "0x00000001"
-	]
-[
-	=
-		data()
-		2
-]
-
-(//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]
-  0.            @name  [iVar]
-  1.       0x00000000  [iString]
-  2.                ]  [iPredEnd]
-  3.                =  [iEqualsOperator]
-  4.                [  [iPredStart]
-  5.                *  [iNodeTest]
-  6.               //  [iAxisOperator]
-  7.            @name  [iVar]
-  8.       0x00000001  [iString]
-  9.                ]  [iPredEnd]
- 10.                =  [iEqualsOperator]
- 11.                [  [iPredStart]
- 12.                *  [iNodeTest]
- 13.               //  [iAxisOperator]
- 14.                |  [iUnionOperator]
- 15.             data  [iVar]
- 16.                2  [iInt]
- 17.                ]  [iPredEnd]
- 18.                =  [iEqualsOperator]
- 19.                [  [iPredStart]
-
-
-
-["@name" "0x00000000" "]" "=" "[" "*" "//" "@name" "0x00000001" "]" "=" "[" "*" "//" "|" "data" "2" "]" "=" "["]
-
-*/
-
-/*
-type Element struct {
-	a ElementMimicker
-}
-interface ElementMimic {
-	Id() // unique id, or ???
-	Children()
-	Type()
-	Name()
-	Data()
-	Descendants() // flat list of all descendants in hierarchical order
-	String()
-}
-*/
