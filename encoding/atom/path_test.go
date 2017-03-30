@@ -488,6 +488,8 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod 5 = -0.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod 4 = -3.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
+	} // DEBUG
+	tests = []PathTest{ // DEBUG
 		PathTest{TestAtomGINF, "//AVAL/*[@name_int32 mod 2 = 0]", []string{
 			// get even-numbered elements
 			"0x00000000:UI32:2",
@@ -495,8 +497,6 @@ func TestAtomsAtPath(t *testing.T) {
 			"0x00000000:UI32:2",
 			"0x00000000:UI32:2",
 		}, nil},
-	} // DEBUG
-	tests = []PathTest{ // DEBUG
 
 		// Test predicate intersection (multiple predicates)
 		PathTest{TestAtom2, "/ROOT[position() = 1][@name=ROOT]", []string{"ROOT:CONT:"}, nil},
@@ -526,13 +526,11 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[false() and true()]", []string{}, nil},
 		PathTest{TestAtom2, "/ROOT[false() and false()]", []string{}, nil},
 		PathTest{TestAtom2, "/ROOT[false() or false() and true()]", []string{}, nil},
-		PathTest{TestAtom2, "/ROOT[false() and false() or true()]", []string{}, nil},
+		PathTest{TestAtom2, "/ROOT[false() and false() or true()]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[ position() = 0 or position() = 1]", []string{"ROOT:CONT:"}, nil},
-	} // DEBUG
-	_ = []PathTest{ // DEBUG
 		PathTest{TestAtom2, "/ROOT[ or position() = 1]", []string{}, errInvalidPredicate(`expect boolean value, got nothing in "/ROOT[ or position() = 1]"`)},
-		PathTest{TestAtom2, "/ROOT[ position() = 1 or]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or]"`)},
-		PathTest{TestAtom2, "/ROOT[ position() = 1 or ()]", []string{}, errInvalidPredicate(`operator 'or' expects boolean argument, got nothing in "/ROOT[ position() = 1 or ()]"`)},
+		PathTest{TestAtom2, "/ROOT[ position() = 1 or]", []string{}, errInvalidPredicate(`expect boolean value, got nothing in "/ROOT[ position() = 1 or]"`)},
+		PathTest{TestAtom2, "/ROOT[ position() = 1 or ()]", []string{}, errInvalidPredicate(`expect boolean value, got nothing in "/ROOT[ position() = 1 or ()]"`)},
 
 		// test union operator
 		PathTest{TestAtomGINF, `//*[@name="0x00000000"] | //*[@name="0x00000001"]`, []string{

@@ -100,12 +100,11 @@ const (
 	// Operator tokens by the parser
 	tokenLeftParen          = "tknParenL"
 	tokenRightParen         = "tknParenR"
-	tokenPredicateStart     = "tknPredStartOperator"
-	tokenPredicateEnd       = "tknPredEndOperator"
+	tokenPredicateStart     = "tknPredStart"
+	tokenPredicateEnd       = "tknPredEnd"
 	tokenAxisOperator       = "tknAxisOperator" // "/" or "//" which precedes pathTest
 	tokenArithmeticOperator = "tknArithmeticOperator"
 	tokenBooleanOperator    = "tknBooleanOperator"
-	tokenBooleanLiteral     = "tknBooleanLiteral"
 	tokenEqualityOperator   = "tknEqualsOperator"
 	tokenNodeTest           = "tknNodeTest"
 	tokenComparisonOperator = "tknCompareOperator"
@@ -120,33 +119,6 @@ const (
 	tokenBareString         = "tknBareString"
 	tokenHex                = "tknHex"
 )
-
-// // FIXME: maybe this is too many allocations, if we have to convert the entire
-// // nodeset into these for each path evaluation
-// // Consider changing the Atom type itself to confirm to the interface as much
-// // as possible,  which is a long way.
-// // Maybe convert to this type only when necessary, eg. to add new capabilities
-// // like id() or parent()
-// // AtomicElement makes the Atom type implement the Element interface
-// type AtomicElement struct {
-// 	AtomPtr *Atom
-// }
-//
-// func (ae AtomicElement) Name() string {
-// 	return ae.AtomPtr.Name()
-// }
-// func (ae AtomicElement) Type() string {
-// 	return ae.AtomPtr.Type()
-// }
-// func (ae AtomicElement) DataString() string {
-// 	return ae.AtomPtr.DataString()
-// }
-// func (ae AtomicElement) String() string {
-// 	return ae.AtomPtr.String()
-// }
-// func (ae AtomicElement) Children() []*Element {
-// 	return []*Element(ae.AtomPtr.children)
-// }
 
 // FIXME define type AtomicElement, which embeds an Atom and adds parent ptr and unique id? Is embedded type a copy or a reference?  Must be a copy since it should take up full width.  Could add atomPtr field instead of embedding.
 
@@ -608,9 +580,7 @@ func lexFunctionCall(l *lexer) stateFn {
 	case "not":
 		l.emit(tokenFunctionBool)
 	case "true", "false":
-		// don't make this a real function.  It consumes no arguments so it needs
-		// to be parsed exactly as a literal
-		l.emit(tokenBooleanLiteral)
+		l.emit(tokenFunctionBool)
 	case "count", "position", "last":
 		l.emit(tokenFunctionNumeric)
 	case "name", "type", "data":
@@ -757,7 +727,7 @@ func (pp *PathParser) receiveTokens() {
 		ok := pp.parseToken(tk)
 
 		str := fmt.Sprintf("parseToken(%s, '%v')", tk.typ, tk.value)
-		log.Printf("    %-35s %30s %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
+		log.Printf("    %-35s %35v | %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
 
 		if tk.typ == tokenEOF || !ok {
 			break
@@ -793,7 +763,7 @@ func (pp *PathParser) parseToken(tk token) bool {
 	switch tk.typ {
 	case tokenError:
 		return pp.errorf(tk.value)
-	case tokenInteger, tokenHex, tokenFloat, tokenBareString, tokenString, tokenVariable, tokenFunctionNumeric, tokenBooleanLiteral:
+	case tokenInteger, tokenHex, tokenFloat, tokenBareString, tokenString, tokenVariable:
 		pp.outputQueue.push(&tk)
 	case tokenPredicateStart:
 		pp.pushOperatorsToOutputUntil(func(t token) bool {
@@ -803,9 +773,9 @@ func (pp *PathParser) parseToken(tk token) bool {
 		// push to both.  Only the output queue copy will be kept.
 		pp.outputQueue.push(&tk)
 		pp.opStack.push(&tk)
-	case tokenFunctionBool, tokenNodeTest:
+	case tokenFunctionBool, tokenFunctionNumeric, tokenNodeTest:
 		pp.opStack.push(&tk)
-	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator, tokenStepSeparator:
+	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator, tokenStepSeparator, tokenUnionOperator:
 		pp.pushOperatorsToOutput(tk)
 		pp.opStack.push(&tk)
 	case tokenLeftParen:
@@ -813,13 +783,18 @@ func (pp *PathParser) parseToken(tk token) bool {
 	case tokenRightParen:
 		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
 		pp.opStack.pop() // remove the matching LeftParen from the stack
+		if isFunctionToken(pp.opStack.peek()) {
+			pp.outputQueue.push(pp.opStack.pop()) // move completed function call to output
+		}
 	case tokenPredicateEnd:
 		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenPredicateStart })
-		pp.opStack.pop() // discard PredicateStart from opstack. There's already one on the output queue, so no push()
+		//		pp.pushOperatorsToOutput(tk)
+		//		pp.opStack.pop() // discard PredicateStart from opstack. There's already one on the output queue, so no push()
+		pp.opStack.pop() // remove predicate start from operator stack
 		pp.outputQueue.push(&tk)
-	case tokenUnionOperator:
-		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
-		pp.opStack.push(&tk)
+		//	case tokenUnionOperator:
+		//		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
+		//		pp.opStack.push(&tk)
 	case tokenEOF:
 		for !pp.opStack.empty() {
 			op := pp.opStack.pop()
@@ -859,7 +834,7 @@ func (pp *PathParser) pushOperatorsToOutputUntil(test func(t token) bool) {
 //    o1 is right associative, and has precedence less than that of o2,
 //        pop o2 off the operator stack, onto the output queue;
 func (pp *PathParser) pushOperatorsToOutput(tk token) {
-	tPrec, tAssoc := operatorOrder(tk)
+	tkPrec, tAssoc := operatorOrder(tk)
 	for {
 		if pp.opStack.empty() {
 			break
@@ -871,7 +846,8 @@ func (pp *PathParser) pushOperatorsToOutput(tk token) {
 		}
 		p, _ := operatorOrder(*nextToken)
 		log.Println("        opStack before: ", pp.opStack)
-		if (tAssoc == assocLeft && tPrec <= p) || (tAssoc == assocRight && tPrec < p) {
+		//if (tAssoc == assocLeft && tkPrec <= p) || (tAssoc == assocRight && tkPrec < p) {
+		if tkPrec < p || (tAssoc == assocLeft && tkPrec == p) {
 			pp.outputQueue.push(pp.opStack.pop())
 		} else {
 			break
@@ -883,7 +859,16 @@ func (pp *PathParser) pushOperatorsToOutput(tk token) {
 // func (pp *PathParser) parsePredicateTokens(tk token) bool {
 
 func isOperatorToken(tk *token) bool {
+	if tk == nil {
+		return false
+	}
 	return strings.HasSuffix(string(tk.typ), "Operator")
+}
+func isFunctionToken(tk *token) bool {
+	if tk == nil {
+		return false
+	}
+	return strings.Contains(string(tk.typ), "Function")
 }
 
 type PathEvaluator struct {
@@ -1115,8 +1100,6 @@ Loop:
 			results = append(results, pre.evalFunctionBool())
 		case tokenFunctionNumeric:
 			results = append(results, pre.evalFunctionNumeric())
-		case tokenBooleanLiteral:
-			results = append(results, pre.evalBooleanLiteral())
 		default:
 			t := pre.Tokens.peek()
 			pre.errorf("unrecognized token '%v'", t.value)
@@ -1132,8 +1115,6 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 	}
 	log.Printf("    evalBoolean() %v,%v", pre.NextTokenType(), pre.Tokens.peek().value)
 	switch pre.NextTokenType() {
-	case tokenBooleanLiteral:
-		result = pre.evalBooleanLiteral()
 	case tokenEqualityOperator:
 		result = pre.evalEqualityOperator()
 	case tokenBooleanOperator:
@@ -1149,22 +1130,6 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 	}
 	// calculate a boolean value from op and vars
 	return
-}
-func (pre *PredicateEvaluator) evalBooleanLiteral() BooleanType {
-	t := pre.Tokens.pop()
-	if t.typ != tokenBooleanLiteral {
-		pre.errorf("expected boolean literal, received type %s", t.typ)
-		return BooleanType(false)
-	}
-	switch t.value {
-	case "true":
-		return BooleanType(true)
-	case "false":
-		return BooleanType(false)
-	default:
-		pre.errorf("unknown boolean literal %s", t.value)
-	}
-	return BooleanType(false)
 }
 
 func (pre *PredicateEvaluator) evalBooleanOperator() BooleanType {
@@ -1322,8 +1287,6 @@ func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
 		v, e := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		err = e
 		result = Float64Type(v)
-	case tokenBooleanLiteral:
-		result = pre.evalBooleanLiteral()
 	case tokenBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
@@ -1341,6 +1304,8 @@ func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
 		result = pre.evalFunctionNumeric()
 	case tokenArithmeticOperator:
 		result = pre.evalArithmeticOperator()
+	case tokenFunctionBool:
+		result = pre.evalFunctionBool()
 	default:
 		t := pre.Tokens.pop()
 		pre.errorf("expected Equaler type, got %q [%s])", t.value, t.typ)
@@ -2004,7 +1969,7 @@ func operatorOrder(tk token) (int, associativity) {
 	case "or":
 		return 3, assocNone
 	case "and":
-		return 5, assocNone
+		return 4, assocNone
 	case "eq", "ne", "lt", "le", "gt", "ge", "=", "!=", "<", "<=", ">", ">=", "is", "<<", ">>":
 		return 5, assocNone
 	case "||": // string concatenate
@@ -2016,7 +1981,7 @@ func operatorOrder(tk token) (int, associativity) {
 	case "*", "div", "idiv", "mod":
 		return 9, assocLeft
 	case "union", "|":
-		return 10, assocNone
+		return 10, assocNone // FIXME changed from XML spec: 10
 	case "intersect", "except":
 		return 11, assocLeft
 	case "instance of":
