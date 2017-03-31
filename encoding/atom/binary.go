@@ -156,12 +156,11 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 			}
 		}
 		adeType := ADEType(h.Type[:])
-		name, err := FC32ToString(h.Name[:])
 		if err != nil {
 			return atoms, err
 		}
 		var a = Atom{
-			name: name,
+			name: h.Name[:],
 			typ:  adeType,
 			data: data,
 		}
@@ -271,16 +270,13 @@ func (a *Atom) MarshalBinary() ([]byte, error) {
 // If the Writer returns an error, processing stops and the error is returned.
 func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	// create members for atom header
-	var name, typ [4]byte
 	var buf []byte
-	if err = FC32StringToBytes(a.name, &buf); err != nil {
-		return
-	}
-	copy(name[:], buf)
+	var name, typ [4]byte
 	if err = FC32StringToBytes(string(a.typ), &buf); err != nil {
 		return
 	}
 	copy(typ[:], buf)
+	copy(name[:], a.name)
 
 	// write atom header
 	err = binary.Write(w, binary.BigEndian, atomHeader{a.Len(), name, typ})

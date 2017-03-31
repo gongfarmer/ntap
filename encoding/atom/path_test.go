@@ -490,7 +490,7 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
 	} // DEBUG
 	tests = []PathTest{ // DEBUG
-		PathTest{TestAtomGINF, "//AVAL/*[@name_int32 mod 2 = 0]", []string{
+		PathTest{TestAtomGINF, "//AVAL/*[@name_uint32 mod 2 = 0]", []string{
 			// get even-numbered elements
 			"0x00000000:UI32:2",
 			"0x00000000:UI32:2",

@@ -22,7 +22,7 @@ var _ encoding.TextMarshaler = &Atom{}
 
 // Atom represents a single ADE atom, which may be a container containing other atoms.
 type Atom struct {
-	name     string
+	name     []byte
 	typ      ADEType
 	data     []byte
 	children []*Atom
@@ -32,8 +32,15 @@ type Atom struct {
 // Name returns a copy of the atoms's name.
 // If printable, it's 4 printable chars.  Otherwise, it's
 // a hex string preceded by 0x.
-func (a Atom) Name() string {
-	return string(a.name)
+func (a Atom) Name() (name string) {
+	name, _ = FC32ToString(a.name)
+	return name
+}
+
+// NameAsUint32 returns a copy of the atoms's 4-byte name as a single uint32
+// value.
+func (a Atom) NameAsUint32() uint32 {
+	return binary.BigEndian.Uint32(a.name)
 }
 
 // Type returns a copy of the atoms's ADE data type.
@@ -57,7 +64,7 @@ func (a Atom) Children() []*Atom {
 // previous memory allocated for data.
 // It also empties the list of child atoms.
 func (a *Atom) Zero() {
-	a.name = ""
+	a.name = []byte{0, 0, 0, 0}
 	a.SetType(NULL)
 	a.children = []*Atom{}
 }

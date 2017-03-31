@@ -387,7 +387,7 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 
 func (pre *PredicateEvaluator) getChildValue(atomName string) (v Comparer, ok bool) {
 	for _, a := range pre.AtomPtr.children {
-		if a.name != atomName {
+		if a.Name() != atomName {
 			continue
 		}
 		v = atomValueToComparerType(a)
@@ -1366,13 +1366,9 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 	switch token.value {
 	case "@name", "name":
 		return StringType(pre.AtomPtr.Name())
-	case "@name_int32":
-		name, err := strconv.ParseUint(pre.AtomPtr.name, 0, 32)
-		if err != nil {
-			pre.errorf("invalid atom @name_int32: %s", pre.AtomPtr.Name)
-			return
-		}
-		return Uint64Type(name)
+	case "@name_uint32":
+		log.Println(" here's your @name_uint32::::::", pre.AtomPtr.NameAsUint32())
+		return Uint64Type(pre.AtomPtr.NameAsUint32())
 	case "@type", "type":
 		return StringType(pre.AtomPtr.Type())
 	case "@data", "data":
