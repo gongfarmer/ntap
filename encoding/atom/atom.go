@@ -107,10 +107,10 @@ func (a *Atom) ZeroData() {
 // This is a single line, it doesn't include a list of child atoms.
 func (a Atom) String() string {
 	if a.typ == CONT {
-		return fmt.Sprintf("%s:%s:", a.name, a.Type())
+		return fmt.Sprintf("%s:%s:", a.Name(), a.Type())
 	} else {
 		str, _ := a.Value.StringDelimited()
-		return fmt.Sprintf("%s:%s:%s", a.name, a.Type(), str)
+		return fmt.Sprintf("%s:%s:%s", a.Name(), a.Type(), str)
 	}
 }
 

@@ -353,7 +353,14 @@ func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 // Path lexing is done by the same lexer used for Atom Text format lexing.
 // They use very different parsers though.
 
-// NewPredicateEvaluator reads the predicate from a string by sending
+// NewPredicateEvaluator reads predicate tokens from a PathEvaluator, and returns a new PredicateEvaluator.
+func NewPredicateEvaluator(pe *PathEvaluator) (pre PredicateEvaluator, err error){
+	// Predicate end comes before pred start, that's the order they're pushed to stack
+	// Predicate tokens are in postfix order at this point.
+	if pe.Tokens.empty() || pe.Tokens.pop().typ != tokenPredicateEnd {
+		pe.errorf("expected predicate end token")
+		return nil
+	}
 
 // Evaluate filters a list of atoms against the predicate conditions, returning
 // the atoms that satisfy the predicate.
@@ -982,14 +989,9 @@ func (pe *PathEvaluator) evalNodeTest(atoms []*Atom) []*Atom {
 }
 
 func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
+	// First eval the stuff that's only valid at the front of a path
+	// expression, or the union operator which returns an element set
 	log.Println("evalElementSet()")
-	if pe.Done() {
-		return
-	}
-	if pe.NextTokenType() == tokenPredicateEnd {
-		log.Println("Got predicate")
-		return pe.evalPredicate()
-	}
 	if pe.NextTokenType() == tokenUnionOperator {
 		log.Println("Got union operator")
 		return pe.evalUnionOperator()
@@ -997,14 +999,19 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 	if pe.NextTokenType() == tokenAxisOperator || pe.NextTokenType() == tokenStepSeparator {
 		log.Println("Got axis operator")
 		atoms = pe.evalAxisOperator()
-	} else {
-		log.Println("no axis operator. Next token type is ", pe.NextTokenType())
-		// No axis operator given, so use context node
-		atoms = append(atoms, pe.ContextAtomPtr)
 	}
-	atoms = pe.evalNodeTest(atoms) // may be nil in which case returns .
 
-	return
+	// Next, eval the repeatable path expression steps
+	for pe.NextTokenType() {
+		switch pe.NextTokenType() {
+		case tokenPredicateEnd:
+			atoms = pe.evalPredicate()
+		case tokenStepSeparator:
+			pe.pop()
+			atoms = evalNodeTest(atoms) // may be nil in which case returns .
+		}
+		break
+	}
 }
 
 // read predicate tokens.
@@ -1366,9 +1373,8 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 	switch token.value {
 	case "@name", "name":
 		return StringType(pre.AtomPtr.Name())
-	case "@name_uint32":
-		log.Println(" here's your @name_uint32::::::", pre.AtomPtr.NameAsUint32())
-		return Uint64Type(pre.AtomPtr.NameAsUint32())
+	case "@name_hex":
+		return StringType(fmt.Sprint("0x%08X", pre.AtomPtr.NameAsUint32()))
 	case "@type", "type":
 		return StringType(pre.AtomPtr.Type())
 	case "@data", "data":

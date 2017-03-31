@@ -343,7 +343,12 @@ func TestAtomsAtPath(t *testing.T) {
 		// These are different code paths.
 
 		// Test less-than operator and its type conversions
-		PathTest{TestAtom2, "/ROOT/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
+	} // DEBUG
+	tests = []PathTest{ // DEBUG
+		PathTest{TestAtom2, "/ROOT[1]/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
+		//		PathTest{TestAtom2, "/ROOT/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
+	} // DEBUG
+	_ = []PathTest{ // DEBUG
 		PathTest{TestAtom2, "/ROOT[UI_1 < 2]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 < 2.0]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[2 < UI_1]", []string{}, nil},
@@ -488,15 +493,6 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N mod 5 = -0.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod 4 = -3.5]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N mod UI_1 = -0.5]", []string{"ROOT:CONT:"}, nil},
-	} // DEBUG
-	tests = []PathTest{ // DEBUG
-		PathTest{TestAtomGINF, "//AVAL/*[@name_uint32 mod 2 = 0]", []string{
-			// get even-numbered elements
-			"0x00000000:UI32:2",
-			"0x00000000:UI32:2",
-			"0x00000000:UI32:2",
-			"0x00000000:UI32:2",
-		}, nil},
 
 		// Test predicate intersection (multiple predicates)
 		PathTest{TestAtom2, "/ROOT[position() = 1][@name=ROOT]", []string{"ROOT:CONT:"}, nil},
