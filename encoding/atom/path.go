@@ -349,18 +349,36 @@ func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 	return pe, pp.err
 }
 
-// lexer - identifies tokens(aka tokens) in the atom path definition.
-// Path lexing is done by the same lexer used for Atom Text format lexing.
-// They use very different parsers though.
-
-// NewPredicateEvaluator reads predicate tokens from a PathEvaluator, and returns a new PredicateEvaluator.
-func NewPredicateEvaluator(pe *PathEvaluator) (pre PredicateEvaluator, err error){
+// NewPredicateEvaluator consumes a series of predicate tokens from a
+// PathEvaluator starting with a PredicateEnd token and ending with a
+// PredicateStart token (yes it's supposed to be backwards), and returns a new
+// PredicateEvaluator.
+func NewPredicateEvaluator(pe *PathEvaluator) (pre PredicateEvaluator, ok bool) {
 	// Predicate end comes before pred start, that's the order they're pushed to stack
 	// Predicate tokens are in postfix order at this point.
 	if pe.Tokens.empty() || pe.Tokens.pop().typ != tokenPredicateEnd {
 		pe.errorf("expected predicate end token")
-		return nil
+		return pre, false
 	}
+
+	// read predicate tokens
+	var predicateTokens tokenList
+	for pe.NextTokenType() != tokenPredicateStart && !pe.Tokens.empty() {
+		predicateTokens.unshift(pe.Tokens.pop())
+	}
+	pe.Tokens.pop() // discard predicate start token
+
+	// check for predicate with no tokens
+	if len(predicateTokens) == 0 {
+		pe.Error = pe.addPathToError(errInvalidPredicate("empty predicate"))
+		return pre, false
+	}
+
+	// evaluate element set by predicate
+	return PredicateEvaluator{
+		tokens: predicateTokens,
+	}, true
+}
 
 // Evaluate filters a list of atoms against the predicate conditions, returning
 // the atoms that satisfy the predicate.
@@ -988,10 +1006,40 @@ func (pe *PathEvaluator) evalNodeTest(atoms []*Atom) []*Atom {
 	return results
 }
 
+// func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
+// 	// First eval the stuff that's only valid at the front of a path
+// 	// expression, or the union operator which returns an element set
+// 	log.Println("evalElementSet()")
+// 	if pe.NextTokenType() == tokenUnionOperator {
+// 		log.Println("Got union operator")
+// 		return pe.evalUnionOperator()
+// 	}
+// 	if pe.NextTokenType() == tokenAxisOperator || pe.NextTokenType() == tokenStepSeparator {
+// 		log.Println("Got axis operator")
+// 		atoms = pe.evalAxisOperator()
+// 	}
+//
+// 	// Next, eval the repeatable path expression steps
+// 	for pe.NextTokenType() {
+// 		switch pe.NextTokenType() {
+// 		case tokenPredicateEnd:
+// 			atoms = pe.evalPredicate()
+// 		case tokenStepSeparator:
+// 			pe.pop()
+// 			atoms = evalNodeTest(atoms) // may be nil in which case returns .
+// 		}
+// 		break
+// 	}
+// }
 func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
-	// First eval the stuff that's only valid at the front of a path
-	// expression, or the union operator which returns an element set
 	log.Println("evalElementSet()")
+	if pe.Done() {
+		return
+	}
+	if pe.NextTokenType() == tokenPredicateEnd {
+		log.Println("Got predicate")
+		return pe.evalPredicate()
+	}
 	if pe.NextTokenType() == tokenUnionOperator {
 		log.Println("Got union operator")
 		return pe.evalUnionOperator()
@@ -999,19 +1047,14 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 	if pe.NextTokenType() == tokenAxisOperator || pe.NextTokenType() == tokenStepSeparator {
 		log.Println("Got axis operator")
 		atoms = pe.evalAxisOperator()
+	} else {
+		log.Println("no axis operator. Next token type is ", pe.NextTokenType())
+		// No axis operator given, so use context node
+		atoms = append(atoms, pe.ContextAtomPtr)
 	}
+	atoms = pe.evalNodeTest(atoms) // may be nil in which case returns .
 
-	// Next, eval the repeatable path expression steps
-	for pe.NextTokenType() {
-		switch pe.NextTokenType() {
-		case tokenPredicateEnd:
-			atoms = pe.evalPredicate()
-		case tokenStepSeparator:
-			pe.pop()
-			atoms = evalNodeTest(atoms) // may be nil in which case returns .
-		}
-		break
-	}
+	return
 }
 
 // read predicate tokens.
