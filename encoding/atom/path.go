@@ -109,7 +109,7 @@ const (
 	tokenNodeTest           = "tknNodeTest"
 	tokenComparisonOperator = "tknCompareOperator"
 	tokenUnionOperator      = "tknUnionOperator"
-	tokenStepSeparator      = "tknStepSeparator"
+	tokenStepSeparator      = "tknStepSeparatorOperator"
 	tokenOperator           = "tknOperator"
 	tokenFunctionBool       = "tknFunctionBool"
 	tokenFunctionNumeric    = "tknFunctionNum"
@@ -791,34 +791,37 @@ func (pp *PathParser) parseToken(tk token) bool {
 	case tokenInteger, tokenHex, tokenFloat, tokenBareString, tokenString, tokenVariable:
 		pp.outputQueue.push(&tk)
 	case tokenPredicateStart:
-		pp.pushOperatorsToOutputUntil(func(t token) bool {
+		pp.moveOperatorsToOutputUntil(func(t token) bool {
 			// want predicate delimiter tokens to precede axis+node test in stack order
 			return (t.typ != tokenAxisOperator) && (t.typ != tokenNodeTest) && (t.typ != tokenStepSeparator)
 		})
 		// push to both.  Only the output queue copy will be kept.
 		pp.outputQueue.push(&tk)
 		pp.opStack.push(&tk)
-	case tokenFunctionBool, tokenFunctionNumeric, tokenNodeTest:
+	case tokenFunctionBool, tokenFunctionNumeric:
 		pp.opStack.push(&tk)
+	case tokenNodeTest: // act like an operator with same precedence as //, /
+		pp.moveOperatorsToOutput(token{tokenStepSeparator, "/", 0})
+		pp.outputQueue.push(&tk)
 	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator, tokenStepSeparator, tokenUnionOperator:
-		pp.pushOperatorsToOutput(tk)
+		pp.moveOperatorsToOutput(tk)
 		pp.opStack.push(&tk)
 	case tokenLeftParen:
 		pp.opStack.push(&tk)
 	case tokenRightParen:
-		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
+		pp.moveOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
 		pp.opStack.pop() // remove the matching LeftParen from the stack
 		if isFunctionToken(pp.opStack.peek()) {
 			pp.outputQueue.push(pp.opStack.pop()) // move completed function call to output
 		}
 	case tokenPredicateEnd:
-		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenPredicateStart })
-		//		pp.pushOperatorsToOutput(tk)
+		pp.moveOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenPredicateStart })
+		//		pp.moveOperatorsToOutput(tk)
 		//		pp.opStack.pop() // discard PredicateStart from opstack. There's already one on the output queue, so no push()
 		pp.opStack.pop() // remove predicate start from operator stack
 		pp.outputQueue.push(&tk)
 		//	case tokenUnionOperator:
-		//		pp.pushOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
+		//		pp.moveOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
 		//		pp.opStack.push(&tk)
 	case tokenEOF:
 		for !pp.opStack.empty() {
@@ -835,11 +838,11 @@ func (pp *PathParser) parseToken(tk token) bool {
 	return true
 }
 
-// pushOperatorsToOutputUntil() pops tokens from the operator stack, and pushes
+// moveOperatorsToOutputUntil() pops tokens from the operator stack, and pushes
 // them into the output queue. This continues until the given test function
 // fails to satisfy the given test function.
 // The failed end token is left on the operator stack.
-func (pp *PathParser) pushOperatorsToOutputUntil(test func(t token) bool) {
+func (pp *PathParser) moveOperatorsToOutputUntil(test func(t token) bool) {
 	for {
 		if pp.opStack.empty() {
 			break
@@ -852,13 +855,13 @@ func (pp *PathParser) pushOperatorsToOutputUntil(test func(t token) bool) {
 	}
 }
 
-// pushOperatorsToOutput implements this part of the Shunting-yard algorithm:
+// moveOperatorsToOutput implements this part of the Shunting-yard algorithm:
 
 //  while there is an operator token o2, at the top of the operator stack and either
 //    o1 is left-associative and its precedence is less than or equal to that of o2, or
 //    o1 is right associative, and has precedence less than that of o2,
 //        pop o2 off the operator stack, onto the output queue;
-func (pp *PathParser) pushOperatorsToOutput(tk token) {
+func (pp *PathParser) moveOperatorsToOutput(tk token) {
 	tkPrec, tAssoc := operatorOrder(tk)
 	for {
 		if pp.opStack.empty() {
@@ -922,18 +925,15 @@ func (pe *PathEvaluator) addPathToError(err error) error {
 
 func (pe *PathEvaluator) Evaluate(atom *Atom) (result []*Atom, e error) {
 	pe.ContextAtomPtr = atom // FIXME does this change over time?
+	if pe.tokens.empty() {
+		e = errInvalidPath("<empty>")
+		return
+	}
 	pe.Tokens = pe.tokens
 	fmt.Println("PathEvaluator::Evaluate() ", pe.Tokens)
-	result = pe.eval()
+	result = pe.evalElementSet()
 	e = pe.Error
 	return
-}
-
-// eval() is the top-level evaluation function.  It accepts every token that
-// can appear as the first token in the evaluation list.
-// Return value is a slice of Atoms, but it may contain just a single node.
-func (pe *PathEvaluator) eval() (atoms []*Atom) {
-	return pe.evalElementSet()
 }
 
 // Done returns true if this PathEvaluator is done processing.
@@ -952,7 +952,7 @@ func (pe *PathEvaluator) NextTokenType() tokenEnum {
 }
 
 func (pe *PathEvaluator) evalUnionOperator() []*Atom {
-	// consume union operator
+	log.Println("evalUnionOperator()")
 	op := pe.Tokens.pop()
 	if op.typ != tokenUnionOperator {
 		pe.errorf("expected union operator, received type %s", op.typ)
@@ -962,32 +962,54 @@ func (pe *PathEvaluator) evalUnionOperator() []*Atom {
 	// FIXME uniqueness, avoid duplicates
 	return append(pe.evalElementSet(), pe.evalElementSet()...)
 }
-func (pe *PathEvaluator) evalAxisOperator() []*Atom {
+func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
 	tk := pe.Tokens.pop()
+	log.Printf("evalAxisOperator(%q)", tk.value)
 	if tk.typ != tokenAxisOperator && tk.typ != tokenStepSeparator {
 		pe.errorf("expected axis operator, got '%v' [%[1]T]", tk.value)
 		return nil
 	}
-	switch tk.value {
-	case "//":
-		return pe.ContextAtomPtr.Descendants()
-	case "/":
-		return []*Atom{pe.ContextAtomPtr}
+
+	if pe.NextTokenType() == tokenNodeTest {
+		pe.errorf("expected operator '%s' to be followed by node test", tk.value)
+		return nil
 	}
 
-	// same as / for this implementation..
+	if tk.value == "//" {
+		atoms = pe.ContextAtomPtr.Descendants()
+	} else if tk.value == "/" {
+		atoms = []*Atom{pe.ContextAtomPtr}
+	}
+
+	// The empty case is the same as / for this implementation..
 	// because atoms don't know their parent, it's not possible to refer to a
-	// higher-level atom in the tree.  This should be corrected, perhaps Element
-	// object should add parent awareness.
+	// higher-level atom in the tree.
 	return []*Atom{pe.ContextAtomPtr}
 }
 
-func (pe *PathEvaluator) evalNodeTest(atoms []*Atom) []*Atom {
+func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
 	// Get node test token
 	tkNodeTest := pe.Tokens.pop()
 	if tkNodeTest.typ != tokenNodeTest {
 		pe.errorf("expected node test, got '%v' [%[1]T]", tkNodeTest.value)
 		return nil
+	}
+
+	if pe.NextTokenType() == tokenStepSeparator {
+		// New path step, so apply nodeTest to the children of whatever atoms are
+		// returned by the path  expression following the step separator operator
+		pe.Tokens.pop()
+		if pe.Tokens.empty() {
+			pe.errorf("expected path elements after /")
+			return nil
+		}
+		for _, a := range pe.evalElementSet() {
+			atoms = append(atoms, a.Children()...)
+		}
+	} else if pe.NextTokenType() == tokenAxisOperator {
+		atoms = pe.evalAxisOperator()
+	} else {
+		atoms = append(atoms, pe.ContextAtomPtr)
 	}
 	log.Printf("evalNodeTest(%q) %v", tkNodeTest.value, atoms)
 
@@ -1006,54 +1028,25 @@ func (pe *PathEvaluator) evalNodeTest(atoms []*Atom) []*Atom {
 	return results
 }
 
-// func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
-// 	// First eval the stuff that's only valid at the front of a path
-// 	// expression, or the union operator which returns an element set
-// 	log.Println("evalElementSet()")
-// 	if pe.NextTokenType() == tokenUnionOperator {
-// 		log.Println("Got union operator")
-// 		return pe.evalUnionOperator()
-// 	}
-// 	if pe.NextTokenType() == tokenAxisOperator || pe.NextTokenType() == tokenStepSeparator {
-// 		log.Println("Got axis operator")
-// 		atoms = pe.evalAxisOperator()
-// 	}
-//
-// 	// Next, eval the repeatable path expression steps
-// 	for pe.NextTokenType() {
-// 		switch pe.NextTokenType() {
-// 		case tokenPredicateEnd:
-// 			atoms = pe.evalPredicate()
-// 		case tokenStepSeparator:
-// 			pe.pop()
-// 			atoms = evalNodeTest(atoms) // may be nil in which case returns .
-// 		}
-// 		break
-// 	}
-// }
 func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
-	log.Println("evalElementSet()")
+	log.Printf("evalElementSet() [%s]'", pe.NextTokenType())
 	if pe.Done() {
 		return
 	}
-	if pe.NextTokenType() == tokenPredicateEnd {
-		log.Println("Got predicate")
+	switch pe.NextTokenType() {
+	case tokenPredicateEnd:
 		return pe.evalPredicate()
-	}
-	if pe.NextTokenType() == tokenUnionOperator {
-		log.Println("Got union operator")
+	case tokenUnionOperator:
 		return pe.evalUnionOperator()
+	case tokenAxisOperator, tokenStepSeparator:
+		return pe.evalAxisOperator()
+	case tokenNodeTest:
+		return pe.evalNodeTest() // may be nil in which case returns .
 	}
-	if pe.NextTokenType() == tokenAxisOperator || pe.NextTokenType() == tokenStepSeparator {
-		log.Println("Got axis operator")
-		atoms = pe.evalAxisOperator()
-	} else {
-		log.Println("no axis operator. Next token type is ", pe.NextTokenType())
-		// No axis operator given, so use context node
-		atoms = append(atoms, pe.ContextAtomPtr)
-	}
-	atoms = pe.evalNodeTest(atoms) // may be nil in which case returns .
 
+	log.Println("evalElementSet: Returning context atom. Next Token Type is ", pe.NextTokenType())
+	// No axis operator given, so use context node
+	atoms = append(atoms, pe.ContextAtomPtr)
 	return
 }
 
@@ -1062,36 +1055,15 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 // for each Element in the NodeSet, make a predicateEvaluator and apply predicate.
 func (pe *PathEvaluator) evalPredicate() []*Atom {
 	log.Println("evalPredicate()")
-	// Predicate end comes before pred start, that's the order they're pushed to stack
-	// Predicate tokens are in postfix order at this point.
-	if pe.Tokens.empty() || pe.Tokens.pop().typ != tokenPredicateEnd {
-		pe.errorf("expected predicate end token")
-		return nil
-	}
-
-	// read predicate tokens
-	var predicateTokens tokenList
-	for pe.NextTokenType() != tokenPredicateStart && !pe.Tokens.empty() {
-		log.Println("evalPredicate(): add token to predicate:", pe.NextTokenType())
-		predicateTokens.unshift(pe.Tokens.pop())
-	}
-	pe.Tokens.pop() // discard predicate start token
-
-	// check for predicate with no tokens
-	if len(predicateTokens) == 0 {
-		pe.Error = pe.addPathToError(errInvalidPredicate("empty predicate"))
-		return nil
-	}
-
 	// evaluate element set by predicate
-	pre := PredicateEvaluator{
-		tokens: predicateTokens,
+	pre, ok := NewPredicateEvaluator(pe)
+	if ok != true {
+		return nil // error is already set by NewPredicateEvaluator
 	}
-
-	// handle results
 	atoms, err := pre.Evaluate(pe.evalElementSet())
 	if err != nil {
 		pe.Error = pe.addPathToError(err)
+		return nil
 	}
 	return atoms
 }
@@ -1472,13 +1444,14 @@ func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
 
 // evalUnionOperator consumes two nodesets and returns their set union.
 func (pre *PredicateEvaluator) evalUnionOperator(results []Equaler) (result bool) {
-	fmt.Println("evalUnionOperator()")
+	log.Println("evalUnionOperator()")
 
 	// consume union operator
-	op := pre.Tokens.pop()
-	if op.typ != tokenUnionOperator {
-		pre.errorf("expected union operator, received type %s", op.typ)
+	tk := pre.Tokens.pop()
+	if tk.typ != tokenUnionOperator {
+		pre.errorf("expected union operator, received type %s", tk.typ)
 	}
+	log.Println("evalUnionOperator()")
 
 	// operator requires expressions on both sides, so error if this is the first token
 	if pre.tokens[0].typ == tokenUnionOperator {
@@ -2026,7 +1999,7 @@ func operatorOrder(tk token) (int, associativity) {
 	case "*", "div", "idiv", "mod":
 		return 9, assocLeft
 	case "union", "|":
-		return 10, assocNone // FIXME changed from XML spec: 10
+		return 10, assocNone
 	case "intersect", "except":
 		return 11, assocLeft
 	case "instance of":

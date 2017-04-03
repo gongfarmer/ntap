@@ -167,14 +167,14 @@ func TestAtomsAtPath(t *testing.T) {
 		// Part 1 -- test paths with no filters
 
 		// Empty path request returns empty result and no error
-		PathTest{TestAtom1, "", zero, errInvalidPath(`<empty> in ""`)},
+		PathTest{TestAtom1, "", zero, errInvalidPath(`<empty>`)},
 
 		// Single slash path request returns root element only (which contains entire doc)
 		PathTest{TestAtom1, "/", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom1, "/ROOT", []string{"ROOT:CONT:"}, nil},
 
 		// predicates ended with / are errors, except a couple of special cases
-		PathTest{TestAtom1, "/ROOT/", zero, errInvalidPath(`<empty> in "/ROOT/"`)},
+		PathTest{TestAtom1, "/ROOT/", zero, errInvalidPath(`expected operator '/' to be followed by node test in "/ROOT/"`)},
 
 		// Double slash prefix means all matching atoms at any level
 		PathTest{TestAtom1, "//", zero, errInvalidPath(`<empty> in "//"`)},
@@ -343,12 +343,10 @@ func TestAtomsAtPath(t *testing.T) {
 		// These are different code paths.
 
 		// Test less-than operator and its type conversions
-	} // DEBUG
-	tests = []PathTest{ // DEBUG
+		// predicates in multiple path steps
 		PathTest{TestAtom2, "/ROOT[1]/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
-		//		PathTest{TestAtom2, "/ROOT/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
-	} // DEBUG
-	_ = []PathTest{ // DEBUG
+		PathTest{TestAtom2, "/ROOT/UI_1[@data < 2]", []string{"UI_1:UI64:1"}, nil},
+		PathTest{TestAtom2, "ROOT|UI_1", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 < 2]", strings.Split("ROOT:CONT:", " "), nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 < 2.0]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[2 < UI_1]", []string{}, nil},
@@ -497,14 +495,9 @@ func TestAtomsAtPath(t *testing.T) {
 		// Test predicate intersection (multiple predicates)
 		PathTest{TestAtom2, "/ROOT[position() = 1][@name=ROOT]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtomGINF, "//*/AVAL/*[@type=UI32][@data<10]", []string{
-			"BVER:UI32:4",
-			"AVER:UI32:2",
 			"0x00000000:UI32:2",
-			"AVER:UI32:2",
 			"0x00000000:UI32:2",
-			"AVER:UI32:2",
 			"0x00000000:UI32:2",
-			"AVER:UI32:2",
 			"0x00000000:UI32:2",
 		}, nil},
 		PathTest{TestAtom2, "/ROOT[position() = 1][]", []string{}, errInvalidPredicate(`empty predicate in "/ROOT[position() = 1][]"`)},
