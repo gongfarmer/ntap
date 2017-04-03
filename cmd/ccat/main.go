@@ -20,6 +20,8 @@ var (
 	FlagOutputXML   = flag.Bool("x", false, "print atom as xml")
 	FlagOutputHex   = flag.Bool("X", false, "print atom as hex string")
 	FlagOutputDebug = flag.Bool("d", false, "print atoms in verbose debug format")
+	FlagPath        = flag.String("p", "", "find atoms matching PATH")
+	FlagVerbose     = flag.Bool("v", "", "enable verbose logging")
 )
 
 func usage() {
@@ -51,10 +53,17 @@ func main() {
 
 	// Read atom data
 	var files = filter(os.Args[1:], func(s string) bool { return !strings.HasPrefix(s, "-") && s != *FlagFilename })
-
 	atoms, err := ReadAtomsFromInput(files)
 	if err != nil {
 		log.Fatalf(err.Error())
+	}
+
+	// Apply path to root atom
+	if "" != *FlagPath {
+		atoms, err = PathSearch(atoms, *FlagPath)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
 	}
 
 	// Make Writer for output stream
@@ -88,7 +97,7 @@ func main() {
 func printAtomDebug(w io.Writer, a *atom.Atom) {
 	var lines [][]string
 	depth, maxLen := 0, 0
-	atoms := a.AtomList()
+	atoms := a.Descendants()
 	for _, a := range atoms {
 		col1 := bytes.NewBuffer([]byte{})
 		col2 := bytes.NewBuffer([]byte{})
@@ -226,4 +235,15 @@ func WriteAtoms(atoms []*atom.Atom, printFunc func(*atom.Atom)) {
 	for _, a := range atoms {
 		printFunc(a)
 	}
+}
+
+func PathSearch(atoms []*atom.Atom, path string) (results []*atom.Atom, err error) {
+	for _, a := range atoms {
+		if moreResults, e := a.AtomsAtPath(path); e != nil {
+			return nil, e
+		} else {
+			results = append(results, moreResults...)
+		}
+	}
+	return
 }
