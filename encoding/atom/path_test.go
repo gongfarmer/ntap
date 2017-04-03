@@ -174,13 +174,15 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "/ROOT", []string{"ROOT:CONT:"}, nil},
 
 		// predicates ended with / are errors, except a couple of special cases
-		PathTest{TestAtom1, "/ROOT/", zero, errInvalidPath(`expected operator '/' to be followed by node test in "/ROOT/"`)},
+		PathTest{TestAtom1, "/ROOT/", zero, errInvalidPath(`operator '/' must be followed by element name or * in "/ROOT/"`)},
 
 		// Double slash prefix means all matching atoms at any level
-		PathTest{TestAtom1, "//", zero, errInvalidPath(`<empty> in "//"`)},
+		PathTest{TestAtom1, "//", zero, errInvalidPath(`operator '//' must be followed by element name or * in "//"`)},
+
 		PathTest{TestAtom1, "//LEAF", []string{
-			"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3", "LEAF:UI32:4", "LEAF:UI32:5",
-			"LEAF:UI32:6", "LEAF:UI32:7", "LEAF:UI32:8", "LEAF:UI32:9"}, nil},
+			"LEAF:UI32:1", "LEAF:UI32:2", "LEAF:UI32:3",
+			"LEAF:UI32:4", "LEAF:UI32:5", "LEAF:UI32:6",
+			"LEAF:UI32:7", "LEAF:UI32:8", "LEAF:UI32:9"}, nil},
 		PathTest{TestAtom1, "//leaf", zero, nil}, // case sensitive
 		// FIXME: test that CONT with same name as its leaf can be found
 
@@ -264,8 +266,7 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "ROOT[11 mod 10]", []string{"ROOT:CONT:"}, nil},
 
 		// division is "div" not "/".
-		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, fmt.Errorf(`invalid predicate: unterminated square brackets in "ROOT[64/8-7]"`)},
-
+		PathTest{TestAtom1, "ROOT[64/8-7]", []string{}, errInvalidPath(`operator '/' is not valid within predicate in "ROOT[64/8-7]"`)},
 		// handle gibberish operators gracefully
 		PathTest{TestAtom1, "ROOT[64 shazbot 8]", []string{}, fmt.Errorf(`invalid predicate: unrecognized token 'shazbot' in "ROOT[64 shazbot 8]"`)},
 
@@ -276,9 +277,9 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom1, "ROOT[last()]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom1, "ROOT[not(last())]", zero, errInvalidPredicate(`expect boolean, got 'last' in "ROOT[not(last())]"`)},
 		PathTest{TestAtom1, "ROOT[not(not(last()))]", zero, errInvalidPredicate(`expect boolean, got 'last' in "ROOT[not(not(last()))]"`)},
-		PathTest{TestAtom1, "ROOT[shazbot()]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[shazbot()]"`)},
-		PathTest{TestAtom1, "ROOT[shazbot(5)]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[shazbot(5)]"`)},
-		PathTest{TestAtom1, "ROOT[not(shazbot())]", zero, errInvalidPredicate(`unrecognized function "shazbot" in "ROOT[not(shazbot())]"`)},
+		PathTest{TestAtom1, "ROOT[shazbot()]", zero, errInvalidPath(`unrecognized function "shazbot" in "ROOT[shazbot()]"`)},
+		PathTest{TestAtom1, "ROOT[shazbot(5)]", zero, errInvalidPath(`unrecognized function "shazbot" in "ROOT[shazbot(5)]"`)},
+		PathTest{TestAtom1, "ROOT[not(shazbot())]", zero, errInvalidPath(`unrecognized function "shazbot" in "ROOT[not(shazbot())]"`)},
 
 		// test usage of attributes which retrieve atom data
 
@@ -300,7 +301,7 @@ func TestAtomsAtPath(t *testing.T) {
 			"0x00000000:UI32:2",
 			`0x00000001:CSTR:"10.4.0"`,
 		}, nil},
-		PathTest{TestAtomGINF, "//AVAL/[@name > 0]", []string{}, errInvalidPath(`<empty> in "//AVAL/[@name > 0]"`)},
+		PathTest{TestAtomGINF, "//AVAL/[@name > 0]", []string{}, errInvalidPath(`operator '/' must be followed by element name or * in "//AVAL/[@name > 0]"`)},
 		PathTest{TestAtomGINF, "//AVAL/*[@name > 0]", []string{
 			"0x00000001:UI32:908767",
 			"0x00000001:UI64:1484722540084888",

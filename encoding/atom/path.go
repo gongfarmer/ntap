@@ -229,7 +229,7 @@ func NewAtomPath(path string) (ap *AtomPath, e error) {
 	var pe *PathEvaluator
 	pe, e = NewPathEvaluator(path)
 	if e != nil {
-		return
+		return ap, addPathToError(e, path)
 	}
 	for i, tk := range pe.Tokens {
 		fmt.Printf("%3d.  %15s  [%s]\n", i, tk.value, tk.typ)
@@ -370,7 +370,7 @@ func NewPredicateEvaluator(pe *PathEvaluator) (pre PredicateEvaluator, ok bool) 
 
 	// check for predicate with no tokens
 	if len(predicateTokens) == 0 {
-		pe.Error = pe.addPathToError(errInvalidPredicate("empty predicate"))
+		pe.Error = addPathToError(errInvalidPredicate("empty predicate"), pe.Path)
 		return pre, false
 	}
 
@@ -486,7 +486,7 @@ func lexPath(l *lexer) stateFn {
 	case strings.ContainsRune(alphaNumericChars, r):
 		lexBareStringInPath(l)
 	default:
-		return l.errorf("lexPath cannot parse %q", r)
+		return l.errorf("operator %q is not valid within path", r)
 	}
 	if l.prevTokenType == tokenError {
 		return nil
@@ -517,8 +517,6 @@ func lexPredicate(l *lexer) stateFn {
 		l.emit(tokenLeftParen)
 	case r == ')':
 		l.emit(tokenRightParen)
-	case r == '|':
-		return l.errorf("union not permitted within predicate")
 	case r == '+', r == '*':
 		l.emit(tokenArithmeticOperator)
 	case strings.ContainsRune(numericChars, r):
@@ -534,7 +532,7 @@ func lexPredicate(l *lexer) stateFn {
 	case strings.ContainsRune(alphaNumericChars, r):
 		lexBareStringInPredicate(l)
 	default:
-		return l.errorf("lexPredicate cannot parse %q", r)
+		return l.errorf("operator %q is not valid within predicate", r)
 	}
 
 	return lexPredicate
@@ -916,10 +914,10 @@ func (pe *PathEvaluator) errorf(format string, args ...interface{}) bool {
 	}, ""))
 	return false
 }
-func (pe *PathEvaluator) addPathToError(err error) error {
+func addPathToError(err error, path string) error {
 	return fmt.Errorf(strings.Join([]string{
 		err.Error(),
-		fmt.Sprintf(" in %q", pe.Path),
+		fmt.Sprintf(" in %q", path),
 	}, ""))
 }
 
@@ -929,6 +927,12 @@ func (pe *PathEvaluator) Evaluate(atom *Atom) (result []*Atom, e error) {
 		e = errInvalidPath("<empty>")
 		return
 	}
+
+	// Special case, otherwise path specifiers may not end with /
+	if len(pe.tokens) == 1 && pe.tokens[0].value == "/" {
+		return []*Atom{pe.ContextAtomPtr}, nil
+	}
+
 	pe.Tokens = pe.tokens
 	fmt.Println("PathEvaluator::Evaluate() ", pe.Tokens)
 	result = pe.evalElementSet()
@@ -970,15 +974,17 @@ func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
 		return nil
 	}
 
-	if pe.NextTokenType() == tokenNodeTest {
-		pe.errorf("expected operator '%s' to be followed by node test", tk.value)
-		return nil
-	}
+	//	if pe.NextTokenType() == tokenNodeTest {
+	//		pe.errorf("operator '%s' must be followed element name or *", tk.value)
+	//		return nil
+	//	}
 
 	if tk.value == "//" {
 		atoms = pe.ContextAtomPtr.Descendants()
+		return
 	} else if tk.value == "/" {
 		atoms = []*Atom{pe.ContextAtomPtr}
+		return
 	}
 
 	// The empty case is the same as / for this implementation..
@@ -987,6 +993,16 @@ func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
 	return []*Atom{pe.ContextAtomPtr}
 }
 
+func filterByNodeName(atoms []*Atom, name string) (results []*Atom) {
+	return
+}
+
+func getElementChildren(atoms []*Atom) (children []*Atom) {
+	return
+}
+
+// evaluate path expression starting with a node test.
+// There's no preceding axis operator.
 func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
 	// Get node test token
 	tkNodeTest := pe.Tokens.pop()
@@ -995,6 +1011,7 @@ func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
 		return nil
 	}
 
+	// Get element set to filter
 	if pe.NextTokenType() == tokenStepSeparator {
 		// New path step, so apply nodeTest to the children of whatever atoms are
 		// returned by the path  expression following the step separator operator
@@ -1013,14 +1030,12 @@ func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
 	}
 	log.Printf("evalNodeTest(%q) %v", tkNodeTest.value, atoms)
 
+	// Filter the ElementPtrSlice by name against the node test
 	if tkNodeTest.value == "*" {
 		return atoms
 	}
-
-	// Filter the ElementPtrSlice by name against the node test
 	results := atoms[:0] // overwite elements list while filtering to avoid allocation
 	for _, elt := range atoms {
-		fmt.Printf("    evalNodeTest[%q == %q\n", (*elt).Name(), tkNodeTest.value)
 		if (*elt).Name() == tkNodeTest.value {
 			results = append(results, elt)
 		}
@@ -1039,7 +1054,10 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 	case tokenUnionOperator:
 		return pe.evalUnionOperator()
 	case tokenAxisOperator, tokenStepSeparator:
-		return pe.evalAxisOperator()
+		tk := pe.Tokens.pop()
+		pe.errorf("operator '%s' must be followed by element name or *", tk.value)
+		return
+		//		return pe.evalAxisOperator()
 	case tokenNodeTest:
 		return pe.evalNodeTest() // may be nil in which case returns .
 	}
@@ -1062,7 +1080,7 @@ func (pe *PathEvaluator) evalPredicate() []*Atom {
 	}
 	atoms, err := pre.Evaluate(pe.evalElementSet())
 	if err != nil {
-		pe.Error = pe.addPathToError(err)
+		pe.Error = addPathToError(err, pe.Path)
 		return nil
 	}
 	return atoms
