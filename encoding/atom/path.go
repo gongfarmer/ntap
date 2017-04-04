@@ -531,7 +531,7 @@ func lexPredicate(l *lexer) stateFn {
 
 func lexStepSeparatorOrAxis(l *lexer) stateFn {
 	if l.first() != '/' {
-		panic(`lexStepSeparatorOrAxis called without leading "/"`)
+		return l.errorf(`lexStepSeparatorOrAxis called without leading "/"`)
 	}
 	if l.accept("/") {
 		l.emit(tokenAxisOperator)
@@ -565,7 +565,8 @@ func lexNodeTest(l *lexer) stateFn {
 // lexAtomAttribute accepts @name, @type or @data.  The @ is already read.
 func lexAtomAttribute(l *lexer) stateFn {
 	if l.first() != '@' {
-		panic("lexAtomAttribute called without leading attribute sigil @")
+		l.errorf("lexAtomAttribute called without leading attribute sigil @")
+		return nil
 	}
 	l.acceptRun(alphaNumericChars)
 	l.emit(tokenVariable)
@@ -1197,22 +1198,26 @@ func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
 	if pre.Error != nil {
 		return
 	}
+	var err error
 	switch op.value {
 	case "+":
-		result = lhs.Plus(rhs)
+		result, err = lhs.Plus(rhs)
 	case "-":
-		result = lhs.Minus(rhs)
+		result, err = lhs.Minus(rhs)
 	case "*":
-		result = lhs.Multiply(rhs)
+		result, err = lhs.Multiply(rhs)
 	case "div":
-		result = lhs.Divide(rhs)
+		result, err = lhs.Divide(rhs)
 	case "idiv":
-		result = lhs.IntegerDivide(rhs)
+		result, err = lhs.IntegerDivide(rhs)
 	case "mod":
-		result = lhs.Mod(rhs)
+		result, err = lhs.Mod(rhs)
 	default:
 		pre.errorf("unknown arithmetic operator: %s", op.value)
 		return
+	}
+	if err != nil {
+		pre.errorf(err.Error())
 	}
 	return result
 }
@@ -1518,12 +1523,12 @@ type (
 	}
 	Arithmeticker interface {
 		Comparer
-		Plus(other Arithmeticker) Arithmeticker
-		Minus(other Arithmeticker) Arithmeticker
-		Multiply(other Arithmeticker) Arithmeticker
-		Divide(other Arithmeticker) Arithmeticker
-		IntegerDivide(other Arithmeticker) Arithmeticker
-		Mod(other Arithmeticker) Arithmeticker
+		Plus(other Arithmeticker) (Arithmeticker, error)
+		Minus(other Arithmeticker) (Arithmeticker, error)
+		Multiply(other Arithmeticker) (Arithmeticker, error)
+		Divide(other Arithmeticker) (Arithmeticker, error)
+		IntegerDivide(other Arithmeticker) (Arithmeticker, error)
+		Mod(other Arithmeticker) (Arithmeticker, error)
 	}
 )
 
@@ -1703,216 +1708,249 @@ func (v StringType) GreaterThan(other Comparer) bool {
 	}
 	return false
 }
-func (v Float64Type) Plus(other Arithmeticker) Arithmeticker {
+func (v Float64Type) Plus(other Arithmeticker) (result Arithmeticker, err error) {
 	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(float64(v) + float64(o))
+		result = Float64Type(float64(v) + float64(o))
 	case Int64Type:
-		return Float64Type(float64(v) + float64(o))
+		result = Float64Type(float64(v) + float64(o))
 	case Uint64Type:
-		return Float64Type(float64(v) + float64(o))
-	}
-	panic(fmt.Sprintf("addition not supported for type %T, value '%[1]v'", other))
-}
-func (v Float64Type) Minus(other Arithmeticker) Arithmeticker {
-	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(float64(v) - float64(o))
-	case Int64Type:
-		return Float64Type(float64(v) - float64(o))
-	case Uint64Type:
-		return Float64Type(float64(v) - float64(o))
-	}
-	panic(fmt.Sprintf("multiplication not supported for type %T, value '%[1]v'", other))
-}
-func (v Float64Type) Multiply(other Arithmeticker) Arithmeticker {
-	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(float64(v) * float64(o))
-	case Int64Type:
-		return Float64Type(float64(v) * float64(o))
-	case Uint64Type:
-		return Float64Type(float64(v) * float64(o))
-	}
-	panic(fmt.Sprintf("multiplication not supported for type %T, value '%[1]v'", other))
-}
-func (v Float64Type) Divide(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
-	case Float64Type:
-		return Float64Type(float64(v) / float64(other))
-	case Int64Type:
-		return Float64Type(float64(v) / float64(other))
-	case Uint64Type:
-		return Float64Type(float64(v) / float64(other))
-	}
-	panic(fmt.Sprintf("division not supported for type %T, value '%[1]v'", other))
-}
-func (v Float64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
-	case Float64Type:
-		return Int64Type(int64(v) / int64(other))
-	case Int64Type:
-		return Int64Type(int64(v) / int64(other))
-	case Uint64Type:
-		return Int64Type(int64(v) / int64(other))
-	}
-	panic(fmt.Sprintf("integer division not supported for type %T, value '%[1]v'", other))
-}
-func (v Float64Type) Mod(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
-	case Float64Type:
-		return Float64Type(math.Mod(float64(v), float64(other)))
-	case Int64Type:
-		return Float64Type(math.Mod(float64(v), float64(other)))
-	case Uint64Type:
-		return Float64Type(math.Mod(float64(v), float64(other)))
-	}
-	panic(fmt.Sprintf("modulus not supported for type %T, value '%[1]v'", other))
-}
-func (v Uint64Type) Plus(other Arithmeticker) Arithmeticker {
-	switch other := other.(type) {
-	case Float64Type:
-		return Float64Type(v) + other
-	case Int64Type:
-		return Int64Type(v) + other
+		result = Float64Type(float64(v) + float64(o))
 	default:
-		return v + other.(Uint64Type)
+		err = fmt.Errorf("addition not supported for type %T, value '%[1]v'", other)
 	}
+	return
 }
-func (v Uint64Type) Minus(other Arithmeticker) Arithmeticker {
+func (v Float64Type) Minus(other Arithmeticker) (result Arithmeticker, err error) {
 	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) - o
+		result = Float64Type(float64(v) - float64(o))
 	case Int64Type:
-		return Int64Type(v) - o
+		result = Float64Type(float64(v) - float64(o))
+	case Uint64Type:
+		result = Float64Type(float64(v) - float64(o))
 	default:
-		return v - o.(Uint64Type)
+		err = fmt.Errorf("multiplication not supported for type %T, value '%[1]v'", other)
 	}
+	return
 }
-func (v Uint64Type) Multiply(other Arithmeticker) Arithmeticker {
+func (v Float64Type) Multiply(other Arithmeticker) (result Arithmeticker, err error) {
 	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(v) * o
+		result = Float64Type(float64(v) * float64(o))
 	case Int64Type:
-		return Int64Type(v) * o
+		result = Float64Type(float64(v) * float64(o))
+	case Uint64Type:
+		result = Float64Type(float64(v) * float64(o))
 	default:
-		return v * o.(Uint64Type)
+		err = fmt.Errorf("multiplication not supported for type %T, value '%[1]v'", other)
 	}
+	return
 }
-func (v Uint64Type) Divide(other Arithmeticker) Arithmeticker {
-	switch o := other.(type) {
+func (v Float64Type) Divide(other Arithmeticker) (result Arithmeticker, err error) {
+	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(float64(v) / float64(o))
+		result = Float64Type(float64(v) / float64(other))
 	case Int64Type:
-		return Float64Type(float64(v) / float64(o))
+		result = Float64Type(float64(v) / float64(other))
 	case Uint64Type:
-		return Float64Type(float64(v) / float64(o))
+		result = Float64Type(float64(v) / float64(other))
+	default:
+		err = fmt.Errorf("division not supported for type %T, value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("division not supported for type %T value '%[1]v'", other))
+	return
 }
-func (v Uint64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
-	switch o := other.(type) {
+func (v Float64Type) IntegerDivide(other Arithmeticker) (result Arithmeticker, err error) {
+	switch other := other.(type) {
 	case Float64Type:
-		return Int64Type(int64(v) / int64(o))
+		result = Int64Type(int64(v) / int64(other))
 	case Int64Type:
-		return Int64Type(int64(v) / int64(o))
+		result = Int64Type(int64(v) / int64(other))
 	case Uint64Type:
-		return Uint64Type(uint64(v) / uint64(o))
+		result = Int64Type(int64(v) / int64(other))
+	default:
+		err = fmt.Errorf("integer division not supported for type %T, value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("integer division not supported for type %T value'%[1]v'", other))
+	return
 }
-func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
-	switch o := other.(type) {
+func (v Float64Type) Mod(other Arithmeticker) (result Arithmeticker, err error) {
+	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(math.Mod(float64(v), float64(o)))
+		result = Float64Type(math.Mod(float64(v), float64(other)))
 	case Int64Type:
-		return Int64Type(int64(v) % int64(o))
+		result = Float64Type(math.Mod(float64(v), float64(other)))
 	case Uint64Type:
-		return Uint64Type(uint64(v) % uint64(o))
+		result = Float64Type(math.Mod(float64(v), float64(other)))
+	default:
+		err = fmt.Errorf("modulus not supported for type %T, value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("modulus not supported for type %T value'%[1]v'", other))
+	return
 }
-func (v Int64Type) Plus(other Arithmeticker) Arithmeticker {
+func (v Uint64Type) Plus(other Arithmeticker) (result Arithmeticker, err error) {
+	switch other := other.(type) {
+	case Float64Type:
+		result = Float64Type(v) + other
+	case Int64Type:
+		result = Int64Type(v) + other
+	default:
+		result = v + other.(Uint64Type)
+	}
+	return
+}
+func (v Uint64Type) Minus(other Arithmeticker) (result Arithmeticker, err error) {
 	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(float64(v) + float64(o))
+		result = Float64Type(v) - o
 	case Int64Type:
-		return Int64Type(int64(v) + int64(o))
+		result = Int64Type(v) - o
+	default:
+		result = v - o.(Uint64Type)
+	}
+	return
+}
+func (v Uint64Type) Multiply(other Arithmeticker) (result Arithmeticker, err error) {
+	switch o := other.(type) {
+	case Float64Type:
+		result = Float64Type(v) * o
+	case Int64Type:
+		result = Int64Type(v) * o
+	default:
+		result = v * o.(Uint64Type)
+	}
+	return
+}
+func (v Uint64Type) Divide(other Arithmeticker) (result Arithmeticker, err error) {
+	switch o := other.(type) {
+	case Float64Type:
+		result = Float64Type(float64(v) / float64(o))
+	case Int64Type:
+		result = Float64Type(float64(v) / float64(o))
+	case Uint64Type:
+		result = Float64Type(float64(v) / float64(o))
+	default:
+		err = fmt.Errorf("division not supported for type %T value '%[1]v'", other)
+	}
+	return
+}
+func (v Uint64Type) IntegerDivide(other Arithmeticker) (result Arithmeticker, err error) {
+	switch o := other.(type) {
+	case Float64Type:
+		result = Int64Type(int64(v) / int64(o))
+	case Int64Type:
+		result = Int64Type(int64(v) / int64(o))
+	case Uint64Type:
+		result = Uint64Type(uint64(v) / uint64(o))
+	default:
+		err = fmt.Errorf("integer division not supported for type %T value'%[1]v'", other)
+	}
+	return
+}
+func (v Uint64Type) Mod(other Arithmeticker) (result Arithmeticker, err error) {
+	switch o := other.(type) {
+	case Float64Type:
+		result = Float64Type(math.Mod(float64(v), float64(o)))
+	case Int64Type:
+		result = Int64Type(int64(v) % int64(o))
+	case Uint64Type:
+		result = Uint64Type(uint64(v) % uint64(o))
+	default:
+		err = fmt.Errorf("modulus not supported for type %T value'%[1]v'", other)
+	}
+	return
+}
+func (v Int64Type) Plus(other Arithmeticker) (result Arithmeticker, err error) {
+	switch o := other.(type) {
+	case Float64Type:
+		result = Float64Type(float64(v) + float64(o))
+	case Int64Type:
+		result = Int64Type(int64(v) + int64(o))
 	case Uint64Type:
 		if int64(v) < 0 {
-			return Int64Type(int64(v) + int64(o))
+			result = Int64Type(int64(v) + int64(o))
 		} else {
-			return Uint64Type(uint64(v) + uint64(o))
+			result = Uint64Type(uint64(v) + uint64(o))
 		}
+	default:
+		err = fmt.Errorf("integer addition not supported for type %T value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("integer addition not supported for type %T value '%[1]v'", other))
+	return
 }
-func (v Int64Type) Minus(other Arithmeticker) Arithmeticker {
+func (v Int64Type) Minus(other Arithmeticker) (result Arithmeticker, err error) {
 	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(float64(v) - float64(other))
+		result = Float64Type(float64(v) - float64(other))
 	case Int64Type:
-		return Int64Type(int64(v) - int64(other))
+		result = Int64Type(int64(v) - int64(other))
 	case Uint64Type:
 		if v < 0 {
-			return Int64Type(int64(v) - int64(other))
+			result = Int64Type(int64(v) - int64(other))
 		} else {
-			return Uint64Type(uint64(v) - uint64(other))
+			result = Uint64Type(uint64(v) - uint64(other))
 		}
+	default:
+		err = fmt.Errorf("subtraction not supported for type %T value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("subtraction not supported for type %T value '%[1]v'", other))
+	return
 }
-func (v Int64Type) Multiply(other Arithmeticker) Arithmeticker {
+func (v Int64Type) Multiply(other Arithmeticker) (result Arithmeticker, err error) {
 	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(float64(v) * float64(other))
+		result = Float64Type(float64(v) * float64(other))
 	case Int64Type:
-		return Int64Type(int64(v) * int64(other))
+		result = Int64Type(int64(v) * int64(other))
 	case Uint64Type:
 		if v < 0 {
-			return Int64Type(int64(v) * int64(other))
+			result = Int64Type(int64(v) * int64(other))
 		} else {
-			return Uint64Type(uint64(v) * uint64(other))
+			result = Uint64Type(uint64(v) * uint64(other))
 		}
+	default:
+		err = fmt.Errorf("subtraction not supported for type %T value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("subtraction not supported for type %T value '%[1]v'", other))
+	return
 }
-func (v Int64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
+func (v Int64Type) IntegerDivide(other Arithmeticker) (result Arithmeticker, err error) {
 	switch other := other.(type) {
 	case Float64Type:
-		return Int64Type(int64(v) / int64(other))
+		result = Int64Type(int64(v) / int64(other))
 	case Int64Type:
-		return Int64Type(int64(v) / int64(other))
+		result = Int64Type(int64(v) / int64(other))
 	case Uint64Type:
-		return Int64Type(int64(v) / int64(other))
+		result = Int64Type(int64(v) / int64(other))
+	default:
+		err = fmt.Errorf("integer division not supported for type %T value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("integer division not supported for type %T value '%[1]v'", other))
+	return
 }
-func (v Int64Type) Divide(other Arithmeticker) Arithmeticker {
+func (v Int64Type) Divide(other Arithmeticker) (result Arithmeticker, err error) {
 	switch other := other.(type) {
 	case Float64Type:
-		return Float64Type(float64(v) / float64(other))
+		result = Float64Type(float64(v) / float64(other))
 	case Int64Type:
-		return Float64Type(float64(v) / float64(other))
+		result = Float64Type(float64(v) / float64(other))
 	case Uint64Type:
-		return Float64Type(float64(v) / float64(other))
+		result = Float64Type(float64(v) / float64(other))
+	default:
+		err = fmt.Errorf("division not supported for type %T value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("division not supported for type %T value '%[1]v'", other))
+	return
 }
-func (v Int64Type) Mod(other Arithmeticker) Arithmeticker {
+func (v Int64Type) Mod(other Arithmeticker) (result Arithmeticker, err error) {
 	switch o := other.(type) {
 	case Float64Type:
-		return Float64Type(math.Mod(float64(v), float64(o)))
+		result = Float64Type(math.Mod(float64(v), float64(o)))
 	case Int64Type:
-		return Int64Type(int64(v) % int64(o))
+		result = Int64Type(int64(v) % int64(o))
 	case Uint64Type:
 		if v < 0 {
-			return Int64Type(int64(v) % int64(o))
+			result = Int64Type(int64(v) % int64(o))
 		} else {
-			return Uint64Type(uint64(v) % uint64(o))
+			result = Uint64Type(uint64(v) % uint64(o))
 		}
+	default:
+		err = fmt.Errorf("modulus not supported for type %T value '%[1]v'", other)
 	}
-	panic(fmt.Sprintf("modulus not supported for type %T value '%[1]v'", other))
+	return
 }
 func (v BooleanType) Equal(other Equaler) bool {
 	switch o := other.(type) {

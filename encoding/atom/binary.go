@@ -57,8 +57,7 @@ func (s *containerStack) Pop() cont {
 
 // Pop fully-read containers off the container stack based on the given byte
 // position.
-func (s *containerStack) PopCompleted(pos uint32) []*Atom {
-	var closedConts []*Atom
+func (s *containerStack) PopCompleted(pos uint32) (closedConts []*Atom, e error) {
 	// Pop until the given byte offset precedes the top object's end position.
 	for p, ok := s.Peek(); ok; p, ok = s.Peek() {
 		if pos == p.end {
@@ -66,12 +65,12 @@ func (s *containerStack) PopCompleted(pos uint32) []*Atom {
 			continue // next CONT might end too
 		}
 		if pos > p.end {
-			panic(fmt.Errorf("%s:CONT wanted to end at byte %d, but read position is now %d", p.atomPtr.Name, p.end, pos))
+			e = fmt.Errorf("%s:CONT wanted to end at byte %d, but read position is now %d", p.atomPtr.Name, p.end, pos)
 		}
 		break
 	}
 
-	return closedConts
+	return
 }
 
 // An atomHeader models the binary encoding values that start every ADE
@@ -140,10 +139,12 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		bytesRead  uint32
 		containers containerStack
 	)
-	for err := error(nil); err != io.EOF; {
+	for err == nil {
 		// read next atom header
-		h, err := readAtomHeader(r, &bytesRead)
-		if checkError(err) == io.EOF {
+		var h atomHeader
+		h, err = readAtomHeader(r, &bytesRead)
+		if err == io.EOF {
+			err = nil
 			break
 		}
 
@@ -152,12 +153,12 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		if !h.isContainer() {
 			data, err = readAtomData(r, h.Size-headerSize, &bytesRead)
 			if err != nil {
-				return atoms, fmt.Errorf("Input is invalid for conversion to Atom")
+				return nil, fmt.Errorf("Input is invalid for conversion to Atom")
 			}
 		}
 		adeType := ADEType(h.Type[:])
 		if err != nil {
-			return atoms, err
+			break
 		}
 		var a = Atom{
 			name: h.Name[:],
@@ -180,9 +181,12 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		}
 
 		// pop fully read containers off stack
-		containers.PopCompleted(bytesRead)
+		_, err = containers.PopCompleted(bytesRead)
 	}
-	return atoms, err // err is never set after initialization
+	if err != nil {
+		return nil, err
+	}
+	return
 }
 
 func readAtomHeader(r io.Reader, bytesRead *uint32) (h atomHeader, err error) {
@@ -208,7 +212,7 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 
 	buffer, err = ioutil.ReadAll(r)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// Strip newlines, spaces

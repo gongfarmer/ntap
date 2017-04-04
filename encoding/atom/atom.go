@@ -7,7 +7,6 @@ import (
 	"encoding"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -174,15 +173,6 @@ func FromFile(path string) (a Atom, err error) {
 
 	err = a.UnmarshalBinary(buf)
 	return
-}
-
-// Panic if an unexpected error is encountered here.
-// Return the same error if it's expected.
-func checkError(err error) error {
-	if err == nil || err == io.EOF {
-		return err
-	}
-	panic(err)
 }
 
 // Return true if string is printable, false otherwise
