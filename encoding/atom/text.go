@@ -37,12 +37,15 @@ import (
 // MarshalText writes an Atom to a byte slice in ADE ContainerText format.
 // tk implements the encoding.TextMarshaler interface.
 func (a *Atom) MarshalText() (text []byte, err error) {
-	buf := atomToTextBuffer(a, 0)
+	var buf bytes.Buffer
+	buf, err = atomToTextBuffer(a, 0)
+	if err != nil {
+		return []byte{}, err
+	}
 	return buf.Bytes(), err
 }
 
-func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
-	var output bytes.Buffer
+func atomToTextBuffer(a *Atom, depth int) (output bytes.Buffer, err error) {
 
 	// write indentation
 	for i := 0; i < depth; i++ {
@@ -53,14 +56,17 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 	fmt.Fprintf(&output, "%s:%s:", a.Name(), a.Type())
 	s, err := a.Value.StringDelimited()
 	if err != nil {
-		panic(fmt.Errorf("conversion of atom to text failed for atom '%s:%s': %s", a.Name(), a.Type(), err))
+		return output, fmt.Errorf("conversion of atom to text failed for atom '%s:%s': %s", a.Name(), a.Type(), err)
 	}
 	fmt.Fprintln(&output, s)
 
 	if a.typ == CONT {
 		// write children
 		for _, childPtr := range a.children {
-			buf := atomToTextBuffer(childPtr, depth+1)
+			buf, err := atomToTextBuffer(childPtr, depth+1)
+			if err != nil {
+				return output, err
+			}
 			output.Write(buf.Bytes())
 		}
 
@@ -70,7 +76,7 @@ func atomToTextBuffer(a *Atom, depth int) bytes.Buffer {
 		}
 		fmt.Fprintf(&output, "END\n")
 	}
-	return output
+	return output, err
 }
 
 /**********************************************************
@@ -162,18 +168,6 @@ type (
 		prevTokenType tokenEnum  // type of previous token emitted
 	}
 )
-
-func (i token) String() string {
-	switch {
-	case i.typ == tokenEOF:
-		return "EOF"
-	case i.typ == tokenError:
-		panic(fmt.Errorf(i.value))
-	case len(i.value) > 40:
-		return fmt.Sprintf("%.40q...", i.value)
-	}
-	return fmt.Sprintf("%q", i.value)
-}
 
 func lex(input string) *lexer {
 	l := &lexer{
@@ -299,7 +293,8 @@ func (l *lexer) line() string {
 // first returns the first rune in the value
 func (l *lexer) first() (r rune) {
 	if l.bufferSize() == 0 {
-		panic("Can't return first char from empty buffer")
+		l.errorf("Can't return first char from empty buffer")
+		return r
 	}
 	r, _ = utf8.DecodeRuneInString(l.input[l.start:])
 	return r
@@ -322,8 +317,7 @@ func lexLine(l *lexer) stateFn {
 	ok := true
 	for ok {
 		if l.bufferSize() != 0 {
-			s := fmt.Sprintf("expecting empty buffer at start of line, got <<<%s>>>", l.buffer())
-			panic(s)
+			return l.errorf("expecting empty buffer at start of line, got <<<%s>>>", l.buffer())
 		}
 		r := l.next()
 		switch {
@@ -809,7 +803,7 @@ func (ptr *atomStack) pop() *Atom {
 	var stack = *ptr
 	size := len(stack)
 	if size == 0 {
-		panic("attempt to pop from empty stack")
+		return nil
 	}
 	lastAtom := stack[size-1]
 	*ptr = stack[:size-1]
@@ -837,7 +831,7 @@ func parseAtomName(p *parser) parseFunc {
 	switch tk.typ {
 	case tokenAtomName: // may be hex or 4 printable chars
 		if e := FC32StringToBytes(tk.value, &p.theAtom.name); e != nil {
-			return p.errorf(fmt.Sprint("Invalid atom name: ", tk.value))
+			return p.errorf(fmt.Sprint("invalid atom name: ", tk.value))
 		}
 	case tokenError:
 		return p.errorf(tk.value)
@@ -900,7 +894,7 @@ func parseAtomType(p *parser) parseFunc {
 func parseAtomData(p *parser) parseFunc {
 	parseFunc := parseType[p.theAtom.typ]
 	if parseFunc == nil {
-		panic(fmt.Sprintf("no data parse function defined for type %s", p.theAtom.Type()))
+		return p.errorf("no data parse function defined for type %s", p.theAtom.Type())
 	}
 	retval := parseFunc(p)
 	if retval == nil { // nil function returned means error

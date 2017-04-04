@@ -1959,15 +1959,13 @@ func (v BooleanType) Equal(other Equaler) bool {
 	case Int64Type:
 		if bool(v) == false {
 			return int64(o) == 0
-		} else {
-			return int64(o) != 0
 		}
+		return int64(o) != 0
 	case Uint64Type:
 		if bool(v) == false {
 			return uint64(o) == 0
-		} else {
-			return uint64(o) != 0
 		}
+		return uint64(o) != 0
 	default:
 		return false
 	}

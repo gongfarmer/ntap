@@ -136,7 +136,7 @@ func errRange(t string, v interface{}) (e error) {
 	case string:
 		e = fmt.Errorf("value exceeds range of type %s: %v", t, v)
 	default:
-		panic(fmt.Errorf("cannot handle type %T", v))
+		e = fmt.Errorf("range error cannot handle type %T", v)
 	}
 	return
 }

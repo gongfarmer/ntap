@@ -55,19 +55,19 @@ func main() {
 	// Convert text to atom
 	var a atom.Atom
 	if err = a.UnmarshalText(bb.Bytes()); err != nil {
-		log.Fatalf("Invalid input container: ", err)
+		log.Fatalf("invalid input container: %s", err)
 	}
 
 	// Convert atom to binary
 	buf, err := a.MarshalBinary()
 	if err != nil {
-		log.Fatalf("Unable to convert container to binary: ", err)
+		log.Fatalf("unable to convert container to binary: ", err)
 	}
 
 	// Write binary to file
 	_, err = output.Write(buf)
 	if err != nil {
-		log.Fatalf("Unable to write to file: ", err)
+		log.Fatalf("unable to write to file: ", err)
 	}
 }
 
@@ -82,7 +82,7 @@ func setInput(argv []string) (input io.Reader, args []string) {
 	var err error
 	if len(argv) == 0 {
 		if stdinIsEmpty() {
-			fmt.Fprintln(os.Stderr, "Please provide input filename, or pipe in some text.")
+			fmt.Fprintln(os.Stderr, "please provide input filename, or pipe in some text.")
 			usage()
 		} else {
 			input = os.Stdin
@@ -100,7 +100,7 @@ func setInput(argv []string) (input io.Reader, args []string) {
 func setOutput(argv []string) (output io.Writer, args []string) {
 	var err error
 	if len(argv) == 0 {
-		log.Fatalf("Please provide output filename, or - to get binary on STDOUT")
+		log.Fatalf("please provide output filename, or - to get binary on STDOUT")
 	} else {
 		if argv[0] == "-" {
 			output = os.Stdout

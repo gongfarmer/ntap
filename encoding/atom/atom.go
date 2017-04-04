@@ -105,7 +105,7 @@ func (a *Atom) ZeroData() {
 	case CONT, NULL:
 		a.data = nil
 	default:
-		panic(fmt.Sprintf("unknown ADE type: %s", string(a.typ)))
+		Log.Printf("unknown ADE type: %s", string(a.typ))
 	}
 }
 
