@@ -539,6 +539,14 @@ func TestAtomsAtPath(t *testing.T) {
 			"0x00000000:UI32:2",
 			"0x00000000:UI32:2",
 		}, nil},
+
+		// test intersect operator
+		PathTest{TestAtomGINF, `//*[@name="0x00000001"] intersect //*[data()="10.4.0"]`, []string{
+			`0x00000001:CSTR:"10.4.0"`,
+		}, nil},
+		PathTest{TestAtomGINF, `(//*[@type="UI32"] intersect //*[data()>2])`, []string{
+			"BVER:UI32:4", "0x00000001:UI32:908767",
+		}, nil},
 	}
 	runPathTests(t, tests)
 }

@@ -108,7 +108,7 @@ const (
 	tokenEqualityOperator   = "tknEqualsOperator"
 	tokenNodeTest           = "tknNodeTest"
 	tokenComparisonOperator = "tknCompareOperator"
-	tokenUnionOperator      = "tknUnionOperator"
+	tokenSetOperator        = "tknSetOperator"
 	tokenStepSeparator      = "tknStepSeparatorOperator"
 	tokenOperator           = "tknOperator"
 	tokenFunctionBool       = "tknFunctionBool"
@@ -239,29 +239,8 @@ func NewAtomPath(path string) (ap *AtomPath, e error) {
 	return
 }
 
-// AtomPath contains an array of 1-N {pathStep, [predicate]...}
-// predicates are stored as PredicateEvaluator objects
-// also store starting piece: // or / if any
-// Union operators are stored as AtomUnion objects which store lists of |, (, ) and atomUnion
-
-// return a set of
-/*
-(//*[true()] | //*[false()])[data() = 2] | /root/down/two
-(
-	//*[true()] # AtomPath
-	|
-	//*[false()] # AtomPath
-)
-[data() = 2] # AtomPath | /root/down/two # AtomPath
-
-*/
-// (//*[@name="0x00000000"] | //*[@name="0x00000001"])[data() = 2]
-
-// step 1: break down path by union operators
-// step 2: for each piece:
-// step 2a.  consume start of string, / or //, to get starting set for this piece
-// step 2b.  split remainder on /, get pathstep and predicates for each
-
+// AtomsAtPath returns the set of descendant atoms in atom a which match the
+// given path.
 func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	atomPath, e := NewAtomPath(path)
 	if e != nil {
@@ -277,55 +256,6 @@ func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 
 func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
 	return ap.Evaluator.Evaluate(root)
-}
-
-// splitLocationStep reads a single path element, and returns two strings
-// containing the path test and predicate . The square brackets around the
-// filter are stripped.
-// Example:
-//   "CN1A[@type=UI32]" => "CN1A", ["@type=UI32"]
-//   "CN1A[@name=ROOT][@type=UI32][3]" => "CN1A", ["@name=ROOT","@type=UI32","3"]
-func splitPathOnUnions(pathRaw string) (pathinfo [][]string, e error) {
-	path := strings.Replace(pathRaw, "union", "|", -1) // treat "union" same as "|"
-	for _, str := range strings.Split(path, "|") {
-		if step, e := splitPathAndPredicate(str); e != nil {
-			return nil, e
-		} else {
-			pathinfo = append(pathinfo, step)
-		}
-	}
-	return
-}
-
-// splitPathAndPredicate returns a string slice where the first element is the
-// path, and the remaining 0-N elements are predicates to apply to that path.
-func splitPathAndPredicate(pathRaw string) (pathinfo []string, e error) {
-	// find path, make tk the first element in the slice
-	path := strings.TrimSpace(pathRaw)
-	i_start := strings.IndexByte(path, '[')
-	if i_start == -1 {
-		if strings.HasSuffix(path, "]") {
-			// predicate terminator without predicate start
-			e = errInvalidPredicate("mismatched square brackets")
-		}
-		return append(pathinfo, path), nil
-	}
-	pathinfo = append(pathinfo, strings.TrimSpace(path[:i_start]))
-	// there's at least one predicate if we get here
-
-	// collect each predicate delimited by [ ... ]
-	for _, p := range strings.Split(path[i_start+1:], "[") {
-		trimmed := strings.TrimSpace(p)
-		if !strings.HasSuffix(trimmed, "]") {
-			e = errInvalidPredicate("unterminated square brackets")
-			break
-		}
-		// strip ] and any preceding whitespace
-		pathinfo = append(pathinfo, strings.TrimSpace(trimmed[:len(trimmed)-1]))
-	}
-
-	// Already verified that there's nothing after the last ], so done
-	return
 }
 
 // NewPathEvaluator reads the path
@@ -464,7 +394,7 @@ func lexPath(l *lexer) stateFn {
 	case r == '*':
 		l.emit(tokenNodeTest)
 	case r == '|':
-		l.emit(tokenUnionOperator)
+		l.emit(tokenSetOperator)
 	case r == '/':
 		lexStepSeparatorOrAxis(l)
 	case r == '[':
@@ -654,8 +584,8 @@ func lexBareStringInPath(l *lexer) stateFn {
 		return lexFunctionCall(l)
 	}
 	switch l.buffer() {
-	case "union":
-		l.emit(tokenUnionOperator)
+	case "union", "intersect":
+		l.emit(tokenSetOperator)
 	default:
 		l.emit(tokenNodeTest)
 	}
@@ -793,7 +723,7 @@ func (pp *PathParser) parseToken(tk token) bool {
 	case tokenNodeTest: // act like an operator with same precedence as //, /
 		pp.moveOperatorsToOutput(token{tokenStepSeparator, "/", 0})
 		pp.outputQueue.push(&tk)
-	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator, tokenStepSeparator, tokenUnionOperator:
+	case tokenComparisonOperator, tokenArithmeticOperator, tokenEqualityOperator, tokenBooleanOperator, tokenAxisOperator, tokenStepSeparator, tokenSetOperator:
 		pp.moveOperatorsToOutput(tk)
 		pp.opStack.push(&tk)
 	case tokenLeftParen:
@@ -810,7 +740,7 @@ func (pp *PathParser) parseToken(tk token) bool {
 		//		pp.opStack.pop() // discard PredicateStart from opstack. There's already one on the output queue, so no push()
 		pp.opStack.pop() // remove predicate start from operator stack
 		pp.outputQueue.push(&tk)
-		//	case tokenUnionOperator:
+		//	case tokenSetOperator:
 		//		pp.moveOperatorsToOutputUntil(func(t token) bool { return t.typ == tokenLeftParen })
 		//		pp.opStack.push(&tk)
 	case tokenEOF:
@@ -947,16 +877,32 @@ func (pe *PathEvaluator) NextTokenType() tokenEnum {
 	return pe.Tokens.nextType()
 }
 
-func (pe *PathEvaluator) evalUnionOperator() []*Atom {
-	Log.Println("evalUnionOperator()")
+func (pe *PathEvaluator) evalSetOperator() (atoms []*Atom) {
+	Log.Println("evalSetOperator()")
 	op := pe.Tokens.pop()
-	if op.typ != tokenUnionOperator {
-		pe.errorf("expected union operator, received type %s", op.typ)
+	if op.typ != tokenSetOperator {
+		pe.errorf("expected union or intersect operator, received type %s", op.typ)
 		return nil
 	}
 
-	// FIXME uniqueness, avoid duplicates
-	return append(pe.evalElementSet(), pe.evalElementSet()...)
+	switch op.value {
+	case "union", "|":
+		atoms = append(pe.evalElementSet(), pe.evalElementSet()...)
+	case "intersect":
+		// hash elements in first set
+		var zero struct{}
+		var eltMap = make(map[string]struct{})
+		for _, a := range pe.evalElementSet() {
+			eltMap[a.String()] = zero
+		}
+		// find elements in second set that are in first set
+		for _, a := range pe.evalElementSet() {
+			if _, ok := eltMap[a.String()]; ok {
+				atoms = append(atoms, a)
+			}
+		}
+	}
+	return
 }
 func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
 	tk := pe.Tokens.pop()
@@ -1043,8 +989,8 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 	switch pe.NextTokenType() {
 	case tokenPredicateEnd:
 		return pe.evalPredicate()
-	case tokenUnionOperator:
-		return pe.evalUnionOperator()
+	case tokenSetOperator:
+		return pe.evalSetOperator()
 	case tokenAxisOperator, tokenStepSeparator:
 		tk := pe.Tokens.pop()
 		pe.errorf("operator '%s' must be followed by element name or *", tk.value)
@@ -1577,6 +1523,8 @@ func (v Uint64Type) Equal(other Equaler) bool {
 		return Float64Type(v) == o
 	case Int64Type:
 		return Int64Type(v) == o
+	case StringType:
+		return false
 	default:
 		return v == o.(Uint64Type)
 	}
