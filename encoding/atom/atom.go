@@ -38,25 +38,40 @@ func init() {
 // Name returns a copy of the atoms's name.
 // If printable, it's 4 printable chars.  Otherwise, it's
 // a hex string preceded by 0x.
-func (a Atom) Name() (name string) {
+func (a *Atom) Name() (name string) {
 	name, _ = FC32ToString(a.name)
 	return name
 }
 
 // NameAsUint32 returns a copy of the atoms's 4-byte name as a single uint32
 // value.
-func (a Atom) NameAsUint32() uint32 {
+func (a *Atom) NameAsUint32() uint32 {
 	return binary.BigEndian.Uint32(a.name)
 }
 
 // Type returns a copy of the atoms's ADE data type.
-func (a Atom) Type() string {
+func (a *Atom) Type() string {
 	return string(a.typ)
 }
 
 // Children returns a slice of this Atom's child atoms
-func (a Atom) Children() []*Atom {
+func (a *Atom) Children() []*Atom {
 	return a.children
+}
+
+func NewAtom(name string, typ string) (a *Atom, e error) {
+	if len(name) != 4 {
+		return nil, fmt.Errorf(`atom name must be 4 chars long, got "%s"`, name)
+	}
+	if len(name) != 4 {
+		return nil, fmt.Errorf(`atom type must be 4 chars long, got "%s"`, name)
+	}
+	a = &Atom{
+		name: []byte{name[0], name[1], name[2], name[3]},
+		typ:  ADEType(typ),
+	}
+	a.SetType(a.typ)
+	return a, e
 }
 
 // AtomAtPath returns the single Atom descendant at the given path, or nil if none.

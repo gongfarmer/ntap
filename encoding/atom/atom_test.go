@@ -2,8 +2,10 @@
 package atom
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -193,4 +195,24 @@ func BenchmarkUnmarshalText(b *testing.B) {
 		}
 	}
 	b.ReportAllocs()
+}
+
+// Make 100 random uint32s. Use each one's FCHR32 value as an atom name, and
+// test that it matches the output from NameAsUint32().
+func TestNameAsUint32(t *testing.T) {
+	var i uint32
+
+	var buf = make([]byte, 4)
+	for i = 0; i <= 100; i++ {
+		num := rand.Uint32()
+		binary.BigEndian.PutUint32(buf, num)
+		a, err := NewAtom(string(buf), "UI32")
+		if err != nil {
+			panic(err)
+		}
+		a.Value.SetUint(uint64(num))
+		if a.NameAsUint32() != num {
+			t.Errorf(`TestNameAsUint32(): Atom name "%s"(%X), expected uint32 value %d, got %d`, a.Name(), a.name, num, a.NameAsUint32())
+		}
+	}
 }
