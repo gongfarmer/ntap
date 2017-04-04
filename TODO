@@ -30,3 +30,7 @@ Deferred:
   obviously could not support some go types that have no equivalent ADE
   representation.
 
+
+Eliminate FIXME
+Eliminate logging except at debug level, and hide that
+Eliminate all panics and log.Fatal from API

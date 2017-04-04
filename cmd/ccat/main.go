@@ -21,7 +21,7 @@ var (
 	FlagOutputHex   = flag.Bool("X", false, "print atom as hex string")
 	FlagOutputDebug = flag.Bool("d", false, "print atoms in verbose debug format")
 	FlagPath        = flag.String("p", "", "find atoms matching PATH")
-	FlagVerbose     = flag.Bool("v", "", "enable verbose logging")
+	FlagVerbose     = flag.Bool("v", false, "enable verbose logging")
 )
 
 func usage() {
@@ -49,6 +49,10 @@ func main() {
 	log.SetPrefix("ccat: ")
 	if flag.NArg() == 0 && stdinIsEmpty() {
 		usage()
+	}
+	if *FlagVerbose {
+		fmt.Println("Verbose flag is now on")
+		atom.Log.SetOutput(os.Stdout)
 	}
 
 	// Read atom data

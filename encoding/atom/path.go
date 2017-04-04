@@ -86,10 +86,10 @@ package atom
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 // this is good because tk handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
 
+// FIXME explain terminology, and lexer/parser/evaluators relationship
+// FIXME implement path.Compile
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -215,7 +215,6 @@ type PathParser struct {
 
 type AtomPath struct {
 	Path      string
-	Log       *log.Logger
 	Evaluator *PathEvaluator
 	err       error
 }
@@ -224,20 +223,16 @@ type AtomPath struct {
 // performs all lexing and parsing steps, so that evaluating data sets against
 // the path will have as little overhead as possible.
 func NewAtomPath(path string) (ap *AtomPath, e error) {
-	log.Printf("NewAtomPath(%q)", path)
+	Log.Printf("NewAtomPath(%q)", path)
 
 	var pe *PathEvaluator
 	pe, e = NewPathEvaluator(path)
 	if e != nil {
 		return ap, addPathToError(e, path)
 	}
-	for i, tk := range pe.Tokens {
-		fmt.Printf("%3d.  %15s  [%s]\n", i, tk.value, tk.typ)
-	}
 
 	ap = &AtomPath{
 		Path:      strings.TrimSpace(path),
-		Log:       log.New(ioutil.Discard, "", log.LstdFlags),
 		Evaluator: pe,
 		err:       nil,
 	}
@@ -266,10 +261,6 @@ func NewAtomPath(path string) (ap *AtomPath, e error) {
 // step 2: for each piece:
 // step 2a.  consume start of string, / or //, to get starting set for this piece
 // step 2b.  split remainder on /, get pathstep and predicates for each
-
-func (ap *AtomPath) SetLogger(l *log.Logger) {
-	ap.Log = l
-}
 
 func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	atomPath, e := NewAtomPath(path)
@@ -387,7 +378,7 @@ func NewPredicateEvaluator(pe *PathEvaluator) (pre PredicateEvaluator, ok bool) 
 // once, because the predicate may refer to individual child atoms by name,
 // requiring them to be evaluated against every other candidate.
 func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
-	log.Print("PredicateEvaluator::Evaluate()  ", pre.tokens, candidates)
+	Log.Print("PredicateEvaluator::Evaluate()  ", pre.tokens, candidates)
 	pre.Atoms = candidates
 	pre.Count = len(candidates)
 	for i, atomPtr := range candidates {
@@ -396,10 +387,10 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 		pre.Tokens = pre.tokens
 
 		// eval candidate atoms against path+predicate(s)
-		log.Printf("    eval() with Tokens(%v)", pre.tokens)
+		Log.Printf("    eval() with Tokens(%v)", pre.tokens)
 		results := pre.eval()
 		ok, err := pre.evalResultsToBool(results)
-		log.Printf("    eval() returned %t and err %v", ok, pre.Error)
+		Log.Printf("    eval() returned %t and err %v", ok, pre.Error)
 		if err != nil {
 			return nil, err
 		}
@@ -750,7 +741,7 @@ func (pp *PathParser) receiveTokens() {
 		ok := pp.parseToken(tk)
 
 		str := fmt.Sprintf("parseToken(%s, '%v')", tk.typ, tk.value)
-		log.Printf("    %-35s %35v | %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
+		Log.Printf("    %-35s %35v | %v\n", str, fmt.Sprint(pp.opStack), pp.outputQueue)
 
 		if tk.typ == tokenEOF || !ok {
 			break
@@ -782,7 +773,7 @@ func (pp *PathParser) errorf(format string, args ...interface{}) bool {
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 func (pp *PathParser) parseToken(tk token) bool {
-	log.Printf("      parseToken %q {%s} ", tk.value, tk.typ)
+	Log.Printf("      parseToken %q {%s} ", tk.value, tk.typ)
 	switch tk.typ {
 	case tokenError:
 		return pp.errorf(tk.value)
@@ -871,7 +862,7 @@ func (pp *PathParser) moveOperatorsToOutput(tk token) {
 			break
 		}
 		p, _ := operatorOrder(*nextToken)
-		log.Println("        opStack before: ", pp.opStack)
+		Log.Println("        opStack before: ", pp.opStack)
 		//if (tAssoc == assocLeft && tkPrec <= p) || (tAssoc == assocRight && tkPrec < p) {
 		if tkPrec < p || (tAssoc == assocLeft && tkPrec == p) {
 			pp.outputQueue.push(pp.opStack.pop())
@@ -879,7 +870,7 @@ func (pp *PathParser) moveOperatorsToOutput(tk token) {
 			break
 		}
 	}
-	log.Println("        opStack after: ", pp.opStack)
+	Log.Println("        opStack after: ", pp.opStack)
 }
 
 // func (pp *PathParser) parsePredicateTokens(tk token) bool {
@@ -934,7 +925,7 @@ func (pe *PathEvaluator) Evaluate(atom *Atom) (result []*Atom, e error) {
 	}
 
 	pe.Tokens = pe.tokens
-	fmt.Println("PathEvaluator::Evaluate() ", pe.Tokens)
+	Log.Println("PathEvaluator::Evaluate() ", pe.Tokens)
 	result = pe.evalElementSet()
 	e = pe.Error
 	return
@@ -956,7 +947,7 @@ func (pe *PathEvaluator) NextTokenType() tokenEnum {
 }
 
 func (pe *PathEvaluator) evalUnionOperator() []*Atom {
-	log.Println("evalUnionOperator()")
+	Log.Println("evalUnionOperator()")
 	op := pe.Tokens.pop()
 	if op.typ != tokenUnionOperator {
 		pe.errorf("expected union operator, received type %s", op.typ)
@@ -968,7 +959,7 @@ func (pe *PathEvaluator) evalUnionOperator() []*Atom {
 }
 func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
 	tk := pe.Tokens.pop()
-	log.Printf("evalAxisOperator(%q)", tk.value)
+	Log.Printf("evalAxisOperator(%q)", tk.value)
 	if tk.typ != tokenAxisOperator && tk.typ != tokenStepSeparator {
 		pe.errorf("expected axis operator, got '%v' [%[1]T]", tk.value)
 		return nil
@@ -1028,7 +1019,7 @@ func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
 	} else {
 		atoms = append(atoms, pe.ContextAtomPtr)
 	}
-	log.Printf("evalNodeTest(%q) %v", tkNodeTest.value, atoms)
+	Log.Printf("evalNodeTest(%q) %v", tkNodeTest.value, atoms)
 
 	// Filter the ElementPtrSlice by name against the node test
 	if tkNodeTest.value == "*" {
@@ -1044,7 +1035,7 @@ func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
 }
 
 func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
-	log.Printf("evalElementSet() [%s]'", pe.NextTokenType())
+	Log.Printf("evalElementSet() [%s]'", pe.NextTokenType())
 	if pe.Done() {
 		return
 	}
@@ -1062,7 +1053,7 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 		return pe.evalNodeTest() // may be nil in which case returns .
 	}
 
-	log.Println("evalElementSet: Returning context atom. Next Token Type is ", pe.NextTokenType())
+	Log.Println("evalElementSet: Returning context atom. Next Token Type is ", pe.NextTokenType())
 	// No axis operator given, so use context node
 	atoms = append(atoms, pe.ContextAtomPtr)
 	return
@@ -1072,7 +1063,7 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 // read nodeset.
 // for each Element in the NodeSet, make a predicateEvaluator and apply predicate.
 func (pe *PathEvaluator) evalPredicate() []*Atom {
-	log.Println("evalPredicate()")
+	Log.Println("evalPredicate()")
 	// evaluate element set by predicate
 	pre, ok := NewPredicateEvaluator(pe)
 	if ok != true {
@@ -1153,7 +1144,7 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 		pre.errorf("expect boolean value, got nothing")
 		return
 	}
-	log.Printf("    evalBoolean() %v,%v", pre.NextTokenType(), pre.Tokens.peek().value)
+	Log.Printf("    evalBoolean() %v,%v", pre.NextTokenType(), pre.Tokens.peek().value)
 	switch pre.NextTokenType() {
 	case tokenEqualityOperator:
 		result = pre.evalEqualityOperator()
@@ -1237,7 +1228,7 @@ func (pre *PredicateEvaluator) evalEqualityOperator() Equaler {
 	if pre.Error != nil {
 		return BooleanType(false)
 	}
-	log.Printf("  evalEqualityOperator() %v = %v", lhs, rhs)
+	Log.Printf("  evalEqualityOperator() %v = %v", lhs, rhs)
 	switch op.value {
 	case "=", "eq":
 		result = lhs.Equal(rhs)
@@ -1316,7 +1307,7 @@ func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 	return result
 }
 func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
-	log.Printf("    evalEqualer(), Tokens=%v", pre.Tokens)
+	Log.Printf("    evalEqualer(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.NextTokenType() {
 	case tokenInteger, tokenHex:
@@ -1361,7 +1352,7 @@ func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
 // FIXME: this near-duplicates evalEqualer.
 // have tk call evalEqualer and then error out on non-Compararer types?
 func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
-	log.Printf("    evalComparable(), Tokens=%v", pre.Tokens)
+	Log.Printf("    evalComparable(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.NextTokenType() {
 	case tokenInteger, tokenHex:
@@ -1460,43 +1451,6 @@ func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
 	return BooleanType(result)
 }
 
-// evalUnionOperator consumes two nodesets and returns their set union.
-func (pre *PredicateEvaluator) evalUnionOperator(results []Equaler) (result bool) {
-	log.Println("evalUnionOperator()")
-
-	// consume union operator
-	tk := pre.Tokens.pop()
-	if tk.typ != tokenUnionOperator {
-		pre.errorf("expected union operator, received type %s", tk.typ)
-	}
-	log.Println("evalUnionOperator()")
-
-	// operator requires expressions on both sides, so error if this is the first token
-	if pre.tokens[0].typ == tokenUnionOperator {
-		pre.errorf("| has no left-hand-side value")
-		return false
-	}
-
-	// evaluate results so far, same as if predicate was fully evaluated
-	var err error
-	result, err = pre.evalResultsToBool(results)
-	if err != nil {
-		// reword error message to include reference to union operator
-		errString := err.Error()
-		switch {
-		case errString == "no result":
-			pre.errorf("| has no right-hand-side value")
-		case strings.Contains(errString, "unparsed values "):
-			pre.errorf("| has multiple right-hand-side values")
-		case strings.Contains(errString, "unknown type"):
-			pre.errorf(strings.Join([]string{"| expects boolean,", errString}, " "))
-		default:
-			pre.errorf(errString)
-		}
-	}
-	return
-}
-
 func (pre *PredicateEvaluator) evalResultsToBool(results []Equaler) (result bool, err error) {
 	if pre.Error != nil {
 		return false, pre.Error
@@ -1535,10 +1489,10 @@ func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
 	}
 	switch token.value {
 	case "position":
-		log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Position)
+		Log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Position)
 		return Uint64Type(pre.Position)
 	case "last", "count":
-		log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Count)
+		Log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Count)
 		return Uint64Type(pre.Count)
 	default:
 		pre.errorf("unknown numeric function: %s", token.value)
@@ -1868,7 +1822,6 @@ func (v Uint64Type) IntegerDivide(other Arithmeticker) Arithmeticker {
 	panic(fmt.Sprintf("integer division not supported for type %T value'%[1]v'", other))
 }
 func (v Uint64Type) Mod(other Arithmeticker) Arithmeticker {
-	fmt.Println("Uint64Typ::Mod", v, other)
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(math.Mod(float64(v), float64(o)))

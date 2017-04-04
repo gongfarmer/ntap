@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 	"unicode"
@@ -27,6 +28,12 @@ type Atom struct {
 	data     []byte
 	children []*Atom
 	Value    *Codec
+}
+
+var Log *log.Logger
+
+func init() {
+	Log = log.New(ioutil.Discard, "atom", log.LstdFlags)
 }
 
 // Name returns a copy of the atoms's name.
