@@ -1129,10 +1129,6 @@ func (pre *PredicateEvaluator) evalBooleanOperator() BooleanType {
 	return BooleanType(result)
 }
 
-func (pre *PredicateEvaluator) True(v Equaler) bool {
-	return v.Equal(BooleanType(true))
-}
-
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
 func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
 	op := pre.Tokens.pop()

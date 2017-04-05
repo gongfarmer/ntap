@@ -90,6 +90,23 @@ func TestUI08ToUint64(t *testing.T) {
 	})
 }
 
+func TestUI16ToUint16(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI16", 2)
+	tests := []decoderTest{
+		decoderTest{[]byte("\x00\x00"), uint16(0), nil},
+		decoderTest{[]byte("\x00\xFF"), uint16(255), nil},
+		decoderTest{[]byte("\xFF\x00"), uint16(65280), nil},
+		decoderTest{[]byte("\xFF\xFF"), uint16(65535), nil},
+		decoderTest{[]byte{}, uint16(0), byteCountErr(0)},
+		decoderTest{[]byte("\x00"), uint16(0), byteCountErr(1)},
+		decoderTest{[]byte("\xFF"), uint16(0), byteCountErr(1)},
+		decoderTest{[]byte("\x00\x00\x01"), uint16(0), byteCountErr(3)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return UI16ToUint16(input)
+	})
+}
+
 func TestUI16ToUint64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("UI16", 2)
 	tests := []decoderTest{
@@ -154,6 +171,32 @@ func TestUI64ToUint64(t *testing.T) {
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI64ToUint64(input)
+	})
+}
+
+func TestUI64ToInt64(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curryErrFunc("UI64", 8)
+	tests := []decoderTest{
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), int64(0xFF), nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), int64(0xFF00), nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), int64(0xFF0000), nil},
+		decoderTest{[]byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), int64(0xFF000000), nil},
+		decoderTest{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), int64(0xFF00000000), nil},
+		decoderTest{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), int64(0xFF0000000000), nil},
+		decoderTest{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), int64(0xFF000000000000), nil},
+		decoderTest{[]byte{}, int64(0), byteCountErr(0)},
+		decoderTest{[]byte("\x01"), int64(0), byteCountErr(1)},
+		decoderTest{[]byte("\xFF\x01"), int64(0), byteCountErr(2)},
+		decoderTest{[]byte("\xFF\xFF\x01"), int64(0), byteCountErr(3)},
+		decoderTest{[]byte("\xFF\xFF\xFF\x01"), int64(0), byteCountErr(4)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(5)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(6)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(7)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(9)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return UI64ToInt64(input)
 	})
 }
 
@@ -296,6 +339,24 @@ func TestSI08ToInt64(t *testing.T) {
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return SI08ToInt64(input)
+	})
+}
+
+func TestSI16ToInt16(t *testing.T) {
+	byteCountErr := errFunc(errByteCount).curryErrFunc("SI16", 2)
+	zero := int16(0)
+	tests := []decoderTest{
+		decoderTest{[]byte("\x00\x00"), int16(0), nil},
+		decoderTest{[]byte("\x00\x01"), int16(1), nil},
+		decoderTest{[]byte("\x80\x00"), int16(math.MinInt16), nil},
+		decoderTest{[]byte("\x7F\xFF"), int16(math.MaxInt16), nil},
+		decoderTest{[]byte("\xFF\xFF"), int16(-1), nil},
+		decoderTest{[]byte(""), zero, byteCountErr(0)},
+		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
+		decoderTest{[]byte("\x00\x00\x00\x00"), zero, byteCountErr(4)},
+	}
+	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
+		return SI16ToInt16(input)
 	})
 }
 

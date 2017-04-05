@@ -40,11 +40,6 @@ func (s *containerStack) Peek() (value *cont, ok bool) {
 	return
 }
 
-// Empty returns true if the stack is empty.
-func (s *containerStack) Empty() bool {
-	return len(*s) == 0
-}
-
 // Push puts an element on top of the stack.
 func (s *containerStack) Push(c cont) {
 	(*s) = append((*s), c)
