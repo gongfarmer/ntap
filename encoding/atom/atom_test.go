@@ -200,19 +200,64 @@ func BenchmarkUnmarshalText(b *testing.B) {
 // Make 100 random uint32s. Use each one's FCHR32 value as an atom name, and
 // test that it matches the output from NameAsUint32().
 func TestNameAsUint32(t *testing.T) {
-	var i uint32
 
 	var buf = make([]byte, 4)
-	for i = 0; i <= 100; i++ {
-		num := rand.Uint32()
-		binary.BigEndian.PutUint32(buf, num)
+	for i := 0; i <= 100; i++ {
+		nameUint := rand.Uint32()
+		binary.BigEndian.PutUint32(buf, nameUint)
 		a, err := NewAtom(string(buf), "UI32")
 		if err != nil {
 			panic(err)
 		}
-		a.Value.SetUint(uint64(num))
-		if a.NameAsUint32() != num {
-			t.Errorf(`TestNameAsUint32(): Atom name "%s"(%X), expected uint32 value %d, got %d`, a.Name(), a.name, num, a.NameAsUint32())
+		a.Value.SetUint(uint64(nameUint))
+		if a.NameAsUint32() != nameUint {
+			t.Errorf(`TestNameAsUint32(): Atom name "%s"(%X), expected uint32 value %d, got %d`, a.Name(), a.name, nameUint, a.NameAsUint32())
 		}
+	}
+}
+
+// Find and return a test object where the test atom has the given name.
+// Return nil if not found.
+func findTest(tests []Test, name string) *Test {
+	for _, t := range tests {
+		if t.atom.Name() == name {
+			return &t
+		}
+	}
+	return nil
+}
+
+func TestNumChildren(t *testing.T) {
+	tests := make(map[string]int)
+	tests["GINF"] = 7
+	tests["NENT"] = 9
+	tests["BID0"] = 3
+	for name, count := range tests {
+		a := findTest(Tests, name).atom
+		if a == nil {
+			panic(fmt.Errorf("Could not find test bundle %s", name))
+		}
+		if a.NumChildren() != count {
+			t.Errorf(`TestNumChildren(): For bundle "%s", expected result %d, got %d`, name, count, a.NumChildren())
+		}
+	}
+}
+
+var Bid0Text = `BID0:CONT:
+	BVER:UI32:1
+	BTIM:UI64:1484723701865260
+	NEXT:UI64:15987198135227121664
+END
+`
+
+func TestFromFile(t *testing.T) {
+	tst := findTest(Tests, "BID0")
+	a, err := FromFile(tst.binPath)
+	buf, err := a.MarshalText()
+	if err != nil {
+		t.Errorf(`TestFromFile(): expected no error result from FromFile(), got %s`, err.Error())
+	}
+	if string(buf) != Bid0Text {
+		t.Errorf(`TestFromFile(): Bundle from file "BID0" does not match expected got (%s), want(%s)`, string(buf), Bid0Text)
 	}
 }
