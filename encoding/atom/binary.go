@@ -203,6 +203,13 @@ func readAtomData(r io.Reader, length uint32, bytesRead *uint32) (data []byte, e
 	return
 }
 
+func errOddLength(len int, name string) error {
+	if name == "" {
+		return fmt.Errorf("odd length hex string (length %d)", len)
+	}
+	return fmt.Errorf(`odd length hex string in atom "%s" (length %d)`, name, len)
+}
+
 // ReadAtomsFromHex reads a stream of hex characters that represent the binary
 // encodings of a series of Atoms.  It returns a slice of Atom pointers.
 // If no atoms are found on input, an empty slice is returned and the error code is nil.
@@ -223,6 +230,11 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 		}
 	}
 
+	// Don't attempt hex conversion without even length at this point
+	if 0 != len(clean)%2 {
+		return nil, errOddLength(len(clean), string(buffer[4:8]))
+	}
+
 	// Strip leading 0x
 	if string(clean[0:2]) == "0x" {
 		buffer = clean[2:]
@@ -233,12 +245,6 @@ func ReadAtomsFromHex(r io.Reader) (atoms []*Atom, err error) {
 	// Convert pairs of hex values to single bytes
 	buffer, err = hex.DecodeString(string(buffer))
 	if err != nil && err != io.ErrUnexpectedEOF {
-		return
-	}
-
-	// Don't attempt hex conversion without even length at this point
-	if 0 != len(buffer)%2 {
-		err = hex.ErrLength
 		return
 	}
 
