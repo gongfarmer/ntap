@@ -143,7 +143,6 @@ func errInvalidPredicate(msg string) error {
 }
 
 type tokenList []*token
-type PathError error
 
 func (s *tokenList) push(tk *token) {
 	*s = append(*s, tk)
@@ -202,9 +201,11 @@ type PathParser struct {
 	outputQueue tokenList    // tokens ordered for evaluation
 	opStack     tokenList    // holds operators until their operands reach output queue
 	tokens      <-chan token // tokens received from lexer
-	err         PathError    // indicates parsing succeeded or describes what failed
+	err         error        // indicates parsing succeeded or describes what failed
 }
 
+// AtomPath is path evaluator in compiled form.
+// It can be sent atoms to evaluate against the path expression it represents.
 type AtomPath struct {
 	Path      string
 	Evaluator *PathEvaluator
@@ -246,13 +247,15 @@ func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	return
 }
 
+// GetAtoms returns the result atoms from evaluating the given atom as the root
+// of the path expression.
 func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
 	return ap.Evaluator.Evaluate(root)
 }
 
 // NewPathEvaluator reads the path
 func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
-	var lexr = NewPathLexer(path)
+	var lexr = newPathLexer(path)
 	var pp = PathParser{tokens: lexr.tokens}
 	pp.receiveTokens()
 	pe = &PathEvaluator{
@@ -353,7 +356,7 @@ func atomValueToComparerType(a *Atom) (v Comparer) {
 	return
 }
 
-func NewPathLexer(path string) *lexer {
+func newPathLexer(path string) *lexer {
 	l := &lexer{
 		input:  path,
 		tokens: make(chan token),
@@ -470,9 +473,8 @@ func lexNodeTest(l *lexer) stateFn {
 	if l.accept("/") {
 		l.emit(tokenStepSeparator)
 		return lexNodeTest
-	} else {
-		return lexPath
 	}
+	return lexPath
 }
 
 // lexAtomAttribute accepts @name, @type or @data.  The @ is already read.
@@ -1010,9 +1012,9 @@ type PredicateEvaluator struct {
 	Count    int       // number of atoms in the atom list
 }
 
-func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) PathError {
+func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) error {
 	msg := fmt.Sprintf(format, args...)
-	pre.Error = PathError(errInvalidPredicate(msg))
+	pre.Error = errInvalidPredicate(msg)
 	return pre.Error
 }
 
