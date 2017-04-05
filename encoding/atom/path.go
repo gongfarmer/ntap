@@ -120,11 +120,9 @@ const (
 	tokenHex                = "tknHex"
 )
 
-// FIXME define type AtomicElement, which embeds an Atom and adds parent ptr and unique id? Is embedded type a copy or a reference?  Must be a copy since it should take up full width.  Could add atomPtr field instead of embedding.
-
 // A Node is data that can be represented as a string.
 // An Atom/Element is a Node, so are Atom.Name(), Atom.Type(), and atom.Data().
-// All type system types such as Int64Type, Float64Type, StringType are Nodes.
+// All type system types such as typeInt64, typeFloat64, typeString are Nodes.
 type Node interface {
 	String() string
 }
@@ -208,7 +206,7 @@ type PathParser struct {
 // It can be sent atoms to evaluate against the path expression it represents.
 type AtomPath struct {
 	Path      string
-	Evaluator *PathEvaluator
+	evaluator *pathEvaluator
 	err       error
 }
 
@@ -218,15 +216,15 @@ type AtomPath struct {
 func NewAtomPath(path string) (ap *AtomPath, e error) {
 	Log.Printf("NewAtomPath(%q)", path)
 
-	var pe *PathEvaluator
-	pe, e = NewPathEvaluator(path)
+	var pe *pathEvaluator
+	pe, e = newPathEvaluator(path)
 	if e != nil {
 		return ap, addPathToError(e, path)
 	}
 
 	ap = &AtomPath{
 		Path:      strings.TrimSpace(path),
-		Evaluator: pe,
+		evaluator: pe,
 		err:       nil,
 	}
 	return
@@ -250,15 +248,16 @@ func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 // GetAtoms returns the result atoms from evaluating the given atom as the root
 // of the path expression.
 func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
-	return ap.Evaluator.Evaluate(root)
+	return ap.evaluator.evaluate(root)
 }
 
-// NewPathEvaluator reads the path
-func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
+// newPathEvaluator reads a path string and returns a pathEvaluator object
+// representing the path.
+func newPathEvaluator(path string) (pe *pathEvaluator, err error) {
 	var lexr = newPathLexer(path)
 	var pp = PathParser{tokens: lexr.tokens}
 	pp.receiveTokens()
-	pe = &PathEvaluator{
+	pe = &pathEvaluator{
 		Path:   path,
 		tokens: pp.outputQueue,
 		Error:  pp.err}
@@ -266,10 +265,10 @@ func NewPathEvaluator(path string) (pe *PathEvaluator, err error) {
 }
 
 // NewPredicateEvaluator consumes a series of predicate tokens from a
-// PathEvaluator starting with a PredicateEnd token and ending with a
+// pathEvaluator starting with a PredicateEnd token and ending with a
 // PredicateStart token (yes it's supposed to be backwards), and returns a new
 // PredicateEvaluator.
-func NewPredicateEvaluator(pe *PathEvaluator) (pre PredicateEvaluator, ok bool) {
+func NewPredicateEvaluator(pe *pathEvaluator) (pre PredicateEvaluator, ok bool) {
 	// Predicate end comes before pred start, that's the order they're pushed to stack
 	// Predicate tokens are in postfix order at this point.
 	if pe.Tokens.empty() || pe.Tokens.pop().typ != tokenPredicateEnd {
@@ -326,32 +325,32 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 	return
 }
 
-func (pre *PredicateEvaluator) getChildValue(atomName string) (v Comparer, ok bool) {
+func (pre *PredicateEvaluator) getChildValue(atomName string) (v iComparer, ok bool) {
 	for _, a := range pre.AtomPtr.children {
 		if a.Name() != atomName {
 			continue
 		}
-		v = atomValueToComparerType(a)
+		v = atomValueToiComparerType(a)
 		ok = true
 		break
 	}
 	return
 }
 
-func atomValueToComparerType(a *Atom) (v Comparer) {
+func atomValueToiComparerType(a *Atom) (v iComparer) {
 	switch {
 	case a.Value.IsUint(), a.Value.IsBool():
 		x, _ := a.Value.Uint()
-		v = Uint64Type(x)
+		v = typeUint64(x)
 	case a.Value.IsFloat():
 		x, _ := a.Value.Float()
-		v = Float64Type(x)
+		v = typeFloat64(x)
 	case a.Value.IsInt():
 		x, _ := a.Value.Int()
-		v = Int64Type(x)
+		v = typeInt64(x)
 	default:
 		x, _ := a.Value.String()
-		v = StringType(x)
+		v = typeString(x)
 	}
 	return
 }
@@ -796,7 +795,7 @@ func isFunctionToken(tk *token) bool {
 	return strings.Contains(string(tk.typ), "Function")
 }
 
-type PathEvaluator struct {
+type pathEvaluator struct {
 	Path           string
 	tokens         tokenList // path criteria, does not change after creation
 	Tokens         tokenList // path criteria, consumed during each evaluation
@@ -806,7 +805,7 @@ type PathEvaluator struct {
 
 // errorf sets the error field in the parser, and indicates that parsing should
 // stop by returning false.
-func (pe *PathEvaluator) errorf(format string, args ...interface{}) bool {
+func (pe *pathEvaluator) errorf(format string, args ...interface{}) bool {
 	pe.Error = errInvalidPath(strings.Join([]string{
 		fmt.Sprintf(format, args...),
 		fmt.Sprintf(" in %q", pe.Path),
@@ -820,8 +819,8 @@ func addPathToError(err error, path string) error {
 	}, ""))
 }
 
-func (pe *PathEvaluator) Evaluate(atom *Atom) (result []*Atom, e error) {
-	pe.ContextAtomPtr = atom // FIXME does this change over time?
+func (pe *pathEvaluator) evaluate(atom *Atom) (result []*Atom, e error) {
+	pe.ContextAtomPtr = atom
 	if pe.tokens.empty() {
 		e = errInvalidPath("<empty>")
 		return
@@ -833,28 +832,28 @@ func (pe *PathEvaluator) Evaluate(atom *Atom) (result []*Atom, e error) {
 	}
 
 	pe.Tokens = pe.tokens
-	Log.Println("PathEvaluator::Evaluate() ", pe.Tokens)
+	Log.Println("pathEvaluator::evaluate() ", pe.Tokens)
 	result = pe.evalElementSet()
 	e = pe.Error
 	return
 }
 
-// Done returns true if this PathEvaluator is done processing.
+// Done returns true if this pathEvaluator is done processing.
 // Completion can occur due to normal consumption of all tokens (success case)
 // or due to an error state.
-func (pe *PathEvaluator) Done() bool {
+func (pe *pathEvaluator) Done() bool {
 	return pe.Error != nil || len(pe.Tokens) == 0
 }
 
 // NextTokenType returns the tokenType of the next Token in the PathEvalator's Token stack
-func (pe *PathEvaluator) NextTokenType() tokenEnum {
+func (pe *pathEvaluator) NextTokenType() tokenEnum {
 	if len(pe.Tokens) == 0 {
 		return ""
 	}
 	return pe.Tokens.nextType()
 }
 
-func (pe *PathEvaluator) evalSetOperator() (atoms []*Atom) {
+func (pe *pathEvaluator) evalSetOperator() (atoms []*Atom) {
 	Log.Println("evalSetOperator()")
 	op := pe.Tokens.pop()
 	if op.typ != tokenSetOperator {
@@ -881,7 +880,7 @@ func (pe *PathEvaluator) evalSetOperator() (atoms []*Atom) {
 	}
 	return
 }
-func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
+func (pe *pathEvaluator) evalAxisOperator() (atoms []*Atom) {
 	tk := pe.Tokens.pop()
 	Log.Printf("evalAxisOperator(%q)", tk.value)
 	if tk.typ != tokenAxisOperator && tk.typ != tokenStepSeparator {
@@ -910,7 +909,7 @@ func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
 
 // evaluate path expression starting with a node test.
 // There's no preceding axis operator.
-func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
+func (pe *pathEvaluator) evalNodeTest() (atoms []*Atom) {
 	// Get node test token
 	tkNodeTest := pe.Tokens.pop()
 	if tkNodeTest.typ != tokenNodeTest {
@@ -950,7 +949,7 @@ func (pe *PathEvaluator) evalNodeTest() (atoms []*Atom) {
 	return results
 }
 
-func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
+func (pe *pathEvaluator) evalElementSet() (atoms []*Atom) {
 	Log.Printf("evalElementSet() [%s]'", pe.NextTokenType())
 	if pe.Done() {
 		return
@@ -978,7 +977,7 @@ func (pe *PathEvaluator) evalElementSet() (atoms []*Atom) {
 // read predicate tokens.
 // read nodeset.
 // for each Element in the NodeSet, make a predicateEvaluator and apply predicate.
-func (pe *PathEvaluator) evalPredicate() []*Atom {
+func (pe *pathEvaluator) evalPredicate() []*Atom {
 	Log.Println("evalPredicate()")
 	// evaluate element set by predicate
 	pre, ok := NewPredicateEvaluator(pe)
@@ -1027,7 +1026,7 @@ func (pre *PredicateEvaluator) NextTokenType() tokenEnum {
 }
 
 // evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
-func (pre *PredicateEvaluator) eval() (results []Equaler) {
+func (pre *PredicateEvaluator) eval() (results []iEqualer) {
 Loop:
 	for !pre.Tokens.empty() && pre.Error == nil {
 		switch pre.NextTokenType() {
@@ -1055,7 +1054,7 @@ Loop:
 	}
 	return
 }
-func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
+func (pre *PredicateEvaluator) evalBoolean() (result iEqualer) {
 	if pre.Tokens.empty() {
 		pre.errorf("expect boolean value, got nothing")
 		return
@@ -1067,7 +1066,7 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 	case tokenBooleanOperator:
 		result = pre.evalBooleanOperator()
 	case tokenComparisonOperator:
-		result = pre.evalComparisonOperator().(Equaler)
+		result = pre.evalComparisonOperator().(iEqualer)
 	case tokenFunctionBool:
 		result = pre.evalFunctionBool()
 	default:
@@ -1079,13 +1078,13 @@ func (pre *PredicateEvaluator) evalBoolean() (result Equaler) {
 	return
 }
 
-func (pre *PredicateEvaluator) evalBooleanOperator() BooleanType {
+func (pre *PredicateEvaluator) evalBooleanOperator() typeBoolean {
 	op := pre.Tokens.pop()
 	if op.typ != tokenBooleanOperator {
 		pre.errorf("expected boolean operator, received type %s", op.typ)
 	}
-	results := []Equaler{pre.evalBoolean(), pre.evalBoolean()}
-	tru := BooleanType(true)
+	results := []iEqualer{pre.evalBoolean(), pre.evalBoolean()}
+	tru := typeBoolean(true)
 	var result bool
 	switch op.value {
 	case "and":
@@ -1095,11 +1094,11 @@ func (pre *PredicateEvaluator) evalBooleanOperator() BooleanType {
 	default:
 		pre.errorf("unknown boolean operator: %s", op.value)
 	}
-	return BooleanType(result)
+	return typeBoolean(result)
 }
 
 // Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
-func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
+func (pre *PredicateEvaluator) evalArithmeticOperator() (result iArithmeticker) {
 	op := pre.Tokens.pop()
 	if op.typ != tokenArithmeticOperator {
 		pre.errorf("expected tokenArithmeticOperator, received type %s", op.typ)
@@ -1132,17 +1131,17 @@ func (pre *PredicateEvaluator) evalArithmeticOperator() (result Arithmeticker) {
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evalEqualityOperator() Equaler {
+func (pre *PredicateEvaluator) evalEqualityOperator() iEqualer {
 	var result bool
 	op := pre.Tokens.pop()
 	if op.typ != tokenEqualityOperator {
 		pre.errorf("expected tokenEqualityOperator, received type %s", op.typ)
-		return BooleanType(false)
+		return typeBoolean(false)
 	}
-	rhs := pre.evalEqualer()
-	lhs := pre.evalEqualer()
+	rhs := pre.evaliEqualer()
+	lhs := pre.evaliEqualer()
 	if pre.Error != nil {
-		return BooleanType(false)
+		return typeBoolean(false)
 	}
 	Log.Printf("  evalEqualityOperator() %v = %v", lhs, rhs)
 	switch op.value {
@@ -1154,19 +1153,19 @@ func (pre *PredicateEvaluator) evalEqualityOperator() Equaler {
 		pre.errorf("unknown equality operator: %s", op.value)
 		result = false
 	}
-	return BooleanType(result)
+	return typeBoolean(result)
 }
-func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
+func (pre *PredicateEvaluator) evalComparisonOperator() iEqualer {
 	var result bool
 	op := pre.Tokens.pop()
 	if op.typ != tokenComparisonOperator {
 		pre.errorf("expected tokenComparisonOperator, received type %s", op.typ)
-		return BooleanType(false)
+		return typeBoolean(false)
 	}
 	rhs := pre.evalComparable()
 	lhs := pre.evalComparable()
 	if pre.Error != nil {
-		return BooleanType(false)
+		return typeBoolean(false)
 	}
 	switch op.value {
 	case "<", "lt":
@@ -1181,9 +1180,9 @@ func (pre *PredicateEvaluator) evalComparisonOperator() Equaler {
 		pre.errorf("unknown comparison operator: %s", op.value)
 		result = false
 	}
-	return BooleanType(result)
+	return typeBoolean(result)
 }
-func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
+func (pre *PredicateEvaluator) evalNumber() (result iArithmeticker) {
 	var err error
 	ok := true
 	switch pre.NextTokenType() {
@@ -1193,24 +1192,24 @@ func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 			pre.errorf(err.Error())
 			return
 		}
-		result = Int64Type(v)
+		result = typeInt64(v)
 	case tokenFloat:
 		v, err := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		if err != nil {
 			pre.errorf(err.Error())
 			return
 		}
-		result = Float64Type(v)
+		result = typeFloat64(v)
 	case tokenFunctionNumeric:
 		result = pre.evalFunctionNumeric()
 	case tokenVariable:
-		result, ok = pre.evalVariable().(Arithmeticker)
+		result, ok = pre.evalVariable().(iArithmeticker)
 	case tokenArithmeticOperator:
 		result = pre.evalArithmeticOperator()
 	case tokenBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
-			result = v.(Arithmeticker)
+			result = v.(iArithmeticker)
 		} else {
 			pre.errorf("expect number, got %s", t.value)
 		}
@@ -1222,27 +1221,27 @@ func (pre *PredicateEvaluator) evalNumber() (result Arithmeticker) {
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
-	Log.Printf("    evalEqualer(), Tokens=%v", pre.Tokens)
+func (pre *PredicateEvaluator) evaliEqualer() (result iEqualer) {
+	Log.Printf("    evaliEqualer(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.NextTokenType() {
 	case tokenInteger, tokenHex:
 		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		err = e
-		result = Int64Type(v)
+		result = typeInt64(v)
 	case tokenFloat:
 		v, e := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		err = e
-		result = Float64Type(v)
+		result = typeFloat64(v)
 	case tokenBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
 			result = v // string is Atom name, substitute atom value.
 		} else {
-			result = StringType(t.value)
+			result = typeString(t.value)
 		}
 	case tokenString:
-		result = StringType(pre.Tokens.pop().value)
+		result = typeString(pre.Tokens.pop().value)
 	case tokenEqualityOperator:
 		result = pre.evalEqualityOperator()
 	case tokenVariable:
@@ -1255,39 +1254,39 @@ func (pre *PredicateEvaluator) evalEqualer() (result Equaler) {
 		result = pre.evalFunctionBool()
 	default:
 		t := pre.Tokens.pop()
-		pre.errorf("expected Equaler type, got %q [%s])", t.value, t.typ)
+		pre.errorf("expected iEqualer type, got %q [%s])", t.value, t.typ)
 		return
 	}
 	if err != nil {
-		pre.errorf("failed to convert '%s' to Equaler value")
+		pre.errorf("failed to convert '%s' to iEqualer value")
 		return
 	}
 	return result
 }
 
-// FIXME: this near-duplicates evalEqualer.
-// have tk call evalEqualer and then error out on non-Compararer types?
-func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
+// FIXME: this near-duplicates evaliEqualer.
+// have tk call evaliEqualer and then error out on non-Compararer types?
+func (pre *PredicateEvaluator) evalComparable() (result iComparer) {
 	Log.Printf("    evalComparable(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.NextTokenType() {
 	case tokenInteger, tokenHex:
 		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		err = e
-		result = Int64Type(v)
+		result = typeInt64(v)
 	case tokenFloat:
 		v, e := strconv.ParseFloat(pre.Tokens.pop().value, 64)
 		err = e
-		result = Float64Type(v)
+		result = typeFloat64(v)
 	case tokenBareString:
 		t := pre.Tokens.pop()
 		if v, ok := pre.getChildValue(t.value); ok {
 			result = v // string is Atom name, substitute atom value.
 		} else {
-			result = StringType(t.value)
+			result = typeString(t.value)
 		}
 	case tokenString:
-		result = StringType(pre.Tokens.pop().value)
+		result = typeString(pre.Tokens.pop().value)
 	case tokenVariable:
 		result = pre.evalVariable()
 	case tokenFunctionNumeric:
@@ -1305,18 +1304,18 @@ func (pre *PredicateEvaluator) evalComparable() (result Comparer) {
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
+func (pre *PredicateEvaluator) evalVariable() (result iComparer) {
 	token := pre.Tokens.pop()
 	if token.typ != tokenVariable {
 		pre.errorf("expected tokenVariable, received type %s", token.typ)
 	}
 	switch token.value {
 	case "@name", "name":
-		return StringType(pre.AtomPtr.Name())
+		return typeString(pre.AtomPtr.Name())
 	case "@name_hex":
-		return StringType(fmt.Sprint("0x%08X", pre.AtomPtr.NameAsUint32()))
+		return typeString(fmt.Sprint("0x%08X", pre.AtomPtr.NameAsUint32()))
 	case "@type", "type":
-		return StringType(pre.AtomPtr.Type())
+		return typeString(pre.AtomPtr.Type())
 	case "@data", "data":
 	default:
 		pre.errorf("unknown variable: %s", token.value)
@@ -1327,23 +1326,23 @@ func (pre *PredicateEvaluator) evalVariable() (result Comparer) {
 	switch {
 	case pre.AtomPtr.Value.IsFloat():
 		v, _ := pre.AtomPtr.Value.Float()
-		result = Float64Type(v)
+		result = typeFloat64(v)
 	case pre.AtomPtr.Value.IsInt():
 		v, _ := pre.AtomPtr.Value.Int()
-		result = Int64Type(v)
+		result = typeInt64(v)
 	case pre.AtomPtr.Value.IsUint():
 		v, _ := pre.AtomPtr.Value.Uint()
-		result = Uint64Type(v)
+		result = typeUint64(v)
 	case pre.AtomPtr.Value.IsBool():
 		v, _ := pre.AtomPtr.Value.Uint() // use UINT since tk's represented as 0/1
-		result = Uint64Type(v)
+		result = typeUint64(v)
 	default:
 		v, _ := pre.AtomPtr.Value.String()
-		result = StringType(v)
+		result = typeString(v)
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
+func (pre *PredicateEvaluator) evalFunctionBool() iEqualer {
 	var result bool
 	token := pre.Tokens.pop()
 	if token.typ != tokenFunctionBool {
@@ -1359,15 +1358,15 @@ func (pre *PredicateEvaluator) evalFunctionBool() Equaler {
 		if r == nil {
 			result = false
 		} else {
-			result = r.Equal(BooleanType(false))
+			result = r.Equal(typeBoolean(false))
 		}
 	default:
 		pre.errorf("unknown boolean function: %s", token.value)
 	}
-	return BooleanType(result)
+	return typeBoolean(result)
 }
 
-func (pre *PredicateEvaluator) evalResultsToBool(results []Equaler) (result bool, err error) {
+func (pre *PredicateEvaluator) evalResultsToBool(results []iEqualer) (result bool, err error) {
 	if pre.Error != nil {
 		return false, pre.Error
 	}
@@ -1383,21 +1382,21 @@ func (pre *PredicateEvaluator) evalResultsToBool(results []Equaler) (result bool
 	}
 	// verify that evaluation resulted in a usable type
 	switch r := results[0].(type) {
-	case BooleanType:
+	case typeBoolean:
 		result = bool(r)
-	case Int64Type:
-		result = r.Equal(Int64Type(pre.Position))
-	case Uint64Type:
-		result = r.Equal(Uint64Type(pre.Position))
-	case Float64Type:
-		result = r.Equal(Float64Type(pre.Position))
+	case typeInt64:
+		result = r.Equal(typeInt64(pre.Position))
+	case typeUint64:
+		result = r.Equal(typeUint64(pre.Position))
+	case typeFloat64:
+		result = r.Equal(typeFloat64(pre.Position))
 	default:
 		err = fmt.Errorf("result '%v' has unknown type %[1]T", results[0])
 		return
 	}
 	return
 }
-func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
+func (pre *PredicateEvaluator) evalFunctionNumeric() (result iArithmeticker) {
 	token := pre.Tokens.pop()
 	if token.typ != tokenFunctionNumeric {
 		pre.errorf("expected tokenFunctionNumeric, received type %s", token.typ)
@@ -1406,10 +1405,10 @@ func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
 	switch token.value {
 	case "position":
 		Log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Position)
-		return Uint64Type(pre.Position)
+		return typeUint64(pre.Position)
 	case "last", "count":
 		Log.Printf(`    evalFunctionNumeric("%s") = %d`, token.value, pre.Count)
-		return Uint64Type(pre.Count)
+		return typeUint64(pre.Count)
 	default:
 		pre.errorf("unknown numeric function: %s", token.value)
 	}
@@ -1418,99 +1417,99 @@ func (pre *PredicateEvaluator) evalFunctionNumeric() (result Arithmeticker) {
 
 // Implement a small type system with type coercion for operators
 type (
-	Int64Type   int64
-	Uint64Type  uint64
-	Float64Type float64
-	StringType  string
-	BooleanType bool
+	typeInt64   int64
+	typeUint64  uint64
+	typeFloat64 float64
+	typeString  string
+	typeBoolean bool
 
-	Equaler interface {
-		Equal(other Equaler) bool
+	iEqualer interface {
+		Equal(other iEqualer) bool
 	}
-	Comparer interface {
-		Equaler
-		LessThan(other Comparer) bool
-		GreaterThan(other Comparer) bool
+	iComparer interface {
+		iEqualer
+		LessThan(other iComparer) bool
+		GreaterThan(other iComparer) bool
 	}
-	Arithmeticker interface {
-		Comparer
-		Plus(other Arithmeticker) (Arithmeticker, error)
-		Minus(other Arithmeticker) (Arithmeticker, error)
-		Multiply(other Arithmeticker) (Arithmeticker, error)
-		Divide(other Arithmeticker) (Arithmeticker, error)
-		IntegerDivide(other Arithmeticker) (Arithmeticker, error)
-		Mod(other Arithmeticker) (Arithmeticker, error)
+	iArithmeticker interface {
+		iComparer
+		Plus(other iArithmeticker) (iArithmeticker, error)
+		Minus(other iArithmeticker) (iArithmeticker, error)
+		Multiply(other iArithmeticker) (iArithmeticker, error)
+		Divide(other iArithmeticker) (iArithmeticker, error)
+		IntegerDivide(other iArithmeticker) (iArithmeticker, error)
+		Mod(other iArithmeticker) (iArithmeticker, error)
 	}
 )
 
 // Define explicitly how to do type conversion when performing arithmetic on
 // pairs of heterogenous types.
 
-func (v Float64Type) Equal(other Equaler) bool {
+func (v typeFloat64) Equal(other iEqualer) bool {
 	switch o := other.(type) {
-	case Float64Type:
+	case typeFloat64:
 		return v == o
-	case Uint64Type:
+	case typeUint64:
 		return float64(v) == float64(o)
-	case Int64Type:
+	case typeInt64:
 		return float64(v) == float64(o)
-	case StringType:
-		if fp, err := strconv.ParseFloat(string(o), 64); err != nil {
+	case typeString:
+		fp, err := strconv.ParseFloat(string(o), 64)
+		if err != nil {
 			return false
-		} else {
-			return float64(v) == fp
 		}
+		return float64(v) == fp
 	default:
 		return false
 	}
 }
-func (v Float64Type) LessThan(other Comparer) bool {
+func (v typeFloat64) LessThan(other iComparer) bool {
 	switch o := other.(type) {
-	case Float64Type:
+	case typeFloat64:
 		return v < o
-	case Uint64Type:
+	case typeUint64:
 		return float64(v) < float64(o)
-	case Int64Type:
+	case typeInt64:
 		return float64(v) < float64(o)
 	default:
 		return false
 	}
 }
-func (v Float64Type) GreaterThan(other Comparer) bool {
+func (v typeFloat64) GreaterThan(other iComparer) bool {
 	switch o := other.(type) {
-	case Float64Type:
+	case typeFloat64:
 		return v > o
-	case Uint64Type:
+	case typeUint64:
 		return float64(v) > float64(o)
-	case Int64Type:
+	case typeInt64:
 		return float64(v) > float64(o)
 	default:
 		return false
 	}
 }
-func (v Uint64Type) Equal(other Equaler) bool {
+func (v typeUint64) Equal(other iEqualer) bool {
 	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(v) == o
-	case Int64Type:
-		return Int64Type(v) == o
-	case StringType:
-		if o_uint, err := strconv.ParseUint(string(o), 0, 64); err != nil {
+	case typeFloat64:
+		return typeFloat64(v) == o
+	case typeInt64:
+		return typeInt64(v) == o
+	case typeString:
+		oUint, err := strconv.ParseUint(string(o), 0, 64)
+		if err != nil {
 			return false
-		} else {
-			return uint64(v) == o_uint
 		}
+		return uint64(v) == oUint
 	default:
-		return v == o.(Uint64Type)
+		return v == o.(typeUint64)
 	}
 }
-func (v Uint64Type) LessThan(other Comparer) bool {
+func (v typeUint64) LessThan(other iComparer) bool {
 	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(v) < o
-	case Int64Type:
-		return Int64Type(v) < o
-	case StringType:
+	case typeFloat64:
+		return typeFloat64(v) < o
+	case typeInt64:
+		return typeInt64(v) < o
+	case typeString:
 		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
 			return float64(v) < x
 		}
@@ -1521,17 +1520,17 @@ func (v Uint64Type) LessThan(other Comparer) bool {
 			return int64(v) < x
 		}
 	default:
-		return v < o.(Uint64Type)
+		return v < o.(typeUint64)
 	}
 	return false
 }
-func (v Uint64Type) GreaterThan(other Comparer) bool {
+func (v typeUint64) GreaterThan(other iComparer) bool {
 	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(v) > o
-	case Int64Type:
-		return Int64Type(v) > o
-	case StringType:
+	case typeFloat64:
+		return typeFloat64(v) > o
+	case typeInt64:
+		return typeInt64(v) > o
+	case typeString:
 		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
 			return float64(v) > x
 		}
@@ -1542,17 +1541,17 @@ func (v Uint64Type) GreaterThan(other Comparer) bool {
 			return int64(v) > x
 		}
 	default:
-		return v > other.(Uint64Type)
+		return v > other.(typeUint64)
 	}
 	return false
 }
-func (v Int64Type) Equal(other Equaler) bool {
+func (v typeInt64) Equal(other iEqualer) bool {
 	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(v) == o
-	case Uint64Type:
-		return v == Int64Type(o)
-	case StringType:
+	case typeFloat64:
+		return typeFloat64(v) == o
+	case typeUint64:
+		return v == typeInt64(o)
+	case typeString:
 		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
 			return float64(v) == x
 		}
@@ -1563,15 +1562,15 @@ func (v Int64Type) Equal(other Equaler) bool {
 			return int64(v) == x
 		}
 	default:
-		return v == other.(Int64Type)
+		return v == other.(typeInt64)
 	}
 	return false
 }
-func (v Int64Type) LessThan(other Comparer) bool {
+func (v typeInt64) LessThan(other iComparer) bool {
 	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(v) < o
-	case StringType:
+	case typeFloat64:
+		return typeFloat64(v) < o
+	case typeString:
 		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
 			return float64(v) < x
 		}
@@ -1581,20 +1580,20 @@ func (v Int64Type) LessThan(other Comparer) bool {
 		if x, e := strconv.ParseInt(string(o), 0, 64); e == nil {
 			return int64(v) < x
 		}
-	case Uint64Type:
-		return v < Int64Type(o)
+	case typeUint64:
+		return v < typeInt64(o)
 	default:
-		return v < o.(Int64Type)
+		return v < o.(typeInt64)
 	}
 	return false
 }
-func (v Int64Type) GreaterThan(other Comparer) bool {
+func (v typeInt64) GreaterThan(other iComparer) bool {
 	switch o := other.(type) {
-	case Float64Type:
-		return Float64Type(v) > o
-	case Uint64Type:
-		return v > Int64Type(o)
-	case StringType:
+	case typeFloat64:
+		return typeFloat64(v) > o
+	case typeUint64:
+		return v > typeInt64(o)
+	case typeString:
 		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
 			return float64(v) > x
 		}
@@ -1605,312 +1604,312 @@ func (v Int64Type) GreaterThan(other Comparer) bool {
 			return int64(v) > x
 		}
 	default:
-		return v > o.(Int64Type)
+		return v > o.(typeInt64)
 	}
 	return false
 }
-func (v StringType) Equal(other Equaler) bool {
+func (v typeString) Equal(other iEqualer) bool {
 	switch o := other.(type) {
-	case StringType:
+	case typeString:
 		// case insensitive comparison
 		return strings.EqualFold(string(v), string(o))
-	case Int64Type:
+	case typeInt64:
 		return string(v) == strconv.Itoa(int(o))
-	case Uint64Type:
+	case typeUint64:
 		return string(v) == strconv.Itoa(int(o))
-	case Float64Type:
+	case typeFloat64:
 		return string(v) == fmt.Sprintf("%G", o)
 	}
 	return false
 }
-func (v StringType) LessThan(other Comparer) bool {
+func (v typeString) LessThan(other iComparer) bool {
 	str := string(v)
 	if x, e := strconv.ParseFloat(str, 64); e == nil {
-		return Float64Type(x).LessThan(other)
+		return typeFloat64(x).LessThan(other)
 	}
 	if x, e := strconv.ParseUint(str, 10, 64); e == nil {
-		return Uint64Type(x).LessThan(other)
+		return typeUint64(x).LessThan(other)
 	}
 	if x, e := strconv.ParseInt(str, 0, 64); e == nil {
 		// this case handles hex strings too, based on prefix
-		return Int64Type(x).LessThan(other)
+		return typeInt64(x).LessThan(other)
 	}
-	if o, ok := other.(StringType); ok {
+	if o, ok := other.(typeString); ok {
 		return str > string(o)
 	}
 	return false
 }
-func (v StringType) GreaterThan(other Comparer) bool {
+func (v typeString) GreaterThan(other iComparer) bool {
 	str := string(v)
 	if x, e := strconv.ParseFloat(str, 64); e == nil {
-		return Float64Type(x).GreaterThan(other)
+		return typeFloat64(x).GreaterThan(other)
 	}
 	if x, e := strconv.ParseUint(str, 10, 64); e == nil {
-		return Uint64Type(x).GreaterThan(other)
+		return typeUint64(x).GreaterThan(other)
 	}
 	if x, e := strconv.ParseInt(str, 0, 64); e == nil {
 		// this case handles hex strings too, based on prefix
-		return Int64Type(x).GreaterThan(other)
+		return typeInt64(x).GreaterThan(other)
 	}
-	if o, ok := other.(StringType); ok {
+	if o, ok := other.(typeString); ok {
 		return str > string(o)
 	}
 	return false
 }
-func (v Float64Type) Plus(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeFloat64) Plus(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) + float64(o))
-	case Int64Type:
-		result = Float64Type(float64(v) + float64(o))
-	case Uint64Type:
-		result = Float64Type(float64(v) + float64(o))
+	case typeFloat64:
+		result = typeFloat64(float64(v) + float64(o))
+	case typeInt64:
+		result = typeFloat64(float64(v) + float64(o))
+	case typeUint64:
+		result = typeFloat64(float64(v) + float64(o))
 	default:
 		err = fmt.Errorf("addition not supported for type %T, value '%[1]v'", other)
 	}
 	return
 }
-func (v Float64Type) Minus(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeFloat64) Minus(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) - float64(o))
-	case Int64Type:
-		result = Float64Type(float64(v) - float64(o))
-	case Uint64Type:
-		result = Float64Type(float64(v) - float64(o))
+	case typeFloat64:
+		result = typeFloat64(float64(v) - float64(o))
+	case typeInt64:
+		result = typeFloat64(float64(v) - float64(o))
+	case typeUint64:
+		result = typeFloat64(float64(v) - float64(o))
 	default:
 		err = fmt.Errorf("multiplication not supported for type %T, value '%[1]v'", other)
 	}
 	return
 }
-func (v Float64Type) Multiply(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeFloat64) Multiply(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) * float64(o))
-	case Int64Type:
-		result = Float64Type(float64(v) * float64(o))
-	case Uint64Type:
-		result = Float64Type(float64(v) * float64(o))
+	case typeFloat64:
+		result = typeFloat64(float64(v) * float64(o))
+	case typeInt64:
+		result = typeFloat64(float64(v) * float64(o))
+	case typeUint64:
+		result = typeFloat64(float64(v) * float64(o))
 	default:
 		err = fmt.Errorf("multiplication not supported for type %T, value '%[1]v'", other)
 	}
 	return
 }
-func (v Float64Type) Divide(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeFloat64) Divide(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) / float64(other))
-	case Int64Type:
-		result = Float64Type(float64(v) / float64(other))
-	case Uint64Type:
-		result = Float64Type(float64(v) / float64(other))
+	case typeFloat64:
+		result = typeFloat64(float64(v) / float64(other))
+	case typeInt64:
+		result = typeFloat64(float64(v) / float64(other))
+	case typeUint64:
+		result = typeFloat64(float64(v) / float64(other))
 	default:
 		err = fmt.Errorf("division not supported for type %T, value '%[1]v'", other)
 	}
 	return
 }
-func (v Float64Type) IntegerDivide(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeFloat64) IntegerDivide(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Int64Type(int64(v) / int64(other))
-	case Int64Type:
-		result = Int64Type(int64(v) / int64(other))
-	case Uint64Type:
-		result = Int64Type(int64(v) / int64(other))
+	case typeFloat64:
+		result = typeInt64(int64(v) / int64(other))
+	case typeInt64:
+		result = typeInt64(int64(v) / int64(other))
+	case typeUint64:
+		result = typeInt64(int64(v) / int64(other))
 	default:
 		err = fmt.Errorf("integer division not supported for type %T, value '%[1]v'", other)
 	}
 	return
 }
-func (v Float64Type) Mod(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeFloat64) Mod(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Float64Type(math.Mod(float64(v), float64(other)))
-	case Int64Type:
-		result = Float64Type(math.Mod(float64(v), float64(other)))
-	case Uint64Type:
-		result = Float64Type(math.Mod(float64(v), float64(other)))
+	case typeFloat64:
+		result = typeFloat64(math.Mod(float64(v), float64(other)))
+	case typeInt64:
+		result = typeFloat64(math.Mod(float64(v), float64(other)))
+	case typeUint64:
+		result = typeFloat64(math.Mod(float64(v), float64(other)))
 	default:
 		err = fmt.Errorf("modulus not supported for type %T, value '%[1]v'", other)
 	}
 	return
 }
-func (v Uint64Type) Plus(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeUint64) Plus(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Float64Type(v) + other
-	case Int64Type:
-		result = Int64Type(v) + other
+	case typeFloat64:
+		result = typeFloat64(v) + other
+	case typeInt64:
+		result = typeInt64(v) + other
 	default:
-		result = v + other.(Uint64Type)
+		result = v + other.(typeUint64)
 	}
 	return
 }
-func (v Uint64Type) Minus(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeUint64) Minus(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(v) - o
-	case Int64Type:
-		result = Int64Type(v) - o
+	case typeFloat64:
+		result = typeFloat64(v) - o
+	case typeInt64:
+		result = typeInt64(v) - o
 	default:
-		result = v - o.(Uint64Type)
+		result = v - o.(typeUint64)
 	}
 	return
 }
-func (v Uint64Type) Multiply(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeUint64) Multiply(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(v) * o
-	case Int64Type:
-		result = Int64Type(v) * o
+	case typeFloat64:
+		result = typeFloat64(v) * o
+	case typeInt64:
+		result = typeInt64(v) * o
 	default:
-		result = v * o.(Uint64Type)
+		result = v * o.(typeUint64)
 	}
 	return
 }
-func (v Uint64Type) Divide(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeUint64) Divide(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) / float64(o))
-	case Int64Type:
-		result = Float64Type(float64(v) / float64(o))
-	case Uint64Type:
-		result = Float64Type(float64(v) / float64(o))
+	case typeFloat64:
+		result = typeFloat64(float64(v) / float64(o))
+	case typeInt64:
+		result = typeFloat64(float64(v) / float64(o))
+	case typeUint64:
+		result = typeFloat64(float64(v) / float64(o))
 	default:
 		err = fmt.Errorf("division not supported for type %T value '%[1]v'", other)
 	}
 	return
 }
-func (v Uint64Type) IntegerDivide(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeUint64) IntegerDivide(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Int64Type(int64(v) / int64(o))
-	case Int64Type:
-		result = Int64Type(int64(v) / int64(o))
-	case Uint64Type:
-		result = Uint64Type(uint64(v) / uint64(o))
+	case typeFloat64:
+		result = typeInt64(int64(v) / int64(o))
+	case typeInt64:
+		result = typeInt64(int64(v) / int64(o))
+	case typeUint64:
+		result = typeUint64(uint64(v) / uint64(o))
 	default:
 		err = fmt.Errorf("integer division not supported for type %T value'%[1]v'", other)
 	}
 	return
 }
-func (v Uint64Type) Mod(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeUint64) Mod(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(math.Mod(float64(v), float64(o)))
-	case Int64Type:
-		result = Int64Type(int64(v) % int64(o))
-	case Uint64Type:
-		result = Uint64Type(uint64(v) % uint64(o))
+	case typeFloat64:
+		result = typeFloat64(math.Mod(float64(v), float64(o)))
+	case typeInt64:
+		result = typeInt64(int64(v) % int64(o))
+	case typeUint64:
+		result = typeUint64(uint64(v) % uint64(o))
 	default:
 		err = fmt.Errorf("modulus not supported for type %T value'%[1]v'", other)
 	}
 	return
 }
-func (v Int64Type) Plus(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeInt64) Plus(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) + float64(o))
-	case Int64Type:
-		result = Int64Type(int64(v) + int64(o))
-	case Uint64Type:
+	case typeFloat64:
+		result = typeFloat64(float64(v) + float64(o))
+	case typeInt64:
+		result = typeInt64(int64(v) + int64(o))
+	case typeUint64:
 		if int64(v) < 0 {
-			result = Int64Type(int64(v) + int64(o))
+			result = typeInt64(int64(v) + int64(o))
 		} else {
-			result = Uint64Type(uint64(v) + uint64(o))
+			result = typeUint64(uint64(v) + uint64(o))
 		}
 	default:
 		err = fmt.Errorf("integer addition not supported for type %T value '%[1]v'", other)
 	}
 	return
 }
-func (v Int64Type) Minus(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeInt64) Minus(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) - float64(other))
-	case Int64Type:
-		result = Int64Type(int64(v) - int64(other))
-	case Uint64Type:
+	case typeFloat64:
+		result = typeFloat64(float64(v) - float64(other))
+	case typeInt64:
+		result = typeInt64(int64(v) - int64(other))
+	case typeUint64:
 		if v < 0 {
-			result = Int64Type(int64(v) - int64(other))
+			result = typeInt64(int64(v) - int64(other))
 		} else {
-			result = Uint64Type(uint64(v) - uint64(other))
+			result = typeUint64(uint64(v) - uint64(other))
 		}
 	default:
 		err = fmt.Errorf("subtraction not supported for type %T value '%[1]v'", other)
 	}
 	return
 }
-func (v Int64Type) Multiply(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeInt64) Multiply(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) * float64(other))
-	case Int64Type:
-		result = Int64Type(int64(v) * int64(other))
-	case Uint64Type:
+	case typeFloat64:
+		result = typeFloat64(float64(v) * float64(other))
+	case typeInt64:
+		result = typeInt64(int64(v) * int64(other))
+	case typeUint64:
 		if v < 0 {
-			result = Int64Type(int64(v) * int64(other))
+			result = typeInt64(int64(v) * int64(other))
 		} else {
-			result = Uint64Type(uint64(v) * uint64(other))
+			result = typeUint64(uint64(v) * uint64(other))
 		}
 	default:
 		err = fmt.Errorf("subtraction not supported for type %T value '%[1]v'", other)
 	}
 	return
 }
-func (v Int64Type) IntegerDivide(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeInt64) IntegerDivide(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Int64Type(int64(v) / int64(other))
-	case Int64Type:
-		result = Int64Type(int64(v) / int64(other))
-	case Uint64Type:
-		result = Int64Type(int64(v) / int64(other))
+	case typeFloat64:
+		result = typeInt64(int64(v) / int64(other))
+	case typeInt64:
+		result = typeInt64(int64(v) / int64(other))
+	case typeUint64:
+		result = typeInt64(int64(v) / int64(other))
 	default:
 		err = fmt.Errorf("integer division not supported for type %T value '%[1]v'", other)
 	}
 	return
 }
-func (v Int64Type) Divide(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeInt64) Divide(other iArithmeticker) (result iArithmeticker, err error) {
 	switch other := other.(type) {
-	case Float64Type:
-		result = Float64Type(float64(v) / float64(other))
-	case Int64Type:
-		result = Float64Type(float64(v) / float64(other))
-	case Uint64Type:
-		result = Float64Type(float64(v) / float64(other))
+	case typeFloat64:
+		result = typeFloat64(float64(v) / float64(other))
+	case typeInt64:
+		result = typeFloat64(float64(v) / float64(other))
+	case typeUint64:
+		result = typeFloat64(float64(v) / float64(other))
 	default:
 		err = fmt.Errorf("division not supported for type %T value '%[1]v'", other)
 	}
 	return
 }
-func (v Int64Type) Mod(other Arithmeticker) (result Arithmeticker, err error) {
+func (v typeInt64) Mod(other iArithmeticker) (result iArithmeticker, err error) {
 	switch o := other.(type) {
-	case Float64Type:
-		result = Float64Type(math.Mod(float64(v), float64(o)))
-	case Int64Type:
-		result = Int64Type(int64(v) % int64(o))
-	case Uint64Type:
+	case typeFloat64:
+		result = typeFloat64(math.Mod(float64(v), float64(o)))
+	case typeInt64:
+		result = typeInt64(int64(v) % int64(o))
+	case typeUint64:
 		if v < 0 {
-			result = Int64Type(int64(v) % int64(o))
+			result = typeInt64(int64(v) % int64(o))
 		} else {
-			result = Uint64Type(uint64(v) % uint64(o))
+			result = typeUint64(uint64(v) % uint64(o))
 		}
 	default:
 		err = fmt.Errorf("modulus not supported for type %T value '%[1]v'", other)
 	}
 	return
 }
-func (v BooleanType) Equal(other Equaler) bool {
+func (v typeBoolean) Equal(other iEqualer) bool {
 	switch o := other.(type) {
-	case BooleanType:
+	case typeBoolean:
 		return bool(v) == bool(o)
-	case Int64Type:
+	case typeInt64:
 		if bool(v) == false {
 			return int64(o) == 0
 		}
 		return int64(o) != 0
-	case Uint64Type:
+	case typeUint64:
 		if bool(v) == false {
 			return uint64(o) == 0
 		}
