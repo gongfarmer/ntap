@@ -1142,9 +1142,9 @@ Encoder method table for ADE types
 func init() {
 	// ADE unsigned int types
 	enc := newEncoder(UI01)
-	enc.SetString = SetUI01FromString
-	enc.SetBool = SetUI01FromBool
-	enc.SetUint = SetUI01FromUint64
+	enc.SetString = func(a *Atom, v string) error { return StringToUI01Bytes(a.data, v) }
+	enc.SetBool = func(a *Atom, v bool) error { return BoolToUI01Bytes(a.data, v) }
+	enc.SetUint = func(a *Atom, v uint64) error { return Uint64ToUI01Bytes(a.data, v) }
 	encoderByType[UI01] = enc
 
 	enc = newEncoder(UI08)
@@ -1303,44 +1303,46 @@ func init() {
 Encoding functions - set Atom.data bytes from go type
 ************************************************************/
 
-func SetUI01FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToUI01Bytes(buf []byte, v string) (e error) {
+	if len(buf) != 4 {
+		buf = make([]byte, 4)
 	}
 	switch v {
 	case "false", "0", "+0", "-0":
-		binary.BigEndian.PutUint32(a.data, uint32(0))
+		binary.BigEndian.PutUint32(buf, uint32(0))
 	case "true", "1", "+1":
-		binary.BigEndian.PutUint32(a.data, uint32(1))
+		binary.BigEndian.PutUint32(buf, uint32(1))
 	default:
 		e = errStrInvalid("UI01", v)
 	}
 	return
 }
 
-func SetUI01FromBool(a *Atom, v bool) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func BoolToUI01Bytes(buf []byte, v bool) (e error) {
+	if len(buf) != 4 {
+		buf = make([]byte, 4)
 	}
 	if v {
-		binary.BigEndian.PutUint32(a.data, uint32(1))
+		binary.BigEndian.PutUint32(buf, uint32(1))
 	} else {
-		binary.BigEndian.PutUint32(a.data, uint32(0))
+		binary.BigEndian.PutUint32(buf, uint32(0))
 	}
 	return
 }
 
-func SetUI01FromUint64(a *Atom, v uint64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func Uint64ToUI01Bytes(buf []byte, v uint64) (e error) {
+	fmt.Printf("len(%d) - ", len(buf))
+	if len(buf) != 4 {
+		buf = make([]byte, 4)
 	}
 	if v == 1 {
-		binary.BigEndian.PutUint32(a.data, uint32(1))
+		binary.BigEndian.PutUint32(buf, uint32(1))
 	} else if v == 0 {
-		binary.BigEndian.PutUint32(a.data, uint32(0))
+		binary.BigEndian.PutUint32(buf, uint32(0))
 	} else {
 		e = errRange("UI01", v)
 	}
+	fmt.Printf("len(%d) %x\n", len(buf), buf)
 	return
 }
 

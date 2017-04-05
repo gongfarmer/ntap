@@ -197,18 +197,19 @@ func BenchmarkUnmarshalText(b *testing.B) {
 	b.ReportAllocs()
 }
 
-// Make 100 random uint32s. Use each one's FCHR32 value as an atom name, and
+// Make some random uint32s. Use each one's FCHR32 value as an atom name, and
 // test that it matches the output from NameAsUint32().
 func TestNameAsUint32(t *testing.T) {
 
 	var buf = make([]byte, 4)
-	for i := 0; i <= 100; i++ {
+	for i := 0; i <= 20; i++ {
 		nameUint := rand.Uint32()
 		binary.BigEndian.PutUint32(buf, nameUint)
-		a, err := NewAtom(string(buf), "UI32")
+		a, err := NewAtom(string(buf), UI32)
 		if err != nil {
 			panic(err)
 		}
+
 		a.Value.SetUint(uint64(nameUint))
 		if a.NameAsUint32() != nameUint {
 			t.Errorf(`TestNameAsUint32(): Atom name "%s"(%X), expected uint32 value %d, got %d`, a.Name(), a.name, nameUint, a.NameAsUint32())

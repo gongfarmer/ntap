@@ -1941,10 +1941,42 @@ type (
 )
 
 // runEncoderTests evaluates an encodeFunc against test data
+// LEGACY
 func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 	for _, test := range tests {
 		funcName := GetFunctionName(f)
 		var inputAtom = new(Atom)
+		var gotErr = f(inputAtom, test.Input)
+		var gotValue = inputAtom.data
+
+		switch {
+		case gotErr == nil && test.WantError == nil:
+		case gotErr != nil && test.WantError == nil:
+			t.Errorf("%v(%b): got err {%s}, want err <nil>", funcName, test.Input, gotErr)
+			return
+		case gotErr == nil && test.WantError != nil:
+			t.Errorf("%v(%b): got err <nil>, want err {%s}", funcName, test.Input, test.WantError)
+			return
+		case gotErr.Error() != test.WantError.Error():
+			t.Errorf("%v(%v): got err {%s}, want err {%s}", funcName, test.Input, gotErr, test.WantError)
+			return
+		}
+
+		// Instead of ==, compare with DeepEqual because it can compare slices of bytes
+		if !reflect.DeepEqual(gotValue, test.WantValue) {
+			t.Errorf("%v(Atom, %v): got %T (% [3]x), want %[4]T (% [4]x)", funcName, test.Input, gotValue, test.WantValue)
+		}
+	}
+}
+
+// runEncodeTests evaluates an encodeFunc against test data
+func runEncodeTests(t *testing.T, tests []encoderTest, f encodeFunc) {
+	for _, test := range tests {
+		funcName := GetFunctionName(f)
+		var inputAtom, err = NewAtom("TEST", "NULL")
+		if err != nil {
+			panic(err)
+		}
 		var gotErr = f(inputAtom, test.Input)
 		var gotValue = inputAtom.data
 
@@ -1988,8 +2020,9 @@ func TestSetUI01FromString(t *testing.T) {
 		encoderTest{"0x01", zero, errStrInvalid(typ, "0x01")},
 		encoderTest{"dog", zero, errStrInvalid(typ, "dog")},
 	}
-	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUI01FromString(atom, input.(string))
+	runEncodeTests(t, tests, func(a *Atom, input interface{}) error {
+		a.SetType(UI01)
+		return a.Value.SetString(input.(string))
 	})
 }
 func TestSetUI01FromBool(t *testing.T) {
@@ -1998,7 +2031,7 @@ func TestSetUI01FromBool(t *testing.T) {
 		encoderTest{true, []byte("\x00\x00\x00\x01"), nil},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUI01FromBool(atom, input.(bool))
+		return BoolToUI01Bytes(atom.data, input.(bool))
 	})
 }
 func TestSetUI01FromUint64(t *testing.T) {
@@ -2013,7 +2046,7 @@ func TestSetUI01FromUint64(t *testing.T) {
 		encoderTest{uint64(10), zero, errRange(typ, uint64(10))},
 	}
 	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUI01FromUint64(atom, input.(uint64))
+		return Uint64ToUI01Bytes(atom.data, input.(uint64))
 	})
 }
 func TestSetUI08FromString(t *testing.T) {

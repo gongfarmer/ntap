@@ -59,7 +59,7 @@ func (a *Atom) Children() []*Atom {
 	return a.children
 }
 
-func NewAtom(name string, typ string) (a *Atom, e error) {
+func NewAtom(name string, typ ADEType) (a *Atom, e error) {
 	if len(name) != 4 {
 		return nil, fmt.Errorf(`atom name must be 4 chars long, got "%s"`, name)
 	}
@@ -68,17 +68,10 @@ func NewAtom(name string, typ string) (a *Atom, e error) {
 	}
 	a = &Atom{
 		name: []byte{name[0], name[1], name[2], name[3]},
-		typ:  ADEType(typ),
 	}
-	a.SetType(a.typ)
+	a.SetType(typ)
 	return a, e
 }
-
-// AtomAtPath returns the single Atom descendant at the given path, or nil if none.
-// ValueAtPath returns the atom Value object at the given path, or nil if none.
-// FIXME: provide a way to get all children of a node without specifying all
-// their names -- needed to access data in attribute containers.
-// FIXME: provide a way to replace specifier at 1 level with *? multi-level with **?
 
 // Zero sets the atom to the type Atom's zero value.
 // It sets the atom data to a zero-length slice, releasing any
@@ -120,7 +113,7 @@ func (a *Atom) ZeroData() {
 	case CONT, NULL:
 		a.data = nil
 	default:
-		Log.Printf("unknown ADE type: %s", string(a.typ))
+		panic(fmt.Sprintf(`unknown ADE type: "%v"`, a.typ))
 	}
 }
 
