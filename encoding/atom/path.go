@@ -149,6 +149,7 @@ func (s *tokenList) push(tk *token) {
 	*s = append(*s, tk)
 }
 
+// add a new token to the front of the queue, as the new first lement
 func (s *tokenList) unshift(tk *token) {
 	*s = append(tokenList{tk}, *s...)
 }
@@ -173,15 +174,6 @@ func (s *tokenList) pop() (tk *token) {
 	tk = (*s)[size-1]  // get token from stack top
 	*s = (*s)[:size-1] // resize stack
 	return
-}
-
-// pop the stack only if the top token has the specified type.
-// Return ok=true if an token is popped.
-func (s *tokenList) popType(typ tokenEnum) (tk *token, ok bool) {
-	if s.empty() || s.nextType() != typ {
-		return
-	}
-	return s.pop(), true
 }
 
 // peek at the top token on the stack, without removing the token.
@@ -367,15 +359,6 @@ func NewPathLexer(path string) *lexer {
 		tokens: make(chan token),
 	}
 	go l.run(lexPath)
-	return l
-}
-
-func NewPredicateLexer(predicate string) *lexer {
-	l := &lexer{
-		input:  predicate,
-		tokens: make(chan token),
-	}
-	go l.run(lexPredicate)
 	return l
 }
 
@@ -656,14 +639,6 @@ func lexNumberInPath(l *lexer) stateFn {
 	return lexPredicate
 }
 
-// parseTokens translates stream of tokens emitted by the lexer into a
-// function that can evaluate whether an atom gets filtered.
-func parseTokens(ch <-chan token) (tokens tokenList, e error) {
-	var pp = PathParser{tokens: ch}
-	pp.receiveTokens()
-	return pp.outputQueue, pp.err
-}
-
 // receiveTokens gets tokens from the lexer and sends them to the parser
 // for parsing.
 func (pp *PathParser) receiveTokens() {
@@ -929,14 +904,6 @@ func (pe *PathEvaluator) evalAxisOperator() (atoms []*Atom) {
 	// because atoms don't know their parent, it's not possible to refer to a
 	// higher-level atom in the tree.
 	return []*Atom{pe.ContextAtomPtr}
-}
-
-func filterByNodeName(atoms []*Atom, name string) (results []*Atom) {
-	return
-}
-
-func getElementChildren(atoms []*Atom) (children []*Atom) {
-	return
 }
 
 // evaluate path expression starting with a node test.
@@ -1485,6 +1452,12 @@ func (v Float64Type) Equal(other Equaler) bool {
 		return float64(v) == float64(o)
 	case Int64Type:
 		return float64(v) == float64(o)
+	case StringType:
+		if fp, err := strconv.ParseFloat(string(o), 64); err != nil {
+			return false
+		} else {
+			return float64(v) == fp
+		}
 	default:
 		return false
 	}
@@ -1520,7 +1493,11 @@ func (v Uint64Type) Equal(other Equaler) bool {
 	case Int64Type:
 		return Int64Type(v) == o
 	case StringType:
-		return false
+		if o_uint, err := strconv.ParseUint(string(o), 0, 64); err != nil {
+			return false
+		} else {
+			return uint64(v) == o_uint
+		}
 	default:
 		return v == o.(Uint64Type)
 	}
@@ -1553,7 +1530,15 @@ func (v Uint64Type) GreaterThan(other Comparer) bool {
 	case Int64Type:
 		return Int64Type(v) > o
 	case StringType:
-		return !(o.LessThan(v) || o.Equal(v))
+		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
+			return float64(v) > x
+		}
+		if x, e := strconv.ParseUint(string(o), 10, 64); e == nil {
+			return uint64(v) > x
+		}
+		if x, e := strconv.ParseInt(string(o), 0, 64); e == nil {
+			return int64(v) > x
+		}
 	default:
 		return v > other.(Uint64Type)
 	}
@@ -1585,24 +1570,42 @@ func (v Int64Type) LessThan(other Comparer) bool {
 	case Float64Type:
 		return Float64Type(v) < o
 	case StringType:
-		return !(o.GreaterThan(v) || o.Equal(v))
+		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
+			return float64(v) < x
+		}
+		if x, e := strconv.ParseUint(string(o), 10, 64); e == nil {
+			return uint64(v) < x
+		}
+		if x, e := strconv.ParseInt(string(o), 0, 64); e == nil {
+			return int64(v) < x
+		}
 	case Uint64Type:
 		return v < Int64Type(o)
 	default:
 		return v < o.(Int64Type)
 	}
+	return false
 }
 func (v Int64Type) GreaterThan(other Comparer) bool {
 	switch o := other.(type) {
 	case Float64Type:
 		return Float64Type(v) > o
-	case StringType:
-		return !(o.LessThan(v) || o.Equal(v))
 	case Uint64Type:
 		return v > Int64Type(o)
+	case StringType:
+		if x, e := strconv.ParseFloat(string(o), 64); e == nil {
+			return float64(v) > x
+		}
+		if x, e := strconv.ParseUint(string(o), 10, 64); e == nil {
+			return uint64(v) > x
+		}
+		if x, e := strconv.ParseInt(string(o), 0, 64); e == nil {
+			return int64(v) > x
+		}
 	default:
 		return v > o.(Int64Type)
 	}
+	return false
 }
 func (v StringType) Equal(other Equaler) bool {
 	switch o := other.(type) {

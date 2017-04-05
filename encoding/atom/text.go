@@ -663,30 +663,6 @@ func isSpace(r rune) bool {
 	return strings.ContainsRune(whitespaceChars, r)
 }
 
-func isAtomNameChar(r rune) bool {
-	// multibyte UTF8 is allowed within strings, but not within an FC32
-	if utf8.RuneLen(r) > 1 {
-		return false
-	}
-
-	// check for byte value within ascii printable range
-	b := byte(r)
-	if b < 0x21 || b > 0x7f {
-		return false
-	}
-
-	return true
-}
-
-func isAlphaNumeric(buf []byte) bool {
-	for _, c := range buf {
-		if !strings.ContainsRune(alphaNumericChars, rune(c)) {
-			return false
-		}
-	}
-	return true
-}
-
 func isPrintableRune(r rune) bool {
 	return strings.ContainsRune(printableChars, r)
 }

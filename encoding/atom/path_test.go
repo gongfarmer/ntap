@@ -313,6 +313,7 @@ func TestAtomsAtPath(t *testing.T) {
 		// === Equality Operator testing.
 		PathTest{TestAtom2, "/ROOT/UI_1[2 = @data]", zero, nil},
 		PathTest{TestAtom2, "/ROOT[2 = UI_1]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[FP_P = FP_N]", zero, nil},
 		PathTest{TestAtom2, "/ROOT[2.0 = UI_1]", zero, nil},
 		PathTest{TestAtom2, "/ROOT[2.0 = 2.00000000000]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[UI_1 = 2]", zero, nil},
@@ -333,6 +334,12 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[SI_P = SI_P]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_P = FP_P]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N = FP_N]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT["1" = UI_1]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[UI_1 = "1"]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT["-10" = SI_N]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[SI_N = "-10"]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT["15.5" = FP_P]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[FP_P = "15.5"]`, []string{"ROOT:CONT:"}, nil},
 
 		// test boolean literals
 		PathTest{TestAtom2, "/ROOT[true()]", []string{"ROOT:CONT:"}, nil},
@@ -361,6 +368,14 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[FP_N < SI_N]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N < SI_P]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_N < FP_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[FP_P < FP_N]", zero, nil},
+		PathTest{TestAtom2, "/ROOT[FP_N < FP_P]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT["0" < UI_1]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[UI_1 < "0"]`, zero, nil},
+		PathTest{TestAtom2, `/ROOT["-100" < SI_N]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[SI_N < "-100"]`, zero, nil},
+		PathTest{TestAtom2, `/ROOT["1" < FP_P]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[FP_P < "1"]`, zero, nil},
 
 		// Test greater-than operator and its type conversions
 		PathTest{TestAtom2, "/ROOT/UI_1[2 > @data]", []string{"UI_1:UI64:1"}, nil},
@@ -377,6 +392,12 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[SI_N > FP_N]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_P > FP_N]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[FP_P > FP_N]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT["10" > UI_1]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[UI_1 > "10"]`, zero, nil},
+		PathTest{TestAtom2, `/ROOT["100" > SI_N]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[SI_N > "100"]`, zero, nil},
+		PathTest{TestAtom2, `/ROOT["1024.768" > FP_P]`, []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, `/ROOT[FP_P > "1024.768"]`, zero, nil},
 
 		// === Arithmetic Operator testing.
 		// For all possible combinations of 2 types, test the pair twice
@@ -437,6 +458,7 @@ func TestAtomsAtPath(t *testing.T) {
 		PathTest{TestAtom2, "/ROOT[UI_1 div FP_N = -.06451612903225806451]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[-0.6666666666666666 = SI_N div SI_P]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_N div UI_1 = -10]", []string{"ROOT:CONT:"}, nil},
+		PathTest{TestAtom2, "/ROOT[-1024 div 2 = -512]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_P div UI_1 = SI_P]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_N div FP_P = -0.64516129032258064516]", []string{"ROOT:CONT:"}, nil},
 		PathTest{TestAtom2, "/ROOT[SI_N div FP_N = 0.64516129032258064516]", []string{"ROOT:CONT:"}, nil},
