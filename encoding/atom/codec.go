@@ -17,6 +17,14 @@ import (
 	"unicode/utf8"
 )
 
+// FIXME
+//  Encoding/Decoding update plan
+//   1. Change all unit tests and encoder funcs in serial pairs.
+//   2. Remove old runEncoderTest func, rename runEncodeTest
+//   3. Update Codec.Set*() methods to call Encoder.Set* with atom data instead of atom
+//   4. Update encoder table to use plain method references instead of anonymous func
+//   5. Verify that encode and decode funcs have consistent method names
+
 // ADE Data types are defined in 112-0002_r4.0B_StorageGRID_Data_Types.
 // The ADE headers for these types are in OSL_Types.h.
 const (
@@ -227,15 +235,17 @@ func (c Codec) SliceOfInt() ([]int64, error)     { return c.Decoder.SliceOfInt(c
 func (c Codec) SliceOfByte() ([]byte, error)     { return c.Atom.data, nil }
 
 // Encoder methods: convert given data type to []byte and store in ATom
-func (c Codec) SetString(v string) error          { return c.Encoder.SetString(c.Atom, v) }
-func (c Codec) SetStringDelimited(v string) error { return c.Encoder.SetStringDelimited(c.Atom, v) }
-func (c Codec) SetBool(v bool) error              { return c.Encoder.SetBool(c.Atom, v) }
-func (c Codec) SetUint(v uint64) error            { return c.Encoder.SetUint(c.Atom, v) }
-func (c Codec) SetInt(v int64) error              { return c.Encoder.SetInt(c.Atom, v) }
-func (c Codec) SetFloat(v float64) error          { return c.Encoder.SetFloat(c.Atom, v) }
-func (c Codec) SetSliceOfUint(v []uint64) error   { return c.Encoder.SetSliceOfUint(c.Atom, v) }
-func (c Codec) SetSliceOfInt(v []int64) error     { return c.Encoder.SetSliceOfInt(c.Atom, v) }
-func (c Codec) SetSliceOfByte(v []byte) error     { return c.Encoder.SetSliceOfByte(c.Atom, v) }
+func (c Codec) SetString(v string) error { return c.Encoder.SetString(&c.Atom.data, v) }
+func (c Codec) SetStringDelimited(v string) error {
+	return c.Encoder.SetStringDelimited(&c.Atom.data, v)
+}
+func (c Codec) SetBool(v bool) error            { return c.Encoder.SetBool(&c.Atom.data, v) }
+func (c Codec) SetUint(v uint64) error          { return c.Encoder.SetUint(&c.Atom.data, v) }
+func (c Codec) SetInt(v int64) error            { return c.Encoder.SetInt(&c.Atom.data, v) }
+func (c Codec) SetFloat(v float64) error        { return c.Encoder.SetFloat(&c.Atom.data, v) }
+func (c Codec) SetSliceOfUint(v []uint64) error { return c.Encoder.SetSliceOfUint(&c.Atom.data, v) }
+func (c Codec) SetSliceOfInt(v []int64) error   { return c.Encoder.SetSliceOfInt(&c.Atom.data, v) }
+func (c Codec) SetSliceOfByte(v []byte) error   { return c.Encoder.SetSliceOfByte(&c.Atom.data, v) }
 
 // Initialize decoder table, which makes decoders accessible by ADE type.
 // Variable 'd' is used for assignment, because Go disallows assigning directly
@@ -1142,19 +1152,19 @@ Encoder method table for ADE types
 func init() {
 	// ADE unsigned int types
 	enc := newEncoder(UI01)
-	enc.SetString = func(a *Atom, v string) error { return StringToUI01Bytes(a.data, v) }
-	enc.SetBool = func(a *Atom, v bool) error { return BoolToUI01Bytes(a.data, v) }
-	enc.SetUint = func(a *Atom, v uint64) error { return Uint64ToUI01Bytes(a.data, v) }
+	enc.SetString = StringToUI01Bytes
+	enc.SetBool = BoolToUI01Bytes
+	enc.SetUint = Uint64ToUI01Bytes
 	encoderByType[UI01] = enc
 
 	enc = newEncoder(UI08)
-	enc.SetString = SetUI08FromString
-	enc.SetUint = SetUI08FromUint64
+	enc.SetString = StringToUI08Bytes
+	enc.SetUint = Uint64ToUI08Bytes
 	encoderByType[UI08] = enc
 
 	enc = newEncoder(UI16)
-	enc.SetString = SetUI16FromString
-	enc.SetUint = SetUI16FromUint64
+	enc.SetString = StringToUI16Bytes
+	enc.SetUint = Uint64ToUI16Bytes
 	encoderByType[UI16] = enc
 
 	enc = newEncoder(UI32)
@@ -1303,96 +1313,94 @@ func init() {
 Encoding functions - set Atom.data bytes from go type
 ************************************************************/
 
-func StringToUI01Bytes(buf []byte, v string) (e error) {
-	if len(buf) != 4 {
-		buf = make([]byte, 4)
+func StringToUI01Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	switch v {
 	case "false", "0", "+0", "-0":
-		binary.BigEndian.PutUint32(buf, uint32(0))
+		binary.BigEndian.PutUint32(*buf, uint32(0))
 	case "true", "1", "+1":
-		binary.BigEndian.PutUint32(buf, uint32(1))
+		binary.BigEndian.PutUint32(*buf, uint32(1))
 	default:
 		e = errStrInvalid("UI01", v)
 	}
 	return
 }
 
-func BoolToUI01Bytes(buf []byte, v bool) (e error) {
-	if len(buf) != 4 {
-		buf = make([]byte, 4)
+func BoolToUI01Bytes(buf *[]byte, v bool) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if v {
-		binary.BigEndian.PutUint32(buf, uint32(1))
+		binary.BigEndian.PutUint32(*buf, uint32(1))
 	} else {
-		binary.BigEndian.PutUint32(buf, uint32(0))
+		binary.BigEndian.PutUint32(*buf, uint32(0))
 	}
 	return
 }
 
-func Uint64ToUI01Bytes(buf []byte, v uint64) (e error) {
-	fmt.Printf("len(%d) - ", len(buf))
-	if len(buf) != 4 {
-		buf = make([]byte, 4)
+func Uint64ToUI01Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if v == 1 {
-		binary.BigEndian.PutUint32(buf, uint32(1))
+		binary.BigEndian.PutUint32(*buf, uint32(1))
 	} else if v == 0 {
-		binary.BigEndian.PutUint32(buf, uint32(0))
+		binary.BigEndian.PutUint32(*buf, uint32(0))
 	} else {
 		e = errRange("UI01", v)
 	}
-	fmt.Printf("len(%d) %x\n", len(buf), buf)
 	return
 }
 
 // encode of unsigned integer types
 
-func SetUI08FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 1 {
-		a.data = make([]byte, 1)
+func StringToUI08Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 1 {
+		*buf = make([]byte, 1)
 	}
 	var i uint64
 	i, e = strconv.ParseUint(v, 0, 8)
 	if e != nil {
 		return errStrInvalid("UI08", v)
 	}
-	return SetUI08FromUint64(a, i)
+	return Uint64ToUI08Bytes(buf, i)
 }
 
-func SetUI08FromUint64(a *Atom, v uint64) (e error) {
-	if len(a.data) != 1 {
-		a.data = make([]byte, 1)
+func Uint64ToUI08Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 1 {
+		*buf = make([]byte, 1)
 	}
 	if v > math.MaxUint8 {
 		e = errRange("UI08", v)
 		return
 	}
-	a.data[0] = uint8(v)
+	(*buf)[0] = uint8(v)
 	return
 }
 
-func SetUI16FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 2 {
-		a.data = make([]byte, 2)
+func StringToUI16Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 2 {
+		*buf = make([]byte, 2)
 	}
 	var i uint64
 	i, e = strconv.ParseUint(v, 0, 16)
 	if e != nil {
 		return errStrInvalid("UI16", v)
 	}
-	binary.BigEndian.PutUint16(a.data, uint16(i))
+	binary.BigEndian.PutUint16((*buf)[0:1], uint16(i))
 	return
 }
 
-func SetUI16FromUint64(a *Atom, v uint64) (e error) {
-	if len(a.data) != 2 {
-		a.data = make([]byte, 2)
+func Uint64ToUI16Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 2 {
+		*buf = make([]byte, 2)
 	}
 	if v > math.MaxUint16 {
 		return errRange("UI16", v)
 	}
-	binary.BigEndian.PutUint16(a.data, uint16(v))
+	binary.BigEndian.PutUint16(*buf, uint16(v))
 	return
 }
 

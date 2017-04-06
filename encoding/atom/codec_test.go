@@ -2030,8 +2030,9 @@ func TestSetUI01FromBool(t *testing.T) {
 		encoderTest{false, []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{true, []byte("\x00\x00\x00\x01"), nil},
 	}
-	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return BoolToUI01Bytes(atom.data, input.(bool))
+	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
+		a.SetType(UI01)
+		return a.Value.SetBool(input.(bool))
 	})
 }
 func TestSetUI01FromUint64(t *testing.T) {
@@ -2045,8 +2046,9 @@ func TestSetUI01FromUint64(t *testing.T) {
 		encoderTest{uint64(2), zero, errRange(typ, uint64(2))},
 		encoderTest{uint64(10), zero, errRange(typ, uint64(10))},
 	}
-	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return Uint64ToUI01Bytes(atom.data, input.(uint64))
+	runEncodeTests(t, tests, func(a *Atom, input interface{}) error {
+		a.SetType(UI01)
+		return a.Value.SetUint(input.(uint64))
 	})
 }
 func TestSetUI08FromString(t *testing.T) {
@@ -2063,8 +2065,9 @@ func TestSetUI08FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUI08FromString(atom, input.(string))
+	runEncodeTests(t, tests, func(a *Atom, input interface{}) error {
+		a.SetType(UI08)
+		return a.Value.SetString(input.(string))
 	})
 }
 func TestSetUI08FromUint64(t *testing.T) {
@@ -2077,8 +2080,9 @@ func TestSetUI08FromUint64(t *testing.T) {
 		encoderTest{uint64(255), []byte("\xFF"), nil},
 		encoderTest{uint64(3000), zero, errRange(typ, uint64(3000))},
 	}
-	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUI08FromUint64(atom, input.(uint64))
+	runEncodeTests(t, tests, func(a *Atom, input interface{}) error {
+		a.SetType(UI08)
+		return a.Value.SetUint(input.(uint64))
 	})
 }
 func TestSetUI16FromString(t *testing.T) {
@@ -2095,8 +2099,9 @@ func TestSetUI16FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUI16FromString(atom, input.(string))
+	runEncodeTests(t, tests, func(a *Atom, input interface{}) error {
+		a.SetType(UI16)
+		return a.Value.SetString(input.(string))
 	})
 }
 func TestSetUI16FromUint64(t *testing.T) {
@@ -2109,8 +2114,9 @@ func TestSetUI16FromUint64(t *testing.T) {
 		encoderTest{uint64(65535), []byte("\xFF\xFF"), nil},
 		encoderTest{uint64(65536), zero, errRange(typ, uint64(65536))},
 	}
-	runEncoderTests(t, tests, func(atom *Atom, input interface{}) error {
-		return SetUI16FromUint64(atom, input.(uint64))
+	runEncodeTests(t, tests, func(a *Atom, input interface{}) error {
+		a.SetType(UI16)
+		return a.Value.SetUint(input.(uint64))
 	})
 }
 func TestSetUI32FromString(t *testing.T) {

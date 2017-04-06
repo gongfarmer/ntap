@@ -202,7 +202,7 @@ type PathParser struct {
 	err         error        // indicates parsing succeeded or describes what failed
 }
 
-// AtomPath is path evaluator in compiled form.
+// AtomPath is a path evaluator in compiled form.
 // It can be sent atoms to evaluate against the path expression it represents.
 type AtomPath struct {
 	Path      string
