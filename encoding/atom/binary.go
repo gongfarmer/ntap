@@ -277,7 +277,7 @@ func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	// create members for atom header
 	var buf []byte
 	var name, typ [4]byte
-	if err = FC32StringToBytes(string(a.typ), &buf); err != nil {
+	if err = StringToFC32Bytes(&buf, string(a.typ)); err != nil {
 		return
 	}
 	copy(typ[:], buf)

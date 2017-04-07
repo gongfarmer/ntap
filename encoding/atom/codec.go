@@ -17,14 +17,6 @@ import (
 	"unicode/utf8"
 )
 
-// FIXME
-//  Encoding/Decoding update plan
-//   1. Change all unit tests and encoder funcs in serial pairs.
-//   2. Remove old runEncoderTest func, rename runEncodeTest
-//   3. Update Codec.Set*() methods to call Encoder.Set* with atom data instead of atom
-//   4. Update encoder table to use plain method references instead of anonymous func
-//   5. Verify that encode and decode funcs have consistent method names
-
 // ADE Data types are defined in 112-0002_r4.0B_StorageGRID_Data_Types.
 // The ADE headers for these types are in OSL_Types.h.
 const (
@@ -96,15 +88,15 @@ type (
 		SliceOfByte     func(buf []byte) ([]byte, error)
 	}
 	encoder struct {
-		SetString          func(*Atom, string) error
-		SetStringDelimited func(*Atom, string) error
-		SetBool            func(*Atom, bool) error
-		SetUint            func(*Atom, uint64) error
-		SetInt             func(*Atom, int64) error
-		SetFloat           func(*Atom, float64) error
-		SetSliceOfUint     func(*Atom, []uint64) error
-		SetSliceOfInt      func(*Atom, []int64) error
-		SetSliceOfByte     func(*Atom, []byte) error
+		SetString          func(*[]byte, string) error
+		SetStringDelimited func(*[]byte, string) error
+		SetBool            func(*[]byte, bool) error
+		SetUint            func(*[]byte, uint64) error
+		SetInt             func(*[]byte, int64) error
+		SetFloat           func(*[]byte, float64) error
+		SetSliceOfUint     func(*[]byte, []uint64) error
+		SetSliceOfInt      func(*[]byte, []int64) error
+		SetSliceOfByte     func(*[]byte, []byte) error
 	}
 
 	uuidType struct {
@@ -121,8 +113,8 @@ type (
 
 // error construction functions
 
-func errNoEncoder(a *Atom, from interface{}) error {
-	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'", from, a.typ)
+func errNoEncoder(to ADEType, from string) error {
+	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'", from, to)
 }
 func errNoDecoder(from ADEType, to GoType) error {
 	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'", from, to)
@@ -186,26 +178,26 @@ func NewCodec(a *Atom) *Codec {
 // encoding is not supported.
 // The caller should implement whichever encoding methods are appropriate for
 // the ADE data type's Codec.
-func newEncoder(i interface{}) encoder {
+func newEncoder(from ADEType) encoder {
 	return encoder{
-		SetString:          func(a *Atom, v string) (e error) { return errNoEncoder(a, "string") },
-		SetStringDelimited: func(a *Atom, v string) (e error) { return errNoEncoder(a, "string(delimited)") },
-		SetBool:            func(a *Atom, v bool) (e error) { return errNoEncoder(a, "bool") },
-		SetUint:            func(a *Atom, v uint64) (e error) { return errNoEncoder(a, "uint64") },
-		SetInt:             func(a *Atom, v int64) (e error) { return errNoEncoder(a, "int64") },
-		SetFloat:           func(a *Atom, v float64) (e error) { return errNoEncoder(a, "float64") },
-		SetSliceOfUint:     func(a *Atom, v []uint64) (e error) { return errNoEncoder(a, "[]uint64") },
-		SetSliceOfInt:      func(a *Atom, v []int64) (e error) { return errNoEncoder(a, "[]int64") },
-		SetSliceOfByte:     func(a *Atom, v []byte) (e error) { return errNoEncoder(a, "[]byte") },
+		SetString:          func(_ *[]byte, v string) (e error) { return errNoEncoder(from, "string") },
+		SetStringDelimited: func(_ *[]byte, v string) (e error) { return errNoEncoder(from, "string(delimited)") },
+		SetBool:            func(_ *[]byte, v bool) (e error) { return errNoEncoder(from, "bool") },
+		SetUint:            func(_ *[]byte, v uint64) (e error) { return errNoEncoder(from, "uint64") },
+		SetInt:             func(_ *[]byte, v int64) (e error) { return errNoEncoder(from, "int64") },
+		SetFloat:           func(_ *[]byte, v float64) (e error) { return errNoEncoder(from, "float64") },
+		SetSliceOfUint:     func(_ *[]byte, v []uint64) (e error) { return errNoEncoder(from, "[]uint64") },
+		SetSliceOfInt:      func(_ *[]byte, v []int64) (e error) { return errNoEncoder(from, "[]int64") },
+		SetSliceOfByte:     func(_ *[]byte, v []byte) (e error) { return errNoEncoder(from, "[]byte") },
 	}
 }
 
-// newEncoder returns a new encoder that provides functions for converting Go
-// native types into ADE Atom data.  The returned encoder contains all of the
-// default encoding methods, which simply return an error stating that the
-// encoding is not supported.
-// The caller should implement whichever encoding methods are appropriate for
-// the ADE data type's Codec.
+// newDecoder returns a new decoder that provides functions for converting ADE
+// Atom data into Go native types .  The returned decoder contains all of the
+// default decdoer methods, which simply return an error stating that the
+// decoding to the requested type is not supported.
+// The caller should implement whichever decoding methods are appropriate for
+// the ADE data type.
 func newDecoder(from ADEType) decoder {
 	return decoder{
 		String:          func([]byte) (v string, e error) { return v, errNoDecoder(from, "string") },
@@ -234,7 +226,7 @@ func (c Codec) SliceOfUint() ([]uint64, error)   { return c.Decoder.SliceOfUint(
 func (c Codec) SliceOfInt() ([]int64, error)     { return c.Decoder.SliceOfInt(c.Atom.data) }
 func (c Codec) SliceOfByte() ([]byte, error)     { return c.Atom.data, nil }
 
-// Encoder methods: convert given data type to []byte and store in ATom
+// Encoder methods: convert given data type to []byte and store in Atom
 func (c Codec) SetString(v string) error { return c.Encoder.SetString(&c.Atom.data, v) }
 func (c Codec) SetStringDelimited(v string) error {
 	return c.Encoder.SetStringDelimited(&c.Atom.data, v)
@@ -1168,144 +1160,144 @@ func init() {
 	encoderByType[UI16] = enc
 
 	enc = newEncoder(UI32)
-	enc.SetString = SetUI32FromString
-	enc.SetUint = SetUI32FromUint64
+	enc.SetString = StringToUI32Bytes
+	enc.SetUint = Uint64ToUI32Bytes
 	encoderByType[UI32] = enc
 
 	enc = newEncoder(UI64)
-	enc.SetString = SetUI64FromString
-	enc.SetUint = SetUI64FromUint64
+	enc.SetString = StringToUI64Bytes
+	enc.SetUint = Uint64ToUI64Bytes
 	encoderByType[UI64] = enc
 
 	// ADE signed int types
 	enc = newEncoder(SI08)
-	enc.SetString = SetSI08FromString
-	enc.SetInt = SetSI08FromInt64
+	enc.SetString = StringToSI08Bytes
+	enc.SetInt = Int64ToSI08Bytes
 	encoderByType[SI08] = enc
 
 	enc = newEncoder(SI16)
-	enc.SetString = SetSI16FromString
-	enc.SetInt = SetSI16FromInt64
+	enc.SetString = StringToSI16Bytes
+	enc.SetInt = Int64ToSI16Bytes
 	encoderByType[SI16] = enc
 
 	enc = newEncoder(SI32)
-	enc.SetString = SetSI32FromString
-	enc.SetInt = SetSI32FromInt64
+	enc.SetString = StringToSI32Bytes
+	enc.SetInt = Int64ToSI32Bytes
 	encoderByType[SI32] = enc
 
 	enc = newEncoder(SI64)
-	enc.SetString = SetSI64FromString
-	enc.SetInt = SetSI64FromInt64
+	enc.SetString = StringToSI64Bytes
+	enc.SetInt = Int64ToSI64Bytes
 	encoderByType[SI64] = enc
 
 	// ADE floating point types
 	enc = newEncoder(FP32)
-	enc.SetString = SetFP32FromString
-	enc.SetFloat = SetFP32FromFloat64
+	enc.SetString = StringToFP32Bytes
+	enc.SetFloat = Float64ToFP32Bytes
 	encoderByType[FP32] = enc
 
 	enc = newEncoder(FP64)
-	enc.SetString = SetFP64FromString
-	enc.SetFloat = SetFP64FromFloat64
+	enc.SetString = StringToFP64Bytes
+	enc.SetFloat = Float64ToFP64Bytes
 	encoderByType[FP64] = enc
 
 	// ADE fixed point types
 	enc = newEncoder(UF32)
-	enc.SetString = SetUF32FromString
-	enc.SetFloat = SetUF32FromFloat64
+	enc.SetString = StringToUF32Bytes
+	enc.SetFloat = Float64ToUF32Bytes
 	encoderByType[UF32] = enc
 
 	enc = newEncoder(UF64)
-	enc.SetString = SetUF64FromString
-	enc.SetFloat = SetUF64FromFloat64
+	enc.SetString = StringToUF64Bytes
+	enc.SetFloat = Float64ToUF64Bytes
 	encoderByType[UF64] = enc
 
 	enc = newEncoder(SF32)
-	enc.SetString = SetSF32FromString
-	enc.SetFloat = SetSF32FromFloat64
+	enc.SetString = StringToSF32Bytes
+	enc.SetFloat = Float64ToSF32Bytes
 	encoderByType[SF32] = enc
 
 	enc = newEncoder(SF64)
-	enc.SetString = SetSF64FromString
-	enc.SetFloat = SetSF64FromFloat64
+	enc.SetString = StringToSF64Bytes
+	enc.SetFloat = Float64ToSF64Bytes
 	encoderByType[SF64] = enc
 
 	// ADE fractional types
 
 	enc = newEncoder(UR32)
-	enc.SetString = SetUR32FromString
-	enc.SetSliceOfUint = SetUR32FromSliceOfUint
+	enc.SetString = StringToUR32Bytes
+	enc.SetSliceOfUint = SliceOfUint64ToUR32Bytes
 	encoderByType[UR32] = enc
 
 	enc = newEncoder(UR64)
-	enc.SetString = SetUR64FromString
-	enc.SetSliceOfUint = SetUR64FromSliceOfUint
+	enc.SetString = StringToUR64Bytes
+	enc.SetSliceOfUint = SliceOfUint64ToUR64Bytes
 	encoderByType[UR64] = enc
 
 	enc = newEncoder(SR32)
-	enc.SetString = SetSR32FromString
-	enc.SetSliceOfInt = SetSR32FromSliceOfInt
+	enc.SetString = StringToSR32Bytes
+	enc.SetSliceOfInt = SliceOfInt64ToSR32Bytes
 	encoderByType[SR32] = enc
 
 	enc = newEncoder(SR64)
-	enc.SetString = SetSR64FromString
-	enc.SetSliceOfInt = SetSR64FromSliceOfInt
+	enc.SetString = StringToSR64Bytes
+	enc.SetSliceOfInt = SliceOfInt64ToSR64Bytes
 	encoderByType[SR64] = enc
 
 	// ADE Four char code
 	enc = newEncoder(FC32)
-	enc.SetString = SetFC32FromString
-	enc.SetUint = SetFC32FromUint64
+	enc.SetString = StringToFC32Bytes
+	enc.SetUint = Uint64ToFC32Bytes
 	encoderByType[FC32] = enc
 
 	// IP Address types
 	enc = newEncoder(IP32)
-	enc.SetString = SetIP32FromString
-	enc.SetUint = SetIP32FromUint64
+	enc.SetString = StringToIP32Bytes
+	enc.SetUint = Uint64ToIP32Bytes
 	encoderByType[IP32] = enc
 
 	enc = newEncoder(IPAD)
-	enc.SetString = SetIPADFromString
+	enc.SetString = StringToIPADBytes
 	encoderByType[IPAD] = enc
 
 	// ADE UUID type
 	enc = newEncoder(UUID)
-	enc.SetString = SetUUIDFromString
+	enc.SetString = StringToUUIDBytes
 	encoderByType[UUID] = enc
 
 	// ADE String types
 	enc = newEncoder(CSTR)
-	enc.SetString = SetCSTRFromString
-	enc.SetStringDelimited = SetCSTRFromDelimitedString
+	enc.SetString = StringToCSTRBytes
+	enc.SetStringDelimited = DelimitedStringToCSTRBytes
 	encoderByType[CSTR] = enc
 
 	enc = newEncoder(USTR)
-	enc.SetString = SetUSTRFromString
-	enc.SetStringDelimited = SetUSTRFromDelimitedString
+	enc.SetString = StringToUSTRBytes
+	enc.SetStringDelimited = DelimitedStringToUSTRBytes
 	encoderByType[USTR] = enc
 
 	// DATA type, and aliases
 	enc = newEncoder(DATA)
-	enc.SetString = SetDATAFromHexString
-	enc.SetStringDelimited = SetDATAFromHexString
+	enc.SetString = HexStringToDATABytes
+	enc.SetStringDelimited = HexStringToDATABytes
 	encoderByType[DATA] = enc
 	encoderByType[CNCT] = enc
 	encoderByType[Cnct] = enc
 
 	// ADE ENUM type
 	enc = newEncoder(ENUM)
-	enc.SetString = SetSI32FromString
-	enc.SetInt = SetSI32FromInt64
+	enc.SetString = StringToSI32Bytes
+	enc.SetInt = Int64ToSI32Bytes
 	encoderByType[ENUM] = enc
 
 	// NULL type
 	enc = newEncoder(NULL)
-	enc.SetString = func(_ *Atom, _ string) (e error) { return }
+	enc.SetString = func(_ *[]byte, _ string) (e error) { return }
 	encoderByType[NULL] = enc
 
 	// ADE container
 	enc = newEncoder(CONT)
-	enc.SetString = func(_ *Atom, _ string) (e error) { return }
+	enc.SetString = func(_ *[]byte, _ string) (e error) { return }
 	encoderByType[CONT] = enc
 }
 
@@ -1389,7 +1381,7 @@ func StringToUI16Bytes(buf *[]byte, v string) (e error) {
 	if e != nil {
 		return errStrInvalid("UI16", v)
 	}
-	binary.BigEndian.PutUint16((*buf)[0:1], uint16(i))
+	binary.BigEndian.PutUint16(*buf, uint16(i))
 	return
 }
 
@@ -1404,33 +1396,33 @@ func Uint64ToUI16Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
-func SetUI32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToUI32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var i uint64
 	i, e = strconv.ParseUint(v, 0, 32)
 	if e != nil {
 		return errStrInvalid("UI32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(i))
+	binary.BigEndian.PutUint32(*buf, uint32(i))
 	return
 }
 
-func SetUI32FromUint64(a *Atom, v uint64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func Uint64ToUI32Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if v > math.MaxUint32 {
 		return errRange("UI32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(v))
+	binary.BigEndian.PutUint32(*buf, uint32(v))
 	return
 }
 
-func SetUI64FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func StringToUI64Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 
 	var i uint64
@@ -1438,117 +1430,117 @@ func SetUI64FromString(a *Atom, v string) (e error) {
 	if e != nil {
 		return errStrInvalid("UI64", v)
 	}
-	binary.BigEndian.PutUint64(a.data, uint64(i))
+	binary.BigEndian.PutUint64(*buf, uint64(i))
 	return
 }
 
-func SetUI64FromUint64(a *Atom, v uint64) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func Uint64ToUI64Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
-	binary.BigEndian.PutUint64(a.data, uint64(v))
+	binary.BigEndian.PutUint64(*buf, uint64(v))
 	return
 }
 
 // encode of signed integer types
 
-func SetSI08FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 1 {
-		a.data = make([]byte, 1)
+func StringToSI08Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 1 {
+		*buf = make([]byte, 1)
 	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 8)
 	if e != nil {
 		return errStrInvalid("SI08", v)
 	}
-	return SetSI08FromInt64(a, i)
+	return Int64ToSI08Bytes(buf, i)
 }
 
-func SetSI08FromInt64(a *Atom, v int64) (e error) {
-	if len(a.data) != 1 {
-		a.data = make([]byte, 1)
+func Int64ToSI08Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 1 {
+		*buf = make([]byte, 1)
 	}
 	if v < math.MinInt8 || v > math.MaxInt8 {
 		return errRange("SI08", v)
 	}
-	a.data[0] = byte(v)
+	(*buf)[0] = byte(v)
 	return
 }
 
-func SetSI16FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 2 {
-		a.data = make([]byte, 2)
+func StringToSI16Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 2 {
+		*buf = make([]byte, 2)
 	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 16)
 	if e != nil {
 		return errStrInvalid("SI16", v)
 	}
-	binary.BigEndian.PutUint16(a.data, uint16(i))
+	binary.BigEndian.PutUint16(*buf, uint16(i))
 	return
 }
 
-func SetSI16FromInt64(a *Atom, v int64) (e error) {
-	if len(a.data) != 2 {
-		a.data = make([]byte, 2)
+func Int64ToSI16Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 2 {
+		*buf = make([]byte, 2)
 	}
 	if v < math.MinInt16 || v > math.MaxInt16 {
 		return errRange("SI16", v)
 	}
-	binary.BigEndian.PutUint16(a.data, uint16(v))
+	binary.BigEndian.PutUint16(*buf, uint16(v))
 	return
 }
 
-func SetSI32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToSI32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 32)
 	if e != nil {
 		return errStrInvalid("SI32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(i))
+	binary.BigEndian.PutUint32(*buf, uint32(i))
 	return
 }
 
-func SetSI32FromInt64(a *Atom, v int64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func Int64ToSI32Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if v < math.MinInt32 || v > math.MaxInt32 {
 		return errRange("SI32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(v))
+	binary.BigEndian.PutUint32(*buf, uint32(v))
 	return
 }
 
-func SetSI64FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func StringToSI64Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	var i int64
 	i, e = strconv.ParseInt(v, 0, 64)
 	if e != nil {
 		return errStrInvalid("SI64", v)
 	}
-	binary.BigEndian.PutUint64(a.data, uint64(i))
+	binary.BigEndian.PutUint64(*buf, uint64(i))
 	return
 }
 
-func SetSI64FromInt64(a *Atom, v int64) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func Int64ToSI64Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
-	binary.BigEndian.PutUint64(a.data, uint64(v))
+	binary.BigEndian.PutUint64(*buf, uint64(v))
 	return
 }
 
 // encode of unsigned fractional types
 
-func SetUR32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToUR32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 
 	// The %s is to detect trailing garbage in the line. It should not match
@@ -1562,12 +1554,12 @@ func SetUR32FromString(a *Atom, v string) (e error) {
 	if den == 0 {
 		return errZeroDenominator("UR32", v)
 	}
-	return SetUR32FromSliceOfUint(a, []uint64{num, den})
+	return SliceOfUint64ToUR32Bytes(buf, []uint64{num, den})
 }
 
-func SetUR32FromSliceOfUint(a *Atom, v []uint64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func SliceOfUint64ToUR32Bytes(buf *[]byte, v []uint64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var num, den uint64
 	num = v[0]
@@ -1580,13 +1572,13 @@ func SetUR32FromSliceOfUint(a *Atom, v []uint64) (e error) {
 	}
 
 	value := (uint32(num) << 16) + uint32(den)
-	binary.BigEndian.PutUint32(a.data, value)
+	binary.BigEndian.PutUint32(*buf, value)
 	return
 }
 
-func SetUR64FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func StringToUR64Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	var num, den uint64
 	var extra string
@@ -1597,12 +1589,12 @@ func SetUR64FromString(a *Atom, v string) (e error) {
 	if den == 0 {
 		return errZeroDenominator("UR64", v)
 	}
-	return SetUR64FromSliceOfUint(a, []uint64{num, den})
+	return SliceOfUint64ToUR64Bytes(buf, []uint64{num, den})
 }
 
-func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func SliceOfUint64ToUR64Bytes(buf *[]byte, v []uint64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	var num, den uint64
 	num = v[0]
@@ -1614,15 +1606,15 @@ func SetUR64FromSliceOfUint(a *Atom, v []uint64) (e error) {
 		return errZeroDenominator("UR64", "")
 	}
 	value := (num << 32) + den
-	binary.BigEndian.PutUint64(a.data, value)
+	binary.BigEndian.PutUint64(*buf, value)
 	return
 }
 
 // encode of signed fractional types
 
-func SetSR32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToSR32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var num, den int64
 	var extra string
@@ -1633,12 +1625,12 @@ func SetSR32FromString(a *Atom, v string) (e error) {
 	if den == 0 {
 		return errZeroDenominator("SR32", v)
 	}
-	return SetSR32FromSliceOfInt(a, []int64{num, den})
+	return SliceOfInt64ToSR32Bytes(buf, []int64{num, den})
 }
 
-func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func SliceOfInt64ToSR32Bytes(buf *[]byte, v []int64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var num, den int64
 	num = v[0]
@@ -1650,13 +1642,13 @@ func SetSR32FromSliceOfInt(a *Atom, v []int64) (e error) {
 		return errZeroDenominator("SR32", "")
 	}
 	value := (int32(num) << 16) + int32(den)
-	binary.BigEndian.PutUint32(a.data, uint32(value))
+	binary.BigEndian.PutUint32(*buf, uint32(value))
 	return
 }
 
-func SetSR64FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func StringToSR64Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	var num, den int64
 	var extra string
@@ -1667,12 +1659,12 @@ func SetSR64FromString(a *Atom, v string) (e error) {
 	if den == 0 {
 		return errZeroDenominator("SR64", v)
 	}
-	return SetSR64FromSliceOfInt(a, []int64{num, den})
+	return SliceOfInt64ToSR64Bytes(buf, []int64{num, den})
 }
 
-func SetSR64FromSliceOfInt(a *Atom, v []int64) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func SliceOfInt64ToSR64Bytes(buf *[]byte, v []int64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	var num, den int64
 	num = v[0]
@@ -1685,66 +1677,66 @@ func SetSR64FromSliceOfInt(a *Atom, v []int64) (e error) {
 	}
 
 	value := (num << 32) + den
-	binary.BigEndian.PutUint64(a.data, uint64(value))
+	binary.BigEndian.PutUint64(*buf, uint64(value))
 	return
 }
 
 // encode of floating point types
 
-func SetFP32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToFP32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 32)
 	if e != nil {
 		return errStrInvalid("FP32", v)
 	}
-	return SetFP32FromFloat64(a, f)
+	return Float64ToFP32Bytes(buf, f)
 }
 
-func SetFP32FromFloat64(a *Atom, v float64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func Float64ToFP32Bytes(buf *[]byte, v float64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if v > math.MaxFloat32 || math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("FP32", v)
 	}
 	var bits = math.Float32bits(float32(v))
-	binary.BigEndian.PutUint32(a.data, bits)
+	binary.BigEndian.PutUint32(*buf, bits)
 	return
 }
 
-func SetFP64FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func StringToFP64Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 64)
 	if e != nil {
 		return errStrInvalid("FP64", v)
 	}
-	return SetFP64FromFloat64(a, f)
+	return Float64ToFP64Bytes(buf, f)
 }
 
-func SetFP64FromFloat64(a *Atom, v float64) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func Float64ToFP64Bytes(buf *[]byte, v float64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	if math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("FP64", v)
 	}
-	binary.BigEndian.PutUint64(a.data, uint64(v))
+	binary.BigEndian.PutUint64(*buf, uint64(v))
 	var bits = math.Float64bits(v)
-	binary.BigEndian.PutUint64(a.data, bits)
+	binary.BigEndian.PutUint64(*buf, bits)
 	return
 }
 
 // encode of fixed point types
 
-func SetUF32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToUF32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 64)
@@ -1754,17 +1746,17 @@ func SetUF32FromString(a *Atom, v string) (e error) {
 	if f >= (math.MaxUint16 + 1) {
 		return errRange("UF32", f)
 	}
-	return SetUF32FromFloat64(a, f)
+	return Float64ToUF32Bytes(buf, f)
 }
 
-func SetUF32FromFloat64(a *Atom, v float64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func Float64ToUF32Bytes(buf *[]byte, v float64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if int(v) > math.MaxUint16 || math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("UF32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
+	binary.BigEndian.PutUint32(*buf, uint32(v*(1+math.MaxUint16)))
 	return
 }
 
@@ -1781,9 +1773,9 @@ func SetUF32FromFloat64(a *Atom, v float64) (e error) {
 //     4294967295.999999999767169 = 0x7FFFFFFFFFFFFFFF
 // but you'll get this:
 //     4294967295.999999999767169 = 0x7FFFFFFFFFFFFFFE
-func SetUF64FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func StringToUF64Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 
 	// split string into whole and fractional parts
@@ -1830,44 +1822,44 @@ func SetUF64FromString(a *Atom, v string) (e error) {
 	fractF *= (math.MaxUint32 + 1)
 	fractF = Round(fractF, 6) // match rounding magnitude of ADE ccat
 
-	binary.BigEndian.PutUint32(a.data, uint32(whole))
-	binary.BigEndian.PutUint32(a.data[4:], uint32(fractF))
+	binary.BigEndian.PutUint32(*buf, uint32(whole))
+	binary.BigEndian.PutUint32((*buf)[4:], uint32(fractF))
 
 	return
 }
 
-func SetUF64FromFloat64(a *Atom, v float64) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func Float64ToUF64Bytes(buf *[]byte, v float64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	if v < 0 || math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("UF64", v)
 	}
 	var i = uint64(v * (1 + math.MaxUint32))
-	binary.BigEndian.PutUint64(a.data, i)
+	binary.BigEndian.PutUint64(*buf, i)
 	return
 }
 
-func SetSF32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func StringToSF32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	var f float64
 	f, e = strconv.ParseFloat(v, 64)
 	if e != nil {
 		return errStrInvalid("SF32", v)
 	}
-	return SetSF32FromFloat64(a, f)
+	return Float64ToSF32Bytes(buf, f)
 }
 
-func SetSF32FromFloat64(a *Atom, v float64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func Float64ToSF32Bytes(buf *[]byte, v float64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if v < -32768.0 || v >= 32768.0 || math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("SF32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(v*(1+math.MaxUint16)))
+	binary.BigEndian.PutUint32(*buf, uint32(v*(1+math.MaxUint16)))
 	return
 }
 
@@ -1878,9 +1870,9 @@ func SetSF32FromFloat64(a *Atom, v float64) (e error) {
 //     0x7FFFFFFFFFFFFFFF =  2147483647.9999999997671694
 // As a result, the correct conversion procedure results in an almost-right value like
 // My measurements show that float value as too low.
-func SetSF64FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func StringToSF64Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 
 	if _, e = strconv.ParseFloat(v, 128); e != nil {
@@ -1889,27 +1881,27 @@ func SetSF64FromString(a *Atom, v string) (e error) {
 
 	iMinus := strings.IndexByte(v, '-')
 	if iMinus == -1 {
-		SetUF64FromString(a, v)
+		StringToUF64Bytes(buf, v)
 		return
 	}
 
 	// Number is negative.
 	// Discard sign and set as UFIX64
-	SetUF64FromString(a, v[iMinus+1:])
-	signed, e := SI64ToInt64(a.data)
+	StringToUF64Bytes(buf, v[iMinus+1:])
+	signed, e := SI64ToInt64(*buf)
 	if e != nil {
 		return e
 	}
 
 	// Reapply sign by pretending bytes are an int64.
 	// This sorts out the 2s complement.
-	SetSI64FromInt64(a, -1*signed)
+	Int64ToSI64Bytes(buf, -1*signed)
 	return nil
 }
 
-func SetSF64FromFloat64(a *Atom, v float64) (e error) {
-	if len(a.data) != 8 {
-		a.data = make([]byte, 8)
+func Float64ToSF64Bytes(buf *[]byte, v float64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
 	}
 	if math.IsNaN(v) || math.IsInf(v, 0) {
 		return errRange("SF64", v)
@@ -1918,26 +1910,20 @@ func SetSF64FromFloat64(a *Atom, v float64) (e error) {
 	if fract < 0 {
 		fract *= -1
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(whole))
-	binary.BigEndian.PutUint32(a.data[4:], uint32(fract*(1+math.MaxUint32)))
+	binary.BigEndian.PutUint32(*buf, uint32(whole))
+	binary.BigEndian.PutUint32((*buf)[4:], uint32(fract*(1+math.MaxUint32)))
 	return
 }
 
-func SetFC32FromString(a *Atom, v string) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+// StringToFC32Bytes writes the given 4-char string into the given byte slice.
+func StringToFC32Bytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
-	return FC32StringToBytes(v, &(a.data))
-}
-
-// FC32StringToBytes writes the given 4-char string into the given byte slice.
-// This is separated out from SetFC32FromString so this part can also be used
-// to set Atom names.
-func FC32StringToBytes(v string, buf *[]byte) (e error) {
-	var extra string
 
 	// nonprintable chars are allowed in input string if they are hex-encoded.
 	// raw unprintable chars must return error.
+	var extra string
 	switch len(v) {
 	case 10: // 8 hex digits plus leading 0x
 		if !strings.HasPrefix(v, "0x") {
@@ -1968,29 +1954,29 @@ func FC32StringToBytes(v string, buf *[]byte) (e error) {
 	return nil
 }
 
-func SetFC32FromUint64(a *Atom, v uint64) (e error) {
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+func Uint64ToFC32Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 	if v > math.MaxUint32 {
 		return errRange("FC32", v)
 	}
-	binary.BigEndian.PutUint32(a.data, uint32(v))
+	binary.BigEndian.PutUint32(*buf, uint32(v))
 	return
 }
 
 // IP32 is usually a simple 4 bytes = 4 octets type, but it also has a
 // rarely used multi-width form used to define a range.
 // The double-width form seems to be expressed solely in hex.
-func SetIP32FromString(a *Atom, v string) (e error) {
+func StringToIP32Bytes(buf *[]byte, v string) (e error) {
 	// Set data to zero value in case of error
-	if len(a.data) != 4 {
-		a.data = make([]byte, 4)
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
 	}
 
 	// handle multi-address form separately
 	if strings.HasPrefix(v, "0x") {
-		return SetIP32FromHexString(a, v)
+		return HexStringToIP32Bytes(buf, v)
 	}
 	// Only a single IPv4 address is allowed from here on.
 
@@ -2001,7 +1987,7 @@ func SetIP32FromString(a *Atom, v string) (e error) {
 	if err != io.EOF || matched != 4 {
 		return errStrInvalid("IP32", v)
 	}
-	copied := copy(a.data, []byte{oct1, oct2, oct3, oct4})
+	copied := copy(*buf, []byte{oct1, oct2, oct3, oct4})
 	if copied != 4 {
 		e = fmt.Errorf("expected 4 bytes copied for IP32 value(%s), got %d: e", v, copied)
 	}
@@ -2011,7 +1997,7 @@ func SetIP32FromString(a *Atom, v string) (e error) {
 // Restrictions:
 // string must start with "0x"
 // following that must be only hex digits, in any number of sets of 8
-func SetIP32FromHexString(a *Atom, v string) (e error) {
+func HexStringToIP32Bytes(buf *[]byte, v string) (e error) {
 	if !strings.HasPrefix(v, "0x") {
 		return errStrInvalid("IP32", v)
 	}
@@ -2023,71 +2009,72 @@ func SetIP32FromHexString(a *Atom, v string) (e error) {
 	}
 
 	// allocate enough space
-	if len(a.data) != size {
-		a.data = make([]byte, size/2)
+	if len(*buf) != size {
+		*buf = make([]byte, size/2)
 	}
 
 	// scan each chunk of 8 hex digits, and store as 4 byte address
 	for i := 2; i < len(v); i += 8 {
 		addr, err := strconv.ParseUint(v[i:i+8], 16, 32)
 		if err != nil {
-			a.data = make([]byte, 4) // zero before returning error
+			*buf = make([]byte, 4) // zero before returning error
 			return errStrInvalid("IP32", v)
 		}
 		iByte := (i - 2) / 2 // number of bytes seen so far
-		binary.BigEndian.PutUint32(a.data[iByte:], uint32(addr))
+		binary.BigEndian.PutUint32((*buf)[iByte:], uint32(addr))
 	}
 	return
 }
 
-func SetIP32FromUint64(a *Atom, v uint64) (e error) {
+func Uint64ToIP32Bytes(buf *[]byte, v uint64) (e error) {
 	if v > math.MaxUint32 {
 		// store as 2 IPv4 addresses in 8 bytes
-		if len(a.data) != 8 {
-			a.data = make([]byte, 8)
+		if len(*buf) != 8 {
+			*buf = make([]byte, 8)
 		}
-		binary.BigEndian.PutUint64(a.data, v)
+		binary.BigEndian.PutUint64(*buf, v)
 	} else {
 		// store as a single IPv4 address in 4 bytes
-		if len(a.data) != 4 {
-			a.data = make([]byte, 4)
+		if len(*buf) != 4 {
+			*buf = make([]byte, 4)
 		}
-		binary.BigEndian.PutUint32(a.data, uint32(v))
+		binary.BigEndian.PutUint32(*buf, uint32(v))
 	}
 	return
 }
 
-func SetIPADFromString(a *Atom, v string) (e error) {
+func StringToIPADBytes(buf *[]byte, v string) (e error) {
 	size := len(v)
-	buf := make([]byte, size)
+	*buf = make([]byte, size)
 	if len(v) < 3 && v != "::" {
+		*buf = []byte(nil)
 		return errStrInvalid("IPAD", v)
 	}
-	copy(buf[:], v)
+	copy(*buf, v)
 
 	// check for optional delimiters
-	if buf[0] == '"' && buf[size-1] == '"' {
-		buf = buf[1 : size-1] // ignore the delimiters from here on
+	if (*buf)[0] == '"' && (*buf)[size-1] == '"' {
+		*buf = (*buf)[1 : size-1] // ignore the delimiters from here on
 	}
 
 	// verify valid chars for IPv6
 	chars := "0123456789abcdefABCDEF:."
-	for _, r := range buf {
-		if !strings.ContainsRune(chars, rune(r)) {
+	for _, b := range *buf {
+		if !strings.ContainsRune(chars, rune(b)) {
+			*buf = []byte(nil)
 			return errStrInvalid("IPAD", v)
 		}
 	}
 
-	buf = append(buf, '\x00') // add null terminator like a CSTR
-	a.data = buf
+	*buf = append(*buf, '\x00') // add null terminator like a CSTR
 	return
 }
 
 // No NULL terminator is used for this type
 // Double-quote delimiters are optional on the input string
-func SetUUIDFromString(a *Atom, v string) (e error) {
-	if len(a.data) != 36 {
-		a.data = make([]byte, 36)
+func StringToUUIDBytes(buf *[]byte, v string) (e error) {
+	if len(*buf) != 36 {
+		*buf = make([]byte, 36)
 	}
 
 	// Read the UUID string into a UUID object, discarding delimiters
@@ -2103,30 +2090,30 @@ func SetUUIDFromString(a *Atom, v string) (e error) {
 	}
 
 	// write raw bytes to Atom.data
-	a.data = uuid.Bytes()
+	*buf = uuid.Bytes()
 	return
 }
 
-func SetCSTRFromDelimitedString(a *Atom, v string) (e error) {
+func DelimitedStringToCSTRBytes(buf *[]byte, v string) (e error) {
 	L := len(v)
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
 		return fmt.Errorf("CSTR input string must be double-quoted: (%s)", v)
 	}
-	return SetCSTRFromString(a, v[1:L-1])
+	return StringToCSTRBytes(buf, v[1:L-1])
 }
 
 // Uses NULL terminator
-func SetCSTRFromString(a *Atom, v string) (e error) {
-	a.data, e = CSTRBytesFromEscapedString(v)
+func StringToCSTRBytes(buf *[]byte, v string) (e error) {
+	*buf, e = CSTRBytesFromEscapedString(v)
 	return e
 }
 
-func SetUSTRFromDelimitedString(a *Atom, v string) (e error) {
+func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 	L := len(v)
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
 		return fmt.Errorf("USTR input string must be double-quoted: (%s)", v)
 	}
-	return SetUSTRFromString(a, v[1:L-1])
+	return StringToUSTRBytes(buf, v[1:L-1])
 }
 
 // SetUSTRFromString sets the atom data to the byte representation of the
@@ -2136,8 +2123,8 @@ func SetUSTRFromDelimitedString(a *Atom, v string) (e error) {
 // variable-length encoding allowed.)
 //
 // No NULL terminator is used for this type, unlike CSTR.
-func SetUSTRFromString(a *Atom, v string) (e error) {
-	buf := bytes.NewBuffer(make([]byte, 0, 4*len(v)))
+func StringToUSTRBytes(buf *[]byte, v string) (e error) {
+	bb := bytes.NewBuffer(make([]byte, 0, 4*len(v)))
 
 	// iterate by rune:  The rune value is the unicode codepoint value, which is
 	// useful because that's the same as the UTF32 encoding.
@@ -2182,7 +2169,7 @@ func SetUSTRFromString(a *Atom, v string) (e error) {
 			e = errUnescaped("USTR", r)
 			return
 		}
-		e := binary.Write(buf, binary.BigEndian, uint32(r))
+		e := binary.Write(bb, binary.BigEndian, uint32(r))
 		if e != nil {
 			return e
 		}
@@ -2194,15 +2181,15 @@ func SetUSTRFromString(a *Atom, v string) (e error) {
 		}
 		return errInvalidEscape("USTR", "\\", "EOF during escaped character")
 	}
-	a.data = buf.Bytes()
+	*buf = bb.Bytes()
 	return
 }
 
-func SetDATAFromHexString(a *Atom, v string) (e error) {
+func HexStringToDATABytes(buf *[]byte, v string) (e error) {
 
 	// empty input string results in empty data section
 	if len(v) == 0 {
-		a.data = []byte{}
+		*buf = []byte{}
 		return
 	}
 
@@ -2214,7 +2201,7 @@ func SetDATAFromHexString(a *Atom, v string) (e error) {
 	if e != nil {
 		return
 	}
-	a.data = buffer
+	*buf = buffer
 	return
 }
 

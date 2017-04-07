@@ -806,7 +806,7 @@ func parseAtomName(p *parser) parseFunc {
 	tk := readToken(p)
 	switch tk.typ {
 	case tokenAtomName: // may be hex or 4 printable chars
-		if e := FC32StringToBytes(tk.value, &p.theAtom.name); e != nil {
+		if e := StringToFC32Bytes(&p.theAtom.name, tk.value); e != nil {
 			return p.errorf(fmt.Sprint("invalid atom name: ", tk.value))
 		}
 	case tokenError:
