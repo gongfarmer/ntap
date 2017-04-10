@@ -49,12 +49,12 @@ const (
 	Cnct ADEType = "cnct" // alias for CNCT
 	CONT ADEType = "CONT" // Atom Container
 
-	String goType = "String"
-	Uint   goType = "Uint"
-	Int    goType = "Int"
-	Bool   goType = "Bool"
-	Bytes  goType = "Bytes"
-	Float  goType = "Float"
+	goString goType = "String"
+	goUint   goType = "Uint"
+	goInt    goType = "Int"
+	goBool   goType = "Bool"
+	goBytes  goType = "Bytes"
+	goFloat  goType = "Float"
 )
 
 /**********************************************************/
@@ -1171,14 +1171,15 @@ func BytesToHexString(buf []byte) (v string, e error) {
 // CSTRBytesToEscapedString accepts ADE CSTR data bytes, reads the CSTR data,
 // and applies ADE escaping rules before returning the result as a string.
 //
-// ade: libs/osl/OSL_Types.cc CStr_Escape()
-// Escaping must be performed on raw byte slice, not on same data casted to
-// string. This is because casting a byte slice containing high ascii (128-255)
-// to string will convert invalid codepoint representations (eg. 0xFF for
-// U+00FF) to the Unicode replacement character.
-// The trickiest part here is that valid unicode must not be altered.
-// This method should always return valid UTF-8, because invalid UTF-8 must be
-// detected and escaped.
+// This method always returns valid UTF-8, because invalid UTF-8 is detected
+// and escaped.
+//
+// Dev note: Escaping must be performed on raw byte slice, not on bytes casted
+// to string. This is because casting a byte slice containing high ascii
+// (128-255) to string will convert invalid codepoint representations (eg. 0xFF
+// for U+00FF) to the Unicode replacement character.
+//
+// Corresponds to ade: libs/osl/OSL_Types.cc CStr_Escape()
 func CSTRBytesToEscapedString(input []byte) string {
 	output := make([]rune, 0, len(input))
 	for i := 0; i < len(input); i++ {
