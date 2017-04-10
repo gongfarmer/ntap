@@ -33,6 +33,13 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "       Input may also be a hex representation of the binary format.")
 	fmt.Fprintln(os.Stderr, "Options:")
 	flag.PrintDefaults()
+	fmt.Fprintln(os.Stderr, "Examples:")
+	fmt.Fprintln(os.Stderr, `       # print grid ID from GINF bundle`)
+	fmt.Fprintln(os.Stderr, `       ccat -p="/GINF/GIDV/AVAL/*[@name > 0]" GINF.bin`)
+	fmt.Fprintln(os.Stderr, ``)
+	fmt.Fprintln(os.Stderr, `       # print all atoms data values exceed 0x2D000000`)
+	fmt.Fprintln(os.Stderr, `       ccat -p="//*[data() > 0x2D000000]" test.FC32.bin`)
+
 	os.Exit(2)
 }
 

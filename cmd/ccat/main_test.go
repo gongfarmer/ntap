@@ -51,14 +51,3 @@ func BenchmarkMarshalText(b *testing.B) {
 		}
 	}
 }
-
-func ReadAtoms(atomBytes [][]byte) (atoms []*atom.Atom) {
-	for _, buf := range atomBytes {
-		a := new(atom.Atom)
-		if err := a.UnmarshalBinary(buf); err != nil {
-			panic(err)
-		}
-		atoms = append(atoms, a)
-	}
-	return
-}
