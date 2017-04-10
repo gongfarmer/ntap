@@ -278,7 +278,7 @@ func NewPredicateEvaluator(pe *pathEvaluator) (pre PredicateEvaluator, ok bool) 
 
 	// read predicate tokens
 	var predicateTokens tokenList
-	for pe.NextTokenType() != tokenPredicateStart && !pe.Tokens.empty() {
+	for pe.nextTokenType() != tokenPredicateStart && !pe.Tokens.empty() {
 		predicateTokens.unshift(pe.Tokens.pop())
 	}
 	pe.Tokens.pop() // discard predicate start token
@@ -845,8 +845,8 @@ func (pe *pathEvaluator) Done() bool {
 	return pe.Error != nil || len(pe.Tokens) == 0
 }
 
-// NextTokenType returns the tokenType of the next Token in the PathEvalator's Token stack
-func (pe *pathEvaluator) NextTokenType() tokenEnum {
+// nextTokenType returns the tokenType of the next Token in the PathEvalator's Token stack
+func (pe *pathEvaluator) nextTokenType() tokenEnum {
 	if len(pe.Tokens) == 0 {
 		return ""
 	}
@@ -888,7 +888,7 @@ func (pe *pathEvaluator) evalAxisOperator() (atoms []*Atom) {
 		return nil
 	}
 
-	//	if pe.NextTokenType() == tokenNodeTest {
+	//	if pe.nextTokenType() == tokenNodeTest {
 	//		pe.errorf("operator '%s' must be followed element name or *", tk.value)
 	//		return nil
 	//	}
@@ -918,7 +918,7 @@ func (pe *pathEvaluator) evalNodeTest() (atoms []*Atom) {
 	}
 
 	// Get element set to filter
-	if pe.NextTokenType() == tokenStepSeparator {
+	if pe.nextTokenType() == tokenStepSeparator {
 		// New path step, so apply nodeTest to the children of whatever atoms are
 		// returned by the path  expression following the step separator operator
 		pe.Tokens.pop()
@@ -929,7 +929,7 @@ func (pe *pathEvaluator) evalNodeTest() (atoms []*Atom) {
 		for _, a := range pe.evalElementSet() {
 			atoms = append(atoms, a.Children()...)
 		}
-	} else if pe.NextTokenType() == tokenAxisOperator {
+	} else if pe.nextTokenType() == tokenAxisOperator {
 		atoms = pe.evalAxisOperator()
 	} else {
 		atoms = append(atoms, pe.ContextAtomPtr)
@@ -950,11 +950,11 @@ func (pe *pathEvaluator) evalNodeTest() (atoms []*Atom) {
 }
 
 func (pe *pathEvaluator) evalElementSet() (atoms []*Atom) {
-	Log.Printf("evalElementSet() [%s]'", pe.NextTokenType())
+	Log.Printf("evalElementSet() [%s]'", pe.nextTokenType())
 	if pe.Done() {
 		return
 	}
-	switch pe.NextTokenType() {
+	switch pe.nextTokenType() {
 	case tokenPredicateEnd:
 		return pe.evalPredicate()
 	case tokenSetOperator:
@@ -968,7 +968,7 @@ func (pe *pathEvaluator) evalElementSet() (atoms []*Atom) {
 		return pe.evalNodeTest() // may be nil in which case returns .
 	}
 
-	Log.Println("evalElementSet: Returning context atom. Next Token Type is ", pe.NextTokenType())
+	Log.Println("evalElementSet: Returning context atom. Next Token Type is ", pe.nextTokenType())
 	// No axis operator given, so use context node
 	atoms = append(atoms, pe.ContextAtomPtr)
 	return
@@ -1017,8 +1017,8 @@ func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) error 
 	return pre.Error
 }
 
-// NextTokenType returns the tokenType of the next Token in the PathEvalator's Token stack
-func (pre *PredicateEvaluator) NextTokenType() tokenEnum {
+// nextTokenType returns the tokenType of the next Token in the PathEvalator's Token stack
+func (pre *PredicateEvaluator) nextTokenType() tokenEnum {
 	if len(pre.Tokens) == 0 {
 		return ""
 	}
@@ -1029,7 +1029,7 @@ func (pre *PredicateEvaluator) NextTokenType() tokenEnum {
 func (pre *PredicateEvaluator) eval() (results []iEqualer) {
 Loop:
 	for !pre.Tokens.empty() && pre.Error == nil {
-		switch pre.NextTokenType() {
+		switch pre.nextTokenType() {
 		case tokenPredicateStart:
 			break Loop
 		case tokenBooleanOperator:
@@ -1059,8 +1059,8 @@ func (pre *PredicateEvaluator) evalBoolean() (result iEqualer) {
 		pre.errorf("expect boolean value, got nothing")
 		return
 	}
-	Log.Printf("    evalBoolean() %v,%v", pre.NextTokenType(), pre.Tokens.peek().value)
-	switch pre.NextTokenType() {
+	Log.Printf("    evalBoolean() %v,%v", pre.nextTokenType(), pre.Tokens.peek().value)
+	switch pre.nextTokenType() {
 	case tokenEqualityOperator:
 		result = pre.evalEqualityOperator()
 	case tokenBooleanOperator:
@@ -1185,7 +1185,7 @@ func (pre *PredicateEvaluator) evalComparisonOperator() iEqualer {
 func (pre *PredicateEvaluator) evalNumber() (result iArithmeticker) {
 	var err error
 	ok := true
-	switch pre.NextTokenType() {
+	switch pre.nextTokenType() {
 	case tokenInteger, tokenHex:
 		v, err := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		if err != nil {
@@ -1214,7 +1214,7 @@ func (pre *PredicateEvaluator) evalNumber() (result iArithmeticker) {
 			pre.errorf("expect number, got %s", t.value)
 		}
 	default:
-		pre.errorf("value has invalid numeric type: %s", pre.NextTokenType())
+		pre.errorf("value has invalid numeric type: %s", pre.nextTokenType())
 	}
 	if err != nil || !ok {
 		pre.errorf("expected numeric value")
@@ -1224,7 +1224,7 @@ func (pre *PredicateEvaluator) evalNumber() (result iArithmeticker) {
 func (pre *PredicateEvaluator) evaliEqualer() (result iEqualer) {
 	Log.Printf("    evaliEqualer(), Tokens=%v", pre.Tokens)
 	var err error
-	switch pre.NextTokenType() {
+	switch pre.nextTokenType() {
 	case tokenInteger, tokenHex:
 		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		err = e
@@ -1269,7 +1269,7 @@ func (pre *PredicateEvaluator) evaliEqualer() (result iEqualer) {
 func (pre *PredicateEvaluator) evalComparable() (result iComparer) {
 	Log.Printf("    evalComparable(), Tokens=%v", pre.Tokens)
 	var err error
-	switch pre.NextTokenType() {
+	switch pre.nextTokenType() {
 	case tokenInteger, tokenHex:
 		v, e := strconv.ParseInt(pre.Tokens.pop().value, 0, 64)
 		err = e

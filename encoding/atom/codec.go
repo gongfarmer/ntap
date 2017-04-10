@@ -1,9 +1,6 @@
 package atom
 
 // This file provides methods for reading and writing atom data values.
-// There are two types of functions:
-//  * Set<adetype>From<goType>, to set atom values
-//  * <adetype>To<goType>, to read an atom value into a go variable
 import (
 	"bytes"
 	"encoding/binary"
@@ -52,19 +49,22 @@ const (
 	Cnct ADEType = "cnct" // alias for CNCT
 	CONT ADEType = "CONT" // Atom Container
 
-	String GoType = "String"
-	Uint   GoType = "Uint"
-	Int    GoType = "Int"
-	Bool   GoType = "Bool"
-	Bytes  GoType = "Bytes"
-	Float  GoType = "Float"
+	String goType = "String"
+	Uint   goType = "Uint"
+	Int    goType = "Int"
+	Bool   goType = "Bool"
+	Bytes  goType = "Bytes"
+	Float  goType = "Float"
 )
 
 /**********************************************************/
 
 type (
+	// ADEType uniquely identifies ADE Atom types as 4 character string enums.
 	ADEType string
-	GoType  string
+
+	// goType identifies some basic go data types
+	goType string
 
 	// A Codec (coder/decoder) object provides access to the data value of an atom.
 	// It contains a full set of getter and setter methods which accept or return
@@ -111,12 +111,14 @@ type (
 	errFunc (func(string, int, int) error)
 )
 
+/**********************************************************/
 // error construction functions
+// These exist so that the unit tests don't have to hardcode the err message they expect
 
 func errNoEncoder(to ADEType, from string) error {
 	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'", from, to)
 }
-func errNoDecoder(from ADEType, to GoType) error {
+func errNoDecoder(from ADEType, to goType) error {
 	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'", from, to)
 }
 func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
@@ -159,6 +161,9 @@ func errZeroDenominator(typ string, v string) (e error) {
 	}
 	return
 }
+
+/**********************************************************/
+// Codec / Encoder / Decoder data structure definitions
 
 // NewCodec returns a Codec that performs type conversion for atom data.
 // A Codec provides encoder/decoder methods for converting data from an atom's
@@ -215,29 +220,88 @@ func newDecoder(from ADEType) decoder {
 var decoderByType = make(map[ADEType]decoder)
 var encoderByType = make(map[ADEType]encoder)
 
+/**********************************************************/
 // Decoder methods: pass atom data to the decoder for type conversion to go type
-func (c Codec) String() (string, error)          { return c.Decoder.String(c.Atom.data) }
-func (c Codec) StringDelimited() (string, error) { return c.Decoder.StringDelimited(c.Atom.data) }
-func (c Codec) Bool() (bool, error)              { return c.Decoder.Bool(c.Atom.data) }
-func (c Codec) Uint() (uint64, error)            { return c.Decoder.Uint(c.Atom.data) }
-func (c Codec) Int() (int64, error)              { return c.Decoder.Int(c.Atom.data) }
-func (c Codec) Float() (float64, error)          { return c.Decoder.Float(c.Atom.data) }
-func (c Codec) SliceOfUint() ([]uint64, error)   { return c.Decoder.SliceOfUint(c.Atom.data) }
-func (c Codec) SliceOfInt() ([]int64, error)     { return c.Decoder.SliceOfInt(c.Atom.data) }
-func (c Codec) SliceOfByte() ([]byte, error)     { return c.Atom.data, nil }
 
+// String returns Atom data as a string.  All Atom types must support this.
+func (c Codec) String() (string, error) { return c.Decoder.String(c.Atom.data) }
+
+// StringDelimited returns Atom data as a string.  If this atom data type is
+// delimited, then surround it with its delimiter characters.  Otherwise, just
+// return the same result as String.
+// All Atom types must support this.
+func (c Codec) StringDelimited() (string, error) { return c.Decoder.StringDelimited(c.Atom.data) }
+
+// Bool returns Atom data as a bool, for Atom types where this makes sense.
+func (c Codec) Bool() (bool, error) { return c.Decoder.Bool(c.Atom.data) }
+
+// Uint returns Atom data as a uint64, for unsigned integer Atom types.  64/32/16/8 bit
+// types are all returned as a uint64 value, which can be cast to their native
+// integer types without overflow.
+func (c Codec) Uint() (uint64, error) { return c.Decoder.Uint(c.Atom.data) }
+
+// Int returns Atom data as an int64, for integer Atom types.  64/32/16/8 bit
+// types are all returned as a uint64 value, which can be cast to their native
+// integer types without overflow.
+func (c Codec) Int() (int64, error) { return c.Decoder.Int(c.Atom.data) }
+
+// Float returns Atom data as an float64, for floating point Atom types.
+func (c Codec) Float() (float64, error) { return c.Decoder.Float(c.Atom.data) }
+
+// SliceOfUint returns Atom data as a slice of uint64, for types which can be represented this way.
+// This includes fractional types, where the numerator and denominator are
+// represented as a 2-element slice.
+func (c Codec) SliceOfUint() ([]uint64, error) { return c.Decoder.SliceOfUint(c.Atom.data) }
+
+// SliceOfInt returns Atom data as a slice of int64, for types which can be represented this way.
+// This includes fractional types, where the numerator and denominator are
+// represented as a 2-element slice.
+func (c Codec) SliceOfInt() ([]int64, error) { return c.Decoder.SliceOfInt(c.Atom.data) }
+
+// SliceOfByte returns the big-endian byte representation of the Atom data.
+// This is how the Atom data is represented within a Binary atom container
+// file.  All Atom types must support this.
+func (c Codec) SliceOfByte() ([]byte, error) { return c.Atom.data, nil }
+
+/**********************************************************/
 // Encoder methods: convert given data type to []byte and store in Atom
-func (c Codec) SetString(v string) error { return c.Encoder.SetString(&c.Atom.data, v) }
+
+// SetString sets the Atom data to the value represented by the given string.
+// Must be implemented by all Atom types.
+func (c Codec) SetString(v string) error {
+	return c.Encoder.SetString(&c.Atom.data, v)
+}
+
+// SetStringDelimited sets the Atom data to the value represented by the given string, after stripping off the surrounding delimiters.
+// Delimiters must be the correct type according to the ADE escaping rules: double-quote for CSTR and USTR, single quote for FC32, double quote for IPAD.
+// For other types, this method has the same result as SetString.
+// Must be implemented by all Atom types.
 func (c Codec) SetStringDelimited(v string) error {
 	return c.Encoder.SetStringDelimited(&c.Atom.data, v)
 }
-func (c Codec) SetBool(v bool) error            { return c.Encoder.SetBool(&c.Atom.data, v) }
-func (c Codec) SetUint(v uint64) error          { return c.Encoder.SetUint(&c.Atom.data, v) }
-func (c Codec) SetInt(v int64) error            { return c.Encoder.SetInt(&c.Atom.data, v) }
-func (c Codec) SetFloat(v float64) error        { return c.Encoder.SetFloat(&c.Atom.data, v) }
+
+// SetBool sets the Atom data to the value of the given bool, for Atom data types that can be represented by a bool.
+func (c Codec) SetBool(v bool) error { return c.Encoder.SetBool(&c.Atom.data, v) }
+
+// SetUint sets the Atom data to the value of the given unsigned integer, for Atom data types that can be represented by an unsigned integer.
+func (c Codec) SetUint(v uint64) error { return c.Encoder.SetUint(&c.Atom.data, v) }
+
+// SetInt sets the Atom data to the value of the given integer, for Atom data types that can be represented by an integer.
+func (c Codec) SetInt(v int64) error { return c.Encoder.SetInt(&c.Atom.data, v) }
+
+// SetFloat sets the Atom data to the value of the given float, for Atom data types that can be represented by an float.
+func (c Codec) SetFloat(v float64) error { return c.Encoder.SetFloat(&c.Atom.data, v) }
+
+// SetSliceOfUint sets the Atom data to the value of the given slice of unsigned integers, for Atom data types that can be represented by a slice of unsigned integers.
 func (c Codec) SetSliceOfUint(v []uint64) error { return c.Encoder.SetSliceOfUint(&c.Atom.data, v) }
-func (c Codec) SetSliceOfInt(v []int64) error   { return c.Encoder.SetSliceOfInt(&c.Atom.data, v) }
-func (c Codec) SetSliceOfByte(v []byte) error   { return c.Encoder.SetSliceOfByte(&c.Atom.data, v) }
+
+// SetSliceOfInt sets the Atom data to the value of the given slice of integers, for Atom data types that can be represented by a slice of integers.
+func (c Codec) SetSliceOfInt(v []int64) error { return c.Encoder.SetSliceOfInt(&c.Atom.data, v) }
+
+// SetSliceOfByte sets the Atom data to the value of the given slice of bytes.
+func (c Codec) SetSliceOfByte(v []byte) error { return c.Encoder.SetSliceOfByte(&c.Atom.data, v) }
+
+/**********************************************************/
 
 // Initialize decoder table, which makes decoders accessible by ADE type.
 // Variable 'd' is used for assignment, because Go disallows assigning directly
@@ -432,24 +496,31 @@ func init() {
 
 // ADE unsigned int types
 
+// UI08ToUint64 accepts ADE UI08 data bytes, and expresses the value as a uint64.
 func UI08ToUint64(buf []byte) (v uint64, e error) {
 	if e = checkByteCount(buf, 1, "UI08"); e != nil {
 		return
 	}
 	return uint64(buf[0]), e
 }
+
+// UI16ToUint16 accepts ADE UI16 data bytes, and expresses the value as a uint16.
 func UI16ToUint16(buf []byte) (v uint16, e error) {
 	if e = checkByteCount(buf, 2, "UI16"); e != nil {
 		return
 	}
 	return binary.BigEndian.Uint16(buf), e
 }
+
+// UI16ToUint64 accepts ADE UI16 data bytes, and expresses the value as a uint64.
 func UI16ToUint64(buf []byte) (v uint64, e error) {
 	if e = checkByteCount(buf, 2, "UI16"); e != nil {
 		return
 	}
 	return uint64(binary.BigEndian.Uint16(buf)), e
 }
+
+// UI01ToBool accepts UI01 data bytes, and expresses the value as a bool.
 func UI01ToBool(buf []byte) (v bool, e error) {
 	if e = checkByteCount(buf, 4, "UI01"); e != nil {
 		return
@@ -460,12 +531,16 @@ func UI01ToBool(buf []byte) (v bool, e error) {
 	}
 	return ui32 == 1, e
 }
+
+// UI32ToUint32 accepts UI32 data bytes, and expresses the value as a uint32.
 func UI32ToUint32(buf []byte) (v uint32, e error) {
 	if e = checkByteCount(buf, 4, "UI32"); e != nil {
 		return
 	}
 	return binary.BigEndian.Uint32(buf), e
 }
+
+// UI32ToUint64 accepts ADE UI32 data bytes, and expresses the value as a uint64.
 func UI32ToUint64(buf []byte) (v uint64, e error) {
 	if e = checkByteCount(buf, 4, "UI32"); e != nil {
 		return
@@ -473,12 +548,16 @@ func UI32ToUint64(buf []byte) (v uint64, e error) {
 	var ui32 = binary.BigEndian.Uint32(buf)
 	return uint64(ui32), e
 }
+
+// UI64ToUint64 accepts ADE UI64 data bytes, and expresses the value as a uint64.
 func UI64ToUint64(buf []byte) (v uint64, e error) {
 	if e = checkByteCount(buf, 8, "UI64"); e != nil {
 		return
 	}
 	return binary.BigEndian.Uint64(buf), e
 }
+
+// UI64ToInt64 accepts ADE UI64 data bytes, and expresses the value as an int64.
 func UI64ToInt64(buf []byte) (v int64, e error) {
 	if e = checkByteCount(buf, 8, "UI64"); e != nil {
 		return
@@ -489,24 +568,32 @@ func UI64ToInt64(buf []byte) (v int64, e error) {
 	}
 	return int64(ui), e
 }
+
+// UI08ToString accepts ADE UI08 data bytes, and expresses the value as a string.
 func UI08ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 1, "UI08"); e != nil {
 		return
 	}
 	return fmt.Sprintf("%d", (buf[0])), e
 }
+
+// UI16ToString accepts ADE UI16 data bytes, and expresses the value as a string.
 func UI16ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 2, "UI16"); e != nil {
 		return
 	}
 	return fmt.Sprintf("%d", binary.BigEndian.Uint16(buf)), e
 }
+
+// UI32ToString accepts ADE UI32 data bytes, and expresses the value as a string.
 func UI32ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 4, "UI32"); e != nil {
 		return
 	}
 	return fmt.Sprintf("%d", binary.BigEndian.Uint32(buf)), e
 }
+
+// UI64ToString accepts ADE UI64 data bytes, and expresses the value as a string.
 func UI64ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 8, "UI64"); e != nil {
 		return
@@ -516,6 +603,7 @@ func UI64ToString(buf []byte) (v string, e error) {
 
 // ADE signed int types
 
+// SI08ToInt64 accepts ADE SI08 data bytes, and expresses the value as an int64.
 func SI08ToInt64(buf []byte) (v int64, e error) {
 	if e = checkByteCount(buf, 1, "SI08"); e != nil {
 		return
@@ -524,6 +612,8 @@ func SI08ToInt64(buf []byte) (v int64, e error) {
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &i)
 	return int64(i), e
 }
+
+// SI16ToInt16 accepts ADE SI08 data bytes, and expresses the value as an int16.
 func SI16ToInt16(buf []byte) (v int16, e error) {
 	if e = checkByteCount(buf, 2, "SI16"); e != nil {
 		return
@@ -531,6 +621,8 @@ func SI16ToInt16(buf []byte) (v int16, e error) {
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	return
 }
+
+// SI16ToInt64 accepts ADE SI16 data bytes, and expresses the value as an int64.
 func SI16ToInt64(buf []byte) (v int64, e error) {
 	if e = checkByteCount(buf, 2, "SI16"); e != nil {
 		return
@@ -539,6 +631,8 @@ func SI16ToInt64(buf []byte) (v int64, e error) {
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &i)
 	return int64(i), e
 }
+
+// SI32ToInt32 accepts ADE SI32 data bytes, and expresses the value as an int32.
 func SI32ToInt32(buf []byte) (v int32, e error) {
 	if e = checkByteCount(buf, 4, "SI32"); e != nil {
 		return
@@ -546,6 +640,8 @@ func SI32ToInt32(buf []byte) (v int32, e error) {
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	return
 }
+
+// SI32ToInt64 accepts ADE SI32 data bytes, and expresses the value as an int64.
 func SI32ToInt64(buf []byte) (v int64, e error) {
 	var i int32
 	i, e = SI32ToInt32(buf)
@@ -554,6 +650,8 @@ func SI32ToInt64(buf []byte) (v int64, e error) {
 	}
 	return v, e
 }
+
+// SI64ToInt64 accepts ADE SI64 data bytes, and expresses the value as an int64.
 func SI64ToInt64(buf []byte) (v int64, e error) {
 	if e = checkByteCount(buf, 8, "SI64"); e != nil {
 		return
@@ -561,6 +659,8 @@ func SI64ToInt64(buf []byte) (v int64, e error) {
 	e = binary.Read(bytes.NewReader(buf), binary.BigEndian, &v)
 	return v, e
 }
+
+// SI08ToString accepts ADE SI08 data bytes, and expresses the value as a string.
 func SI08ToString(buf []byte) (v string, e error) {
 	var i int64
 	i, e = SI08ToInt64(buf)
@@ -569,6 +669,8 @@ func SI08ToString(buf []byte) (v string, e error) {
 	}
 	return fmt.Sprintf("%d", i), e
 }
+
+// SI16ToString accepts ADE SI16 data bytes, and expresses the value as a string.
 func SI16ToString(buf []byte) (v string, e error) {
 	var i int64
 	i, e = SI16ToInt64(buf)
@@ -577,6 +679,8 @@ func SI16ToString(buf []byte) (v string, e error) {
 	}
 	return fmt.Sprintf("%d", i), e
 }
+
+// SI32ToString accepts ADE SI32 data bytes, and expresses the value as a string.
 func SI32ToString(buf []byte) (v string, e error) {
 	var i int64
 	i, e = SI32ToInt64(buf)
@@ -585,6 +689,8 @@ func SI32ToString(buf []byte) (v string, e error) {
 	}
 	return fmt.Sprintf("%d", i), e
 }
+
+// SI64ToString accepts ADE SI64 data bytes, and expresses the value as a string.
 func SI64ToString(buf []byte) (v string, e error) {
 	var i int64
 	i, e = SI64ToInt64(buf)
@@ -596,6 +702,7 @@ func SI64ToString(buf []byte) (v string, e error) {
 
 // ADE floating point types
 
+// FP32ToFloat32 accepts ADE FP32 data bytes, and expresses the value as a float32.
 func FP32ToFloat32(buf []byte) (v float32, e error) {
 	if e = checkByteCount(buf, 4, "FP32"); e != nil {
 		return
@@ -605,6 +712,8 @@ func FP32ToFloat32(buf []byte) (v float32, e error) {
 	v = math.Float32frombits(i)
 	return
 }
+
+// FP32ToFloat64 accepts ADE FP32 data bytes, and expresses the value as a float64.
 func FP32ToFloat64(buf []byte) (v float64, e error) {
 	if e = checkByteCount(buf, 4, "FP32"); e != nil {
 		return
@@ -616,6 +725,8 @@ func FP32ToFloat64(buf []byte) (v float64, e error) {
 	}
 	return
 }
+
+// FP64ToFloat64 accepts ADE FP64 data bytes, and expresses the value as a float64.
 func FP64ToFloat64(buf []byte) (v float64, e error) {
 	if e = checkByteCount(buf, 8, "FP64"); e != nil {
 		return
@@ -627,6 +738,8 @@ func FP64ToFloat64(buf []byte) (v float64, e error) {
 	}
 	return
 }
+
+// FP32ToString accepts ADE FP32 data bytes, and expresses the value as a string.
 func FP32ToString(buf []byte) (v string, e error) {
 	var f float64
 	f, e = FP32ToFloat64(buf)
@@ -635,6 +748,8 @@ func FP32ToString(buf []byte) (v string, e error) {
 	}
 	return
 }
+
+// FP64ToString accepts ADE FP64 data bytes, and expresses the value as a string.
 func FP64ToString(buf []byte) (v string, e error) {
 	var f float64
 	f, e = FP64ToFloat64(buf)
@@ -646,6 +761,7 @@ func FP64ToString(buf []byte) (v string, e error) {
 
 // ADE fixed point types, unsigned
 
+// UF32ToFloat64 accepts ADE UF32 data bytes, and expresses the value as a float64.
 func UF32ToFloat64(buf []byte) (v float64, e error) {
 	if e = checkByteCount(buf, 4, "UF32"); e != nil {
 		return
@@ -659,6 +775,8 @@ func UF32ToFloat64(buf []byte) (v float64, e error) {
 
 	return
 }
+
+// UF64ToFloat64 accepts ADE UF64 data bytes, and expresses the value as a float64.
 func UF64ToFloat64(buf []byte) (v float64, e error) {
 	if e = checkByteCount(buf, 8, "UF64"); e != nil {
 		return
@@ -671,6 +789,8 @@ func UF64ToFloat64(buf []byte) (v float64, e error) {
 	v = float64(i) / (1 + math.MaxUint32) // + 0.0000000002
 	return
 }
+
+// UF32ToString accepts ADE UF32 data bytes, and expresses the value as a string.
 func UF32ToString(buf []byte) (v string, e error) {
 	var f float64
 	f, e = UF32ToFloat64(buf)
@@ -680,8 +800,7 @@ func UF32ToString(buf []byte) (v string, e error) {
 	return
 }
 
-// ade: CXD_String.cc CXD_String_from_UFIX64(...)
-// isolate whole and fractional parts, then combine within the string
+// UF64ToString accepts ADE UF64 data bytes, and expresses the value as a string.
 func UF64ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 8, "UF64"); e != nil {
 		return
@@ -698,6 +817,7 @@ func UF64ToString(buf []byte) (v string, e error) {
 
 // ADE fixed point types, signed
 
+// SF32ToFloat64 accepts ADE SF32 data bytes, and expresses the value as a float64.
 func SF32ToFloat64(buf []byte) (v float64, e error) {
 	if e = checkByteCount(buf, 4, "SF32"); e != nil {
 		return
@@ -710,6 +830,8 @@ func SF32ToFloat64(buf []byte) (v float64, e error) {
 	v = float64(i) / float64(math.MaxUint16+1)
 	return
 }
+
+// SF64ToFloat64 accepts ADE SF64 data bytes, and expresses the value as a float64.
 func SF64ToFloat64(buf []byte) (v float64, e error) {
 	if e = checkByteCount(buf, 8, "SF64"); e != nil {
 		return
@@ -722,6 +844,8 @@ func SF64ToFloat64(buf []byte) (v float64, e error) {
 	v = float64(i) / (math.MaxUint32 + 1)
 	return
 }
+
+// SF32ToString accepts ADE SF32 data bytes, and expresses the value as a string.
 func SF32ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 4, "SF32"); e != nil {
 		return
@@ -734,6 +858,8 @@ func SF32ToString(buf []byte) (v string, e error) {
 	}
 	return
 }
+
+// SF64ToString accepts ADE SF64 data bytes, and expresses the value as a string.
 func SF64ToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 8, "SF64"); e != nil {
 		return
@@ -762,6 +888,7 @@ func SF64ToString(buf []byte) (v string, e error) {
 
 // ADE fractional types, unsigned
 
+// UR32ToSliceOfUint accepts ADE UR32 data bytes, and expresses the value as a slice of uint64.
 func UR32ToSliceOfUint(buf []byte) (v []uint64, e error) {
 	if e = checkByteCount(buf, 4, "UR32"); e != nil {
 		return
@@ -773,6 +900,8 @@ func UR32ToSliceOfUint(buf []byte) (v []uint64, e error) {
 	}
 	return
 }
+
+// UR64ToSliceOfUint accepts ADE UR64 data bytes, and expresses the value as a slice of uint64.
 func UR64ToSliceOfUint(buf []byte) (v []uint64, e error) {
 	if e = checkByteCount(buf, 8, "UR64"); e != nil {
 		return
@@ -784,6 +913,8 @@ func UR64ToSliceOfUint(buf []byte) (v []uint64, e error) {
 	}
 	return
 }
+
+// UR32ToString accepts ADE UR32 data bytes, and expresses the value as a string.
 func UR32ToString(buf []byte) (v string, e error) {
 	var arr []uint64
 	arr, e = UR32ToSliceOfUint(buf)
@@ -792,6 +923,8 @@ func UR32ToString(buf []byte) (v string, e error) {
 	}
 	return
 }
+
+// UR64ToString accepts ADE UR64 data bytes, and expresses the value as a string.
 func UR64ToString(buf []byte) (v string, e error) {
 	var arr []uint64
 	arr, e = UR64ToSliceOfUint(buf)
@@ -803,6 +936,7 @@ func UR64ToString(buf []byte) (v string, e error) {
 
 // ADE fractional types, signed
 
+// SR32ToSliceOfInt accepts ADE SR32 data bytes, and expresses the value as a slice of int64.
 func SR32ToSliceOfInt(buf []byte) (v []int64, e error) {
 	if e = checkByteCount(buf, 4, "SR32"); e != nil {
 		return
@@ -814,6 +948,8 @@ func SR32ToSliceOfInt(buf []byte) (v []int64, e error) {
 	}
 	return
 }
+
+// SR64ToSliceOfInt accepts ADE SR64 data bytes, and expresses the value as a slice of int64.
 func SR64ToSliceOfInt(buf []byte) (v []int64, e error) {
 	if e = checkByteCount(buf, 8, "SR64"); e != nil {
 		return
@@ -825,6 +961,8 @@ func SR64ToSliceOfInt(buf []byte) (v []int64, e error) {
 	}
 	return
 }
+
+// SR32ToString accepts ADE SR32 data bytes, and expresses the value as a string.
 func SR32ToString(buf []byte) (v string, e error) {
 	var arr []int64
 	arr, e = SR32ToSliceOfInt(buf)
@@ -833,6 +971,8 @@ func SR32ToString(buf []byte) (v string, e error) {
 	}
 	return
 }
+
+// SR64ToString accepts ADE SR64 data bytes, and expresses the value as a string.
 func SR64ToString(buf []byte) (v string, e error) {
 	var arr []int64
 	arr, e = SR64ToSliceOfInt(buf)
@@ -842,9 +982,8 @@ func SR64ToString(buf []byte) (v string, e error) {
 	return
 }
 
-// FC32ToString returns a four-char code value as a printable string.
-// The string may be either 4 printable characters, or 0x followed by 8 hex
-// digits.
+// FC32ToString accepts ADE FC32 data bytes, and expresses the value as a string of printable characters.
+// The string may be either 4 printable characters, or 0x followed by 8 hex digits.
 //
 // This code avoids Mantis #27726: ccat/ctac can't parse container names
 // starting with "#" or " ".
@@ -860,9 +999,8 @@ func FC32ToString(buf []byte) (v string, e error) {
 	return
 }
 
-// FC32ToStringDelimited returns a four-char code value as a printable string.
-// The string may be either 4 printable characters, or 0x followed by 8 hex
-// digits.
+// FC32ToStringDelimited accepts ADE FC32 data bytes, and expresses the value as a delimited string.
+// The string may be either 4 printable characters, or 0x followed by 8 hex digits.
 //
 // If the 4 printable characters version is returned, it will be surrounded by
 // single-quote delimiters.
@@ -877,6 +1015,7 @@ func FC32ToStringDelimited(buf []byte) (v string, e error) {
 	return
 }
 
+// UUIDToString accepts ADE UUID data bytes, and expresses the value as a string.
 func UUIDToString(buf []byte) (v string, e error) {
 	if e = checkByteCount(buf, 16, "UUID"); e != nil {
 		return
@@ -895,6 +1034,7 @@ func UUIDToString(buf []byte) (v string, e error) {
 // The IP32 type may optionally include multiple 4-byte values, which have
 // occasionally (rarely) been used to represent address ranges.
 // These are represented as hex, matching the ADE ccat behaviour.
+// IP32ToString accepts ADE IP32 data bytes, and expresses the value as a string.
 func IP32ToString(buf []byte) (v string, e error) {
 
 	// single address is expressed as dotted quad
@@ -943,6 +1083,7 @@ func IP32ToUint64(buf []byte) (v uint64, e error) {
 	return
 }
 
+// IPADToString accepts ADE IPAD data bytes, and expresses the value as a string.
 func IPADToString(buf []byte) (v string, e error) {
 	v = string(buf[0 : len(buf)-1]) // trim null terminator
 	v = fmt.Sprintf("\"%s\"", v)
@@ -951,6 +1092,7 @@ func IPADToString(buf []byte) (v string, e error) {
 
 // String types
 
+// CSTRToString accepts ADE CSTR data bytes, and expresses the value as a string.
 func CSTRToString(buf []byte) (v string, e error) {
 	if bytes.IndexByte(buf, '\x00') != len(buf)-1 || len(buf) == 0 {
 		pos := bytes.IndexByte(buf, '\x00')
@@ -965,6 +1107,7 @@ func CSTRToString(buf []byte) (v string, e error) {
 	return v, nil
 }
 
+// CSTRToStringDelimited accepts ADE CSTR data bytes, and expresses the value as a string.
 func CSTRToStringDelimited(buf []byte) (v string, e error) {
 	if v, e = CSTRToString(buf); e != nil {
 		return
@@ -972,6 +1115,7 @@ func CSTRToStringDelimited(buf []byte) (v string, e error) {
 	return fmt.Sprintf(`"%s"`, v), e
 }
 
+// USTRToString accepts ADE USTR data bytes, and expresses the value as a string.
 // These values are stored as UTF32 Big Endian: each char is a uint32 that
 // represents the integer value of the codepoint.
 // Example: Unlike in UTF-8, 0xFF ==  0x000000FF == `ÿ`.
@@ -1003,6 +1147,7 @@ func USTRToString(buf []byte) (v string, e error) {
 	return output.String(), nil
 }
 
+// USTRToStringDelimited accepts ADE USTR data bytes, and expresses the value as a string surrounded by double-quote delimiters.
 func USTRToStringDelimited(buf []byte) (v string, e error) {
 	v, e = USTRToString(buf)
 	if e != nil {
@@ -1011,6 +1156,7 @@ func USTRToStringDelimited(buf []byte) (v string, e error) {
 	return fmt.Sprintf("\"%s\"", v), e
 }
 
+// BytesToHexString accepts bytes, and expresses the value as a hexadecimal string starting with "0x".
 func BytesToHexString(buf []byte) (v string, e error) {
 	if len(buf) == 0 {
 		v = ""
@@ -1022,6 +1168,9 @@ func BytesToHexString(buf []byte) (v string, e error) {
 
 /**********************************************************/
 
+// CSTRBytesToEscapedString accepts ADE CSTR data bytes, reads the CSTR data,
+// and applies ADE escaping rules before returning the result as a string.
+//
 // ade: libs/osl/OSL_Types.cc CStr_Escape()
 // Escaping must be performed on raw byte slice, not on same data casted to
 // string. This is because casting a byte slice containing high ascii (128-255)
@@ -1055,6 +1204,9 @@ func CSTRBytesToEscapedString(input []byte) string {
 	return string(output)
 }
 
+// CSTRBytesFromEscapedString accepts a string that has had ADE escaping rules
+// applied, strips the escape characters, and expresses the value as ADE CSTR
+// data bytes.
 func CSTRBytesFromEscapedString(input string) (output []byte, e error) {
 	buf := bytes.NewBuffer(make([]byte, 0, len(input)+1))
 
@@ -1127,6 +1279,8 @@ func CSTRBytesFromEscapedString(input string) (output []byte, e error) {
 	return buf.Bytes(), e
 }
 
+// adeMustEscapeRune returns true if the given rune needs to be escaped
+// according to ADE string escaping rules.
 func adeMustEscapeRune(r rune) bool {
 	if r == '\n' || r == '\r' || r == '"' || r == '\\' {
 		return true
@@ -1305,6 +1459,7 @@ func init() {
 Encoding functions - set Atom.data bytes from go type
 ************************************************************/
 
+// StringToUI01Bytes writes a string value to a byte slice pointer as ADE UI01 binary data.
 func StringToUI01Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1320,6 +1475,7 @@ func StringToUI01Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// BoolToUI01Bytes writes a bool value to a byte slice pointer as ADE UI01 binary data.
 func BoolToUI01Bytes(buf *[]byte, v bool) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1332,6 +1488,7 @@ func BoolToUI01Bytes(buf *[]byte, v bool) (e error) {
 	return
 }
 
+// Uint64ToUI01Bytes writes a uint64 value to the byte slice pointer as ADE UI01 binary data .
 func Uint64ToUI01Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1348,6 +1505,7 @@ func Uint64ToUI01Bytes(buf *[]byte, v uint64) (e error) {
 
 // encode of unsigned integer types
 
+// StringToUI08Bytes writes a string value to a byte slice pointer as ADE UI08 binary data.
 func StringToUI08Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 1 {
 		*buf = make([]byte, 1)
@@ -1360,6 +1518,7 @@ func StringToUI08Bytes(buf *[]byte, v string) (e error) {
 	return Uint64ToUI08Bytes(buf, i)
 }
 
+// Uint64ToUI08Bytes writes a uint64 value to a byte slice pointer as ADE UI08 binary data.
 func Uint64ToUI08Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 1 {
 		*buf = make([]byte, 1)
@@ -1372,6 +1531,7 @@ func Uint64ToUI08Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
+// StringToUI16Bytes writes a string value to a byte slice pointer as ADE UI16 binary data.
 func StringToUI16Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 2 {
 		*buf = make([]byte, 2)
@@ -1385,6 +1545,7 @@ func StringToUI16Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Uint64ToUI16Bytes writes a uint64 value to a byte slice pointer as ADE UI16 binary data.
 func Uint64ToUI16Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 2 {
 		*buf = make([]byte, 2)
@@ -1396,6 +1557,7 @@ func Uint64ToUI16Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
+// StringToUI32Bytes writes a string value to a byte slice pointer as ADE UI32 binary data.
 func StringToUI32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1409,6 +1571,7 @@ func StringToUI32Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Uint64ToUI32Bytes writes a uint64 value to a byte slice pointer as ADE UI32 binary data.
 func Uint64ToUI32Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1420,6 +1583,7 @@ func Uint64ToUI32Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
+// StringToUI64Bytes writes a string value to a byte slice pointer as ADE UI64 binary data.
 func StringToUI64Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1434,6 +1598,7 @@ func StringToUI64Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Uint64ToUI64Bytes writes a uint64 value to a byte slice pointer as ADE UI64 binary data.
 func Uint64ToUI64Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1444,6 +1609,7 @@ func Uint64ToUI64Bytes(buf *[]byte, v uint64) (e error) {
 
 // encode of signed integer types
 
+// StringToSI08Bytes writes a string value to a byte slice pointer as ADE SI08 binary data.
 func StringToSI08Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 1 {
 		*buf = make([]byte, 1)
@@ -1456,6 +1622,7 @@ func StringToSI08Bytes(buf *[]byte, v string) (e error) {
 	return Int64ToSI08Bytes(buf, i)
 }
 
+// Int64ToSI08Bytes writes a int64 value to a byte slice pointer as ADE SI08 binary data.
 func Int64ToSI08Bytes(buf *[]byte, v int64) (e error) {
 	if len(*buf) != 1 {
 		*buf = make([]byte, 1)
@@ -1467,6 +1634,7 @@ func Int64ToSI08Bytes(buf *[]byte, v int64) (e error) {
 	return
 }
 
+// StringToSI16Bytes writes a string value to a byte slice pointer as ADE SI16 binary data.
 func StringToSI16Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 2 {
 		*buf = make([]byte, 2)
@@ -1480,6 +1648,7 @@ func StringToSI16Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Int64ToSI16Bytes and writes an int64 value to a byte slice pointer as ADE SI16 binary data.
 func Int64ToSI16Bytes(buf *[]byte, v int64) (e error) {
 	if len(*buf) != 2 {
 		*buf = make([]byte, 2)
@@ -1491,6 +1660,7 @@ func Int64ToSI16Bytes(buf *[]byte, v int64) (e error) {
 	return
 }
 
+// StringToSI32Bytes writes a string value to a byte slice pointer as ADE SI32 binary data.
 func StringToSI32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1504,6 +1674,7 @@ func StringToSI32Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Int64ToSI32Bytes writes an int64 value to a byte slice pointer as ADE SI32 binary data.
 func Int64ToSI32Bytes(buf *[]byte, v int64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1515,6 +1686,7 @@ func Int64ToSI32Bytes(buf *[]byte, v int64) (e error) {
 	return
 }
 
+// StringToSI64Bytes writes a string value to a byte slice pointer as ADE SI64 binary data.
 func StringToSI64Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1528,6 +1700,7 @@ func StringToSI64Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Int64ToSI64Bytes writes an int64 value to a byte slice pointer as ADE SI64 binary data.
 func Int64ToSI64Bytes(buf *[]byte, v int64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1538,6 +1711,7 @@ func Int64ToSI64Bytes(buf *[]byte, v int64) (e error) {
 
 // encode of unsigned fractional types
 
+// StringToUR32Bytes writes a string value to a byte slice pointer as ADE UR32 binary data.
 func StringToUR32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1557,6 +1731,8 @@ func StringToUR32Bytes(buf *[]byte, v string) (e error) {
 	return SliceOfUint64ToUR32Bytes(buf, []uint64{num, den})
 }
 
+// SliceOfUint64ToUR32Bytes writes a []uint64 value to a byte slice pointer as ADE UR32 binary data.
+// The input should be a length 2 slice with the first value being the numerator, and the second being the denominator.
 func SliceOfUint64ToUR32Bytes(buf *[]byte, v []uint64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1576,6 +1752,7 @@ func SliceOfUint64ToUR32Bytes(buf *[]byte, v []uint64) (e error) {
 	return
 }
 
+// StringToUR64Bytes writes a string value to a byte slice pointer as ADE UR64 binary data.
 func StringToUR64Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1592,6 +1769,8 @@ func StringToUR64Bytes(buf *[]byte, v string) (e error) {
 	return SliceOfUint64ToUR64Bytes(buf, []uint64{num, den})
 }
 
+// SliceOfUint64ToUR64Bytes writes a []uint64 value to a byte slice pointer as ADE UI01 binary data.
+// The input should be a length 2 slice with the first value being the numerator, and the second being the denominator.
 func SliceOfUint64ToUR64Bytes(buf *[]byte, v []uint64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1612,6 +1791,7 @@ func SliceOfUint64ToUR64Bytes(buf *[]byte, v []uint64) (e error) {
 
 // encode of signed fractional types
 
+// StringToSR32Bytes writes a string value to a byte slice pointer as ADE SR32 binary data.
 func StringToSR32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1628,6 +1808,8 @@ func StringToSR32Bytes(buf *[]byte, v string) (e error) {
 	return SliceOfInt64ToSR32Bytes(buf, []int64{num, den})
 }
 
+// SliceOfInt64ToSR32Bytes writes a []int64 value to a byte slice pointer as ADE SR32 binary data.
+// The input should be a length 2 slice with the first value being the numerator, and the second being the denominator.
 func SliceOfInt64ToSR32Bytes(buf *[]byte, v []int64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1646,6 +1828,7 @@ func SliceOfInt64ToSR32Bytes(buf *[]byte, v []int64) (e error) {
 	return
 }
 
+// StringToSR64Bytes writes a string value to a byte slice pointer as ADE SR64 binary data.
 func StringToSR64Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1662,6 +1845,8 @@ func StringToSR64Bytes(buf *[]byte, v string) (e error) {
 	return SliceOfInt64ToSR64Bytes(buf, []int64{num, den})
 }
 
+// SliceOfInt64ToSR64Bytes writes a []int64 value to a byte slice pointer as ADE SR64 binary data.
+// The input should be a length 2 slice with the first value being the numerator, and the second being the denominator.
 func SliceOfInt64ToSR64Bytes(buf *[]byte, v []int64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1683,6 +1868,7 @@ func SliceOfInt64ToSR64Bytes(buf *[]byte, v []int64) (e error) {
 
 // encode of floating point types
 
+// StringToFP32Bytes writes a string value to a byte slice pointer as ADE FP32 binary data.
 func StringToFP32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1695,6 +1881,7 @@ func StringToFP32Bytes(buf *[]byte, v string) (e error) {
 	return Float64ToFP32Bytes(buf, f)
 }
 
+// Float64ToFP32Bytes writes a float64 value to a byte slice pointer as ADE FP32 binary data.
 func Float64ToFP32Bytes(buf *[]byte, v float64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1707,6 +1894,7 @@ func Float64ToFP32Bytes(buf *[]byte, v float64) (e error) {
 	return
 }
 
+// StringToFP64Bytes writes a string value to a byte slice pointer as ADE FP64 binary data.
 func StringToFP64Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1719,6 +1907,7 @@ func StringToFP64Bytes(buf *[]byte, v string) (e error) {
 	return Float64ToFP64Bytes(buf, f)
 }
 
+// Float64ToFP64Bytes writes a float64 value to a byte slice pointer as ADE FP64 binary data.
 func Float64ToFP64Bytes(buf *[]byte, v float64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1734,6 +1923,7 @@ func Float64ToFP64Bytes(buf *[]byte, v float64) (e error) {
 
 // encode of fixed point types
 
+// StringToUF32Bytes writes a string value to a byte slice pointer as ADE UF32 binary data.
 func StringToUF32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1749,6 +1939,7 @@ func StringToUF32Bytes(buf *[]byte, v string) (e error) {
 	return Float64ToUF32Bytes(buf, f)
 }
 
+// Float64ToUF32Bytes writes a float64 value to a byte slice pointer as ADE UF32 binary data.
 func Float64ToUF32Bytes(buf *[]byte, v float64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1760,7 +1951,8 @@ func Float64ToUF32Bytes(buf *[]byte, v float64) (e error) {
 	return
 }
 
-// 2017-03-09 fhanson
+// StringToUF64Bytes writes a string value to a byte slice pointer as ADE UF64 binary data.
+//
 // The doc states this range limit for ADE type UFIX64:
 ///    "The highest value is 0xFFFFFFFFFFFFFFFF
 //      = 231 + 230 + … + 21 + 20 + 2-1 +2-2 + … + 2-31 + 2-32
@@ -1828,6 +2020,7 @@ func StringToUF64Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Float64ToUF64Bytes writes a float64 value to a byte slice pointer as ADE UF64 binary data.
 func Float64ToUF64Bytes(buf *[]byte, v float64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1840,6 +2033,7 @@ func Float64ToUF64Bytes(buf *[]byte, v float64) (e error) {
 	return
 }
 
+// StringToSF32Bytes writes a string value to a byte slice pointer as ADE SF32 binary data.
 func StringToSF32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1852,6 +2046,7 @@ func StringToSF32Bytes(buf *[]byte, v string) (e error) {
 	return Float64ToSF32Bytes(buf, f)
 }
 
+// Float64ToSF32Bytes writes a float64 value to a byte slice pointer as ADE SF32 binary data.
 func Float64ToSF32Bytes(buf *[]byte, v float64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1863,6 +2058,8 @@ func Float64ToSF32Bytes(buf *[]byte, v float64) (e error) {
 	return
 }
 
+// StringToSF64Bytes writes a string value to a byte slice pointer as ADE SF64 binary data.
+//
 // The doc states this:
 //     The highest positive value is:
 //     0x7FFFFFFFFFFFFFFF = 2147483647.999999999
@@ -1899,6 +2096,7 @@ func StringToSF64Bytes(buf *[]byte, v string) (e error) {
 	return nil
 }
 
+// Float64ToSF64Bytes writes a string value to a byte slice pointer as ADE UI01 binary data.
 func Float64ToSF64Bytes(buf *[]byte, v float64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
@@ -1915,7 +2113,7 @@ func Float64ToSF64Bytes(buf *[]byte, v float64) (e error) {
 	return
 }
 
-// StringToFC32Bytes writes the given 4-char string into the given byte slice.
+// StringToFC32Bytes writes a string value to a byte slice pointer as ADE FC32 binary data.
 func StringToFC32Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1954,6 +2152,7 @@ func StringToFC32Bytes(buf *[]byte, v string) (e error) {
 	return nil
 }
 
+// Uint64ToFC32Bytes writes a uint64 value to a byte slice pointer as ADE FC32 binary data.
 func Uint64ToFC32Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 4 {
 		*buf = make([]byte, 4)
@@ -1965,6 +2164,7 @@ func Uint64ToFC32Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
+// StringToIP32Bytes writes a string value to a byte slice pointer as ADE IP32 binary data.
 // IP32 is usually a simple 4 bytes = 4 octets type, but it also has a
 // rarely used multi-width form used to define a range.
 // The double-width form seems to be expressed solely in hex.
@@ -1994,6 +2194,7 @@ func StringToIP32Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// HexStringToIP32Bytes writes a hexadecimal string value to a byte slice pointer as ADE IP32 binary data.
 // Restrictions:
 // string must start with "0x"
 // following that must be only hex digits, in any number of sets of 8
@@ -2026,6 +2227,7 @@ func HexStringToIP32Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// Uint64ToIP32Bytes writes a uint64 value to a byte slice pointer as ADE IP32 binary data.
 func Uint64ToIP32Bytes(buf *[]byte, v uint64) (e error) {
 	if v > math.MaxUint32 {
 		// store as 2 IPv4 addresses in 8 bytes
@@ -2043,6 +2245,7 @@ func Uint64ToIP32Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
+// StringToIPADBytes writes a string value to a byte slice pointer as ADE IPAD binary data.
 func StringToIPADBytes(buf *[]byte, v string) (e error) {
 	size := len(v)
 	*buf = make([]byte, size)
@@ -2070,8 +2273,9 @@ func StringToIPADBytes(buf *[]byte, v string) (e error) {
 	return
 }
 
-// No NULL terminator is used for this type
-// Double-quote delimiters are optional on the input string
+// StringToUUIDBytes writes a string value to a byte slice pointer as ADE UUID binary data.
+// No NULL terminator is used for this type.
+// Double-quote delimiters are optional on the input string.
 func StringToUUIDBytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 36 {
 		*buf = make([]byte, 36)
@@ -2094,6 +2298,7 @@ func StringToUUIDBytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// DelimitedStringToCSTRBytes writes a string value to a byte slice pointer as ADE CSTR binary data.
 func DelimitedStringToCSTRBytes(buf *[]byte, v string) (e error) {
 	L := len(v)
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
@@ -2102,12 +2307,15 @@ func DelimitedStringToCSTRBytes(buf *[]byte, v string) (e error) {
 	return StringToCSTRBytes(buf, v[1:L-1])
 }
 
-// Uses NULL terminator
+// StringToCSTRBytes writes a string value to a byte slice pointer as ADE UI01 binary data.
+// A NULL terminator is appended to the string value.
 func StringToCSTRBytes(buf *[]byte, v string) (e error) {
 	*buf, e = CSTRBytesFromEscapedString(v)
 	return e
 }
 
+// DelimitedStringToUSTRBytes writes a string value to a byte slice pointer as ADE USTR binary data.
+// It first strips off the double-quote delimiters.
 func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 	L := len(v)
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
@@ -2116,8 +2324,7 @@ func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 	return StringToUSTRBytes(buf, v[1:L-1])
 }
 
-// SetUSTRFromString sets the atom data to the byte representation of the
-// input string.
+// StringToUSTRBytes writes a string value to a byte slice pointer as ADE USTR binary data.
 //
 // The string is encoded as UTF32 big-endian (ie. 4 bytes for each rune, no
 // variable-length encoding allowed.)
@@ -2185,6 +2392,8 @@ func StringToUSTRBytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// HexStringToDATABytes writes a hexadecimal byte string value to a byte slice pointer as bytes.
+// A leading "0x" on input is optional.
 func HexStringToDATABytes(buf *[]byte, v string) (e error) {
 
 	// empty input string results in empty data section
@@ -2217,7 +2426,7 @@ func checkByteCount(buf []byte, bytesExpected int, strType string) (e error) {
 // SetFromString initializes a UUID from a string.
 // The string should be a properly formatted UUID string, including dashes, but
 // without delimiters at the start and end.
-func (p *uuidType) SetFromString(s string) (e error) {
+func (u *uuidType) SetFromString(s string) (e error) {
 	if !ValidUUIDString(s) {
 		return errStrInvalid("UUID", s)
 	}
@@ -2230,22 +2439,22 @@ func (p *uuidType) SetFromString(s string) (e error) {
 		}
 		values = append(values, value)
 	}
-	return p.SetFromUints(values)
+	return u.SetFromUints(values)
 }
 
-func (p *uuidType) SetFromUints(values []uint64) (e error) {
+func (u *uuidType) SetFromUints(values []uint64) (e error) {
 	if len(values) != 5 {
 		return fmt.Errorf("invalid integer values for type UUID: %v", values)
 	}
-	p.TimeLow = uint32(values[0])
-	p.TimeMid = uint16(values[1])
-	p.TimeHiAndVersion = uint16(values[2])
-	p.ClkSeqHiRes = uint8(values[3] >> 8)
-	p.ClkSeqLow = uint8(values[3] & 0x00000000000000FF)
+	u.TimeLow = uint32(values[0])
+	u.TimeMid = uint16(values[1])
+	u.TimeHiAndVersion = uint16(values[2])
+	u.ClkSeqHiRes = uint8(values[3] >> 8)
+	u.ClkSeqLow = uint8(values[3] & 0x00000000000000FF)
 
 	var buf = make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, values[4])
-	copy(p.Node[:], buf[2:])
+	copy(u.Node[:], buf[2:])
 	return
 }
 
@@ -2256,6 +2465,7 @@ func (u uuidType) Bytes() []byte {
 	return buf.Bytes()
 }
 
+// String returns the UUID data as a hyphenated string.
 func (u uuidType) String() string {
 	return fmt.Sprintf(
 		"%08X-%04X-%04X-%02X%02X-%012X",
@@ -2314,12 +2524,16 @@ func Round(val float64, places int) float64 {
 // Clients with an Atom can use these to decide how to handle atom data.
 // They are intended to provide hints as to how the data should be handled, rather
 // than a straight mapping of what decoder funcs are provided for each type.
+// than a straight mapping of what decoder funcs are provided for each type.
 // (eg. every ADE type implements String() and FromString(), not just the ones
 // that return true for IsString().)
 
+// IsBool returns true if the receiver's Atom has a boolean type.
 func (c Codec) IsBool() bool {
 	return c.Atom.Type() == "UI01"
 }
+
+// IsUint returns true if the receiver's Atom has an unsigned integer type.
 func (c *Codec) IsUint() bool {
 	switch c.Atom.Type() {
 	case "UI08", "UI16", "UI32", "UI64":
@@ -2327,6 +2541,8 @@ func (c *Codec) IsUint() bool {
 	}
 	return false
 }
+
+// IsInt returns true if the receiver's Atom has an integer type.
 func (c *Codec) IsInt() bool {
 	switch c.Atom.Type() {
 	case "SI08", "SI16", "SI32", "SI64":
@@ -2334,6 +2550,8 @@ func (c *Codec) IsInt() bool {
 	}
 	return false
 }
+
+// IsFloat returns true if the receiver's Atom has a floating point type.
 func (c *Codec) IsFloat() bool {
 	switch c.Atom.Type() {
 	case "FP32", "FP64", "UF32", "UF64", "SF32", "SF64":
@@ -2341,6 +2559,8 @@ func (c *Codec) IsFloat() bool {
 	}
 	return false
 }
+
+// IsString returns true if the receiver's Atom has a string type.
 func (c *Codec) IsString() bool {
 	switch c.Atom.Type() {
 	case "CSTR", "USTR", "FC32", "IP32", "IPAD", "DATA", "CNCT", "cnct", "UUID":

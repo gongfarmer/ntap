@@ -29,6 +29,10 @@ type Atom struct {
 	Value    *Codec
 }
 
+// Log is a log.Logger object where atom debug-level log messages are sent.
+// By default it discards log messages, because there's nothing here that
+// users of this API need to see.  Set this to something else if you want to
+// see log messages.
 var Log *log.Logger
 
 func init() {
@@ -59,6 +63,7 @@ func (a *Atom) Children() []*Atom {
 	return a.children
 }
 
+// NewAtom constructs a new Atom object with the specified name and type.
 func NewAtom(name string, typ ADEType) (a *Atom, e error) {
 	if len(name) != 4 {
 		return nil, fmt.Errorf(`atom name must be 4 chars long, got "%s"`, name)
@@ -122,10 +127,9 @@ func (a *Atom) ZeroData() {
 func (a Atom) String() string {
 	if a.typ == CONT {
 		return fmt.Sprintf("%s:%s:", a.Name(), a.Type())
-	} else {
-		str, _ := a.Value.StringDelimited()
-		return fmt.Sprintf("%s:%s:%s", a.Name(), a.Type(), str)
 	}
+	str, _ := a.Value.StringDelimited()
+	return fmt.Sprintf("%s:%s:%s", a.Name(), a.Type(), str)
 }
 
 // AddChild makes the Atom pointed to by the argument a child of this Atom.
