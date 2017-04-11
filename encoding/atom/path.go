@@ -98,9 +98,7 @@ const (
 )
 
 type (
-	// AtomPath is for evaluating paths.
-	// To evaluate paths, construct one by providing a path string to NewPath().
-	// Then send it a root atom to evaluate against
+	// AtomPath is for using path strings to find matching atoms.
 	AtomPath struct {
 		Path      string
 		evaluator *pathEvaluator
@@ -145,8 +143,8 @@ type (
 )
 
 // NewAtomPath creates an AtomPath object for the given path string.  It
-// performs all lexing and parsing steps, so that evaluating data sets against
-// the path will have as little overhead as possible.
+// performs all lexing and parsing steps, so that evaluating atoms against the
+// path will have as little overhead as possible.
 func NewAtomPath(path string) (ap *AtomPath, e error) {
 	Log.Printf("NewAtomPath(%q)", path)
 
@@ -250,8 +248,8 @@ func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	return
 }
 
-// GetAtoms returns the result atoms from evaluating the given atom as the root
-// of the path expression.
+// GetAtoms returns the atoms that match the path, using the given atom as the
+// root.
 func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
 	return ap.evaluator.evaluate(root)
 }

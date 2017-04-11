@@ -1,10 +1,10 @@
-package codec
-
-// This file provides methods for interpreting and conversion of ADE Atom data types.
+// Package codec provides methods for interpreting and conversion of ADE data types.
 //
-// ADE Data types are defined in 112-0002_r4.0B_StorageGRID_Data_Types.
+// ADE Data types are defined in document 112-0002_r4.0B_StorageGRID_Data_Types.
 //
 // The ADE headers for these types are in OSL_Types.h.
+package codec
+
 import (
 	"bytes"
 	"encoding/binary"
@@ -2568,7 +2568,7 @@ func (c Codec) IsBool() bool {
 }
 
 // IsUint returns true if the receiver's Atom has an unsigned integer type.
-func (c *Codec) IsUint() bool {
+func (c Codec) IsUint() bool {
 	switch c.typ {
 	case "UI08", "UI16", "UI32", "UI64":
 		return true
@@ -2577,7 +2577,7 @@ func (c *Codec) IsUint() bool {
 }
 
 // IsInt returns true if the receiver's Atom has an integer type.
-func (c *Codec) IsInt() bool {
+func (c Codec) IsInt() bool {
 	switch c.typ {
 	case "SI08", "SI16", "SI32", "SI64":
 		return true
@@ -2586,7 +2586,7 @@ func (c *Codec) IsInt() bool {
 }
 
 // IsFloat returns true if the receiver's Atom has a floating point type.
-func (c *Codec) IsFloat() bool {
+func (c Codec) IsFloat() bool {
 	switch c.typ {
 	case "FP32", "FP64", "UF32", "UF64", "SF32", "SF64":
 		return true
@@ -2595,7 +2595,7 @@ func (c *Codec) IsFloat() bool {
 }
 
 // IsString returns true if the receiver's Atom has a string type.
-func (c *Codec) IsString() bool {
+func (c Codec) IsString() bool {
 	switch c.typ {
 	case "CSTR", "USTR", "FC32", "IP32", "IPAD", "DATA", "CNCT", "cnct", "UUID":
 		return true
@@ -2608,7 +2608,7 @@ func (c *Codec) IsString() bool {
 // value can be set without needing memory allocation.
 // For variable-sized types, data is set to nil and all memory released for
 // garbage collection.
-func (c *Codec) ZeroData() {
+func (c Codec) ZeroData() {
 	switch c.typ {
 	case UI08, SI08:
 		zeroOrAllocateByteSlice(c.dataPtr, 1)
