@@ -10,8 +10,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
-	"unicode"
+
+	"github.com/gongfarmer/ntap/encoding/atom/codec"
 )
 
 // Verify that type Atom satisfies these interfaces at compile time
@@ -23,10 +23,10 @@ var _ encoding.TextMarshaler = &Atom{}
 // Atom represents a single ADE atom, which may be a container containing other atoms.
 type Atom struct {
 	name     []byte
-	typ      ADEType
+	typ      codec.ADEType
 	data     []byte
 	children []*Atom
-	Value    *Codec
+	Value    *codec.Codec
 }
 
 // Log is a log.Logger object where atom debug-level log messages are sent.
@@ -43,7 +43,7 @@ func init() {
 // If printable, it's 4 printable chars.  Otherwise, it's
 // a hex string preceded by 0x.
 func (a *Atom) Name() (name string) {
-	name, _ = FC32ToString(a.name)
+	name, _ = codec.FC32ToString(a.name)
 	return name
 }
 
@@ -64,7 +64,7 @@ func (a *Atom) Children() []*Atom {
 }
 
 // NewAtom constructs a new Atom object with the specified name and type.
-func NewAtom(name string, typ ADEType) (a *Atom, e error) {
+func NewAtom(name string, typ codec.ADEType) (a *Atom, e error) {
 	if len(name) != 4 {
 		return nil, fmt.Errorf(`atom name must be 4 chars long, got "%s"`, name)
 	}
@@ -84,48 +84,22 @@ func NewAtom(name string, typ ADEType) (a *Atom, e error) {
 // It also empties the list of child atoms.
 func (a *Atom) Zero() {
 	a.name = []byte{0, 0, 0, 0}
-	a.SetType(NULL)
+	a.SetType(codec.NULL)
 	a.children = []*Atom{}
 }
 
 // SetType sets the type of an Atom object, and handles updating the Codec and
 // data fields to match.
-func (a *Atom) SetType(newType ADEType) {
+func (a *Atom) SetType(newType codec.ADEType) {
 	a.typ = newType
-	a.Value = NewCodec(a)
-	a.ZeroData()
-}
-
-// ZeroData sets an atom's data to the zero value of its ADE type.
-// For fixed-size types, the byte slice capacity remains the same so that a new
-// value can be set without needing memory allocation.
-// For variable-sized types, data is set to nil and all memory released for
-// garbage collection.
-func (a *Atom) ZeroData() {
-	switch a.typ {
-	case UI08, SI08:
-		zeroOrAllocateByteSlice(&a.data, 1)
-	case UI16, SI16:
-		zeroOrAllocateByteSlice(&a.data, 2)
-	case UI01, UI32, SI32, FP32, UF32, SF32, SR32, UR32, FC32, IP32, ENUM:
-		zeroOrAllocateByteSlice(&a.data, 4)
-	case UI64, SI64, FP64, UF64, SF64, UR64, SR64:
-		zeroOrAllocateByteSlice(&a.data, 8)
-	case UUID:
-		zeroOrAllocateByteSlice(&a.data, 36)
-	case IPAD, CSTR, USTR, DATA, CNCT, Cnct:
-		a.data = nil
-	case CONT, NULL:
-		a.data = nil
-	default:
-		panic(fmt.Sprintf(`unknown ADE type: "%v"`, a.typ))
-	}
+	a.Value = codec.NewCodec(&a.data, a.typ)
+	a.Value.ZeroData()
 }
 
 // String returns the atom's text description in ADE ContainerText format.
 // This is a single line, it doesn't include a list of child atoms.
 func (a *Atom) String() string {
-	if a.typ == CONT {
+	if a.typ == codec.CONT {
 		return fmt.Sprintf("%s:%s:", a.Name(), a.Type())
 	}
 	str, _ := a.Value.StringDelimited()
@@ -135,7 +109,7 @@ func (a *Atom) String() string {
 // AddChild makes the Atom pointed to by the argument a child of this Atom.
 // Returns false when called on non-container Atoms.
 func (a *Atom) AddChild(child *Atom) bool {
-	if a.typ != CONT {
+	if a.typ != codec.CONT {
 		return false
 	}
 	a.children = append(a.children, child)
@@ -145,7 +119,7 @@ func (a *Atom) AddChild(child *Atom) bool {
 // NumChildren returns a count of the number of children of this Atom.
 // Returns -1 for non-container Atoms.
 func (a *Atom) NumChildren() int {
-	if a.typ != CONT {
+	if a.typ != codec.CONT {
 		return -1
 	}
 	return len(a.children)
@@ -185,40 +159,4 @@ func FromFile(path string) (a Atom, err error) {
 
 	err = a.UnmarshalBinary(buf)
 	return
-}
-
-// Return true if string is printable, false otherwise
-func isPrintableString(s string) bool {
-	for _, r := range s {
-		if !unicode.IsPrint(r) {
-			return false
-		}
-	}
-	return true
-}
-
-// unicode.IsPrint does not work for this, it returns true for large swathes of
-// ascii 127-255.
-func isPrintableBytes(buf []byte) bool {
-	for _, b := range buf {
-		if !strings.ContainsRune(printableChars, rune(b)) {
-			return false
-		}
-	}
-	return true
-}
-
-// zeroOrAllocateByteSlice verifies that the give byte slice has
-// the specified capacity, and zeroes it out.
-// It avoids memory allocation when possible.
-func zeroOrAllocateByteSlice(buf *[]byte, size int) {
-	if cap(*buf) == size {
-		// zero out the buffer, O(1)
-		for i := range *buf {
-			(*buf)[i] = 0
-		}
-	} else {
-		// newly allocated mem is already zeroed
-		*buf = make([]byte, size)
-	}
 }

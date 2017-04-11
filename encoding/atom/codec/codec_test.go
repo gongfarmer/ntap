@@ -1,4 +1,4 @@
-package atom
+package codec
 
 import (
 	"fmt"
@@ -36,6 +36,8 @@ func GetFunctionName(i interface{}) string {
 type (
 	// A decodeFunc converts a byte slice to a golang native type
 	decodeFunc func([]byte) (interface{}, error)
+
+	errFunc (func(string, int, int) error)
 
 	// decoderTest defines input and expected output values for a decodeFunc
 	decoderTest struct {
@@ -1924,13 +1926,13 @@ func TestCSTRBytesToEscapedString(t *testing.T) {
 }
 
 // *****************************************************
-// 2. Test encoding funcs, which write to an Atom's data
+// 2. Test encoding funcs, which write atom data bytes
 // *****************************************************
 
 // *** encode test framework
 type (
 	// An encodeFunc converts a golang native type to a byte slice at Atom.data
-	encodeFunc func(*Atom, interface{}) error
+	encodeFunc func(*[]byte, interface{}) error
 
 	// encoderTest defines input and expected output values for an encodeFunc
 	encoderTest struct {
@@ -1944,9 +1946,8 @@ type (
 func runEncoderTests(t *testing.T, tests []encoderTest, f encodeFunc) {
 	for _, test := range tests {
 		funcName := GetFunctionName(f)
-		var inputAtom = new(Atom)
-		var gotErr = f(inputAtom, test.Input)
-		var gotValue = inputAtom.data
+		var gotValue []byte
+		var gotErr = f(&gotValue, test.Input)
 
 		switch {
 		case gotErr == nil && test.WantError == nil:
@@ -1988,9 +1989,8 @@ func TestSetUI01FromString(t *testing.T) {
 		encoderTest{"0x01", zero, errStrInvalid(typ, "0x01")},
 		encoderTest{"dog", zero, errStrInvalid(typ, "dog")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI01)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI01).SetString(input.(string))
 	})
 }
 func TestSetUI01FromBool(t *testing.T) {
@@ -1998,9 +1998,8 @@ func TestSetUI01FromBool(t *testing.T) {
 		encoderTest{false, []byte("\x00\x00\x00\x00"), nil},
 		encoderTest{true, []byte("\x00\x00\x00\x01"), nil},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI01)
-		return a.Value.SetBool(input.(bool))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI01).SetBool(input.(bool))
 	})
 }
 func TestSetUI01FromUint64(t *testing.T) {
@@ -2014,9 +2013,8 @@ func TestSetUI01FromUint64(t *testing.T) {
 		encoderTest{uint64(2), zero, errRange(typ, uint64(2))},
 		encoderTest{uint64(10), zero, errRange(typ, uint64(10))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI01)
-		return a.Value.SetUint(input.(uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI01).SetUint(input.(uint64))
 	})
 }
 func TestSetUI08FromString(t *testing.T) {
@@ -2033,9 +2031,8 @@ func TestSetUI08FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI08)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI08).SetString(input.(string))
 	})
 }
 func TestSetUI08FromUint64(t *testing.T) {
@@ -2048,9 +2045,8 @@ func TestSetUI08FromUint64(t *testing.T) {
 		encoderTest{uint64(255), []byte("\xFF"), nil},
 		encoderTest{uint64(3000), zero, errRange(typ, uint64(3000))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI08)
-		return a.Value.SetUint(input.(uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI08).SetUint(input.(uint64))
 	})
 }
 func TestSetUI16FromString(t *testing.T) {
@@ -2067,9 +2063,8 @@ func TestSetUI16FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI16)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI16).SetString(input.(string))
 	})
 }
 func TestSetUI16FromUint64(t *testing.T) {
@@ -2082,9 +2077,8 @@ func TestSetUI16FromUint64(t *testing.T) {
 		encoderTest{uint64(65535), []byte("\xFF\xFF"), nil},
 		encoderTest{uint64(65536), zero, errRange(typ, uint64(65536))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI16)
-		return a.Value.SetUint(input.(uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI16).SetUint(input.(uint64))
 	})
 }
 func TestSetUI32FromString(t *testing.T) {
@@ -2105,9 +2099,8 @@ func TestSetUI32FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI32).SetString(input.(string))
 	})
 }
 func TestSetUI32FromUint64(t *testing.T) {
@@ -2122,9 +2115,8 @@ func TestSetUI32FromUint64(t *testing.T) {
 		encoderTest{uint64(0xFFFFFFFF), []byte("\xFF\xFF\xFF\xFF"), nil},
 		encoderTest{uint64(0xFFFFFFFF + 1), zero, errRange(typ, 0xFFFFFFFF+1)},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI32)
-		return a.Value.SetUint(input.(uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI32).SetUint(input.(uint64))
 	})
 }
 func TestSetUI64FromString(t *testing.T) {
@@ -2150,9 +2142,8 @@ func TestSetUI64FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI64)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI64).SetString(input.(string))
 	})
 }
 func TestSetUI64FromUint64(t *testing.T) {
@@ -2171,9 +2162,8 @@ func TestSetUI64FromUint64(t *testing.T) {
 		encoderTest{uint64(0xFF00000000000000), []byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{uint64(0xFFFFFFFFFFFFFFFF), []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UI64)
-		return a.Value.SetUint(input.(uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI64).SetUint(input.(uint64))
 	})
 }
 
@@ -2193,9 +2183,8 @@ func TestSetSI08FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI08)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI08).SetString(input.(string))
 	})
 }
 func TestSetSI08FromInt64(t *testing.T) {
@@ -2211,9 +2200,8 @@ func TestSetSI08FromInt64(t *testing.T) {
 		encoderTest{int64(128), zero, errRange(typ, 128)},
 		encoderTest{int64(-129), zero, errRange(typ, -129)},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI08)
-		return a.Value.SetInt(input.(int64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI08).SetInt(input.(int64))
 	})
 }
 func TestSetSI16FromString(t *testing.T) {
@@ -2232,9 +2220,8 @@ func TestSetSI16FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI16)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI16).SetString(input.(string))
 	})
 }
 func TestSetSI16FromInt64(t *testing.T) {
@@ -2249,9 +2236,8 @@ func TestSetSI16FromInt64(t *testing.T) {
 		encoderTest{int64(32767), []byte("\x7F\xFF"), nil},
 		encoderTest{int64(32768), zero, errRange(typ, 32768)},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI16)
-		return a.Value.SetInt(input.(int64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI16).SetInt(input.(int64))
 	})
 }
 func TestSetSI32FromString(t *testing.T) {
@@ -2273,9 +2259,8 @@ func TestSetSI32FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI32).SetString(input.(string))
 	})
 }
 
@@ -2294,9 +2279,8 @@ func TestSetSI32FromInt64(t *testing.T) {
 		encoderTest{int64(0xFF000000), zero, errRange(typ, 0xFF000000)},
 		encoderTest{int64(0xFFFFFFFF + 1), zero, errRange(typ, 0xFFFFFFFF+1)},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI32)
-		return a.Value.SetInt(input.(int64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI32).SetInt(input.(int64))
 	})
 }
 
@@ -2319,9 +2303,8 @@ func TestSetSI64FromString(t *testing.T) {
 		encoderTest{"", zero, errStrInvalid(typ, "")},
 		encoderTest{" ", zero, errStrInvalid(typ, " ")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI64)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI64).SetString(input.(string))
 	})
 }
 func TestSetSI64FromInt64(t *testing.T) {
@@ -2331,9 +2314,8 @@ func TestSetSI64FromInt64(t *testing.T) {
 		encoderTest{int64(-9223372036854775808), []byte("\x80\x00\x00\x00\x00\x00\x00\x00"), nil},
 		encoderTest{int64(9223372036854775807), []byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SI64)
-		return a.Value.SetInt(input.(int64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI64).SetInt(input.(int64))
 	})
 }
 func TestSetUR32FromString(t *testing.T) {
@@ -2359,9 +2341,8 @@ func TestSetUR32FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UR32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UR32).SetString(input.(string))
 	})
 }
 func TestSetUR32FromSliceOfUint(t *testing.T) {
@@ -2377,9 +2358,8 @@ func TestSetUR32FromSliceOfUint(t *testing.T) {
 		encoderTest{[]uint64{65535, 65536}, zero, errRange(typ, "[65535 65536]")},
 		encoderTest{[]uint64{65536, 65536}, zero, errRange(typ, "[65536 65536]")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UR32)
-		return a.Value.SetSliceOfUint(input.([]uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UR32).SetSliceOfUint(input.([]uint64))
 	})
 }
 
@@ -2406,9 +2386,8 @@ func TestSetUR64FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UR64)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UR64).SetString(input.(string))
 	})
 }
 func TestSetUR64FromSliceOfUint(t *testing.T) {
@@ -2424,9 +2403,8 @@ func TestSetUR64FromSliceOfUint(t *testing.T) {
 		encoderTest{[]uint64{4294967296, 4294967297}, zero, errRange(typ, "[4294967296 4294967297]")},
 		encoderTest{[]uint64{4294967297, 4294967297}, zero, errRange(typ, "[4294967297 4294967297]")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UR64)
-		return a.Value.SetSliceOfUint(input.([]uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UR64).SetSliceOfUint(input.([]uint64))
 	})
 }
 
@@ -2472,9 +2450,8 @@ func TestSetSR32FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SR32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SR32).SetString(input.(string))
 	})
 }
 func TestSetSR32FromSliceOfInt(t *testing.T) {
@@ -2504,9 +2481,8 @@ func TestSetSR32FromSliceOfInt(t *testing.T) {
 		encoderTest{[]int64{32768, 32768}, zero, errRange(typ, "[32768 32768]")},
 		encoderTest{[]int64{32767, -32769}, zero, errRange(typ, "[32767 -32769]")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SR32)
-		return a.Value.SetSliceOfInt(input.([]int64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SR32).SetSliceOfInt(input.([]int64))
 	})
 }
 
@@ -2552,9 +2528,8 @@ func TestSetSR64FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SR64)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SR64).SetString(input.(string))
 	})
 }
 func TestSetSR64FromSliceOfInt(t *testing.T) {
@@ -2582,9 +2557,8 @@ func TestSetSR64FromSliceOfInt(t *testing.T) {
 		encoderTest{[]int64{2147483647, 2147483648}, zero, errRange(typ, "[2147483647 2147483648]")},
 		encoderTest{[]int64{2147483648, 2147483648}, zero, errRange(typ, "[2147483648 2147483648]")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SR64)
-		return a.Value.SetSliceOfInt(input.([]int64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SR64).SetSliceOfInt(input.([]int64))
 	})
 }
 func TestSetFP32FromString(t *testing.T) {
@@ -2611,9 +2585,8 @@ func TestSetFP32FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(FP32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, FP32).SetString(input.(string))
 	})
 }
 func TestSetFP32FromFloat64(t *testing.T) {
@@ -2642,9 +2615,8 @@ func TestSetFP32FromFloat64(t *testing.T) {
 		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
 		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(FP32)
-		return a.Value.SetFloat(input.(float64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, FP32).SetFloat(input.(float64))
 	})
 }
 func TestSetFP64FromString(t *testing.T) {
@@ -2670,9 +2642,8 @@ func TestSetFP64FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(FP64)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, FP64).SetString(input.(string))
 	})
 }
 func TestSetFP64FromFloat64(t *testing.T) {
@@ -2699,9 +2670,8 @@ func TestSetFP64FromFloat64(t *testing.T) {
 		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
 		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(FP64)
-		return a.Value.SetFloat(input.(float64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, FP64).SetFloat(input.(float64))
 	})
 }
 
@@ -2731,9 +2701,8 @@ func TestSetUF32FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UF32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UF32).SetString(input.(string))
 	})
 }
 
@@ -2754,9 +2723,8 @@ func TestSetUF32FromFloat64(t *testing.T) {
 		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
 		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UF32)
-		return a.Value.SetFloat(input.(float64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UF32).SetFloat(input.(float64))
 	})
 }
 
@@ -2792,9 +2760,8 @@ func TestSetUF64FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UF64)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UF64).SetString(input.(string))
 	})
 }
 func TestSetUF64FromFloat64(t *testing.T) {
@@ -2814,9 +2781,8 @@ func TestSetUF64FromFloat64(t *testing.T) {
 		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
 		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UF64)
-		return a.Value.SetFloat(input.(float64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UF64).SetFloat(input.(float64))
 	})
 }
 func TestSetSF32FromFloat64(t *testing.T) {
@@ -2832,9 +2798,8 @@ func TestSetSF32FromFloat64(t *testing.T) {
 		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
 		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SF32)
-		return a.Value.SetFloat(input.(float64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SF32).SetFloat(input.(float64))
 	})
 }
 func TestSetSF32FromString(t *testing.T) {
@@ -2856,9 +2821,8 @@ func TestSetSF32FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SF32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SF32).SetString(input.(string))
 	})
 }
 
@@ -2886,9 +2850,8 @@ func TestSetSF64FromFloat64(t *testing.T) {
 		encoderTest{math.Inf(0), zero, errRange(typ, math.Inf(0))},
 		encoderTest{math.Inf(1), zero, errRange(typ, math.Inf(1))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SF64)
-		return a.Value.SetFloat(input.(float64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SF64).SetFloat(input.(float64))
 	})
 }
 func TestSetSF64FromString(t *testing.T) {
@@ -2914,9 +2877,8 @@ func TestSetSF64FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(SF64)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SF64).SetString(input.(string))
 	})
 }
 
@@ -2997,9 +2959,8 @@ func TestSetFC32FromString(t *testing.T) {
 		encoderTest{"00", zero, errStrInvalid(typ, "00")},
 		encoderTest{"R0000000", zero, errStrInvalid(typ, "R0000000")},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(FC32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, FC32).SetString(input.(string))
 	})
 }
 
@@ -3073,9 +3034,8 @@ func TestSetFC32FromUint64(t *testing.T) {
 		encoderTest{uint64(0x0F000000), []byte("\x0f\x00\x00\x00"), nil},
 		encoderTest{uint64(0x0100000000), zero, errRange(typ, uint64(0x0100000000))},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(FC32)
-		return a.Value.SetUint(input.(uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, FC32).SetUint(input.(uint64))
 	})
 }
 
@@ -3106,9 +3066,8 @@ func TestSetIP32FromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(IP32)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, IP32).SetString(input.(string))
 	})
 }
 func TestSetIP32FromUint64(t *testing.T) {
@@ -3124,9 +3083,8 @@ func TestSetIP32FromUint64(t *testing.T) {
 		encoderTest{uint64(0xFFFFFFFFFFFFFFFF), []byte("\xff\xff\xff\xff\xff\xff\xff\xff"), nil},
 		encoderTest{uint64(0x7F0000017F000001), []byte("\x7F\x00\x00\x01\x7F\x00\x00\x01"), nil},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(IP32)
-		return a.Value.SetUint(input.(uint64))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, IP32).SetUint(input.(uint64))
 	})
 }
 func TestSetIPADFromString(t *testing.T) {
@@ -3166,9 +3124,8 @@ func TestSetIPADFromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(IPAD)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, IPAD).SetString(input.(string))
 	})
 }
 func TestSetUUIDFromString(t *testing.T) {
@@ -3192,9 +3149,8 @@ func TestSetUUIDFromString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(UUID)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UUID).SetString(input.(string))
 	})
 }
 
@@ -3299,9 +3255,8 @@ func TestSetUSTRFromString(t *testing.T) {
 		encoderTest{"\x1f", nil, errUnescaped(typ, '\x1f')},
 		encoderTest{"\x7f", nil, errUnescaped(typ, '\x7f')},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(USTR)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, USTR).SetString(input.(string))
 	})
 }
 
@@ -3381,9 +3336,8 @@ func TestSetUSTRFromDelimitedString(t *testing.T) {
 		encoderTest{`"\"`, nil, errInvalidEscape(typ, `\`, "EOF during escaped character")},
 		encoderTest{`"""`, nil, errUnescaped(typ, '"')},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(USTR)
-		return a.Value.SetStringDelimited(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, USTR).SetStringDelimited(input.(string))
 	})
 }
 
@@ -3464,9 +3418,8 @@ func TestSetCSTRFromString(t *testing.T) {
 		encoderTest{"\x1f", nil, errUnescaped(typ, '\x1f')},
 		encoderTest{"\x7f", nil, errUnescaped(typ, '\x7f')},
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(CSTR)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, CSTR).SetString(input.(string))
 	})
 }
 func TestSetCSTRFromDelimitedString(t *testing.T) {
@@ -3518,9 +3471,8 @@ func TestSetCSTRFromDelimitedString(t *testing.T) {
 		err := fmt.Errorf("CSTR input string must be double-quoted: (%s)", str)
 		tests = append(tests, encoderTest{str, zero, err})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(CSTR)
-		return a.Value.SetStringDelimited(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, CSTR).SetStringDelimited(input.(string))
 	})
 }
 
@@ -3542,8 +3494,7 @@ func TestSetDATAFromHexString(t *testing.T) {
 	for _, str := range arrInvalid {
 		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
 	}
-	runEncoderTests(t, tests, func(a *Atom, input interface{}) error {
-		a.SetType(DATA)
-		return a.Value.SetString(input.(string))
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, DATA).SetString(input.(string))
 	})
 }

@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/gongfarmer/ntap/encoding/atom/codec"
 )
 
 var Tests []Test
@@ -205,7 +207,7 @@ func TestNameAsUint32(t *testing.T) {
 	for i := 0; i <= 20; i++ {
 		nameUint := rand.Uint32()
 		binary.BigEndian.PutUint32(buf, nameUint)
-		a, err := NewAtom(string(buf), UI32)
+		a, err := NewAtom(string(buf), codec.UI32)
 		if err != nil {
 			panic(err)
 		}

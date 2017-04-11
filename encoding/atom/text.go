@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/gongfarmer/ntap/encoding/atom/codec"
 )
 
 // Enable reading and writing of text format ADE AtomContainers by fulfilling
@@ -60,7 +62,7 @@ func atomToTextBuffer(a *Atom, depth int) (output bytes.Buffer, err error) {
 	}
 	fmt.Fprintln(&output, s)
 
-	if a.typ == CONT {
+	if a.typ == codec.CONT {
 		// write children
 		for _, childPtr := range a.children {
 			buf, err := atomToTextBuffer(childPtr, depth+1)
@@ -143,7 +145,6 @@ const (
 	tokenEOF          = "tknEOF"      // end of input
 )
 
-var printableChars = strPrintableChars()
 var alphaNumericChars = strAlphaNumeric()
 
 type (
@@ -364,7 +365,7 @@ func lexAtomName(l *lexer) stateFn {
 
 	// Try to get 4 printable chars. May already have one.
 	for i := l.bufferSize(); i < 4; i++ {
-		l.accept(printableChars)
+		l.accept(codec.PrintableChars)
 	}
 	if l.buffer() == "END" {
 		l.emit(tokenContainerEnd)
@@ -420,7 +421,7 @@ func lexAtomType(l *lexer) stateFn {
 		}
 	}
 
-	// Accept type CONT even without trailing :
+	// Accept type codec.CONT even without trailing :
 	if l.buffer() == "CONT" {
 		l.emit(tokenAtomType)
 		return lexNullValue
@@ -597,7 +598,7 @@ func acceptFCHR32AsSingleQuotedString(l *lexer) error {
 	if l.bufferSize() < 4 {
 		return fmt.Errorf("four-char code data is too short: %s", l.line())
 	}
-	if !isPrintableString(l.buffer()) {
+	if !codec.IsPrintableString(l.buffer()) {
 		return fmt.Errorf("four-char code data has invalid characters: %s", l.line())
 	}
 
@@ -664,16 +665,7 @@ func isSpace(r rune) bool {
 }
 
 func isPrintableRune(r rune) bool {
-	return strings.ContainsRune(printableChars, r)
-}
-
-// returns string of all printable chars < ascii 127, excludes whitespace
-func strPrintableChars() string {
-	var b = make([]byte, 0, 0x7f-0x21) // ascii char values
-	for c := byte(0x21); c < 0x7f; c++ {
-		b = append(b, c)
-	}
-	return string(b)
+	return strings.ContainsRune(codec.PrintableChars, r)
 }
 
 // returns string of all alphanumeric chars < ascii 127
@@ -699,40 +691,40 @@ type (
 	atomStack []*Atom
 )
 
-var parseType = make(map[ADEType]parseFunc, numOfADETypes)
+var parseType = make(map[codec.ADEType]parseFunc, numOfADETypes)
 
 func init() {
-	parseType[UI01] = parseNumber
-	parseType[UI08] = parseNumber
-	parseType[UI16] = parseNumber
-	parseType[UI32] = parseNumber
-	parseType[UI64] = parseNumber
-	parseType[SI08] = parseNumber
-	parseType[SI16] = parseNumber
-	parseType[SI32] = parseNumber
-	parseType[SI64] = parseNumber
-	parseType[FP32] = parseNumber
-	parseType[FP64] = parseNumber
-	parseType[UF32] = parseNumber
-	parseType[UF64] = parseNumber
-	parseType[SF32] = parseNumber
-	parseType[SF64] = parseNumber
-	parseType[UR32] = parseFraction
-	parseType[UR64] = parseFraction
-	parseType[SR32] = parseFraction
-	parseType[SR64] = parseFraction
-	parseType[FC32] = parseFC32Value
-	parseType[IP32] = parseIP32Value
-	parseType[IPAD] = parseString
-	parseType[CSTR] = parseStringDelimited
-	parseType[USTR] = parseStringDelimited
-	parseType[UUID] = parseString
-	parseType[DATA] = parseString
-	parseType[CNCT] = parseString
-	parseType[Cnct] = parseString
-	parseType[ENUM] = parseNumber
-	parseType[NULL] = parseNULL
-	parseType[CONT] = parseNULL
+	parseType[codec.UI01] = parseNumber
+	parseType[codec.UI08] = parseNumber
+	parseType[codec.UI16] = parseNumber
+	parseType[codec.UI32] = parseNumber
+	parseType[codec.UI64] = parseNumber
+	parseType[codec.SI08] = parseNumber
+	parseType[codec.SI16] = parseNumber
+	parseType[codec.SI32] = parseNumber
+	parseType[codec.SI64] = parseNumber
+	parseType[codec.FP32] = parseNumber
+	parseType[codec.FP64] = parseNumber
+	parseType[codec.UF32] = parseNumber
+	parseType[codec.UF64] = parseNumber
+	parseType[codec.SF32] = parseNumber
+	parseType[codec.SF64] = parseNumber
+	parseType[codec.UR32] = parseFraction
+	parseType[codec.UR64] = parseFraction
+	parseType[codec.SR32] = parseFraction
+	parseType[codec.SR64] = parseFraction
+	parseType[codec.FC32] = parseFC32Value
+	parseType[codec.IP32] = parseIP32Value
+	parseType[codec.IPAD] = parseString
+	parseType[codec.CSTR] = parseStringDelimited
+	parseType[codec.USTR] = parseStringDelimited
+	parseType[codec.UUID] = parseString
+	parseType[codec.DATA] = parseString
+	parseType[codec.CNCT] = parseString
+	parseType[codec.Cnct] = parseString
+	parseType[codec.ENUM] = parseNumber
+	parseType[codec.NULL] = parseNULL
+	parseType[codec.CONT] = parseNULL
 }
 
 func parse(ch <-chan token) (atoms []*Atom, err error) {
@@ -806,7 +798,7 @@ func parseAtomName(p *parser) parseFunc {
 	tk := readToken(p)
 	switch tk.typ {
 	case tokenAtomName: // may be hex or 4 printable chars
-		if e := StringToFC32Bytes(&p.theAtom.name, tk.value); e != nil {
+		if e := codec.StringToFC32Bytes(&p.theAtom.name, tk.value); e != nil {
 			return p.errorf(fmt.Sprint("invalid atom name: ", tk.value))
 		}
 	case tokenError:
@@ -847,7 +839,7 @@ func parseAtomType(p *parser) parseFunc {
 	if tk.typ != tokenAtomType {
 		return p.errorf("expecting token type tokenAtomType, got %s", tk.typ)
 	}
-	p.theAtom.SetType(ADEType(tk.value))
+	p.theAtom.SetType(codec.ADEType(tk.value))
 
 	// Add atom to children of parent, if any
 	if p.containers.empty() { // No open containers = no parent. Add atom to output.
@@ -860,7 +852,7 @@ func parseAtomType(p *parser) parseFunc {
 	}
 
 	// If container, make tk the currently open container
-	if p.theAtom.typ == CONT {
+	if p.theAtom.typ == codec.CONT {
 		p.containers.push(p.theAtom)
 	}
 

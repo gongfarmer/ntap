@@ -1,6 +1,10 @@
-package atom
+package codec
 
-// This file provides methods for reading and writing atom data values.
+// This file provides methods for interpreting and conversion of ADE Atom data types.
+//
+// ADE Data types are defined in 112-0002_r4.0B_StorageGRID_Data_Types.
+//
+// The ADE headers for these types are in OSL_Types.h.
 import (
 	"bytes"
 	"encoding/binary"
@@ -14,8 +18,6 @@ import (
 	"unicode/utf8"
 )
 
-// ADE Data types are defined in 112-0002_r4.0B_StorageGRID_Data_Types.
-// The ADE headers for these types are in OSL_Types.h.
 const (
 	UI01 ADEType = "UI01" // unsigned int / bool
 	UI08 ADEType = "UI08" // unsigned int
@@ -57,7 +59,19 @@ const (
 	goFloat  goType = "Float"
 )
 
-/**********************************************************/
+var PrintableChars = strPrintableChars()
+
+// returns string of all printable chars < ascii 127, excludes whitespace
+func strPrintableChars() string {
+	var b = make([]byte, 0, 0x7f-0x21) // ascii char values
+	for c := byte(0x21); c < 0x7f; c++ {
+		b = append(b, c)
+	}
+	return string(b)
+}
+
+//**********************************************************
+// Codec / Encoder / Decoder data structure definitions
 
 type (
 	// ADEType uniquely identifies ADE Atom types as 4 character string enums.
@@ -72,7 +86,8 @@ type (
 	// Go types that don't make sense for a given ADE type (eg. SliceOfInt for a
 	// string type) simply return an error when called.
 	Codec struct {
-		Atom    *Atom
+		typ     ADEType
+		dataPtr *[]byte
 		Decoder decoder
 		Encoder encoder
 	}
@@ -107,11 +122,9 @@ type (
 		ClkSeqLow        uint8
 		Node             [6]byte
 	}
-
-	errFunc (func(string, int, int) error)
 )
 
-/**********************************************************/
+//**********************************************************
 // error construction functions
 // These exist so that the unit tests don't have to hardcode the err message they expect
 
@@ -162,17 +175,17 @@ func errZeroDenominator(typ string, v string) (e error) {
 	return
 }
 
-/**********************************************************/
-// Codec / Encoder / Decoder data structure definitions
+//**********************************************************
 
 // NewCodec returns a Codec that performs type conversion for atom data.
 // A Codec provides encoder/decoder methods for converting data from an atom's
 // ADE type into suitable Go types, and vice versa.
-func NewCodec(a *Atom) *Codec {
+func NewCodec(dataPtr *[]byte, atomType ADEType) *Codec {
 	c := Codec{
-		Atom:    a,
-		Decoder: decoderByType[a.typ],
-		Encoder: encoderByType[a.typ],
+		dataPtr: dataPtr,
+		typ:     atomType,
+		Decoder: decoderByType[atomType],
+		Encoder: encoderByType[atomType],
 	}
 	return &c
 }
@@ -224,44 +237,44 @@ var encoderByType = make(map[ADEType]encoder)
 // Decoder methods: pass atom data to the decoder for type conversion to go type
 
 // String returns Atom data as a string.  All Atom types must support this.
-func (c Codec) String() (string, error) { return c.Decoder.String(c.Atom.data) }
+func (c Codec) String() (string, error) { return c.Decoder.String(*c.dataPtr) }
 
 // StringDelimited returns Atom data as a string.  If this atom data type is
 // delimited, then surround it with its delimiter characters.  Otherwise, just
 // return the same result as String.
 // All Atom types must support this.
-func (c Codec) StringDelimited() (string, error) { return c.Decoder.StringDelimited(c.Atom.data) }
+func (c Codec) StringDelimited() (string, error) { return c.Decoder.StringDelimited(*c.dataPtr) }
 
 // Bool returns Atom data as a bool, for Atom types where this makes sense.
-func (c Codec) Bool() (bool, error) { return c.Decoder.Bool(c.Atom.data) }
+func (c Codec) Bool() (bool, error) { return c.Decoder.Bool(*c.dataPtr) }
 
 // Uint returns Atom data as a uint64, for unsigned integer Atom types.  64/32/16/8 bit
 // types are all returned as a uint64 value, which can be cast to their native
 // integer types without overflow.
-func (c Codec) Uint() (uint64, error) { return c.Decoder.Uint(c.Atom.data) }
+func (c Codec) Uint() (uint64, error) { return c.Decoder.Uint(*c.dataPtr) }
 
 // Int returns Atom data as an int64, for integer Atom types.  64/32/16/8 bit
 // types are all returned as a uint64 value, which can be cast to their native
 // integer types without overflow.
-func (c Codec) Int() (int64, error) { return c.Decoder.Int(c.Atom.data) }
+func (c Codec) Int() (int64, error) { return c.Decoder.Int(*c.dataPtr) }
 
 // Float returns Atom data as an float64, for floating point Atom types.
-func (c Codec) Float() (float64, error) { return c.Decoder.Float(c.Atom.data) }
+func (c Codec) Float() (float64, error) { return c.Decoder.Float(*c.dataPtr) }
 
 // SliceOfUint returns Atom data as a slice of uint64, for types which can be represented this way.
 // This includes fractional types, where the numerator and denominator are
 // represented as a 2-element slice.
-func (c Codec) SliceOfUint() ([]uint64, error) { return c.Decoder.SliceOfUint(c.Atom.data) }
+func (c Codec) SliceOfUint() ([]uint64, error) { return c.Decoder.SliceOfUint(*c.dataPtr) }
 
 // SliceOfInt returns Atom data as a slice of int64, for types which can be represented this way.
 // This includes fractional types, where the numerator and denominator are
 // represented as a 2-element slice.
-func (c Codec) SliceOfInt() ([]int64, error) { return c.Decoder.SliceOfInt(c.Atom.data) }
+func (c Codec) SliceOfInt() ([]int64, error) { return c.Decoder.SliceOfInt(*c.dataPtr) }
 
 // SliceOfByte returns the big-endian byte representation of the Atom data.
 // This is how the Atom data is represented within a Binary atom container
 // file.  All Atom types must support this.
-func (c Codec) SliceOfByte() ([]byte, error) { return c.Atom.data, nil }
+func (c Codec) SliceOfByte() ([]byte, error) { return *c.dataPtr, nil }
 
 /**********************************************************/
 // Encoder methods: convert given data type to []byte and store in Atom
@@ -269,7 +282,7 @@ func (c Codec) SliceOfByte() ([]byte, error) { return c.Atom.data, nil }
 // SetString sets the Atom data to the value represented by the given string.
 // Must be implemented by all Atom types.
 func (c Codec) SetString(v string) error {
-	return c.Encoder.SetString(&c.Atom.data, v)
+	return c.Encoder.SetString(c.dataPtr, v)
 }
 
 // SetStringDelimited sets the Atom data to the value represented by the given string, after stripping off the surrounding delimiters.
@@ -277,29 +290,29 @@ func (c Codec) SetString(v string) error {
 // For other types, this method has the same result as SetString.
 // Must be implemented by all Atom types.
 func (c Codec) SetStringDelimited(v string) error {
-	return c.Encoder.SetStringDelimited(&c.Atom.data, v)
+	return c.Encoder.SetStringDelimited(c.dataPtr, v)
 }
 
 // SetBool sets the Atom data to the value of the given bool, for Atom data types that can be represented by a bool.
-func (c Codec) SetBool(v bool) error { return c.Encoder.SetBool(&c.Atom.data, v) }
+func (c Codec) SetBool(v bool) error { return c.Encoder.SetBool(c.dataPtr, v) }
 
 // SetUint sets the Atom data to the value of the given unsigned integer, for Atom data types that can be represented by an unsigned integer.
-func (c Codec) SetUint(v uint64) error { return c.Encoder.SetUint(&c.Atom.data, v) }
+func (c Codec) SetUint(v uint64) error { return c.Encoder.SetUint(c.dataPtr, v) }
 
 // SetInt sets the Atom data to the value of the given integer, for Atom data types that can be represented by an integer.
-func (c Codec) SetInt(v int64) error { return c.Encoder.SetInt(&c.Atom.data, v) }
+func (c Codec) SetInt(v int64) error { return c.Encoder.SetInt(c.dataPtr, v) }
 
 // SetFloat sets the Atom data to the value of the given float, for Atom data types that can be represented by an float.
-func (c Codec) SetFloat(v float64) error { return c.Encoder.SetFloat(&c.Atom.data, v) }
+func (c Codec) SetFloat(v float64) error { return c.Encoder.SetFloat(c.dataPtr, v) }
 
 // SetSliceOfUint sets the Atom data to the value of the given slice of unsigned integers, for Atom data types that can be represented by a slice of unsigned integers.
-func (c Codec) SetSliceOfUint(v []uint64) error { return c.Encoder.SetSliceOfUint(&c.Atom.data, v) }
+func (c Codec) SetSliceOfUint(v []uint64) error { return c.Encoder.SetSliceOfUint(c.dataPtr, v) }
 
 // SetSliceOfInt sets the Atom data to the value of the given slice of integers, for Atom data types that can be represented by a slice of integers.
-func (c Codec) SetSliceOfInt(v []int64) error { return c.Encoder.SetSliceOfInt(&c.Atom.data, v) }
+func (c Codec) SetSliceOfInt(v []int64) error { return c.Encoder.SetSliceOfInt(c.dataPtr, v) }
 
 // SetSliceOfByte sets the Atom data to the value of the given slice of bytes.
-func (c Codec) SetSliceOfByte(v []byte) error { return c.Encoder.SetSliceOfByte(&c.Atom.data, v) }
+func (c Codec) SetSliceOfByte(v []byte) error { return c.Encoder.SetSliceOfByte(c.dataPtr, v) }
 
 /**********************************************************/
 
@@ -980,6 +993,27 @@ func SR64ToString(buf []byte) (v string, e error) {
 		v = fmt.Sprintf("%d/%d", arr[0], arr[1])
 	}
 	return
+}
+
+// unicode.IsPrint does not work for this, it returns true for large swathes of
+// ascii 127-255.
+func isPrintableBytes(buf []byte) bool {
+	for _, b := range buf {
+		if !strings.ContainsRune(PrintableChars, rune(b)) {
+			return false
+		}
+	}
+	return true
+}
+
+// Return true if string is printable, false otherwise
+func IsPrintableString(s string) bool {
+	for _, r := range s {
+		if !unicode.IsPrint(r) {
+			return false
+		}
+	}
+	return true
 }
 
 // FC32ToString accepts ADE FC32 data bytes, and expresses the value as a string of printable characters.
@@ -2138,7 +2172,7 @@ func StringToFC32Bytes(buf *[]byte, v string) (e error) {
 			return errStrInvalid("FC32", v)
 		}
 	case 6: // 4 printable chars, single quote delimited
-		if !isPrintableString(v) {
+		if !IsPrintableString(v) {
 			return fmt.Errorf("FC32 value is not printable: 0x%x", v)
 		}
 		if v[0] != '\'' || v[5] != '\'' {
@@ -2525,18 +2559,17 @@ func Round(val float64, places int) float64 {
 // Clients with an Atom can use these to decide how to handle atom data.
 // They are intended to provide hints as to how the data should be handled, rather
 // than a straight mapping of what decoder funcs are provided for each type.
-// than a straight mapping of what decoder funcs are provided for each type.
 // (eg. every ADE type implements String() and FromString(), not just the ones
 // that return true for IsString().)
 
 // IsBool returns true if the receiver's Atom has a boolean type.
 func (c Codec) IsBool() bool {
-	return c.Atom.Type() == "UI01"
+	return c.typ == "UI01"
 }
 
 // IsUint returns true if the receiver's Atom has an unsigned integer type.
 func (c *Codec) IsUint() bool {
-	switch c.Atom.Type() {
+	switch c.typ {
 	case "UI08", "UI16", "UI32", "UI64":
 		return true
 	}
@@ -2545,7 +2578,7 @@ func (c *Codec) IsUint() bool {
 
 // IsInt returns true if the receiver's Atom has an integer type.
 func (c *Codec) IsInt() bool {
-	switch c.Atom.Type() {
+	switch c.typ {
 	case "SI08", "SI16", "SI32", "SI64":
 		return true
 	}
@@ -2554,7 +2587,7 @@ func (c *Codec) IsInt() bool {
 
 // IsFloat returns true if the receiver's Atom has a floating point type.
 func (c *Codec) IsFloat() bool {
-	switch c.Atom.Type() {
+	switch c.typ {
 	case "FP32", "FP64", "UF32", "UF64", "SF32", "SF64":
 		return true
 	}
@@ -2563,9 +2596,50 @@ func (c *Codec) IsFloat() bool {
 
 // IsString returns true if the receiver's Atom has a string type.
 func (c *Codec) IsString() bool {
-	switch c.Atom.Type() {
+	switch c.typ {
 	case "CSTR", "USTR", "FC32", "IP32", "IPAD", "DATA", "CNCT", "cnct", "UUID":
 		return true
 	}
 	return false
+}
+
+// ZeroData sets an atom's data to the zero value of its ADE type.
+// For fixed-size types, the byte slice capacity remains the same so that a new
+// value can be set without needing memory allocation.
+// For variable-sized types, data is set to nil and all memory released for
+// garbage collection.
+func (c *Codec) ZeroData() {
+	switch c.typ {
+	case UI08, SI08:
+		zeroOrAllocateByteSlice(c.dataPtr, 1)
+	case UI16, SI16:
+		zeroOrAllocateByteSlice(c.dataPtr, 2)
+	case UI01, UI32, SI32, FP32, UF32, SF32, SR32, UR32, FC32, IP32, ENUM:
+		zeroOrAllocateByteSlice(c.dataPtr, 4)
+	case UI64, SI64, FP64, UF64, SF64, UR64, SR64:
+		zeroOrAllocateByteSlice(c.dataPtr, 8)
+	case UUID:
+		zeroOrAllocateByteSlice(c.dataPtr, 36)
+	case IPAD, CSTR, USTR, DATA, CNCT, Cnct:
+		*c.dataPtr = nil
+	case CONT, NULL:
+		*c.dataPtr = nil
+	default:
+		panic(fmt.Sprintf(`unknown ADE type: "%v"`, c.typ))
+	}
+}
+
+// zeroOrAllocateByteSlice verifies that the give byte slice has
+// the specified capacity, and zeroes it out.
+// It avoids memory allocation when possible.
+func zeroOrAllocateByteSlice(buf *[]byte, size int) {
+	if cap(*buf) == size {
+		// zero out the buffer, O(1)
+		for i := range *buf {
+			(*buf)[i] = 0
+		}
+	} else {
+		// newly allocated mem is already zeroed
+		*buf = make([]byte, size)
+	}
 }

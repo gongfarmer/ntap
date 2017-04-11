@@ -13,6 +13,8 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
+
+	"github.com/gongfarmer/ntap/encoding/atom/codec"
 )
 
 func TestUnmarshalBinary(t *testing.T) {
@@ -58,7 +60,7 @@ func TestReadAtomsFromHex(t *testing.T) {
 	tests := make(map[string]*Atom)
 	for _, i := range rand.Perm(len(Tests)) {
 		test := Tests[i]
-		hexString, err := BytesToHexString(test.binBytes)
+		hexString, err := codec.BytesToHexString(test.binBytes)
 		if err != nil {
 			panic(fmt.Errorf("failed to convert bytes to hex string: %v", err))
 		}

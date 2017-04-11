@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+
+	"github.com/gongfarmer/ntap/encoding/atom/codec"
 )
 
 // AtomContainer object, paired with its end byte position in the stream
@@ -81,7 +83,7 @@ const headerSize = 12
 
 // isContainer returns true if this atomHeader's type is CONT.
 func (h atomHeader) isContainer() bool {
-	return ADEType(h.Type[:]) == CONT
+	return codec.ADEType(h.Type[:]) == codec.CONT
 }
 
 /**********************************************************/
@@ -151,7 +153,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 				return nil, fmt.Errorf("Input is invalid for conversion to Atom")
 			}
 		}
-		adeType := ADEType(h.Type[:])
+		adeType := codec.ADEType(h.Type[:])
 		if err != nil {
 			break
 		}
@@ -160,7 +162,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 			typ:  adeType,
 			data: data,
 		}
-		a.Value = NewCodec(&a)
+		a.Value = codec.NewCodec(&a.data, a.typ)
 
 		// add atom to parent.Children, or to atoms list if no parent
 		if parent, ok := containers.Peek(); ok {
@@ -170,7 +172,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		}
 
 		// push container onto stack
-		if a.typ == CONT {
+		if a.typ == codec.CONT {
 			endPos := bytesRead + h.Size - headerSize
 			containers.Push(cont{&a, endPos})
 		}
@@ -277,7 +279,7 @@ func (a *Atom) BinaryWrite(w io.Writer) (err error) {
 	// create members for atom header
 	var buf []byte
 	var name, typ [4]byte
-	if err = StringToFC32Bytes(&buf, string(a.typ)); err != nil {
+	if err = codec.StringToFC32Bytes(&buf, string(a.typ)); err != nil {
 		return
 	}
 	copy(typ[:], buf)
