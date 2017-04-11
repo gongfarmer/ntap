@@ -1,93 +1,70 @@
 package atom
 
-// AtomsAtPath returns a slice of all Atom descendants at the given path.
-// If no atom is found, tk returns an error message that describes which path
-// part doesn't exist.
+// == Purpose ==
+// This code provides the AtomsAtPath method, which returns a slice of Atoms
+// that match the given path, from a given root atom.  Path syntax duplicates
+// XPath as closely as possible.
 //
-// Requirements for Path definition wildcards:
-//   * provide a way to select all attribute container data elemnts while
-//     omitting the index element. (???)
-//   * provide a terse syntax to use form command-line clients to search for
-//     an element by name at any position in the tree.  (**/NAME)
-// Path definition wildcards to borrow from XPATH:
-//   * match any single path element of any type
-//   ** match any number of nested path elements
-//   *[1] return first child of container elt (there's no 0 elt)
-//   book[last()] return last child of container elt named "book"
-//   *[position()<3] return first 2 child elts of container elt named "book"
-//   *[not(position()<3)] return first 2 child elts of container elt named "book"
-//   *[@type=XXXX] match any element of type XXXX
-//   *[@name=XXXX] match any element with name XXXX
-//   *[@data<35] match any element whose numeric value < 35 (raise error on non-numeric)
-//   *[not(@type!=UI32) and @data<35] boolean syntax // is != a thing??
-// brackets too: @type=ui32 and (position > 1 or not(@name = 0x00000000))
-// -cannot have bare square brackets, must be preceded by name or keyword.
-// -stretch goal: allow wildcards within name/type/data, (eg. @type=UI?? matches types ui01,ui08,ui16,ui32,ui64)
-//  [==, position(), 1]   function(2), function(0), param
-//  [==, position, last()]
-//  [<, position(), 3]
-//  [not, <, position(), 3]
-//  [not, <, position(), 3]
-//  [==, @type, "XXXX"]
-//  [==, @name, "XXXX"]
-//  [==, @data(numeric), 35]
-
-// Terminology:
-//     Each step is evaluated against the elements in the current node-set.
+// An error and an empty set are returned if an invalid path is used.
 //
-//     A step consists of:
+
+// == Development notes ==
+
+// === Structure ===
+// Path evaluation is implemented as a language compiler with 3 steps:
+// lexing, parsing and evaluating.
 //
-//     an axis (defines the tree-relationship between the selected elements and the current node)
-//     a node-test (identifies a node within an axis)
-//     zero or more predicates (to further refine the selected node-set)
-//     The syntax for a location step is:
+// Lexing is performed during AtomPath object creation. The lexer splits the
+// given path string into tokens with known types and sends them to the
+// pathParser, which runs concurrently.
 //
-//     axisname::nodetest[predicate]
-
-// TODO:
-//   define boolean syntax for operators
-//   missing operators:   | (ie. //book | //cd ) div mod
-//   xpath axis support ( <something>::  ) https://www.w3schools.com/xml/xpath_axes.asp
-//   consider adopting xpath terminology (eg. predicate replaces filter)
-//   support for multiple predicates, eg. a[1][@href='help.php']
-//   review precedence table and see what else to implement (eg. idiv)
-//   distinct-values()  sum()
+// Parsing is also performed during AtomPath object creation. The pathParser
+// receives a stream of tokens from the lexer, and puts them into a stack in
+// prefix order so that during evaluation, operator tokens are followed by
+// their operands. This follows operator precedence rules.
 //
-// FIXME paths should be resolveable using hex or non-hex FC32 representation.
-// Currently, the user-provided path is matched only against what is stored as
-// the Name field, which is one or the other.
+// Evaluation is performed whenever the AtomPath method GetAtoms(a *Atom) is
+// called, which provides a root atom to evaluate against the path.
+//
+// At a low level, there are separate evaluators for the path and predicate
+// even though they share the same token stack, because the code is simpler
+// this way. Evaluation is almost 100% different within a predicate.  The
+// parser does some juggling to delimit predicate tokens with Predicate Start
+// and Predicate End tokens, so it is simple to know when to switch evaluators.
+//
+// === Terminology ===
+// Terms used to describe attributes of a path are 100% stolen from the XPath
+// documentation.  To make sense of the method / variable names and comments in
+// this code, be familiar with these XPath terms:
+//
+// location step:
+//     Like directory paths, you build location paths out of individual steps,
+//     called location steps, separated by / or //.
+//     Each location step is made up of an axis, a node test, and zero or more
+//     predicates, like this (where the * symbol means "zero or more of"):
+//         axis node-test [predicate]*
+//
+// axis:
+//     An axis defines a node-set relative to the current node.
+//     AtomPath has minimal support for axes, it only supports the child axis
+//     which is the default of XPath. The leading / or // in a path expression
+//     are the axis.
+// node test:
+//     A node test is a test applied to the axis which filters out the atoms
+//     that don't match the test.  The node test operator "*" matches all atoms
+//     in the axis node set. An atom name can be used as a node test to match
+//     only nodes with the given name. A node test is required for a valid path,
+//     you cannot have a predicate directly after a path
+//          //[position() == 1]     illegal: predicate right after path
+//          //*[position() == 1]    legal
+// predicate:
+//     A predicate is another filter, like the node test, which is applied to
+//     the node set resulting from the node test.  It performs some tests and
+//     removes nodes that don't pass from the node set.
+//     A predicate is delimited by []. 0-N predicates may be used -- if a
+//     predicate B follows predicate A, then B filters down the node set
+//     resulting from A, instead of the nodeset resulting from the node test.
 
-/// struct stackToken {
-/// type {func,numeric,string,operator,keyword}
-/// goal {position, attribute}
-/// value {func, numeric, string, operator, keyword}
-/// eval() {
-///   func: execute if stack has enough args (can be boolean arg too)
-///   numeric: do nothing
-///   string: do nothing
-///   operator: execute if stack has enough args
-///   keyword: evaluate unary (eg. position(), @value,@type)
-/// } value
-/// }
-
-// Path expressions from XPath:
-/*
-	/   Selects from the root node (meanigless for Atom)
-	//  Selects elements in the document from the current node that match the
-      selection no matter where they are
-	.   Selects the current node (meaningless for Atom)
-	..  Selects the parent of the current node (useful, just not at root)
-	@   Selects attributes (adopted for atom attributes)
-*/
-
-// parsing objective: a single func which can take in an atom and position, and
-// return a bool indicating whether to keep tk.
-// future: some XPATH specifiers affect the result by specifying output format.
-// https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-// this is good because tk handles endless nested parens, and respects explicitly defined order of operations. XPath order of operations is defined somewhere.
-
-// FIXME explain terminology, and lexer/parser/evaluators relationship
-// FIXME implement path.Compile
 import (
 	"fmt"
 	"math"
@@ -96,8 +73,8 @@ import (
 )
 
 const (
-	// Operators must end with string "Operator".. tk is how they are identified as
-	// Operator tokens by the parser
+	// Operators must end with string "Operator", that is how they are identified as
+	// operator-type tokens by the parser
 	tokenLeftParen          = "tknParenL"
 	tokenRightParen         = "tknParenR"
 	tokenPredicateStart     = "tknPredStart"
@@ -120,11 +97,71 @@ const (
 	tokenHex                = "tknHex"
 )
 
-// A Node is data that can be represented as a string.
-// An Atom/Element is a Node, so are Atom.Name(), Atom.Type(), and atom.Data().
-// All type system types such as typeInt64, typeFloat64, typeString are Nodes.
-type Node interface {
-	String() string
+type (
+	// AtomPath is for evaluating paths.
+	// To evaluate paths, construct one by providing a path string to NewPath().
+	// Then send it a root atom to evaluate against
+	AtomPath struct {
+		Path      string
+		evaluator *pathEvaluator
+		err       error
+	}
+	tokenList []*token
+
+	// pathParser is a parser for interpreting atom path tokens.
+	pathParser struct {
+		outputQueue tokenList    // tokens ordered for evaluation
+		opStack     tokenList    // holds operators until their operands reach output queue
+		tokens      <-chan token // tokens received from lexer
+		err         error        // indicates parsing succeeded or describes what failed
+	}
+
+	pathEvaluator struct {
+		Path           string
+		tokens         tokenList // path criteria, does not change after creation
+		Tokens         tokenList // path criteria, consumed during each evaluation
+		Error          error     // evaluation status, nil on success
+		ContextAtomPtr *Atom
+	}
+
+	// predicateEvaluator determines which candidate atoms satisfy the
+	// predicate criteria.
+	//
+	// The predicate is the part of the path within the [].
+	// Examples:
+	//    /ROOT[1]
+	//    /ROOT[@name=NONE]
+	//		/ROOT/UI_1[@data < 2]
+	predicateEvaluator struct {
+		tokens tokenList // predicate criteria, as a list of tokens
+		Error  error     // evaluation status, nil on success
+
+		Tokens   tokenList // Copy of tokens to consume during evaluation
+		Atoms    []*Atom   // Atoms being evaluated
+		AtomPtr  *Atom     // Atom currently being evaluated from the atom list
+		Position int       // index of the atom in the atom list, starts from 1
+		Count    int       // number of atoms in the atom list
+	}
+)
+
+// NewAtomPath creates an AtomPath object for the given path string.  It
+// performs all lexing and parsing steps, so that evaluating data sets against
+// the path will have as little overhead as possible.
+func NewAtomPath(path string) (ap *AtomPath, e error) {
+	Log.Printf("NewAtomPath(%q)", path)
+
+	var pe *pathEvaluator
+	pe, e = newPathEvaluator(path)
+	if e != nil {
+		return ap, addPathToError(e, path)
+	}
+
+	ap = &AtomPath{
+		Path:      strings.TrimSpace(path),
+		evaluator: pe,
+		err:       nil,
+	}
+	return
 }
 
 func errInvalidPath(msg string) error {
@@ -140,18 +177,17 @@ func errInvalidPredicate(msg string) error {
 	return fmt.Errorf("invalid predicate: %s", msg)
 }
 
-type tokenList []*token
-
+// push a new token onto the end of the stack, as the new top element
 func (s *tokenList) push(tk *token) {
 	*s = append(*s, tk)
 }
 
-// add a new token to the front of the queue, as the new first lement
+// add a new token to the front of the queue, as the new first element
 func (s *tokenList) unshift(tk *token) {
 	*s = append(tokenList{tk}, *s...)
 }
 
-// remove and return the first list token
+// remove and return the first token token in the queue (zeroth element)
 func (s *tokenList) shift() (tk *token) {
 	if len(*s) == 0 {
 		return nil
@@ -160,7 +196,7 @@ func (s *tokenList) shift() (tk *token) {
 	return
 }
 
-// pop an token off the stack and return tk.
+// pop one token off the stack and return it.
 // Return ok=false if stack is empty.
 func (s *tokenList) pop() (tk *token) {
 	size := len(*s)
@@ -194,44 +230,13 @@ func (s *tokenList) empty() bool {
 	return len(*s) == 0
 }
 
-// PathParser is a parser for interpreting predicate tokens.
-type PathParser struct {
-	outputQueue tokenList    // tokens ordered for evaluation
-	opStack     tokenList    // holds operators until their operands reach output queue
-	tokens      <-chan token // tokens received from lexer
-	err         error        // indicates parsing succeeded or describes what failed
-}
-
-// AtomPath is a path evaluator in compiled form.
-// It can be sent atoms to evaluate against the path expression it represents.
-type AtomPath struct {
-	Path      string
-	evaluator *pathEvaluator
-	err       error
-}
-
-// NewAtomPath creates an AtomPath object for the given path string.  It
-// performs all lexing and parsing steps, so that evaluating data sets against
-// the path will have as little overhead as possible.
-func NewAtomPath(path string) (ap *AtomPath, e error) {
-	Log.Printf("NewAtomPath(%q)", path)
-
-	var pe *pathEvaluator
-	pe, e = newPathEvaluator(path)
-	if e != nil {
-		return ap, addPathToError(e, path)
-	}
-
-	ap = &AtomPath{
-		Path:      strings.TrimSpace(path),
-		evaluator: pe,
-		err:       nil,
-	}
-	return
-}
-
-// AtomsAtPath returns the set of descendant atoms in atom a which match the
-// given path.
+// AtomsAtPath returns the set of descendant atoms in which match the given
+// path.
+//
+// This is shorthand for creating an AtomPath object and calling
+// AtomPath.GetAtoms().  Do it the long way if you plan to perform the path
+// evaluation multiple times, because keeping the compiled AtomPath object
+// instead of repeating the lexing and parsing steps saves allocations.
 func (a *Atom) AtomsAtPath(path string) (atoms []*Atom, e error) {
 	atomPath, e := NewAtomPath(path)
 	if e != nil {
@@ -255,7 +260,7 @@ func (ap *AtomPath) GetAtoms(root *Atom) (atoms []*Atom, e error) {
 // representing the path.
 func newPathEvaluator(path string) (pe *pathEvaluator, err error) {
 	var lexr = newPathLexer(path)
-	var pp = PathParser{tokens: lexr.tokens}
+	var pp = pathParser{tokens: lexr.tokens}
 	pp.receiveTokens()
 	pe = &pathEvaluator{
 		Path:   path,
@@ -264,11 +269,11 @@ func newPathEvaluator(path string) (pe *pathEvaluator, err error) {
 	return pe, pp.err
 }
 
-// NewPredicateEvaluator consumes a series of predicate tokens from a
+// newPredicateEvaluator consumes a series of predicate tokens from a
 // pathEvaluator starting with a PredicateEnd token and ending with a
 // PredicateStart token (yes it's supposed to be backwards), and returns a new
-// PredicateEvaluator.
-func NewPredicateEvaluator(pe *pathEvaluator) (pre PredicateEvaluator, ok bool) {
+// predicateEvaluator.
+func newPredicateEvaluator(pe *pathEvaluator) (pre predicateEvaluator, ok bool) {
 	// Predicate end comes before pred start, that's the order they're pushed to stack
 	// Predicate tokens are in postfix order at this point.
 	if pe.Tokens.empty() || pe.Tokens.pop().typ != tokenPredicateEnd {
@@ -290,7 +295,7 @@ func NewPredicateEvaluator(pe *pathEvaluator) (pre PredicateEvaluator, ok bool) 
 	}
 
 	// evaluate element set by predicate
-	return PredicateEvaluator{
+	return predicateEvaluator{
 		tokens: predicateTokens,
 	}, true
 }
@@ -298,11 +303,11 @@ func NewPredicateEvaluator(pe *pathEvaluator) (pre PredicateEvaluator, ok bool) 
 // Evaluate filters a list of atoms against the predicate conditions, returning
 // the atoms that satisfy the predicate.
 //
-// The candidate atoms must all be made available to the PredicateEvaluator at
+// The candidate atoms must all be made available to the predicateEvaluator at
 // once, because the predicate may refer to individual child atoms by name,
 // requiring them to be evaluated against every other candidate.
-func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
-	Log.Print("PredicateEvaluator::Evaluate()  ", pre.tokens, candidates)
+func (pre *predicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e error) {
+	Log.Print("predicateEvaluator::Evaluate()  ", pre.tokens, candidates)
 	pre.Atoms = candidates
 	pre.Count = len(candidates)
 	for i, atomPtr := range candidates {
@@ -325,7 +330,7 @@ func (pre *PredicateEvaluator) Evaluate(candidates []*Atom) (atoms []*Atom, e er
 	return
 }
 
-func (pre *PredicateEvaluator) getChildValue(atomName string) (v iComparer, ok bool) {
+func (pre *predicateEvaluator) getChildValue(atomName string) (v iComparer, ok bool) {
 	for _, a := range pre.AtomPtr.children {
 		if a.Name() != atomName {
 			continue
@@ -642,7 +647,7 @@ func lexNumberInPath(l *lexer) stateFn {
 
 // receiveTokens gets tokens from the lexer and sends them to the parser
 // for parsing.
-func (pp *PathParser) receiveTokens() {
+func (pp *pathParser) receiveTokens() {
 	for {
 		tk := pp.readToken()
 		ok := pp.parseToken(tk)
@@ -657,7 +662,7 @@ func (pp *PathParser) receiveTokens() {
 }
 
 // read next time from token channel, and return tk.
-func (pp *PathParser) readToken() (tk token) {
+func (pp *pathParser) readToken() (tk token) {
 	var ok bool
 	select {
 	case tk, ok = <-pp.tokens:
@@ -670,7 +675,7 @@ func (pp *PathParser) readToken() (tk token) {
 
 // errorf sets the error field in the parser, and indicates that parsing should
 // stop by returning false.
-func (pp *PathParser) errorf(format string, args ...interface{}) bool {
+func (pp *pathParser) errorf(format string, args ...interface{}) bool {
 	pp.err = errInvalidPath(fmt.Sprintf(format, args...))
 	return false
 }
@@ -679,7 +684,7 @@ func (pp *PathParser) errorf(format string, args ...interface{}) bool {
 // in the path string, and queues them into evaluation order.
 // This is based on Djikstra's shunting-yard algorithm.
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-func (pp *PathParser) parseToken(tk token) bool {
+func (pp *pathParser) parseToken(tk token) bool {
 	Log.Printf("      parseToken %q {%s} ", tk.value, tk.typ)
 	switch tk.typ {
 	case tokenError:
@@ -738,7 +743,7 @@ func (pp *PathParser) parseToken(tk token) bool {
 // them into the output queue. This continues until the given test function
 // fails to satisfy the given test function.
 // The failed end token is left on the operator stack.
-func (pp *PathParser) moveOperatorsToOutputUntil(test func(t token) bool) {
+func (pp *pathParser) moveOperatorsToOutputUntil(test func(t token) bool) {
 	for {
 		if pp.opStack.empty() {
 			break
@@ -752,12 +757,12 @@ func (pp *PathParser) moveOperatorsToOutputUntil(test func(t token) bool) {
 }
 
 // moveOperatorsToOutput implements this part of the Shunting-yard algorithm:
-
+//
 //  while there is an operator token o2, at the top of the operator stack and either
 //    o1 is left-associative and its precedence is less than or equal to that of o2, or
 //    o1 is right associative, and has precedence less than that of o2,
 //        pop o2 off the operator stack, onto the output queue;
-func (pp *PathParser) moveOperatorsToOutput(tk token) {
+func (pp *pathParser) moveOperatorsToOutput(tk token) {
 	tkPrec, tAssoc := operatorOrder(tk)
 	for {
 		if pp.opStack.empty() {
@@ -780,8 +785,6 @@ func (pp *PathParser) moveOperatorsToOutput(tk token) {
 	Log.Println("        opStack after: ", pp.opStack)
 }
 
-// func (pp *PathParser) parsePredicateTokens(tk token) bool {
-
 func isOperatorToken(tk *token) bool {
 	if tk == nil {
 		return false
@@ -793,14 +796,6 @@ func isFunctionToken(tk *token) bool {
 		return false
 	}
 	return strings.Contains(string(tk.typ), "Function")
-}
-
-type pathEvaluator struct {
-	Path           string
-	tokens         tokenList // path criteria, does not change after creation
-	Tokens         tokenList // path criteria, consumed during each evaluation
-	Error          error     // evaluation status, nil on success
-	ContextAtomPtr *Atom
 }
 
 // errorf sets the error field in the parser, and indicates that parsing should
@@ -974,15 +969,14 @@ func (pe *pathEvaluator) evalElementSet() (atoms []*Atom) {
 	return
 }
 
-// read predicate tokens.
-// read nodeset.
-// for each Element in the NodeSet, make a predicateEvaluator and apply predicate.
+// evalPredicate returns the set of Atoms from the input set which match the
+// predicate.
 func (pe *pathEvaluator) evalPredicate() []*Atom {
 	Log.Println("evalPredicate()")
 	// evaluate element set by predicate
-	pre, ok := NewPredicateEvaluator(pe)
+	pre, ok := newPredicateEvaluator(pe)
 	if ok != true {
-		return nil // error is already set by NewPredicateEvaluator
+		return nil // error is already set by newPredicateEvaluator
 	}
 	atoms, err := pre.Evaluate(pe.evalElementSet())
 	if err != nil {
@@ -992,41 +986,25 @@ func (pe *pathEvaluator) evalPredicate() []*Atom {
 	return atoms
 }
 
-// PredicateEvaluator determines which candidate atoms satisfy the
-// predicate criteria.
-//
-// The predicate is the part of the path within the [].
-// Examples:
-//    /ROOT[1]
-//    /ROOT[@name=NONE]
-//		/ROOT/UI_1[@data < 2]
-type PredicateEvaluator struct {
-	tokens tokenList // predicate criteria, as a list of tokens
-	Error  error     // evaluation status, nil on success
-
-	Tokens   tokenList // Copy of tokens to consume during evaluation
-	Atoms    []*Atom   // Atoms being evaluated
-	AtomPtr  *Atom     // Atom currently being evaluated from the atom list
-	Position int       // index of the atom in the atom list, starts from 1
-	Count    int       // number of atoms in the atom list
-}
-
-func (pre *PredicateEvaluator) errorf(format string, args ...interface{}) error {
+// errorf is called to record an error state resulting from predicate evaluation.
+func (pre *predicateEvaluator) errorf(format string, args ...interface{}) error {
 	msg := fmt.Sprintf(format, args...)
 	pre.Error = errInvalidPredicate(msg)
 	return pre.Error
 }
 
-// nextTokenType returns the tokenType of the next Token in the PathEvalator's Token stack
-func (pre *PredicateEvaluator) nextTokenType() tokenEnum {
+// nextTokenType returns the tokenType of the next Token in the PathEvalator's
+// Token stack.
+func (pre *predicateEvaluator) nextTokenType() tokenEnum {
 	if len(pre.Tokens) == 0 {
 		return ""
 	}
 	return pre.Tokens.nextType()
 }
 
-// evaluate the list of operators/values/stuff against the evaluator's atom/pos/count
-func (pre *PredicateEvaluator) eval() (results []iEqualer) {
+// eval evaluates the list of operators/values/stuff against the evaluator's
+// atom/pos/count.
+func (pre *predicateEvaluator) eval() (results []iEqualer) {
 Loop:
 	for !pre.Tokens.empty() && pre.Error == nil {
 		switch pre.nextTokenType() {
@@ -1054,7 +1032,10 @@ Loop:
 	}
 	return
 }
-func (pre *PredicateEvaluator) evalBoolean() (result iEqualer) {
+
+// evalBoolean evaluates some of the next predicate tokens and returns a
+// boolean result.
+func (pre *predicateEvaluator) evalBoolean() (result iEqualer) {
 	if pre.Tokens.empty() {
 		pre.errorf("expect boolean value, got nothing")
 		return
@@ -1078,7 +1059,9 @@ func (pre *PredicateEvaluator) evalBoolean() (result iEqualer) {
 	return
 }
 
-func (pre *PredicateEvaluator) evalBooleanOperator() typeBoolean {
+// evalBooleanOperator evaluates a boolean operator token, followed by some operands, and
+// returns a boolean result.
+func (pre *predicateEvaluator) evalBooleanOperator() typeBoolean {
 	op := pre.Tokens.pop()
 	if op.typ != tokenBooleanOperator {
 		pre.errorf("expected boolean operator, received type %s", op.typ)
@@ -1097,8 +1080,9 @@ func (pre *PredicateEvaluator) evalBooleanOperator() typeBoolean {
 	return typeBoolean(result)
 }
 
-// Numeric operators. All have arity 2.  Must handle float and int types.  Assumed to be signed.
-func (pre *PredicateEvaluator) evalArithmeticOperator() (result iArithmeticker) {
+// evalArithmeticOperator evaluates an arithmetic operator token, followed by some
+// operands, and returns a numeric result.
+func (pre *predicateEvaluator) evalArithmeticOperator() (result iArithmeticker) {
 	op := pre.Tokens.pop()
 	if op.typ != tokenArithmeticOperator {
 		pre.errorf("expected tokenArithmeticOperator, received type %s", op.typ)
@@ -1131,7 +1115,10 @@ func (pre *PredicateEvaluator) evalArithmeticOperator() (result iArithmeticker) 
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evalEqualityOperator() iEqualer {
+
+// evalEqualityOperator evaluates an equality operator token, followed by some
+// operands, and returns a result that can be compared with =.
+func (pre *predicateEvaluator) evalEqualityOperator() iEqualer {
 	var result bool
 	op := pre.Tokens.pop()
 	if op.typ != tokenEqualityOperator {
@@ -1155,7 +1142,10 @@ func (pre *PredicateEvaluator) evalEqualityOperator() iEqualer {
 	}
 	return typeBoolean(result)
 }
-func (pre *PredicateEvaluator) evalComparisonOperator() iEqualer {
+
+// evalComparisonOperator evaluates an comparison operator token and some following
+// operands, and returns a boolean result.
+func (pre *predicateEvaluator) evalComparisonOperator() iEqualer {
 	var result bool
 	op := pre.Tokens.pop()
 	if op.typ != tokenComparisonOperator {
@@ -1182,7 +1172,9 @@ func (pre *PredicateEvaluator) evalComparisonOperator() iEqualer {
 	}
 	return typeBoolean(result)
 }
-func (pre *PredicateEvaluator) evalNumber() (result iArithmeticker) {
+
+// evalNumber evaluates a numeric token and returns an Arithmeticker result.
+func (pre *predicateEvaluator) evalNumber() (result iArithmeticker) {
 	var err error
 	ok := true
 	switch pre.nextTokenType() {
@@ -1221,7 +1213,9 @@ func (pre *PredicateEvaluator) evalNumber() (result iArithmeticker) {
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evaliEqualer() (result iEqualer) {
+
+// evalNumber evaluates a token that con be compared with =, and returns an iEqualer result.
+func (pre *predicateEvaluator) evaliEqualer() (result iEqualer) {
 	Log.Printf("    evaliEqualer(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.nextTokenType() {
@@ -1266,7 +1260,7 @@ func (pre *PredicateEvaluator) evaliEqualer() (result iEqualer) {
 
 // FIXME: this near-duplicates evaliEqualer.
 // have tk call evaliEqualer and then error out on non-Compararer types?
-func (pre *PredicateEvaluator) evalComparable() (result iComparer) {
+func (pre *predicateEvaluator) evalComparable() (result iComparer) {
 	Log.Printf("    evalComparable(), Tokens=%v", pre.Tokens)
 	var err error
 	switch pre.nextTokenType() {
@@ -1304,7 +1298,7 @@ func (pre *PredicateEvaluator) evalComparable() (result iComparer) {
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evalVariable() (result iComparer) {
+func (pre *predicateEvaluator) evalVariable() (result iComparer) {
 	token := pre.Tokens.pop()
 	if token.typ != tokenVariable {
 		pre.errorf("expected tokenVariable, received type %s", token.typ)
@@ -1342,7 +1336,7 @@ func (pre *PredicateEvaluator) evalVariable() (result iComparer) {
 	}
 	return result
 }
-func (pre *PredicateEvaluator) evalFunctionBool() iEqualer {
+func (pre *predicateEvaluator) evalFunctionBool() iEqualer {
 	var result bool
 	token := pre.Tokens.pop()
 	if token.typ != tokenFunctionBool {
@@ -1366,7 +1360,7 @@ func (pre *PredicateEvaluator) evalFunctionBool() iEqualer {
 	return typeBoolean(result)
 }
 
-func (pre *PredicateEvaluator) evalResultsToBool(results []iEqualer) (result bool, err error) {
+func (pre *predicateEvaluator) evalResultsToBool(results []iEqualer) (result bool, err error) {
 	if pre.Error != nil {
 		return false, pre.Error
 	}
@@ -1396,7 +1390,7 @@ func (pre *PredicateEvaluator) evalResultsToBool(results []iEqualer) (result boo
 	}
 	return
 }
-func (pre *PredicateEvaluator) evalFunctionNumeric() (result iArithmeticker) {
+func (pre *predicateEvaluator) evalFunctionNumeric() (result iArithmeticker) {
 	token := pre.Tokens.pop()
 	if token.typ != tokenFunctionNumeric {
 		pre.errorf("expected tokenFunctionNumeric, received type %s", token.typ)

@@ -124,7 +124,7 @@ func (a *Atom) ZeroData() {
 
 // String returns the atom's text description in ADE ContainerText format.
 // This is a single line, it doesn't include a list of child atoms.
-func (a Atom) String() string {
+func (a *Atom) String() string {
 	if a.typ == CONT {
 		return fmt.Sprintf("%s:%s:", a.Name(), a.Type())
 	}
