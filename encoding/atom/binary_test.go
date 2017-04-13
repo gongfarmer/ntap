@@ -26,8 +26,9 @@ func TestUnmarshalBinary(t *testing.T) {
 	}
 }
 
-// NOTE: marshaled output is not guaranteed to always match its input, as
-// odd but valid inputs may be normalized. However, they do match for these tests.
+// NOTE: marshaled output is not guaranteed to always match its input, as odd
+// but valid inputs may become normalized. However, they do match for these
+// particular tests.
 func TestMarshalBinary(t *testing.T) {
 	var got []byte
 	var err error
@@ -88,3 +89,50 @@ func TestReadAtomsFromHex(t *testing.T) {
 		}
 	}
 }
+
+// var BID0_HEX = []byte("0000004442494430434F4E5400000010425645525549333200000001000000144254494D55493634000546592CD6DB2C000000144E45585455493634DDDDF0000C000000")
+//
+// var BID0_TEXT = []byte(`
+// BID0:CONT:
+// 	BVER:UI32:1
+// 	BTIM:UI64:1484723701865260
+// 	NEXT:UI64:15987198135227121664
+// END
+// `)
+//
+// type binaryTest struct {
+// 	Input     interface{}
+// 	WantValue []Atom
+// 	WantError error
+// }
+//
+// func runBinaryTests(t *testing.T, tests []binaryTest) {
+// 	for _, test := range tests {
+// 		atoms, gotErr := ReadAtomsFromHex(strings.NewReader(test.Input.(string)))
+// 		switch {
+// 		case gotErr == nil && test.WantError == nil:
+// 		case gotErr != nil && test.WantError == nil:
+// 			t.Errorf("%v(%b): got err %s, want err <nil>", "ReadAtomsFromHex", test.Input, gotErr)
+// 		case gotErr == nil && test.WantError != nil:
+// 			t.Errorf("%v(%b): got err <nil>, want err %s", "ReadAtomsFromHex", test.Input, test.WantError)
+// 		case gotErr.Error() != test.WantError.Error():
+// 			t.Errorf("%v(%b): got err %s, want err %s", "ReadAtomsFromHex", test.Input, gotErr, test.WantError)
+// 			return
+// 		}
+//
+// 		if fmt.Sprint(atoms) != fmt.Sprint(test.WantValue) {
+// 			t.Errorf("%v(%x): got %T \"%[3]v\", want %[4]T \"%[4]v\"", "ReadAtomsFromHex", test.Input, fmt.Sprint(atoms), fmt.Sprint(test.WantValue))
+// 		}
+// 	}
+// }
+//
+// func TestReadAtomsFromHexErrors(t *testing.T) {
+// 	var bid0 Atom
+// 	if err := bid0.UnmarshalText(BID0_TEXT); err != nil {
+// 		panic("Could not create test atom")
+// 	}
+// 	tests := []binaryTest{
+// 		binaryTest{BID0_HEX, []Atom{bid0}, nil},
+// 	}
+// 	runBinaryTests(t, tests)
+// }
