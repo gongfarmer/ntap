@@ -178,6 +178,7 @@ func TestUI64ToUint64(t *testing.T) {
 
 func TestUI64ToInt64(t *testing.T) {
 	byteCountErr := errFunc(errByteCount).curryErrFunc("UI64", 8)
+	zero := int64(0)
 	tests := []decoderTest{
 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\x00"), int64(0), nil},
 		decoderTest{[]byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), int64(0xFF), nil},
@@ -187,15 +188,17 @@ func TestUI64ToInt64(t *testing.T) {
 		decoderTest{[]byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), int64(0xFF00000000), nil},
 		decoderTest{[]byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), int64(0xFF0000000000), nil},
 		decoderTest{[]byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), int64(0xFF000000000000), nil},
-		decoderTest{[]byte{}, int64(0), byteCountErr(0)},
-		decoderTest{[]byte("\x01"), int64(0), byteCountErr(1)},
-		decoderTest{[]byte("\xFF\x01"), int64(0), byteCountErr(2)},
-		decoderTest{[]byte("\xFF\xFF\x01"), int64(0), byteCountErr(3)},
-		decoderTest{[]byte("\xFF\xFF\xFF\x01"), int64(0), byteCountErr(4)},
-		decoderTest{[]byte("\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(5)},
-		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(6)},
-		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(7)},
-		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), int64(0), byteCountErr(9)},
+		decoderTest{[]byte("\xFF\x00\x00\x00\x00\x00\x00\x00"), zero, errRange("int64", int64(0))},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), zero, errRange("int64", int64(0))},
+		decoderTest{[]byte{}, zero, byteCountErr(0)},
+		decoderTest{[]byte("\x01"), zero, byteCountErr(1)},
+		decoderTest{[]byte("\xFF\x01"), zero, byteCountErr(2)},
+		decoderTest{[]byte("\xFF\xFF\x01"), zero, byteCountErr(3)},
+		decoderTest{[]byte("\xFF\xFF\xFF\x01"), zero, byteCountErr(4)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\x01"), zero, byteCountErr(5)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\x01"), zero, byteCountErr(6)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\x01"), zero, byteCountErr(7)},
+		decoderTest{[]byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), zero, byteCountErr(9)},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI64ToInt64(input)
@@ -235,7 +238,8 @@ func funcUI32ToUint32(t *testing.T) {
 		decoderTest{[]byte("\xFF\x00\xFF"), zero, byteCountErr(3)},
 		decoderTest{[]byte("\x00\x00\x00\x00"), zero, nil},
 		decoderTest{[]byte("\xFF\xFF\xFF\xFF"), math.MaxUint32, nil},
-		decoderTest{[]byte("\x01\xFF\xFF\xFF\xFF"), zero, nil},
+		decoderTest{[]byte("\x01\x01\x01\x01\xFF\xFF\xFF\xFF"), zero, byteCountErr(8)},
+		decoderTest{[]byte(""), zero, byteCountErr(0)},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return UI32ToUint32(input)
@@ -1562,6 +1566,9 @@ func TestIP32ToUint64(t *testing.T) {
 		decoderTest{[]byte(""), zero, byteCountErr(0)},
 		decoderTest{[]byte("\x00"), zero, byteCountErr(1)},
 		decoderTest{[]byte("\x00\x00"), zero, byteCountErr(2)},
+
+		decoderTest{[]byte("\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff"), zero, errByteCount("IP32", 4, 12)},
+		decoderTest{[]byte("\xaa\xaa\xaa\xaa\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff"), zero, errByteCount("IP32", 4, 16)},
 	}
 	runDecoderTests(t, tests, func(input []byte) (interface{}, error) {
 		return IP32ToUint64(input)
@@ -2933,7 +2940,7 @@ func TestSetFC32FromString(t *testing.T) {
 		encoderTest{"0x235C2120", []byte("\x23\x5c\x21\x20"), nil},
 		encoderTest{"0x20202020", []byte("\x20\x20\x20\x20"), nil},
 		encoderTest{"0x202020", zero, errStrInvalid(typ, "0x202020")},
-		encoderTest{"0x2020", zero, fmt.Errorf("FC32 value is too long: (%s)", "0x2020")},
+		encoderTest{"0x2020", zero, errStrInvalid(typ, "0x2020")},
 		encoderTest{"0x20", []byte("0x20"), nil},
 		encoderTest{"0x", zero, errStrInvalid(typ, "0x")},
 
@@ -2958,6 +2965,9 @@ func TestSetFC32FromString(t *testing.T) {
 		encoderTest{"0", zero, errStrInvalid(typ, "0")},
 		encoderTest{"00", zero, errStrInvalid(typ, "00")},
 		encoderTest{"R0000000", zero, errStrInvalid(typ, "R0000000")},
+		encoderTest{"0X00000000", zero, errStrInvalid(typ, "0X00000000")},
+		encoderTest{"000000", zero, errStrInvalid(typ, "000000")},
+		encoderTest{"0x202020XX", zero, errStrInvalid(typ, "0x202020XX")},
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, FC32).SetString(input.(string))
@@ -3153,6 +3163,28 @@ func TestSetUUIDFromString(t *testing.T) {
 		return NewCodec(dataPtr, UUID).SetString(input.(string))
 	})
 }
+func TestSetUUIDFromUints(t *testing.T) {
+	typ := "UUID"
+	zero := make([]byte, 36)
+	tests := []encoderTest{
+		encoderTest{[]uint64{0x64881431, 0xB6DC, 0x478E, 0xB7EE, 0xED306619C797}, []byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), nil},
+		encoderTest{[]uint64{0xA3BFFF54, 0xF474, 0x42E9, 0xAB53, 0x1D913D118B1}, []byte("\xa3\xbf\xff\x54\xf4\x74\x42\xe9\xab\x53\x01\xd9\x13\xd1\x18\xb1"), nil},
+		encoderTest{[]uint64{0x64881431, 0xB6DC, 0x478E, 0xB7EE, 0xED306619C797}, []byte("\x64\x88\x14\x31\xb6\xdc\x47\x8e\xb7\xee\xed\x30\x66\x19\xc7\x97"), nil},
+		encoderTest{[]uint64{0, 0, 0, 0, 0}, []byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{[]uint64{1, 2, 3, 4, 5}, []byte("\x00\x00\x00\x01\x00\x02\x00\x03\x00\x04\x00\x00\x00\x00\x00\x05"), nil},
+		encoderTest{[]uint64{0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFFFFFFFFFF}, []byte("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{[]uint64{0}, zero, errInputInvalid(typ, []uint64{0})},
+		encoderTest{[]uint64{0, 0, 0, 0}, zero, errInputInvalid(typ, []uint64{0, 0, 0, 0})},
+		encoderTest{[]uint64{0x0100000000, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFFFFFFFFFF}, zero, errRange("UUID (octet 1: UI32)", 0x0100000000)},
+		encoderTest{[]uint64{0xFFFFFFFF, 0x010000, 0xFFFF, 0xFFFF, 0xFFFFFFFFFFFF}, zero, errRange("UUID (octet 2: UI16)", 0x010000)},
+		encoderTest{[]uint64{0xFFFFFFFF, 0xFFFF, 0x010000, 0xFFFF, 0xFFFFFFFFFFFF}, zero, errRange("UUID (octet 3: UI16)", 0x010000)},
+		encoderTest{[]uint64{0xFFFFFFFF, 0xFFFF, 0xFFFF, 0x010000, 0xFFFFFFFFFFFF}, zero, errRange("UUID (octet 4: UI16)", 0x010000)},
+		// FIXME: add range exceed test for final octet, how?
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UUID).SetSliceOfUint(input.([]uint64))
+	})
+}
 
 func TestSetUSTRFromString(t *testing.T) {
 	typ := "USTR"
@@ -3333,8 +3365,12 @@ func TestSetUSTRFromDelimitedString(t *testing.T) {
 		encoderTest{"\"=}\"", []byte("\x00\x00\x00\x3D\x00\x00\x00\x7D"), nil},
 		encoderTest{"\">~\"", []byte("\x00\x00\x00\x3E\x00\x00\x00\x7E"), nil},
 		encoderTest{"\"?\\x7F\"", []byte("\x00\x00\x00\x3F\x00\x00\x00\x7F"), nil},
+		encoderTest{`"\x7F\x7F"`, []byte("\x00\x00\x00\x7F\x00\x00\x00\x7F"), nil},
+		encoderTest{`"\x7F\x7"`, nil, errInvalidEscape(typ, `\x7`, "EOF during hex encoded character")},
 		encoderTest{`"\"`, nil, errInvalidEscape(typ, `\`, "EOF during escaped character")},
 		encoderTest{`"""`, nil, errUnescaped(typ, '"')},
+		encoderTest{"", nil, errUndelimited(typ, '"')},
+		encoderTest{"DOG", nil, errUndelimited(typ, '"')},
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, USTR).SetStringDelimited(input.(string))
@@ -3417,6 +3453,7 @@ func TestSetCSTRFromString(t *testing.T) {
 		encoderTest{"\x1e", nil, errUnescaped(typ, '\x1e')},
 		encoderTest{"\x1f", nil, errUnescaped(typ, '\x1f')},
 		encoderTest{"\x7f", nil, errUnescaped(typ, '\x7f')},
+		encoderTest{`\x7`, nil, errInvalidEscape(typ, `\x7`, "EOF during hex encoded character")},
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, CSTR).SetString(input.(string))
@@ -3468,7 +3505,7 @@ func TestSetCSTRFromDelimitedString(t *testing.T) {
 	}
 	var arrInvalid = []string{"dog", "0-0-0-0-0", ".", " ", ""}
 	for _, str := range arrInvalid {
-		err := fmt.Errorf("CSTR input string must be double-quoted: (%s)", str)
+		err := errUndelimited("CSTR", '"')
 		tests = append(tests, encoderTest{str, zero, err})
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
@@ -3496,5 +3533,22 @@ func TestSetDATAFromHexString(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, DATA).SetString(input.(string))
+	})
+}
+
+// All ADE types are required to provide a SetString.
+// Only the empty string is a valid input for NULL though.
+func TestSetNULLFromString(t *testing.T) {
+	typ := "NULL"
+	zero := []byte(nil)
+	tests := []encoderTest{
+		encoderTest{"", zero, nil},
+	}
+	var arrInvalid = []string{"dog", "1..1", ".", "0"}
+	for _, str := range arrInvalid {
+		tests = append(tests, encoderTest{str, zero, errStrInvalid(typ, str)})
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, NULL).SetString(input.(string))
 	})
 }

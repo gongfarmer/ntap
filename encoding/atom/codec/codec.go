@@ -140,6 +140,9 @@ func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
 func errStrInvalid(t string, v string) error {
 	return fmt.Errorf("invalid string value for ADE type %s: \"%s\"", t, strconv.Quote(v))
 }
+func errInputInvalid(t string, v interface{}) error {
+	return fmt.Errorf("invalid input value for ADE type %s: \"%v\"", t, v)
+}
 func errRange(t string, v interface{}) (e error) {
 	switch v := v.(type) {
 	case uint, uint8, uint16, uint32, uint64, int, int32, int64:
@@ -165,6 +168,9 @@ func errInvalidEscape(t, v, note string) (e error) {
 }
 func errUnescaped(typ string, r rune) error {
 	return fmt.Errorf("character %s must be escaped in %s value", strconv.QuoteRune(r), typ)
+}
+func errUndelimited(typ string, r rune) error {
+	return fmt.Errorf("%s value must be delimited by %s", typ, strconv.QuoteRune(r))
 }
 func errZeroDenominator(typ string, v string) (e error) {
 	if v == "" {
@@ -571,13 +577,14 @@ func UI64ToUint64(buf []byte) (v uint64, e error) {
 }
 
 // UI64ToInt64 accepts ADE UI64 data bytes, and expresses the value as an int64.
+// An error is returned if the UI64 value is too large to express as int64.
 func UI64ToInt64(buf []byte) (v int64, e error) {
 	if e = checkByteCount(buf, 8, "UI64"); e != nil {
 		return
 	}
 	var ui = binary.BigEndian.Uint64(buf)
 	if ui > math.MaxInt64 {
-		return 0, errRange("int64", ui)
+		return 0, errRange("int64", v)
 	}
 	return int64(ui), e
 }
@@ -1109,8 +1116,6 @@ func IP32ToUint64(buf []byte) (v uint64, e error) {
 		v = uint64(binary.BigEndian.Uint32(buf))
 	case 8:
 		v = binary.BigEndian.Uint64(buf)
-	case 12, 16:
-		e = fmt.Errorf("extra-long IP32 value overflows uint64: %x", buf)
 	default:
 		e = errByteCount("IP32", 4, len(buf))
 	}
@@ -1456,6 +1461,7 @@ func init() {
 	// ADE UUID type
 	enc = newEncoder(UUID)
 	enc.SetString = StringToUUIDBytes
+	enc.SetSliceOfUint = SliceOfUintToUUIDBytes
 	encoderByType[UUID] = enc
 
 	// ADE String types
@@ -1485,7 +1491,12 @@ func init() {
 
 	// NULL type
 	enc = newEncoder(NULL)
-	enc.SetString = func(_ *[]byte, _ string) (e error) { return }
+	enc.SetString = func(_ *[]byte, s string) (e error) {
+		if s != "" {
+			return errStrInvalid("NULL", s)
+		}
+		return
+	}
 	encoderByType[NULL] = enc
 
 	// ADE container
@@ -2164,15 +2175,17 @@ func StringToFC32Bytes(buf *[]byte, v string) (e error) {
 	switch len(v) {
 	case 10: // 8 hex digits plus leading 0x
 		if !strings.HasPrefix(v, "0x") {
-			return fmt.Errorf("FC32 value is too long: (%s)", v)
+			return errStrInvalid("FC32", v)
 		}
 		matched, e := fmt.Sscanf(v, "0x%x%s", buf, &extra)
 		if e != io.EOF || matched != 1 {
+			*buf = []byte{0x00, 0x00, 0x00, 0x00}
 			return errStrInvalid("FC32", v)
 		}
 	case 8: // 8 hex digits
 		matched, e := fmt.Sscanf(v, "%x%s", buf, &extra)
 		if e != io.EOF || matched != 1 {
+			*buf = []byte{0x00, 0x00, 0x00, 0x00}
 			return errStrInvalid("FC32", v)
 		}
 	case 6: // 4 printable chars, single quote delimited
@@ -2180,12 +2193,14 @@ func StringToFC32Bytes(buf *[]byte, v string) (e error) {
 			return fmt.Errorf("FC32 value is not printable: 0x%x", v)
 		}
 		if v[0] != '\'' || v[5] != '\'' {
-			return fmt.Errorf("FC32 value is too long: (%s)", v)
+			*buf = []byte{0x00, 0x00, 0x00, 0x00}
+			return errStrInvalid("FC32", v)
 		}
 		*buf = []byte(v)[1:5]
 	case 4: // 4 printable chars, no delimiters
 		*buf = []byte(v)
 	default:
+		*buf = []byte{0x00, 0x00, 0x00, 0x00}
 		return errStrInvalid("FC32", v)
 	}
 	return nil
@@ -2337,11 +2352,30 @@ func StringToUUIDBytes(buf *[]byte, v string) (e error) {
 	return
 }
 
+// SliceOfUintToUUIDBytes writes a set of 5 uint64 values to a byte slice
+// pointer as ADE UUID binary data.
+func SliceOfUintToUUIDBytes(buf *[]byte, v []uint64) (e error) {
+	if len(*buf) != 36 {
+		*buf = make([]byte, 36)
+	}
+
+	// Read the UUID string into a UUID object, discarding delimiters
+	var uuid uuidType
+	e = uuid.SetFromUints(v)
+	if e != nil {
+		return
+	}
+
+	// write raw bytes to Atom.data
+	*buf = uuid.Bytes()
+	return
+}
+
 // DelimitedStringToCSTRBytes writes a string value to a byte slice pointer as ADE CSTR binary data.
 func DelimitedStringToCSTRBytes(buf *[]byte, v string) (e error) {
 	L := len(v)
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
-		return fmt.Errorf("CSTR input string must be double-quoted: (%s)", v)
+		return errUndelimited("CSTR", '"')
 	}
 	return StringToCSTRBytes(buf, v[1:L-1])
 }
@@ -2358,7 +2392,7 @@ func StringToCSTRBytes(buf *[]byte, v string) (e error) {
 func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 	L := len(v)
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
-		return fmt.Errorf("USTR input string must be double-quoted: (%s)", v)
+		return errUndelimited("USTR", '"')
 	}
 	return StringToUSTRBytes(buf, v[1:L-1])
 }
@@ -2493,8 +2527,22 @@ func (u *uuidType) SetFromString(s string) (e error) {
 
 func (u *uuidType) SetFromUints(values []uint64) (e error) {
 	if len(values) != 5 {
-		return fmt.Errorf("invalid integer values for type UUID: %v", values)
+		return errInputInvalid("UUID", values)
 	}
+
+	if values[0] > math.MaxUint32 {
+		return errRange("UUID (octet 1: UI32)", values[0])
+	}
+	if values[1] > math.MaxUint16 {
+		return errRange("UUID (octet 2: UI16)", values[1])
+	}
+	if values[2] > math.MaxUint16 {
+		return errRange("UUID (octet 3: UI16)", values[2])
+	}
+	if values[3] > math.MaxUint16 {
+		return errRange("UUID (octet 4: UI16)", values[3])
+	}
+
 	u.TimeLow = uint32(values[0])
 	u.TimeMid = uint16(values[1])
 	u.TimeHiAndVersion = uint16(values[2])
