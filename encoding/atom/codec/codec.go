@@ -1,4 +1,4 @@
-// Package codec provides methods for interpreting and conversion of ADE data types.
+// Package codec provides methods for conversion of ADE data types.
 //
 // ADE Data types are defined in document 112-0002_r4.0B_StorageGRID_Data_Types.
 //
@@ -1150,12 +1150,16 @@ func CSTRToStringDelimited(buf []byte) (v string, e error) {
 }
 
 // USTRToString accepts ADE USTR data bytes, and expresses the value as a string.
-// These values are stored as UTF32 Big Endian: each char is a uint32 that
-// represents the integer value of the codepoint.
-// Example: Unlike in UTF-8, 0xFF ==  0x000000FF == `ÿ`.
-// These values are not stored as UTF-8 with extra padding, it's actual UTF32,
-// which uses different byte values than UTF-8.  Review the unicode tables for a
-// refresher if necessary.
+//
+// These values are stored as UTF32 Big Endian. Each char represents the
+// integer value of the codepoint. Note that this is not just
+// UTF-8 with padding.
+//
+// Example:
+//
+// In UTF-8, ÿ = Codepoint U+00FF = 0xC3BF
+// In UTF-32, ÿ = Codepoint U+00FF == 0x000000FF
+//
 func USTRToString(buf []byte) (v string, e error) {
 	var output bytes.Buffer
 	var codepoint rune
@@ -2365,6 +2369,16 @@ func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 // variable-length encoding allowed.)
 //
 // No NULL terminator is used for this type, unlike CSTR.
+//
+// These values are stored as UTF32 Big Endian. Each char represents the
+// integer value of the codepoint. Note that this is not just UTF-8 with
+// padding.
+//
+// Example:
+//
+// In UTF-8, ÿ = Codepoint U+00FF = 0xC3BF
+// In UTF-32, ÿ = Codepoint U+00FF == 0x000000FF
+//
 func StringToUSTRBytes(buf *[]byte, v string) (e error) {
 	bb := bytes.NewBuffer(make([]byte, 0, 4*len(v)))
 

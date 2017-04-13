@@ -1,4 +1,4 @@
-// Package atom provides encodings for ADE AtomContainers.
+// Package atom provides support for ADE AtomContainers.
 // It includes a struct type with getters/setters for ADE data types, and
 // provides conversions to and from text and binary atom container formats.
 package atom
@@ -41,9 +41,11 @@ func init() {
 	Log = log.New(ioutil.Discard, "atom", log.LstdFlags)
 }
 
-// Name returns a copy of the atoms's name.
-// If printable, it's 4 printable chars.  Otherwise, it's
-// a hex string preceded by 0x.
+// Name returns a printable string version of the atoms's name.
+//
+// If all 4 bytes are printable ascii, output is a 4 character string.
+//
+// Otherwise, output is an 8 digit hex string preceded by 0x.
 func (a *Atom) Name() (name string) {
 	name, _ = codec.FC32ToString(a.name)
 	return name
@@ -66,20 +68,16 @@ func (a *Atom) Children() []*Atom {
 
 // NewAtom constructs a new Atom object with the specified name and type.
 func NewAtom(name string, typ codec.ADEType) (a *Atom, e error) {
-	if len(name) != 4 {
-		return nil, fmt.Errorf(`atom name must be 4 chars long, got "%s"`, name)
-	}
-	if len(name) != 4 {
-		return nil, fmt.Errorf(`atom type must be 4 chars long, got "%s"`, name)
-	}
-	a = &Atom{
-		name: []byte{name[0], name[1], name[2], name[3]},
+	a = new(Atom)
+	e = codec.StringToFC32Bytes(&a.name, name)
+	if e != nil {
+		return
 	}
 	a.SetType(typ)
-	return a, e
+	return
 }
 
-// Zero sets the atom to the type Atom's zero value.
+// Zero sets the atom to the zero value of type Atom .
 // It sets the atom data to a zero-length slice, releasing any
 // previous memory allocated for data.
 // It also empties the list of child atoms.
@@ -89,7 +87,7 @@ func (a *Atom) Zero() {
 	a.children = []*Atom{}
 }
 
-// SetType sets the type of an Atom object, and handles updating the Codec and
+// SetType sets the type of an Atom object, and updates the Codec and
 // data fields to match.
 func (a *Atom) SetType(newType codec.ADEType) {
 	a.typ = newType
@@ -128,6 +126,7 @@ func (a *Atom) NumChildren() int {
 }
 
 // Descendants returns a list of pointers to every Atom in hierarchical order.
+// (ie. results of in-order tree traversal.)
 // Starts with self.
 func (a *Atom) Descendants() []*Atom {
 	return a.getDescendants(new([]*Atom))
