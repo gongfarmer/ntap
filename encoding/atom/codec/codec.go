@@ -1345,47 +1345,56 @@ func init() {
 	enc.SetString = StringToUI01Bytes
 	enc.SetBool = BoolToUI01Bytes
 	enc.SetUint = Uint64ToUI01Bytes
+	enc.SetInt = Int64ToUI01Bytes
 	encoderByType[UI01] = enc
 
 	enc = newEncoder(UI08)
 	enc.SetString = StringToUI08Bytes
 	enc.SetUint = Uint64ToUI08Bytes
+	enc.SetInt = Int64ToUI08Bytes
 	encoderByType[UI08] = enc
 
 	enc = newEncoder(UI16)
 	enc.SetString = StringToUI16Bytes
 	enc.SetUint = Uint64ToUI16Bytes
+	enc.SetInt = Int64ToUI16Bytes
 	encoderByType[UI16] = enc
 
 	enc = newEncoder(UI32)
 	enc.SetString = StringToUI32Bytes
 	enc.SetUint = Uint64ToUI32Bytes
+	enc.SetInt = Int64ToUI32Bytes
 	encoderByType[UI32] = enc
 
 	enc = newEncoder(UI64)
 	enc.SetString = StringToUI64Bytes
 	enc.SetUint = Uint64ToUI64Bytes
+	enc.SetInt = Int64ToUI64Bytes
 	encoderByType[UI64] = enc
 
 	// ADE signed int types
 	enc = newEncoder(SI08)
 	enc.SetString = StringToSI08Bytes
 	enc.SetInt = Int64ToSI08Bytes
+	enc.SetUint = Uint64ToSI08Bytes
 	encoderByType[SI08] = enc
 
 	enc = newEncoder(SI16)
 	enc.SetString = StringToSI16Bytes
 	enc.SetInt = Int64ToSI16Bytes
+	enc.SetUint = Uint64ToSI16Bytes
 	encoderByType[SI16] = enc
 
 	enc = newEncoder(SI32)
 	enc.SetString = StringToSI32Bytes
 	enc.SetInt = Int64ToSI32Bytes
+	enc.SetUint = Uint64ToSI32Bytes
 	encoderByType[SI32] = enc
 
 	enc = newEncoder(SI64)
 	enc.SetString = StringToSI64Bytes
 	enc.SetInt = Int64ToSI64Bytes
+	enc.SetUint = Uint64ToSI64Bytes
 	encoderByType[SI64] = enc
 
 	// ADE floating point types
@@ -1553,6 +1562,21 @@ func Uint64ToUI01Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
+// Int64ToUI01Bytes writes a uint64 value to the byte slice pointer as ADE UI01 binary data .
+func Int64ToUI01Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
+	}
+	if v == 1 {
+		binary.BigEndian.PutUint32(*buf, uint32(1))
+	} else if v == 0 {
+		binary.BigEndian.PutUint32(*buf, uint32(0))
+	} else {
+		e = errRange("UI01", v)
+	}
+	return
+}
+
 // encode of unsigned integer types
 
 // StringToUI08Bytes writes a string value to a byte slice pointer as ADE UI08 binary data.
@@ -1568,6 +1592,21 @@ func StringToUI08Bytes(buf *[]byte, v string) (e error) {
 	return Uint64ToUI08Bytes(buf, i)
 }
 
+// Int64ToUI08Bytes writes an int64 value to a byte slice pointer as ADE UI08 binary data.
+func Int64ToUI08Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 1 {
+		*buf = make([]byte, 1)
+	}
+	if v < 0 {
+		return errRange("UI08", v)
+	}
+	if v > math.MaxUint8 {
+		return errRange("UI08", v)
+	}
+	(*buf)[0] = uint8(v)
+	return
+}
+
 // Uint64ToUI08Bytes writes a uint64 value to a byte slice pointer as ADE UI08 binary data.
 func Uint64ToUI08Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 1 {
@@ -1581,7 +1620,7 @@ func Uint64ToUI08Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
-// StringToUI16Bytes writes a string value to a byte slice pointer as ADE UI16 binary data.
+// StringToUI16Bytes writes a string value to byte slice pointer as ADE UI16 binary data.
 func StringToUI16Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 2 {
 		*buf = make([]byte, 2)
@@ -1595,10 +1634,25 @@ func StringToUI16Bytes(buf *[]byte, v string) (e error) {
 	return
 }
 
-// Uint64ToUI16Bytes writes a uint64 value to a byte slice pointer as ADE UI16 binary data.
+// Uint64ToUI16Bytes writes a uint64 value to byte slice pointer as ADE UI16 binary data.
 func Uint64ToUI16Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 2 {
 		*buf = make([]byte, 2)
+	}
+	if v > math.MaxUint16 {
+		return errRange("UI16", v)
+	}
+	binary.BigEndian.PutUint16(*buf, uint16(v))
+	return
+}
+
+// Int64ToUI16Bytes writes an int64 value to a byte slice pointer as ADE UI16 binary data.
+func Int64ToUI16Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 2 {
+		*buf = make([]byte, 2)
+	}
+	if v < 0 {
+		return errRange("UI16", v)
 	}
 	if v > math.MaxUint16 {
 		return errRange("UI16", v)
@@ -1633,6 +1687,18 @@ func Uint64ToUI32Bytes(buf *[]byte, v uint64) (e error) {
 	return
 }
 
+// Int64ToUI32Bytes writes an int64 value to a byte slice pointer as ADE UI32 binary data.
+func Int64ToUI32Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
+	}
+	if v < 0 || v > math.MaxUint32 {
+		return errRange("UI32", v)
+	}
+	binary.BigEndian.PutUint32(*buf, uint32(v))
+	return
+}
+
 // StringToUI64Bytes writes a string value to a byte slice pointer as ADE UI64 binary data.
 func StringToUI64Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 8 {
@@ -1652,6 +1718,18 @@ func StringToUI64Bytes(buf *[]byte, v string) (e error) {
 func Uint64ToUI64Bytes(buf *[]byte, v uint64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
+	}
+	binary.BigEndian.PutUint64(*buf, uint64(v))
+	return
+}
+
+// Int64ToUI64Byteswrites a uint64 value to a byte slice pointer as ADE UI64 binary data.
+func Int64ToUI64Bytes(buf *[]byte, v int64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
+	}
+	if v < 0 {
+		return errRange("UI64", v)
 	}
 	binary.BigEndian.PutUint64(*buf, uint64(v))
 	return
@@ -1684,6 +1762,18 @@ func Int64ToSI08Bytes(buf *[]byte, v int64) (e error) {
 	return
 }
 
+// Uint64ToSI08Bytes writes a uint64 value to a byte slice pointer as ADE SI08 binary data.
+func Uint64ToSI08Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 1 {
+		*buf = make([]byte, 1)
+	}
+	if v > math.MaxInt8 {
+		return errRange("SI08", v)
+	}
+	(*buf)[0] = byte(v)
+	return
+}
+
 // StringToSI16Bytes writes a string value to a byte slice pointer as ADE SI16 binary data.
 func StringToSI16Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 2 {
@@ -1704,6 +1794,18 @@ func Int64ToSI16Bytes(buf *[]byte, v int64) (e error) {
 		*buf = make([]byte, 2)
 	}
 	if v < math.MinInt16 || v > math.MaxInt16 {
+		return errRange("SI16", v)
+	}
+	binary.BigEndian.PutUint16(*buf, uint16(v))
+	return
+}
+
+// Uint64ToSI16Bytes and writes an uint64 value to a byte slice pointer as ADE SI16 binary data.
+func Uint64ToSI16Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 2 {
+		*buf = make([]byte, 2)
+	}
+	if v > math.MaxInt16 {
 		return errRange("SI16", v)
 	}
 	binary.BigEndian.PutUint16(*buf, uint16(v))
@@ -1736,6 +1838,18 @@ func Int64ToSI32Bytes(buf *[]byte, v int64) (e error) {
 	return
 }
 
+// Uint64ToSI32Bytes writes an uint64 value to a byte slice pointer as ADE SI32 binary data.
+func Uint64ToSI32Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 4 {
+		*buf = make([]byte, 4)
+	}
+	if v > math.MaxInt32 {
+		return errRange("SI32", v)
+	}
+	binary.BigEndian.PutUint32(*buf, uint32(v))
+	return
+}
+
 // StringToSI64Bytes writes a string value to a byte slice pointer as ADE SI64 binary data.
 func StringToSI64Bytes(buf *[]byte, v string) (e error) {
 	if len(*buf) != 8 {
@@ -1754,6 +1868,18 @@ func StringToSI64Bytes(buf *[]byte, v string) (e error) {
 func Int64ToSI64Bytes(buf *[]byte, v int64) (e error) {
 	if len(*buf) != 8 {
 		*buf = make([]byte, 8)
+	}
+	binary.BigEndian.PutUint64(*buf, uint64(v))
+	return
+}
+
+// Uint64ToSI64Bytes writes an uint64 value to a byte slice pointer as ADE SI64 binary data.
+func Uint64ToSI64Bytes(buf *[]byte, v uint64) (e error) {
+	if len(*buf) != 8 {
+		*buf = make([]byte, 8)
+	}
+	if v > math.MaxInt64 {
+		return errRange("SI64", v)
 	}
 	binary.BigEndian.PutUint64(*buf, uint64(v))
 	return

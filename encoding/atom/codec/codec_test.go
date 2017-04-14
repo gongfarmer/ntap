@@ -2024,6 +2024,22 @@ func TestSetUI01FromUint64(t *testing.T) {
 		return NewCodec(dataPtr, UI01).SetUint(input.(uint64))
 	})
 }
+func TestSetUI01FromInt64(t *testing.T) {
+	typ := "UI01"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{int64(0), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{int64(1), []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{int64(0x00), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{int64(0x01), []byte("\x00\x00\x00\x01"), nil},
+		encoderTest{int64(2), zero, errRange(typ, int64(2))},
+		encoderTest{int64(10), zero, errRange(typ, int64(10))},
+		encoderTest{int64(-2), zero, errRange(typ, int64(-2))},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI01).SetInt(input.(int64))
+	})
+}
 func TestSetUI08FromString(t *testing.T) {
 	typ := "UI08"
 	zero := make([]byte, 1)
@@ -2056,6 +2072,21 @@ func TestSetUI08FromUint64(t *testing.T) {
 		return NewCodec(dataPtr, UI08).SetUint(input.(uint64))
 	})
 }
+func TestSetUI08FromInt64(t *testing.T) {
+	typ := "UI08"
+	zero := make([]byte, 1)
+	tests := []encoderTest{
+		encoderTest{int64(0), []byte("\x00"), nil},
+		encoderTest{int64(15), []byte("\x0F"), nil},
+		encoderTest{int64(240), []byte("\xF0"), nil},
+		encoderTest{int64(255), []byte("\xFF"), nil},
+		encoderTest{int64(3000), zero, errRange(typ, int64(3000))},
+		encoderTest{int64(-1), zero, errRange(typ, int64(-1))},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI08).SetInt(input.(int64))
+	})
+}
 func TestSetUI16FromString(t *testing.T) {
 	typ := "UI16"
 	zero := make([]byte, 2)
@@ -2086,6 +2117,21 @@ func TestSetUI16FromUint64(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, UI16).SetUint(input.(uint64))
+	})
+}
+func TestSetUI16FromInt64(t *testing.T) {
+	typ := "UI16"
+	zero := make([]byte, 2)
+	tests := []encoderTest{
+		encoderTest{int64(0), []byte("\x00\x00"), nil},
+		encoderTest{int64(255), []byte("\x00\xFF"), nil},
+		encoderTest{int64(65280), []byte("\xFF\x00"), nil},
+		encoderTest{int64(65535), []byte("\xFF\xFF"), nil},
+		encoderTest{int64(65536), zero, errRange(typ, int64(65536))},
+		encoderTest{int64(-1), zero, errRange(typ, int64(-1))},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI16).SetInt(input.(int64))
 	})
 }
 func TestSetUI32FromString(t *testing.T) {
@@ -2124,6 +2170,22 @@ func TestSetUI32FromUint64(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, UI32).SetUint(input.(uint64))
+	})
+}
+func TestSetUI32FromInt64(t *testing.T) {
+	typ := "UI32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{int64(0x00000000), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{int64(0x000000FF), []byte("\x00\x00\x00\xFF"), nil},
+		encoderTest{int64(0x0000FF00), []byte("\x00\x00\xFF\x00"), nil},
+		encoderTest{int64(0x00FF0000), []byte("\x00\xFF\x00\x00"), nil},
+		encoderTest{int64(0xFF000000), []byte("\xFF\x00\x00\x00"), nil},
+		encoderTest{int64(0xFFFFFFFF), []byte("\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{int64(-1), zero, errRange(typ, -1)},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI32).SetInt(input.(int64))
 	})
 }
 func TestSetUI64FromString(t *testing.T) {
@@ -2174,6 +2236,27 @@ func TestSetUI64FromUint64(t *testing.T) {
 	})
 }
 
+func TestSetUI64FromInt64(t *testing.T) {
+	tests := []encoderTest{
+		encoderTest{int64(0), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{int64(1), []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{int64(255), []byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), nil},
+		encoderTest{int64(0x0000000000000000), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{int64(0x00000000000000FF), []byte("\x00\x00\x00\x00\x00\x00\x00\xFF"), nil},
+		encoderTest{int64(0x000000000000FF00), []byte("\x00\x00\x00\x00\x00\x00\xFF\x00"), nil},
+		encoderTest{int64(0x0000000000FF0000), []byte("\x00\x00\x00\x00\x00\xFF\x00\x00"), nil},
+		encoderTest{int64(0x00000000FF000000), []byte("\x00\x00\x00\x00\xFF\x00\x00\x00"), nil},
+		encoderTest{int64(0x000000FF00000000), []byte("\x00\x00\x00\xFF\x00\x00\x00\x00"), nil},
+		encoderTest{int64(0x0000FF0000000000), []byte("\x00\x00\xFF\x00\x00\x00\x00\x00"), nil},
+		encoderTest{int64(0x00FF000000000000), []byte("\x00\xFF\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{int64(math.MaxInt64), []byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{int64(-1), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), errRange("UI64", -1)},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, UI64).SetInt(input.(int64))
+	})
+}
+
 func TestSetSI08FromString(t *testing.T) {
 	typ := "SI08"
 	zero := make([]byte, 1)
@@ -2211,6 +2294,21 @@ func TestSetSI08FromInt64(t *testing.T) {
 		return NewCodec(dataPtr, SI08).SetInt(input.(int64))
 	})
 }
+func TestSetSI08FromUint64(t *testing.T) {
+	typ := "SI08"
+	zero := make([]byte, 1)
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00"), nil},
+		encoderTest{uint64(64), []byte("\x40"), nil},
+		encoderTest{uint64(127), []byte("\x7F"), nil},
+
+		encoderTest{uint64(128), zero, errRange(typ, 128)},
+		encoderTest{uint64(math.MaxUint64), zero, errRange(typ, uint64(math.MaxUint64))},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI08).SetUint(input.(uint64))
+	})
+}
 func TestSetSI16FromString(t *testing.T) {
 	typ := "SI16"
 	zero := make([]byte, 2)
@@ -2245,6 +2343,19 @@ func TestSetSI16FromInt64(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, SI16).SetInt(input.(int64))
+	})
+}
+func TestSetSI16FromUint64(t *testing.T) {
+	typ := "SI16"
+	zero := make([]byte, 2)
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00\x00"), nil},
+		encoderTest{uint64(255), []byte("\x00\xFF"), nil},
+		encoderTest{uint64(32767), []byte("\x7F\xFF"), nil},
+		encoderTest{uint64(32768), zero, errRange(typ, 32768)},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI16).SetUint(input.(uint64))
 	})
 }
 func TestSetSI32FromString(t *testing.T) {
@@ -2291,6 +2402,25 @@ func TestSetSI32FromInt64(t *testing.T) {
 	})
 }
 
+func TestSetSI32FromUint64(t *testing.T) {
+	typ := "SI32"
+	zero := make([]byte, 4)
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(255), []byte("\x00\x00\x00\xFF"), nil},
+		encoderTest{uint64(0x000000FF), []byte("\x00\x00\x00\xFF"), nil},
+		encoderTest{uint64(0x0000FF00), []byte("\x00\x00\xFF\x00"), nil},
+		encoderTest{uint64(0x00FF0000), []byte("\x00\xFF\x00\x00"), nil},
+		encoderTest{uint64(2147483647), []byte("\x7F\xFF\xFF\xFF"), nil},
+		encoderTest{uint64(0xFF000000), zero, errRange(typ, 0xFF000000)},
+		encoderTest{uint64(0xFFFFFFFF + 1), zero, errRange(typ, 0xFFFFFFFF+1)},
+		encoderTest{uint64(math.MaxUint64), zero, errRange(typ, uint64(math.MaxUint64))},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI32).SetUint(input.(uint64))
+	})
+}
+
 func TestSetSI64FromString(t *testing.T) {
 	typ := "SI64"
 	zero := make([]byte, 8)
@@ -2323,6 +2453,20 @@ func TestSetSI64FromInt64(t *testing.T) {
 	}
 	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
 		return NewCodec(dataPtr, SI64).SetInt(input.(int64))
+	})
+}
+func TestSetSI64FromUint64(t *testing.T) {
+	typ := "SI64"
+	zero := make([]byte, 8)
+	tests := []encoderTest{
+		encoderTest{uint64(0), []byte("\x00\x00\x00\x00\x00\x00\x00\x00"), nil},
+		encoderTest{uint64(1), []byte("\x00\x00\x00\x00\x00\x00\x00\x01"), nil},
+		encoderTest{uint64(9223372036854775807), []byte("\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF"), nil},
+		encoderTest{uint64(math.MaxInt64 + 1), zero, errRange(typ, uint64(math.MaxInt64+1))},
+		encoderTest{uint64(math.MaxUint64), zero, errRange(typ, uint64(math.MaxUint64))},
+	}
+	runEncoderTests(t, tests, func(dataPtr *[]byte, input interface{}) error {
+		return NewCodec(dataPtr, SI64).SetUint(input.(uint64))
 	})
 }
 func TestSetUR32FromString(t *testing.T) {

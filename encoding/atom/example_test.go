@@ -48,19 +48,20 @@ func ExampleAtom_MarshalBinary() {
 
 func ExampleNewAtom() {
 	var a *atom.Atom
-	a, _ = atom.NewAtom("BVER", codec.UI32)
-	a.Value.SetUint(777)
+	a, _ = atom.NewAtom("BVER", codec.UI32, 777)
+	fmt.Println(a)
 
-	fmt.Print(a)
+	a, _ = atom.NewAtom("cont", codec.CONT, nil)
+	fmt.Println(a)
 	// Output: BVER:UI32:777
+	// cont:CONT:
 }
 
 func ExampleAtom_AddChild() {
 	var a *atom.Atom
-	a, _ = atom.NewAtom("ROOT", codec.CONT)
+	a, _ = atom.NewAtom("ROOT", codec.CONT, nil)
 	for i := 0; i < 10; i++ {
-		c, _ := atom.NewAtom("CHLD", "SI32")
-		c.Value.SetInt(int64(i))
+		c, _ := atom.NewAtom("CHLD", "SI32", i)
 		a.AddChild(c)
 	}
 
@@ -82,10 +83,12 @@ func ExampleAtom_AddChild() {
 
 func ExampleAtom_Children() {
 	var a *atom.Atom
-	a, _ = atom.NewAtom("ROOT", codec.CONT)
+	a, _ = atom.NewAtom("ROOT", codec.CONT, nil)
 	for i := 0; i < 10; i++ {
-		c, _ := atom.NewAtom("CHLD", "SI32")
-		c.Value.SetInt(int64(i))
+		c, e := atom.NewAtom("CHLD", "SI32", i)
+		if e != nil {
+			fmt.Println(e)
+		}
 		a.AddChild(c)
 	}
 
@@ -141,13 +144,13 @@ END
 }
 
 func ExampleAtom_Name() {
-	a, e := atom.NewAtom("HELO", codec.CONT)
+	a, e := atom.NewAtom("HELO", codec.CONT, nil)
 	if e != nil {
 		panic(e)
 	}
 	fmt.Println(a.Name())
 
-	a, e = atom.NewAtom("0x0000FFFF", codec.CONT)
+	a, e = atom.NewAtom("0x0000FFFF", codec.CONT, nil)
 	if e != nil {
 		panic(e)
 	}
@@ -157,7 +160,7 @@ func ExampleAtom_Name() {
 }
 
 func ExampleAtom_NameAsUint32() {
-	a, e := atom.NewAtom("0x0000FFFF", codec.CONT)
+	a, e := atom.NewAtom("0x0000FFFF", codec.CONT, nil)
 	if e != nil {
 		panic(e)
 	}

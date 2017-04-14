@@ -65,14 +65,15 @@ func (a *Atom) Children() []*Atom {
 	return a.children
 }
 
-// NewAtom constructs a new Atom object with the specified name and type.
-func NewAtom(name string, typ codec.ADEType) (a *Atom, e error) {
+// NewAtom constructs a new Atom object with the specified name, type and data.
+func NewAtom(name string, typ codec.ADEType, v interface{}) (a *Atom, e error) {
 	a = new(Atom)
 	e = codec.StringToFC32Bytes(&a.name, name)
 	if e != nil {
 		return
 	}
 	a.SetType(typ)
+	e = a.SetValue(v)
 	return
 }
 
@@ -160,4 +161,45 @@ func FromFile(path string) (a Atom, err error) {
 
 	err = a.UnmarshalBinary(buf)
 	return
+}
+
+// SetValue sets Atom data to the given value.
+func (a *Atom) SetValue(v interface{}) error {
+	switch v := v.(type) {
+	case bool:
+		return a.Value.SetBool(v)
+	case uint8:
+		return a.Value.SetUint(uint64(v))
+	case uint16:
+		return a.Value.SetUint(uint64(v))
+	case uint32:
+		return a.Value.SetUint(uint64(v))
+	case uint64:
+		return a.Value.SetUint(v)
+	case int:
+		return a.Value.SetInt(int64(v))
+	case int8:
+		return a.Value.SetInt(int64(v))
+	case int16:
+		return a.Value.SetInt(int64(v))
+	case int32:
+		return a.Value.SetInt(int64(v))
+	case int64:
+		return a.Value.SetInt(v)
+	case float32:
+		return a.Value.SetFloat(float64(v))
+	case float64:
+		return a.Value.SetFloat(v)
+	case string:
+		return a.Value.SetString(v)
+	case []uint64:
+		return a.Value.SetSliceOfUint(v)
+	case []int64:
+		return a.Value.SetSliceOfInt(v)
+	case []byte:
+		return a.Value.SetSliceOfByte(v)
+	case nil:
+		return nil // don't set value
+	}
+	return fmt.Errorf("Cannot set Atom value with type: %T", v)
 }

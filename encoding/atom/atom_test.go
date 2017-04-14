@@ -207,12 +207,12 @@ func TestNameAsUint32(t *testing.T) {
 	for i := 0; i <= 20; i++ {
 		nameUint := rand.Uint32()
 		binary.BigEndian.PutUint32(buf, nameUint)
-		a, err := NewAtom(string(buf), codec.UI32)
+		a, err := NewAtom(string(buf), codec.UI32, nameUint)
 		if err != nil {
 			panic(err)
 		}
 
-		a.Value.SetUint(uint64(nameUint))
+		//		a.Value.SetUint(uint64(nameUint))
 		if a.NameAsUint32() != nameUint {
 			t.Errorf(`TestNameAsUint32(): Atom name "%s"(%X), expected uint32 value %d, got %d`, a.Name(), a.name, nameUint, a.NameAsUint32())
 		}
