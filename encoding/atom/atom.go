@@ -163,7 +163,12 @@ func FromFile(path string) (a Atom, err error) {
 	return
 }
 
-// SetValue sets Atom data to the given value.
+// SetValue sets Atom data to the given value, if a value is given.
+//
+// If nil is given, then no attempt is made to set the value and no error is
+// returned.
+//
+// An error is returned if the Atom's type cannot be set to the given value.
 func (a *Atom) SetValue(v interface{}) error {
 	switch v := v.(type) {
 	case bool:
@@ -199,7 +204,7 @@ func (a *Atom) SetValue(v interface{}) error {
 	case []byte:
 		return a.Value.SetSliceOfByte(v)
 	case nil:
-		return nil // don't set value
+		return nil // don't set value. not an error.
 	}
 	return fmt.Errorf("Cannot set Atom value with type: %T", v)
 }
