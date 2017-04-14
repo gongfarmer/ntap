@@ -98,7 +98,14 @@ const (
 )
 
 type (
-	// AtomPath is for using path strings to find matching atoms.
+	// AtomPath implements XPath expression support for Atoms.
+	//
+	// Paths may include tests based on atom name, type and data.
+	// Arithmetic operations on atom data are supported.
+	// Set operations are supported, allowing requests for the union or
+	// intersection of multiple paths.
+	//
+	// Multiple predicates may be stacked. (eg. "//*[data() > 1][@type != UI64]
 	AtomPath struct {
 		Path      string
 		evaluator *pathEvaluator

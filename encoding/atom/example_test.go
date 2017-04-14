@@ -198,3 +198,41 @@ func ExampleReadAtomsFromBinary() {
 	// Output: SMAL:CONT:
 	// END
 }
+
+func ExampleAtomPath() {
+	var TEXT = `
+ROOT:CONT:
+		ONE_:CONT:
+			DOGS:UI32:1
+			DOGC:CONT:
+				CHOW:UI32:3
+			END
+			DOGS:UI32:2
+		END
+		TWO_:CONT:
+			CATS:UI32:2
+		END
+		THRE:CONT:
+			PIGS:UI32:2
+		END
+END
+`
+	var root atom.Atom
+	root.UnmarshalText([]byte(TEXT))
+
+	// get child atoms of root
+	results, _ := root.AtomsAtPath("/ROOT/*")
+	fmt.Println(results)
+
+	// get the atom at this nested path
+	results, _ = root.AtomsAtPath("/ROOT/ONE_/DOGC/CHOW")
+	fmt.Println(results)
+
+	// get all atoms at any level whose data is numeric and greater than 1
+	results, _ = root.AtomsAtPath("//*[data() > 1]")
+	fmt.Println(results)
+
+	// Output: [ONE_:CONT: TWO_:CONT: THRE:CONT:]
+	// [CHOW:UI32:3]
+	// [CHOW:UI32:3 DOGS:UI32:2 CATS:UI32:2 PIGS:UI32:2]
+}
