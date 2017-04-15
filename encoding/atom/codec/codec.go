@@ -129,10 +129,10 @@ type (
 // These exist so that the unit tests don't have to hardcode the err message they expect
 
 func errNoEncoder(to ADEType, from string) error {
-	return fmt.Errorf("no encoder exists to convert go type '%s' to ADE type '%s'", from, to)
+	return fmt.Errorf("cannot use go type '%s' for ADE data type '%s'", from, to)
 }
 func errNoDecoder(from ADEType, to goType) error {
-	return fmt.Errorf("no decoder exists to convert ADE type '%s' to go type '%s'", from, to)
+	return fmt.Errorf("cannot convert ADE type '%s' to go type '%s'", from, to)
 }
 func errByteCount(t string, bytesWant int, bytesGot int) (e error) {
 	return fmt.Errorf("invalid byte count for ADE type %s: want %d, got %d", t, bytesWant, bytesGot)

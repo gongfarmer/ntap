@@ -11,11 +11,35 @@ import (
 	"github.com/gongfarmer/ntap/encoding/atom/codec"
 )
 
+func ExampleAtom() {
+	var atomText = []byte(`
+		TEST:CONT:
+			BVER:UI32:6
+		END
+	`)
+
+	// Make an Atom from text
+	var a atom.Atom
+	if err := a.UnmarshalText(atomText); err != nil {
+		panic(err)
+	}
+
+	// Print child atom as string
+	results, _ := a.AtomsAtPath("/TEST/BVER")
+	fmt.Println(results[0])
+
+	// Get child atom value, specifying desired go type (see Codec methods for more)
+	value, _ := results[0].Value.Uint()
+	fmt.Println(value)
+	// Output: BVER:UI32:6
+	// 6
+}
+
 func ExampleAtom_UnmarshalText() {
 	var atomText = []byte(`
-	TEST:CONT:
-	BVER:UI32:6
-	END
+		TEST:CONT:
+			BVER:UI32:6
+		END
 	`)
 	var a atom.Atom
 	if err := a.UnmarshalText(atomText); err != nil {
@@ -28,9 +52,9 @@ func ExampleAtom_UnmarshalText() {
 
 func ExampleAtom_MarshalBinary() {
 	var atomText = []byte(`
-	TEST:CONT:
-	BVER:UI32:6
-	END
+		TEST:CONT:
+			BVER:UI32:6
+		END
 	`)
 
 	var a atom.Atom
@@ -109,21 +133,21 @@ func ExampleAtom_Children() {
 
 func ExampleAtom_Descendants() {
 	var TEXT = `
-ROOT:CONT:
-  ONE_:CONT:
-		DOGS:UI32:1
-		DOGC:CONT:
-			CHOW:UI32:3
+	ROOT:CONT:
+		ONE_:CONT:
+			DOGS:UI32:1
+			DOGC:CONT:
+				CHOW:UI32:3
+			END
+			DOGS:UI32:2
 		END
-		DOGS:UI32:2
+		TWO_:CONT:
+			CATS:UI32:2
+		END
+		THRE:CONT:
+			PIGS:UI32:2
+		END
 	END
-  TWO_:CONT:
-		CATS:UI32:2
-	END
-  THRE:CONT:
-		PIGS:UI32:2
-	END
-END
 `
 
 	var root atom.Atom
@@ -238,4 +262,147 @@ END
 	// Output: [ONE_:CONT: TWO_:CONT: THRE:CONT:]
 	// [CHOW:UI32:3]
 	// [CHOW:UI32:3 DOGS:UI32:2 CATS:UI32:2 PIGS:UI32:2]
+}
+
+func ExampleAtom_SetValue() {
+	a, _ := atom.NewAtom("BVER", codec.UI32, 1)
+
+	// set UINT32 value
+	a.SetValue(6)
+	fmt.Println(a)
+
+	// set UFRA64 value
+	a, _ = atom.NewAtom("FRAC", codec.UR64, nil)
+	a.SetValue("12/144") // string is valid for setting any ADE type
+	fmt.Println(a)
+
+	// attempt ot set value on a Container
+	a, _ = atom.NewAtom("GINF", codec.CONT, nil)
+	err := a.SetValue(5) // illegal: can't set value on a Container
+	fmt.Println(err)
+
+	// Output: BVER:UI32:6
+	// FRAC:UR64:12/144
+	// cannot use go type 'int64' for ADE data type 'CONT'
+}
+
+func ExampleAtom_Type() {
+
+	a, _ := atom.NewAtom("BVER", codec.UI32, 5)
+	fmt.Println("Type of BVER is", a.Type())
+
+	// set UFRA64 value
+	a, _ = atom.NewAtom("FRAC", codec.UR64, "12/144")
+	fmt.Println("Type of FRAC is", a.Type())
+
+	// attempt ot set value on a Container
+	a, _ = atom.NewAtom("GINF", codec.CONT, nil)
+	fmt.Println("Type of GINF is", a.Type())
+
+	// Output: Type of BVER is UI32
+	// Type of FRAC is UR64
+	// Type of GINF is CONT
+}
+
+func ExampleAtom_String() {
+
+	a, _ := atom.NewAtom("BVER", codec.UI32, 5)
+	fmt.Println(a.String())
+
+	// set UFRA64 value
+	a, _ = atom.NewAtom("FRAC", codec.UR64, "12/144")
+	fmt.Println(a.String())
+
+	// attempt ot set value on a Container
+	a, _ = atom.NewAtom("GINF", codec.CONT, nil)
+	fmt.Println(a.String())
+
+	// Output: BVER:UI32:5
+	// FRAC:UR64:12/144
+	// GINF:CONT:
+}
+
+func ExampleAtom_AtomsAtPath() {
+	var TEXT = `
+ROOT:CONT:
+		ONE_:CONT:
+			DOGS:UI32:1
+			DOGC:CONT:
+				CHOW:UI32:3
+			END
+			DOGS:UI32:2
+		END
+		TWO_:CONT:
+			CATS:UI32:2
+		END
+		THRE:CONT:
+			PIGS:UI32:2
+		END
+END
+`
+	var root atom.Atom
+	root.UnmarshalText([]byte(TEXT))
+
+	// get all atoms at any level, that are named PIGS
+	results, _ := root.AtomsAtPath("//PIGS")
+	fmt.Println(results)
+
+	// get all atom children of ROOT/ONE_/ that have type UI32
+	results, _ = root.AtomsAtPath("/ROOT/ONE_/*[@type = UI32]")
+	fmt.Println(results)
+
+	// get the ONE_ atom, only if it has a child named DOGS with an odd-numbered value]
+	results, _ = root.AtomsAtPath("/ROOT/ONE_[DOGS mod 2 = 1]")
+	fmt.Println(results)
+
+	// More practical: Get all rows from NENT, except index row
+	results, _ = root.AtomsAtPath("/NENT/*/AVAL/*[name() > 1")
+
+	// Output: [PIGS:UI32:2]
+	// [DOGS:UI32:1 DOGS:UI32:2]
+	// [ONE_:CONT:]
+}
+
+func ExampleNewAtomPath() {
+	var TEXT = `
+ROOT:CONT:
+		ONE_:CONT:
+			DOGS:UI32:1
+			DOGC:CONT:
+				CHOW:UI32:3
+			END
+			DOGS:UI32:2
+		END
+		TWO_:CONT:
+			CATS:UI32:2
+		END
+		THRE:CONT:
+			PIGS:UI32:2
+		END
+END
+`
+	var root atom.Atom
+	root.UnmarshalText([]byte(TEXT))
+
+	// get all atoms at any level, that are named PIGS
+	ap, _ := atom.NewAtomPath("//PIGS")
+	results, _ := ap.GetAtoms(&root)
+	fmt.Println(results)
+
+	// get all atom children of ROOT/ONE_/ that have type UI32
+	ap, _ = atom.NewAtomPath("/ROOT/ONE_/*[@type = UI32]")
+	results, _ = ap.GetAtoms(&root)
+	fmt.Println(results)
+
+	// get the ONE_ atom, only if it has a child named DOGS with an odd-numbered value]
+	ap, _ = atom.NewAtomPath("/ROOT/ONE_[DOGS mod 2 = 1]")
+	results, _ = ap.GetAtoms(&root)
+	fmt.Println(results)
+
+	// More practical: Get all rows from NENT, except index row
+	results, _ = root.AtomsAtPath("/NENT/*/AVAL/*[name() > 1")
+
+	// Output: [PIGS:UI32:2]
+	// [DOGS:UI32:1 DOGS:UI32:2]
+	// [ONE_:CONT:]
 }
