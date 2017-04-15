@@ -1,4 +1,4 @@
-package atom
+package ade
 
 //
 // Verify that UnmarshalBinary successfully reads all binary test files.
@@ -14,7 +14,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/gongfarmer/ntap/encoding/atom/codec"
+	"github.com/gongfarmer/ntap/encoding/ade/codec"
 )
 
 func TestUnmarshalBinary(t *testing.T) {

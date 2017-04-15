@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gongfarmer/ntap/encoding/atom"
+	"github.com/gongfarmer/ntap/encoding/ade"
 )
 
 func usage() {
@@ -53,7 +53,7 @@ func main() {
 	}
 
 	// Convert text to atom
-	var a atom.Atom
+	var a ade.Atom
 	if err = a.UnmarshalText(bb.Bytes()); err != nil {
 		log.Fatalf("invalid input container: %s", err)
 	}

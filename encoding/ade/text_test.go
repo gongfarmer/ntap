@@ -1,4 +1,4 @@
-package atom
+package ade
 
 //
 // Verify that UnmarshalText successfully reads all text test files.

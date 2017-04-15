@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gongfarmer/ntap/encoding/atom"
+	"github.com/gongfarmer/ntap/encoding/ade"
 )
 
 var (
@@ -43,10 +43,10 @@ func usage() {
 	os.Exit(2)
 }
 
-type formatWriter func(io.Writer, *atom.Atom)
+type formatWriter func(io.Writer, *ade.Atom)
 
-func (f formatWriter) formatter(w io.Writer) func(*atom.Atom) {
-	return func(a *atom.Atom) { f(w, a) }
+func (f formatWriter) formatter(w io.Writer) func(*ade.Atom) {
+	return func(a *ade.Atom) { f(w, a) }
 }
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 	}
 	if *FlagVerbose {
 		fmt.Println("Verbose flag is now on")
-		atom.Log.SetOutput(os.Stdout)
+		ade.Log.SetOutput(os.Stdout)
 	}
 
 	// Read atom data
@@ -89,7 +89,7 @@ func main() {
 	}
 
 	// Choose output format, pair with output stream
-	var atomPrinterFunc func(*atom.Atom)
+	var atomPrinterFunc func(*ade.Atom)
 	if true == *FlagOutputDebug {
 		atomPrinterFunc = formatWriter(printAtomDebug).formatter(output)
 	} else if true == *FlagOutputHex {
@@ -105,7 +105,7 @@ func main() {
 }
 
 // print atoms in grossly verbose format showing atom data in hex
-func printAtomDebug(w io.Writer, a *atom.Atom) {
+func printAtomDebug(w io.Writer, a *ade.Atom) {
 	var lines [][]string
 	depth, maxLen := 0, 0
 	atoms := a.Descendants()
@@ -144,7 +144,7 @@ func printAtomDebug(w io.Writer, a *atom.Atom) {
 }
 
 // Print atom as ADE Container Text
-func printAtomText(w io.Writer, a *atom.Atom) {
+func printAtomText(w io.Writer, a *ade.Atom) {
 	buf, err := a.MarshalText()
 	if err != nil {
 		log.Printf("failed to print AtomContainer: %s\n", err)
@@ -154,7 +154,7 @@ func printAtomText(w io.Writer, a *atom.Atom) {
 }
 
 // Print atom as hex representation of binary-form bytes
-func printAtomHex(w io.Writer, a *atom.Atom) {
+func printAtomHex(w io.Writer, a *ade.Atom) {
 	buf, err := a.MarshalBinary()
 	if err != nil {
 		log.Printf("failed to print AtomContainer: %s\n", err)
@@ -174,13 +174,13 @@ func stdinIsEmpty() bool {
 // If no files are provided, then attempt to read a single binary atom from STDIN.
 // An empty array and nil error are returned if no input is found.
 // A non-nil error is returned if invalid input is encountered.
-func ReadAtomsFromInput(files []string) (atoms []*atom.Atom, err error) {
+func ReadAtomsFromInput(files []string) (atoms []*ade.Atom, err error) {
 	if len(files) == 0 && stdinIsEmpty() {
 		return
 	}
 
 	var buffer []byte
-	var someAtoms []*atom.Atom
+	var someAtoms []*ade.Atom
 
 	if len(files) == 0 {
 		// Read STDIN if no files provided
@@ -191,9 +191,9 @@ func ReadAtomsFromInput(files []string) (atoms []*atom.Atom, err error) {
 
 		// Convert input to atoms
 		if uint32(len(buffer)) == binary.BigEndian.Uint32(buffer[0:4]) {
-			someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+			someAtoms, err = ade.ReadAtomsFromBinary(bytes.NewReader(buffer))
 		} else if string(buffer[0:2]) == "0x" {
-			someAtoms, err = atom.ReadAtomsFromHex(bytes.NewReader(buffer))
+			someAtoms, err = ade.ReadAtomsFromHex(bytes.NewReader(buffer))
 		} else {
 			log.Fatalf("STDIN length (%d) does not match encoded size(%d) , not a binary atom container.", len(buffer), binary.BigEndian.Uint32(buffer[0:4]))
 		}
@@ -212,9 +212,9 @@ func ReadAtomsFromInput(files []string) (atoms []*atom.Atom, err error) {
 
 		// convert to atoms.
 		if uint32(len(buffer)) == binary.BigEndian.Uint32(buffer[0:4]) {
-			someAtoms, err = atom.ReadAtomsFromBinary(bytes.NewReader(buffer))
+			someAtoms, err = ade.ReadAtomsFromBinary(bytes.NewReader(buffer))
 		} else if string(buffer[0:1]) == "0x" {
-			someAtoms, err = atom.ReadAtomsFromHex(bytes.NewReader(buffer))
+			someAtoms, err = ade.ReadAtomsFromHex(bytes.NewReader(buffer))
 		} else {
 			log.Fatalf("file size (%d) does not match encoded size(%d), this is not a binary atom container: %s", len(buffer), binary.BigEndian.Uint32(buffer[0:4]), path)
 		}
@@ -242,13 +242,13 @@ func filter(ss []string, testFunc func(string) bool) (out []string) {
 //
 // This bit of code is a separate function so it can be a target for test and
 // benchmark code.  See main_test.go.
-func WriteAtoms(atoms []*atom.Atom, printFunc func(*atom.Atom)) {
+func WriteAtoms(atoms []*ade.Atom, printFunc func(*ade.Atom)) {
 	for _, a := range atoms {
 		printFunc(a)
 	}
 }
 
-func PathSearch(atoms []*atom.Atom, path string) (results []*atom.Atom, err error) {
+func PathSearch(atoms []*ade.Atom, path string) (results []*ade.Atom, err error) {
 	for _, a := range atoms {
 		if moreResults, e := a.AtomsAtPath(path); e != nil {
 			return nil, e

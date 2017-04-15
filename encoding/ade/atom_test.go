@@ -1,5 +1,5 @@
 // Benchmark Marshal / Unmarshal functions
-package atom
+package ade
 
 import (
 	"encoding/binary"
@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gongfarmer/ntap/encoding/atom/codec"
+	"github.com/gongfarmer/ntap/encoding/ade/codec"
 )
 
 var Tests []Test

@@ -1,7 +1,7 @@
 // Package atom provides support for ADE AtomContainers.
 // It includes a struct type with getters/setters for ADE data types, and
 // provides conversions to and from text and binary atom container formats.
-package atom
+package ade
 
 import (
 	"encoding"
@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/gongfarmer/ntap/encoding/atom/codec"
+	"github.com/gongfarmer/ntap/encoding/ade/codec"
 )
 
 // Verify that type Atom satisfies these interfaces at compile time

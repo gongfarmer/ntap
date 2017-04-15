@@ -1,4 +1,4 @@
-package atom
+package ade
 
 // Enable reading and writing of binary format ADE AtomContainers by fulfilling
 // these interfaces from stdlib encoding/:
@@ -19,7 +19,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/gongfarmer/ntap/encoding/atom/codec"
+	"github.com/gongfarmer/ntap/encoding/ade/codec"
 )
 
 // AtomContainer object, paired with its end byte position in the stream

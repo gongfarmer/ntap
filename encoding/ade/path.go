@@ -1,4 +1,4 @@
-package atom
+package ade
 
 // == Purpose ==
 // This code provides the AtomsAtPath method, which returns a slice of Atoms

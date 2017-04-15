@@ -7,10 +7,10 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/gongfarmer/ntap/encoding/atom"
+	"github.com/gongfarmer/ntap/encoding/ade"
 )
 
-var TestAtoms []*atom.Atom
+var TestAtoms []*ade.Atom
 var TestBytes [][]byte
 var atomPrinterFunc = formatWriter(printAtomText).formatter(ioutil.Discard)
 
@@ -26,13 +26,13 @@ func init() {
 
 func findTestFiles() []string {
 	_, dir, _, _ := runtime.Caller(1)
-	testdir := filepath.Join(dir, "../../encoding/atom/testdata/from_grid/")
+	testdir := filepath.Join(dir, "../../encoding/ade/testdata/from_grid/")
 	files, _ := filepath.Glob(filepath.Join(testdir, "*.bin"))
 	return files
 }
 
 func BenchmarkUnmarshalBinary(b *testing.B) {
-	var a = new(atom.Atom)
+	var a = new(ade.Atom)
 	for n := 0; n < b.N; n++ {
 		for _, buf := range TestBytes {
 			if err := a.UnmarshalBinary(buf); err != nil {

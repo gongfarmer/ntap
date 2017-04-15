@@ -1,4 +1,4 @@
-package atom
+package ade
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/gongfarmer/ntap/encoding/atom/codec"
+	"github.com/gongfarmer/ntap/encoding/ade/codec"
 )
 
 // Enable reading and writing of text format ADE AtomContainers by fulfilling

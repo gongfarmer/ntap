@@ -1,5 +1,5 @@
 // Benchmark Marshal / Unmarshal functions
-package atom
+package ade
 
 // TESTS TO ADD:
 // * get all data rows in attr container except 0x00000000 index atom
