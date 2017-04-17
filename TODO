@@ -1,36 +1,39 @@
-  Review error handling
-    -eliminate panics from all library code?
-    -consider what errors are returned and export a couple of package-level errors for them
-  Review package path
-    -atom.Atom is not a great name
-    -review existing StorageGrid go code and figure out how to fit in with their import paths
-  
-  Documentation
-    -doc all exported functions
-    -write good help text for ccat/ctac
-  
-  
+X Review error handling
+X   -eliminate panics from all library code?
+X  Review package path
+X    -atom.Atom is not a great name
+     -review existing StorageGrid go code and figure out how to fit in with their import paths
+X  Documentation
+X    -doc all exported functions
+X    -write good help text for ccat/ctac
 X Implement encoding
-  Implement xml handling?
-  Implement path handling, XPATH like but specified on the command line for any old atomContainer:
-    ccat --path 
-    -come up with something clever for attribute containers
-  
+X  Implement path handling, XPATH like but specified on the command line for any old atomContainer:
+X    ccat --path 
+X Eliminate FIXME
+X Eliminate logging except at debug level, and hide that
+X Eliminate all panics and log.Fatal from API
+X Move code to vtc git servers
+===============================================================================
+
+
+Implement XML marshal / unmarshal
+Implement json marshal / unmarshal
+
+Re-implement Atom as contiguous bytes?
+  * Embed atomHeader field and keep the size up to date?
+  * Benchmark hard before and after, implement on topic branch for ongoing comparison based on unforeseen factors, because who knows if this is actually better?
+
+Add some methods for handling AtomContainers as rows
   Implement container construction
     -client should be able to assemble raw atomContainers easily( including stuff like adding a child to a grandchild of the currently held container, use pathing here perhaps)
     -client should also be able to take a raw string of ADE ContainerText, substitute in a few values within the text, and convert it into a binary Container
   Implement creation of a set of nested Atoms from a byte slice without any other allocation other than pointers
 
+Add methods for working with lists of Atoms
+  * somethink like codec.Uint, so my slice of atoms of type UI32 can transform into a slice of UI32?
 
+Improve XPath
+  -redo the type system to match the types in the real XPath type system
+  -implement a way to have XPath queries return non-atom types like a single boolean or string, or a slice of UI32 values, possibly with arithmetic transformations already done
+  -implement some of XPath's ~ 200 functions, some of which look handy.  Gotta sort out the type system more first.
 
-===============================================================================
-Deferred:
-  -The Encoder interface, which would allow an arbitrary Go struct to be
-  converted into an Atom.  This would be fine using Structs as containers, but
-  obviously could not support some go types that have no equivalent ADE
-  representation.
-
-
-Eliminate FIXME
-Eliminate logging except at debug level, and hide that
-Eliminate all panics and log.Fatal from API
