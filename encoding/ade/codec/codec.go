@@ -452,8 +452,8 @@ func init() {
 
 	// ADE Four char code
 	dec = newDecoder(FC32)
-	dec.String = FC32ToStringDelimited
-	dec.StringDelimited = dec.String
+	dec.String = FC32ToString
+	dec.StringDelimited = FC32ToStringDelimited
 	decoderByType[FC32] = dec
 
 	// ADE ENUM type

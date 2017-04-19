@@ -17,7 +17,11 @@ import (
 	"testing"
 )
 
-const txtWriteDebugFiles = true
+// testWriteDebugFiles toggles this behaviour: when test fails, write expected
+// output file to /tmp/ along with actual result, for easy diffing.
+const testWriteDebugFiles = true
+
+// where to write output files from failed tests, if we're doing that
 const failedOutputDir = "/tmp/test-atom/"
 
 func TestUnmarshalText(t *testing.T) {
@@ -39,7 +43,7 @@ func TestUnmarshalText(t *testing.T) {
 }
 
 func checkFailedTest(t *testing.T) {
-	if t.Failed() && txtWriteDebugFiles {
+	if t.Failed() && testWriteDebugFiles {
 		fmt.Println("text_test.go: failed test results are available for inspection here: ", failedOutputDir)
 	}
 }
@@ -50,7 +54,7 @@ func TestMarshalText(t *testing.T) {
 	defer checkFailedTest(t)
 	var got []byte
 	var err error
-	if txtWriteDebugFiles {
+	if testWriteDebugFiles {
 		os.RemoveAll(failedOutputDir)
 		os.Mkdir(failedOutputDir, 0766)
 	}
@@ -65,8 +69,8 @@ func TestMarshalText(t *testing.T) {
 		// write files
 		if len(got) != len(test.txtBytes) {
 			t.Errorf("MarshalText: Text size differs from original.  Got %d, want %d:  %s", len(got), len(test.txtBytes), test.Name())
-			if txtWriteDebugFiles {
-				writeDebugFiles(got, test.txtBytes, test.Name(), failedOutputDir)
+			if testWriteDebugFiles {
+				writeDebugFiles(got, test.txtBytes, test.Name(), failedOutputDir, "txt")
 			}
 		}
 
@@ -76,8 +80,8 @@ func TestMarshalText(t *testing.T) {
 		if gotSum != wantSum {
 			t.Errorf("MarshalText: Text output differs from original: %s", test.Name())
 
-			if txtWriteDebugFiles {
-				writeDebugFiles(got, test.txtBytes, test.Name(), failedOutputDir)
+			if testWriteDebugFiles {
+				writeDebugFiles(got, test.txtBytes, test.Name(), failedOutputDir, "txt")
 			}
 		}
 	}
@@ -88,10 +92,10 @@ func TestMarshalText(t *testing.T) {
 // Arguments are byte slices containing wanted and actual output, and a
 // filename on which to base output names.
 // Write the wanted and actual outputs to files in the output  dir.
-func writeDebugFiles(got, want []byte, testName, outputDir string) {
+func writeDebugFiles(got, want []byte, testName, outputDir string, ext string) {
 	path := filepath.Join(outputDir, strings.TrimPrefix(testName, "testdata"))
-	gotPath := strings.Join([]string{path, "-got.txt"}, "")
-	wantPath := strings.Join([]string{path, "-want.txt"}, "")
+	gotPath := strings.Join([]string{path, "-got.", ext}, "")
+	wantPath := strings.Join([]string{path, "-want.", ext}, "")
 
 	os.Mkdir(filepath.Dir(gotPath), 0766)
 	err := ioutil.WriteFile(gotPath, got, 0666)

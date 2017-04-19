@@ -163,6 +163,12 @@ func FromFile(path string) (a Atom, err error) {
 	return
 }
 
+// ValueString returns the atom data as a string, without deilimiters.
+func (a *Atom) ValueString() string {
+	output, _ := a.Value.String()
+	return output
+}
+
 // SetValue sets Atom data to the given value, if a value is given.
 //
 // If nil is given, then no attempt is made to set the value and no error is
