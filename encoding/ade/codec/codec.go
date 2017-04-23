@@ -478,7 +478,7 @@ func init() {
 
 	dec = newDecoder(IPAD)
 	dec.String = IPADToString
-	dec.StringDelimited = dec.String
+	dec.StringDelimited = IPADToStringDelimited
 	decoderByType[IPAD] = dec
 
 	// ADE String types
@@ -1124,6 +1124,11 @@ func IP32ToUint64(buf []byte) (v uint64, e error) {
 
 // IPADToString accepts ADE IPAD data bytes, and expresses the value as a string.
 func IPADToString(buf []byte) (v string, e error) {
+	return string(buf[0 : len(buf)-1]), nil // discard null terminator
+}
+
+// IPADToStringDelimited accepts ADE IPAD data bytes, and expresses the value as a string.
+func IPADToStringDelimited(buf []byte) (v string, e error) {
 	v = string(buf[0 : len(buf)-1]) // trim null terminator
 	v = fmt.Sprintf("\"%s\"", v)
 	return
@@ -1142,15 +1147,33 @@ func CSTRToString(buf []byte) (v string, e error) {
 		}
 		return
 	}
-	v = CSTRBytesToEscapedString(buf[:len(buf)-1]) // discard null terminator
-	return v, nil
+	buf = buf[:len(buf)-1] // discard null terminator
+	output := make([]rune, 0, len(buf))
+	for i := 0; i < len(buf); i++ {
+		b := buf[i]
+		if r, width := utf8.DecodeRune(buf[i:]); r == utf8.RuneError {
+			// invalid unicode sequence, consumed 1 byte only
+			output = append(output, []rune(fmt.Sprintf(`\x%02X`, b))...)
+		} else {
+			output = append(output, r) // valid unicode sequence, consumed 1-4 bytes
+			i += width - 1             // -1 because will ++ before next loop iter
+		}
+	}
+	return string(output), e
 }
 
 // CSTRToStringDelimited accepts ADE CSTR data bytes, and expresses the value as a string.
 func CSTRToStringDelimited(buf []byte) (v string, e error) {
-	if v, e = CSTRToString(buf); e != nil {
+	if bytes.IndexByte(buf, '\x00') != len(buf)-1 || len(buf) == 0 {
+		pos := bytes.IndexByte(buf, '\x00')
+		if pos == -1 {
+			e = fmt.Errorf("CSTR data lacks null byte terminator")
+		} else {
+			e = fmt.Errorf("CSTR data contains illegal embedded null byte")
+		}
 		return
 	}
+	v = CSTRBytesToEscapedString(buf[:len(buf)-1]) // discard null terminator
 	return fmt.Sprintf(`"%s"`, v), e
 }
 
@@ -1166,6 +1189,17 @@ func CSTRToStringDelimited(buf []byte) (v string, e error) {
 // In UTF-32, ÿ = Codepoint U+00FF == 0x000000FF
 //
 func USTRToString(buf []byte) (v string, e error) {
+	var output bytes.Buffer
+	var codepoint rune
+	for i := 0; i < len(buf); i += 4 {
+		codepoint = rune(binary.BigEndian.Uint32(buf[i : i+4]))
+		output.WriteRune(codepoint)
+	}
+	return output.String(), nil
+}
+
+// USTRToStringDelimited accepts ADE USTR data bytes, and expresses the value as a string surrounded by double-quote delimiters.
+func USTRToStringDelimited(buf []byte) (v string, e error) {
 	var output bytes.Buffer
 	var codepoint rune
 	for i := 0; i < len(buf); i += 4 {
@@ -1187,16 +1221,7 @@ func USTRToString(buf []byte) (v string, e error) {
 			}
 		}
 	}
-	return output.String(), nil
-}
-
-// USTRToStringDelimited accepts ADE USTR data bytes, and expresses the value as a string surrounded by double-quote delimiters.
-func USTRToStringDelimited(buf []byte) (v string, e error) {
-	v, e = USTRToString(buf)
-	if e != nil {
-		return
-	}
-	return fmt.Sprintf("\"%s\"", v), e
+	return fmt.Sprintf("\"%s\"", output.String()), e
 }
 
 // BytesToHexString accepts bytes, and expresses the value as a hexadecimal string starting with "0x".
@@ -2503,13 +2528,14 @@ func DelimitedStringToCSTRBytes(buf *[]byte, v string) (e error) {
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
 		return errUndelimited("CSTR", '"')
 	}
-	return StringToCSTRBytes(buf, v[1:L-1])
+	*buf, e = CSTRBytesFromEscapedString(v[1 : L-1])
+	return
 }
 
 // StringToCSTRBytes writes a string value to a byte slice pointer as ADE UI01 binary data.
 // A NULL terminator is appended to the string value.
 func StringToCSTRBytes(buf *[]byte, v string) (e error) {
-	*buf, e = CSTRBytesFromEscapedString(v)
+	*buf = ([]byte)(v)
 	return e
 }
 
@@ -2520,7 +2546,7 @@ func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 	if L < 2 || (v[0] != '"' || v[L-1] != '"') {
 		return errUndelimited("USTR", '"')
 	}
-	return StringToUSTRBytes(buf, v[1:L-1])
+	return EscapedStringToUSTRBytes(buf, v[1:L-1])
 }
 
 // StringToUSTRBytes writes a string value to a byte slice pointer as ADE USTR binary data.
@@ -2531,15 +2557,14 @@ func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 // No NULL terminator is used for this type, unlike CSTR.
 //
 // These values are stored as UTF32 Big Endian. Each char represents the
-// integer value of the codepoint. Note that this is not just UTF-8 with
-// padding.
+// integer value of the codepoint. This is not the same as UTF-8 with padding.
 //
 // Example:
 //
 // In UTF-8, ÿ = Codepoint U+00FF = 0xC3BF
 // In UTF-32, ÿ = Codepoint U+00FF == 0x000000FF
 //
-func StringToUSTRBytes(buf *[]byte, v string) (e error) {
+func EscapedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 	bb := bytes.NewBuffer(make([]byte, 0, 4*len(v)))
 
 	// iterate by rune:  The rune value is the unicode codepoint value, which is
@@ -2596,6 +2621,21 @@ func StringToUSTRBytes(buf *[]byte, v string) (e error) {
 			return errInvalidEscape("USTR", strInput, "EOF during hex encoded character")
 		}
 		return errInvalidEscape("USTR", "\\", "EOF during escaped character")
+	}
+	*buf = bb.Bytes()
+	return
+}
+
+func StringToUSTRBytes(buf *[]byte, v string) (e error) {
+	bb := bytes.NewBuffer(make([]byte, 0, 4*len(v)))
+
+	// iterate by rune:  The rune value is the unicode codepoint value, which is
+	// useful because that's the same as the UTF32 encoding.
+	for _, r := range v {
+		e := binary.Write(bb, binary.BigEndian, uint32(r))
+		if e != nil {
+			return e
+		}
 	}
 	*buf = bb.Bytes()
 	return

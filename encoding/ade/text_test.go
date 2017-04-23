@@ -55,8 +55,13 @@ func TestMarshalText(t *testing.T) {
 	var got []byte
 	var err error
 	if testWriteDebugFiles {
-		os.RemoveAll(failedOutputDir)
-		os.Mkdir(failedOutputDir, 0766)
+		oldFiles := func(glob string) (out []string) { out, _ = filepath.Glob(failedOutputDir + "/*"); return }
+		// Empty out the test result dir. Don't remove and recreate the dir,
+		// because it's useful to have a shell open there to run tests. Don't want
+		// to blow away its $PWD and force the user to cd back to the same path.
+		for _, f := range oldFiles(failedOutputDir + "/*") {
+			os.RemoveAll(f)
+		}
 	}
 
 	// Assumes testfiles and TestAtoms have matching order

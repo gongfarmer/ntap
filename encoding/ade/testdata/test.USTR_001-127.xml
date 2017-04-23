@@ -1,129 +1,132 @@
-TEST:CONT:
-	0x01:USTR:"\x01"
-	0x02:USTR:"\x02"
-	0x03:USTR:"\x03"
-	0x04:USTR:"\x04"
-	0x05:USTR:"\x05"
-	0x06:USTR:"\x06"
-	0x07:USTR:"\x07"
-	0x08:USTR:"\x08"
-	0x09:USTR:"\x09"
-	0x0a:USTR:"\n"
-	0x0b:USTR:"\x0B"
-	0x0c:USTR:"\x0C"
-	0x0d:USTR:"\r"
-	0x0e:USTR:"\x0E"
-	0x0f:USTR:"\x0F"
-	0x10:USTR:"\x10"
-	0x11:USTR:"\x11"
-	0x12:USTR:"\x12"
-	0x13:USTR:"\x13"
-	0x14:USTR:"\x14"
-	0x15:USTR:"\x15"
-	0x16:USTR:"\x16"
-	0x17:USTR:"\x17"
-	0x18:USTR:"\x18"
-	0x19:USTR:"\x19"
-	0x1a:USTR:"\x1A"
-	0x1b:USTR:"\x1B"
-	0x1c:USTR:"\x1C"
-	0x1d:USTR:"\x1D"
-	0x1e:USTR:"\x1E"
-	0x1f:USTR:"\x1F"
-	0x20:USTR:" "
-	0x21:USTR:"!"
-	0x22:USTR:"\""
-	0x23:USTR:"#"
-	0x24:USTR:"$"
-	0x25:USTR:"%"
-	0x26:USTR:"&"
-	0x27:USTR:"'"
-	0x28:USTR:"("
-	0x29:USTR:")"
-	0x2a:USTR:"*"
-	0x2b:USTR:"+"
-	0x2c:USTR:","
-	0x2d:USTR:"-"
-	0x2e:USTR:"."
-	0x2f:USTR:"/"
-	0x30:USTR:"0"
-	0x31:USTR:"1"
-	0x32:USTR:"2"
-	0x33:USTR:"3"
-	0x34:USTR:"4"
-	0x35:USTR:"5"
-	0x36:USTR:"6"
-	0x37:USTR:"7"
-	0x38:USTR:"8"
-	0x39:USTR:"9"
-	0x3a:USTR:":"
-	0x3b:USTR:";"
-	0x3c:USTR:"<"
-	0x3d:USTR:"="
-	0x3e:USTR:">"
-	0x3f:USTR:"?"
-	0x40:USTR:"@"
-	0x41:USTR:"A"
-	0x42:USTR:"B"
-	0x43:USTR:"C"
-	0x44:USTR:"D"
-	0x45:USTR:"E"
-	0x46:USTR:"F"
-	0x47:USTR:"G"
-	0x48:USTR:"H"
-	0x49:USTR:"I"
-	0x4a:USTR:"J"
-	0x4b:USTR:"K"
-	0x4c:USTR:"L"
-	0x4d:USTR:"M"
-	0x4e:USTR:"N"
-	0x4f:USTR:"O"
-	0x50:USTR:"P"
-	0x51:USTR:"Q"
-	0x52:USTR:"R"
-	0x53:USTR:"S"
-	0x54:USTR:"T"
-	0x55:USTR:"U"
-	0x56:USTR:"V"
-	0x57:USTR:"W"
-	0x58:USTR:"X"
-	0x59:USTR:"Y"
-	0x5a:USTR:"Z"
-	0x5b:USTR:"["
-	0x5c:USTR:"\\"
-	0x5d:USTR:"]"
-	0x5e:USTR:"^"
-	0x5f:USTR:"_"
-	0x60:USTR:"`"
-	0x61:USTR:"a"
-	0x62:USTR:"b"
-	0x63:USTR:"c"
-	0x64:USTR:"d"
-	0x65:USTR:"e"
-	0x66:USTR:"f"
-	0x67:USTR:"g"
-	0x68:USTR:"h"
-	0x69:USTR:"i"
-	0x6a:USTR:"j"
-	0x6b:USTR:"k"
-	0x6c:USTR:"l"
-	0x6d:USTR:"m"
-	0x6e:USTR:"n"
-	0x6f:USTR:"o"
-	0x70:USTR:"p"
-	0x71:USTR:"q"
-	0x72:USTR:"r"
-	0x73:USTR:"s"
-	0x74:USTR:"t"
-	0x75:USTR:"u"
-	0x76:USTR:"v"
-	0x77:USTR:"w"
-	0x78:USTR:"x"
-	0x79:USTR:"y"
-	0x7a:USTR:"z"
-	0x7b:USTR:"{"
-	0x7c:USTR:"|"
-	0x7d:USTR:"}"
-	0x7e:USTR:"~"
-	0x7f:USTR:"\x7F"
-END
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="TEST">
+		<atom name="0x01" type="USTR" value=""/>
+		<atom name="0x02" type="USTR" value=""/>
+		<atom name="0x03" type="USTR" value=""/>
+		<atom name="0x04" type="USTR" value=""/>
+		<atom name="0x05" type="USTR" value=""/>
+		<atom name="0x06" type="USTR" value=""/>
+		<atom name="0x07" type="USTR" value=""/>
+		<atom name="0x08" type="USTR" value=""/>
+		<atom name="0x09" type="USTR" value="&#9;"/>
+		<atom name="0x0a" type="USTR" value="&#10;"/>
+		<atom name="0x0b" type="USTR" value=""/>
+		<atom name="0x0c" type="USTR" value=""/>
+		<atom name="0x0d" type="USTR" value="&#13;"/>
+		<atom name="0x0e" type="USTR" value=""/>
+		<atom name="0x0f" type="USTR" value=""/>
+		<atom name="0x10" type="USTR" value=""/>
+		<atom name="0x11" type="USTR" value=""/>
+		<atom name="0x12" type="USTR" value=""/>
+		<atom name="0x13" type="USTR" value=""/>
+		<atom name="0x14" type="USTR" value=""/>
+		<atom name="0x15" type="USTR" value=""/>
+		<atom name="0x16" type="USTR" value=""/>
+		<atom name="0x17" type="USTR" value=""/>
+		<atom name="0x18" type="USTR" value=""/>
+		<atom name="0x19" type="USTR" value=""/>
+		<atom name="0x1a" type="USTR" value=""/>
+		<atom name="0x1b" type="USTR" value=""/>
+		<atom name="0x1c" type="USTR" value=""/>
+		<atom name="0x1d" type="USTR" value=""/>
+		<atom name="0x1e" type="USTR" value=""/>
+		<atom name="0x1f" type="USTR" value=""/>
+		<atom name="0x20" type="USTR" value=" "/>
+		<atom name="0x21" type="USTR" value="!"/>
+		<atom name="0x22" type="USTR" value="&quot;"/>
+		<atom name="0x23" type="USTR" value="#"/>
+		<atom name="0x24" type="USTR" value="$"/>
+		<atom name="0x25" type="USTR" value="%"/>
+		<atom name="0x26" type="USTR" value="&amp;"/>
+		<atom name="0x27" type="USTR" value="'"/>
+		<atom name="0x28" type="USTR" value="("/>
+		<atom name="0x29" type="USTR" value=")"/>
+		<atom name="0x2a" type="USTR" value="*"/>
+		<atom name="0x2b" type="USTR" value="+"/>
+		<atom name="0x2c" type="USTR" value=","/>
+		<atom name="0x2d" type="USTR" value="-"/>
+		<atom name="0x2e" type="USTR" value="."/>
+		<atom name="0x2f" type="USTR" value="/"/>
+		<atom name="0x30" type="USTR" value="0"/>
+		<atom name="0x31" type="USTR" value="1"/>
+		<atom name="0x32" type="USTR" value="2"/>
+		<atom name="0x33" type="USTR" value="3"/>
+		<atom name="0x34" type="USTR" value="4"/>
+		<atom name="0x35" type="USTR" value="5"/>
+		<atom name="0x36" type="USTR" value="6"/>
+		<atom name="0x37" type="USTR" value="7"/>
+		<atom name="0x38" type="USTR" value="8"/>
+		<atom name="0x39" type="USTR" value="9"/>
+		<atom name="0x3a" type="USTR" value=":"/>
+		<atom name="0x3b" type="USTR" value=";"/>
+		<atom name="0x3c" type="USTR" value="&lt;"/>
+		<atom name="0x3d" type="USTR" value="="/>
+		<atom name="0x3e" type="USTR" value="&gt;"/>
+		<atom name="0x3f" type="USTR" value="?"/>
+		<atom name="0x40" type="USTR" value="@"/>
+		<atom name="0x41" type="USTR" value="A"/>
+		<atom name="0x42" type="USTR" value="B"/>
+		<atom name="0x43" type="USTR" value="C"/>
+		<atom name="0x44" type="USTR" value="D"/>
+		<atom name="0x45" type="USTR" value="E"/>
+		<atom name="0x46" type="USTR" value="F"/>
+		<atom name="0x47" type="USTR" value="G"/>
+		<atom name="0x48" type="USTR" value="H"/>
+		<atom name="0x49" type="USTR" value="I"/>
+		<atom name="0x4a" type="USTR" value="J"/>
+		<atom name="0x4b" type="USTR" value="K"/>
+		<atom name="0x4c" type="USTR" value="L"/>
+		<atom name="0x4d" type="USTR" value="M"/>
+		<atom name="0x4e" type="USTR" value="N"/>
+		<atom name="0x4f" type="USTR" value="O"/>
+		<atom name="0x50" type="USTR" value="P"/>
+		<atom name="0x51" type="USTR" value="Q"/>
+		<atom name="0x52" type="USTR" value="R"/>
+		<atom name="0x53" type="USTR" value="S"/>
+		<atom name="0x54" type="USTR" value="T"/>
+		<atom name="0x55" type="USTR" value="U"/>
+		<atom name="0x56" type="USTR" value="V"/>
+		<atom name="0x57" type="USTR" value="W"/>
+		<atom name="0x58" type="USTR" value="X"/>
+		<atom name="0x59" type="USTR" value="Y"/>
+		<atom name="0x5a" type="USTR" value="Z"/>
+		<atom name="0x5b" type="USTR" value="["/>
+		<atom name="0x5c" type="USTR" value="\"/>
+		<atom name="0x5d" type="USTR" value="]"/>
+		<atom name="0x5e" type="USTR" value="^"/>
+		<atom name="0x5f" type="USTR" value="_"/>
+		<atom name="0x60" type="USTR" value="`"/>
+		<atom name="0x61" type="USTR" value="a"/>
+		<atom name="0x62" type="USTR" value="b"/>
+		<atom name="0x63" type="USTR" value="c"/>
+		<atom name="0x64" type="USTR" value="d"/>
+		<atom name="0x65" type="USTR" value="e"/>
+		<atom name="0x66" type="USTR" value="f"/>
+		<atom name="0x67" type="USTR" value="g"/>
+		<atom name="0x68" type="USTR" value="h"/>
+		<atom name="0x69" type="USTR" value="i"/>
+		<atom name="0x6a" type="USTR" value="j"/>
+		<atom name="0x6b" type="USTR" value="k"/>
+		<atom name="0x6c" type="USTR" value="l"/>
+		<atom name="0x6d" type="USTR" value="m"/>
+		<atom name="0x6e" type="USTR" value="n"/>
+		<atom name="0x6f" type="USTR" value="o"/>
+		<atom name="0x70" type="USTR" value="p"/>
+		<atom name="0x71" type="USTR" value="q"/>
+		<atom name="0x72" type="USTR" value="r"/>
+		<atom name="0x73" type="USTR" value="s"/>
+		<atom name="0x74" type="USTR" value="t"/>
+		<atom name="0x75" type="USTR" value="u"/>
+		<atom name="0x76" type="USTR" value="v"/>
+		<atom name="0x77" type="USTR" value="w"/>
+		<atom name="0x78" type="USTR" value="x"/>
+		<atom name="0x79" type="USTR" value="y"/>
+		<atom name="0x7a" type="USTR" value="z"/>
+		<atom name="0x7b" type="USTR" value="{"/>
+		<atom name="0x7c" type="USTR" value="|"/>
+		<atom name="0x7d" type="USTR" value="}"/>
+		<atom name="0x7e" type="USTR" value="~"/>
+		<atom name="0x7f" type="USTR" value=""/>
+	</container>
+</containerxml>

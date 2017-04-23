@@ -1,170 +1,173 @@
-SF32:CONT:
-	sf32:SF32:-1.0000
-	sf32:SF32:-1.1000
-	sf32:SF32:-1.9000
-	sf32:SF32:-1.0100
-	sf32:SF32:-1.9900
-	sf32:SF32:-1.0010
-	sf32:SF32:-1.9990
-	sf32:SF32:-1.0001
-	sf32:SF32:-1.9999
-	sf32:SF32:1.0000
-	sf32:SF32:1.1000
-	sf32:SF32:1.9000
-	sf32:SF32:1.0100
-	sf32:SF32:1.9900
-	sf32:SF32:1.0010
-	sf32:SF32:1.9990
-	sf32:SF32:1.0001
-	sf32:SF32:1.9999
-	sf32:SF32:-1.1000
-	sf32:SF32:-1.2000
-	sf32:SF32:-1.3000
-	sf32:SF32:-1.4000
-	sf32:SF32:-1.5000
-	sf32:SF32:-1.6000
-	sf32:SF32:-1.7000
-	sf32:SF32:-1.8000
-	sf32:SF32:-1.9000
-	sf32:SF32:-1.0100
-	sf32:SF32:-1.0200
-	sf32:SF32:-1.0300
-	sf32:SF32:-1.0400
-	sf32:SF32:-1.0500
-	sf32:SF32:-1.0600
-	sf32:SF32:-1.0700
-	sf32:SF32:-1.0800
-	sf32:SF32:-1.0900
-	sf32:SF32:-1.0010
-	sf32:SF32:-1.0020
-	sf32:SF32:-1.0030
-	sf32:SF32:-1.0040
-	sf32:SF32:-1.0050
-	sf32:SF32:-1.0060
-	sf32:SF32:-1.0070
-	sf32:SF32:-1.0080
-	sf32:SF32:-1.0090
-	sf32:SF32:-1.0060
-	sf32:SF32:-1.0001
-	sf32:SF32:-1.0002
-	sf32:SF32:-1.0003
-	sf32:SF32:-1.0004
-	sf32:SF32:-1.0005
-	sf32:SF32:-1.0006
-	sf32:SF32:-1.0007
-	sf32:SF32:-1.0008
-	sf32:SF32:-1.0009
-	sf32:SF32:-32768.0000
-	sf32:SF32:-32767.0000
-	sf32:SF32:-32767.1000
-	sf32:SF32:-32767.2000
-	sf32:SF32:-32767.3000
-	sf32:SF32:-32767.4000
-	sf32:SF32:-32767.5000
-	sf32:SF32:-32767.6000
-	sf32:SF32:-32767.7000
-	sf32:SF32:-32767.8000
-	sf32:SF32:-32767.9000
-	sf32:SF32:-32767.0100
-	sf32:SF32:-32767.0200
-	sf32:SF32:-32767.0300
-	sf32:SF32:-32767.0400
-	sf32:SF32:-32767.0500
-	sf32:SF32:-32767.0600
-	sf32:SF32:-32767.0700
-	sf32:SF32:-32767.0800
-	sf32:SF32:-32767.0900
-	sf32:SF32:-32767.0010
-	sf32:SF32:-32767.0020
-	sf32:SF32:-32767.0030
-	sf32:SF32:-32767.0040
-	sf32:SF32:-32767.0050
-	sf32:SF32:-32767.0060
-	sf32:SF32:-32767.0070
-	sf32:SF32:-32767.0080
-	sf32:SF32:-32767.0090
-	sf32:SF32:-32767.0001
-	sf32:SF32:-32767.0002
-	sf32:SF32:-32767.0003
-	sf32:SF32:-32767.0004
-	sf32:SF32:-32767.0005
-	sf32:SF32:-32767.0006
-	sf32:SF32:-32767.0007
-	sf32:SF32:-32767.0008
-	sf32:SF32:-32767.0009
-	sf32:SF32:-32767.9999
-	sf32:SF32:1.1000
-	sf32:SF32:1.2000
-	sf32:SF32:1.3000
-	sf32:SF32:1.4000
-	sf32:SF32:1.5000
-	sf32:SF32:1.6000
-	sf32:SF32:1.7000
-	sf32:SF32:1.8000
-	sf32:SF32:1.9000
-	sf32:SF32:1.0100
-	sf32:SF32:1.0200
-	sf32:SF32:1.0300
-	sf32:SF32:1.0400
-	sf32:SF32:1.0500
-	sf32:SF32:1.0600
-	sf32:SF32:1.0700
-	sf32:SF32:1.0800
-	sf32:SF32:1.0900
-	sf32:SF32:1.0010
-	sf32:SF32:1.0020
-	sf32:SF32:1.0030
-	sf32:SF32:1.0040
-	sf32:SF32:1.0050
-	sf32:SF32:1.0060
-	sf32:SF32:1.0070
-	sf32:SF32:1.0080
-	sf32:SF32:1.0090
-	sf32:SF32:1.0001
-	sf32:SF32:1.0002
-	sf32:SF32:1.0003
-	sf32:SF32:1.0004
-	sf32:SF32:1.0005
-	sf32:SF32:1.0006
-	sf32:SF32:1.0007
-	sf32:SF32:1.0008
-	sf32:SF32:1.0009
-	sf32:SF32:32767.0000
-	sf32:SF32:32767.1000
-	sf32:SF32:32767.2000
-	sf32:SF32:32767.3000
-	sf32:SF32:32767.4000
-	sf32:SF32:32767.5000
-	sf32:SF32:32767.6000
-	sf32:SF32:32767.7000
-	sf32:SF32:32767.8000
-	sf32:SF32:32767.9000
-	sf32:SF32:32767.0100
-	sf32:SF32:32767.0200
-	sf32:SF32:32767.0300
-	sf32:SF32:32767.0400
-	sf32:SF32:32767.0500
-	sf32:SF32:32767.0600
-	sf32:SF32:32767.0700
-	sf32:SF32:32767.0800
-	sf32:SF32:32767.0900
-	sf32:SF32:32767.0010
-	sf32:SF32:32767.0020
-	sf32:SF32:32767.0030
-	sf32:SF32:32767.0040
-	sf32:SF32:32767.0050
-	sf32:SF32:32767.0060
-	sf32:SF32:32767.0070
-	sf32:SF32:32767.0080
-	sf32:SF32:32767.0090
-	sf32:SF32:32767.0001
-	sf32:SF32:32767.0002
-	sf32:SF32:32767.0003
-	sf32:SF32:32767.0004
-	sf32:SF32:32767.0005
-	sf32:SF32:32767.0006
-	sf32:SF32:32767.0007
-	sf32:SF32:32767.0008
-	sf32:SF32:32767.0009
-	sf32:SF32:32767.9999
-END
+<?xml version="1.0" encoding="UTF-8"?>
+<containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
+	<container name="SF32">
+		<atom name="sf32" type="SF32" value="-1.0000"/>
+		<atom name="sf32" type="SF32" value="-1.1000"/>
+		<atom name="sf32" type="SF32" value="-1.9000"/>
+		<atom name="sf32" type="SF32" value="-1.0100"/>
+		<atom name="sf32" type="SF32" value="-1.9900"/>
+		<atom name="sf32" type="SF32" value="-1.0010"/>
+		<atom name="sf32" type="SF32" value="-1.9990"/>
+		<atom name="sf32" type="SF32" value="-1.0001"/>
+		<atom name="sf32" type="SF32" value="-1.9999"/>
+		<atom name="sf32" type="SF32" value="1.0000"/>
+		<atom name="sf32" type="SF32" value="1.1000"/>
+		<atom name="sf32" type="SF32" value="1.9000"/>
+		<atom name="sf32" type="SF32" value="1.0100"/>
+		<atom name="sf32" type="SF32" value="1.9900"/>
+		<atom name="sf32" type="SF32" value="1.0010"/>
+		<atom name="sf32" type="SF32" value="1.9990"/>
+		<atom name="sf32" type="SF32" value="1.0001"/>
+		<atom name="sf32" type="SF32" value="1.9999"/>
+		<atom name="sf32" type="SF32" value="-1.1000"/>
+		<atom name="sf32" type="SF32" value="-1.2000"/>
+		<atom name="sf32" type="SF32" value="-1.3000"/>
+		<atom name="sf32" type="SF32" value="-1.4000"/>
+		<atom name="sf32" type="SF32" value="-1.5000"/>
+		<atom name="sf32" type="SF32" value="-1.6000"/>
+		<atom name="sf32" type="SF32" value="-1.7000"/>
+		<atom name="sf32" type="SF32" value="-1.8000"/>
+		<atom name="sf32" type="SF32" value="-1.9000"/>
+		<atom name="sf32" type="SF32" value="-1.0100"/>
+		<atom name="sf32" type="SF32" value="-1.0200"/>
+		<atom name="sf32" type="SF32" value="-1.0300"/>
+		<atom name="sf32" type="SF32" value="-1.0400"/>
+		<atom name="sf32" type="SF32" value="-1.0500"/>
+		<atom name="sf32" type="SF32" value="-1.0600"/>
+		<atom name="sf32" type="SF32" value="-1.0700"/>
+		<atom name="sf32" type="SF32" value="-1.0800"/>
+		<atom name="sf32" type="SF32" value="-1.0900"/>
+		<atom name="sf32" type="SF32" value="-1.0010"/>
+		<atom name="sf32" type="SF32" value="-1.0020"/>
+		<atom name="sf32" type="SF32" value="-1.0030"/>
+		<atom name="sf32" type="SF32" value="-1.0040"/>
+		<atom name="sf32" type="SF32" value="-1.0050"/>
+		<atom name="sf32" type="SF32" value="-1.0060"/>
+		<atom name="sf32" type="SF32" value="-1.0070"/>
+		<atom name="sf32" type="SF32" value="-1.0080"/>
+		<atom name="sf32" type="SF32" value="-1.0090"/>
+		<atom name="sf32" type="SF32" value="-1.0060"/>
+		<atom name="sf32" type="SF32" value="-1.0001"/>
+		<atom name="sf32" type="SF32" value="-1.0002"/>
+		<atom name="sf32" type="SF32" value="-1.0003"/>
+		<atom name="sf32" type="SF32" value="-1.0004"/>
+		<atom name="sf32" type="SF32" value="-1.0005"/>
+		<atom name="sf32" type="SF32" value="-1.0006"/>
+		<atom name="sf32" type="SF32" value="-1.0007"/>
+		<atom name="sf32" type="SF32" value="-1.0008"/>
+		<atom name="sf32" type="SF32" value="-1.0009"/>
+		<atom name="sf32" type="SF32" value="-32768.0000"/>
+		<atom name="sf32" type="SF32" value="-32767.0000"/>
+		<atom name="sf32" type="SF32" value="-32767.1000"/>
+		<atom name="sf32" type="SF32" value="-32767.2000"/>
+		<atom name="sf32" type="SF32" value="-32767.3000"/>
+		<atom name="sf32" type="SF32" value="-32767.4000"/>
+		<atom name="sf32" type="SF32" value="-32767.5000"/>
+		<atom name="sf32" type="SF32" value="-32767.6000"/>
+		<atom name="sf32" type="SF32" value="-32767.7000"/>
+		<atom name="sf32" type="SF32" value="-32767.8000"/>
+		<atom name="sf32" type="SF32" value="-32767.9000"/>
+		<atom name="sf32" type="SF32" value="-32767.0100"/>
+		<atom name="sf32" type="SF32" value="-32767.0200"/>
+		<atom name="sf32" type="SF32" value="-32767.0300"/>
+		<atom name="sf32" type="SF32" value="-32767.0400"/>
+		<atom name="sf32" type="SF32" value="-32767.0500"/>
+		<atom name="sf32" type="SF32" value="-32767.0600"/>
+		<atom name="sf32" type="SF32" value="-32767.0700"/>
+		<atom name="sf32" type="SF32" value="-32767.0800"/>
+		<atom name="sf32" type="SF32" value="-32767.0900"/>
+		<atom name="sf32" type="SF32" value="-32767.0010"/>
+		<atom name="sf32" type="SF32" value="-32767.0020"/>
+		<atom name="sf32" type="SF32" value="-32767.0030"/>
+		<atom name="sf32" type="SF32" value="-32767.0040"/>
+		<atom name="sf32" type="SF32" value="-32767.0050"/>
+		<atom name="sf32" type="SF32" value="-32767.0060"/>
+		<atom name="sf32" type="SF32" value="-32767.0070"/>
+		<atom name="sf32" type="SF32" value="-32767.0080"/>
+		<atom name="sf32" type="SF32" value="-32767.0090"/>
+		<atom name="sf32" type="SF32" value="-32767.0001"/>
+		<atom name="sf32" type="SF32" value="-32767.0002"/>
+		<atom name="sf32" type="SF32" value="-32767.0003"/>
+		<atom name="sf32" type="SF32" value="-32767.0004"/>
+		<atom name="sf32" type="SF32" value="-32767.0005"/>
+		<atom name="sf32" type="SF32" value="-32767.0006"/>
+		<atom name="sf32" type="SF32" value="-32767.0007"/>
+		<atom name="sf32" type="SF32" value="-32767.0008"/>
+		<atom name="sf32" type="SF32" value="-32767.0009"/>
+		<atom name="sf32" type="SF32" value="-32767.9999"/>
+		<atom name="sf32" type="SF32" value="1.1000"/>
+		<atom name="sf32" type="SF32" value="1.2000"/>
+		<atom name="sf32" type="SF32" value="1.3000"/>
+		<atom name="sf32" type="SF32" value="1.4000"/>
+		<atom name="sf32" type="SF32" value="1.5000"/>
+		<atom name="sf32" type="SF32" value="1.6000"/>
+		<atom name="sf32" type="SF32" value="1.7000"/>
+		<atom name="sf32" type="SF32" value="1.8000"/>
+		<atom name="sf32" type="SF32" value="1.9000"/>
+		<atom name="sf32" type="SF32" value="1.0100"/>
+		<atom name="sf32" type="SF32" value="1.0200"/>
+		<atom name="sf32" type="SF32" value="1.0300"/>
+		<atom name="sf32" type="SF32" value="1.0400"/>
+		<atom name="sf32" type="SF32" value="1.0500"/>
+		<atom name="sf32" type="SF32" value="1.0600"/>
+		<atom name="sf32" type="SF32" value="1.0700"/>
+		<atom name="sf32" type="SF32" value="1.0800"/>
+		<atom name="sf32" type="SF32" value="1.0900"/>
+		<atom name="sf32" type="SF32" value="1.0010"/>
+		<atom name="sf32" type="SF32" value="1.0020"/>
+		<atom name="sf32" type="SF32" value="1.0030"/>
+		<atom name="sf32" type="SF32" value="1.0040"/>
+		<atom name="sf32" type="SF32" value="1.0050"/>
+		<atom name="sf32" type="SF32" value="1.0060"/>
+		<atom name="sf32" type="SF32" value="1.0070"/>
+		<atom name="sf32" type="SF32" value="1.0080"/>
+		<atom name="sf32" type="SF32" value="1.0090"/>
+		<atom name="sf32" type="SF32" value="1.0001"/>
+		<atom name="sf32" type="SF32" value="1.0002"/>
+		<atom name="sf32" type="SF32" value="1.0003"/>
+		<atom name="sf32" type="SF32" value="1.0004"/>
+		<atom name="sf32" type="SF32" value="1.0005"/>
+		<atom name="sf32" type="SF32" value="1.0006"/>
+		<atom name="sf32" type="SF32" value="1.0007"/>
+		<atom name="sf32" type="SF32" value="1.0008"/>
+		<atom name="sf32" type="SF32" value="1.0009"/>
+		<atom name="sf32" type="SF32" value="32767.0000"/>
+		<atom name="sf32" type="SF32" value="32767.1000"/>
+		<atom name="sf32" type="SF32" value="32767.2000"/>
+		<atom name="sf32" type="SF32" value="32767.3000"/>
+		<atom name="sf32" type="SF32" value="32767.4000"/>
+		<atom name="sf32" type="SF32" value="32767.5000"/>
+		<atom name="sf32" type="SF32" value="32767.6000"/>
+		<atom name="sf32" type="SF32" value="32767.7000"/>
+		<atom name="sf32" type="SF32" value="32767.8000"/>
+		<atom name="sf32" type="SF32" value="32767.9000"/>
+		<atom name="sf32" type="SF32" value="32767.0100"/>
+		<atom name="sf32" type="SF32" value="32767.0200"/>
+		<atom name="sf32" type="SF32" value="32767.0300"/>
+		<atom name="sf32" type="SF32" value="32767.0400"/>
+		<atom name="sf32" type="SF32" value="32767.0500"/>
+		<atom name="sf32" type="SF32" value="32767.0600"/>
+		<atom name="sf32" type="SF32" value="32767.0700"/>
+		<atom name="sf32" type="SF32" value="32767.0800"/>
+		<atom name="sf32" type="SF32" value="32767.0900"/>
+		<atom name="sf32" type="SF32" value="32767.0010"/>
+		<atom name="sf32" type="SF32" value="32767.0020"/>
+		<atom name="sf32" type="SF32" value="32767.0030"/>
+		<atom name="sf32" type="SF32" value="32767.0040"/>
+		<atom name="sf32" type="SF32" value="32767.0050"/>
+		<atom name="sf32" type="SF32" value="32767.0060"/>
+		<atom name="sf32" type="SF32" value="32767.0070"/>
+		<atom name="sf32" type="SF32" value="32767.0080"/>
+		<atom name="sf32" type="SF32" value="32767.0090"/>
+		<atom name="sf32" type="SF32" value="32767.0001"/>
+		<atom name="sf32" type="SF32" value="32767.0002"/>
+		<atom name="sf32" type="SF32" value="32767.0003"/>
+		<atom name="sf32" type="SF32" value="32767.0004"/>
+		<atom name="sf32" type="SF32" value="32767.0005"/>
+		<atom name="sf32" type="SF32" value="32767.0006"/>
+		<atom name="sf32" type="SF32" value="32767.0007"/>
+		<atom name="sf32" type="SF32" value="32767.0008"/>
+		<atom name="sf32" type="SF32" value="32767.0009"/>
+		<atom name="sf32" type="SF32" value="32767.9999"/>
+	</container>
+</containerxml>

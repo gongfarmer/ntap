@@ -163,7 +163,7 @@ func FromFile(path string) (a Atom, err error) {
 	return
 }
 
-// ValueString returns the atom data as a string, without deilimiters.
+// ValueString returns the atom data as a string, without delimiters.
 func (a *Atom) ValueString() string {
 	output, _ := a.Value.String()
 	return output

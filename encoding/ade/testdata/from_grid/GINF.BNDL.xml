@@ -1,56 +1,57 @@
+<!--  NOTE: ADE ccat -x produces GINF/GCAC/AVAL/0x00000001 with newlines encoded as # &#10; instead of \n. This is legal but weird.  go ccat is not going to do that, so the this tes file is not from ADE ccat. -->
 <?xml version="1.0" encoding="UTF-8"?>
 <containerxml version="1" xmlns="http://www.bycast.com/schemas/XML-container-1.0.0">
 	<container name="GINF">
-		<atom name="BVER" type="UI32" value="4"/>
-		<atom name="BTIM" type="UI64" value="1484723582627327"/>
+		<atom name="BVER" type="UI32" value="4"></atom>
+		<atom name="BTIM" type="UI64" value="1484723582627327"></atom>
 		<container name="GIDV">
-			<atom name="AVER" type="UI32" value="2"/>
-			<atom name="ATIM" type="UI64" value="1"/>
-			<atom name="AVTP" type="FC32" value="UI32"/>
-			<atom name="APER" type="FC32" value="READ"/>
+			<atom name="AVER" type="UI32" value="2"></atom>
+			<atom name="ATIM" type="UI64" value="1"></atom>
+			<atom name="AVTP" type="FC32" value="UI32"></atom>
+			<atom name="APER" type="FC32" value="READ"></atom>
 			<container name="AVAL">
-				<atom name="0x00000000" type="UI32" value="2"/>
-				<atom name="0x00000001" type="UI32" value="908767"/>
+				<atom name="0x00000000" type="UI32" value="2"></atom>
+				<atom name="0x00000001" type="UI32" value="908767"></atom>
 			</container>
 		</container>
 		<container name="GPVD">
-			<atom name="AVER" type="UI32" value="2"/>
-			<atom name="ATIM" type="UI64" value="1"/>
-			<atom name="AVTP" type="FC32" value="UI64"/>
-			<atom name="APER" type="FC32" value="READ"/>
+			<atom name="AVER" type="UI32" value="2"></atom>
+			<atom name="ATIM" type="UI64" value="1"></atom>
+			<atom name="AVTP" type="FC32" value="UI64"></atom>
+			<atom name="APER" type="FC32" value="READ"></atom>
 			<container name="AVAL">
-				<atom name="0x00000000" type="UI32" value="2"/>
-				<atom name="0x00000001" type="UI64" value="1484722540084888"/>
+				<atom name="0x00000000" type="UI32" value="2"></atom>
+				<atom name="0x00000001" type="UI64" value="1484722540084888"></atom>
 			</container>
 		</container>
 		<container name="GVND">
-			<atom name="AVER" type="UI32" value="2"/>
-			<atom name="ATIM" type="UI64" value="1"/>
-			<atom name="AVTP" type="FC32" value="CSTR"/>
-			<atom name="APER" type="FC32" value="READ"/>
+			<atom name="AVER" type="UI32" value="2"></atom>
+			<atom name="ATIM" type="UI64" value="1"></atom>
+			<atom name="AVTP" type="FC32" value="CSTR"></atom>
+			<atom name="APER" type="FC32" value="READ"></atom>
 			<container name="AVAL">
-				<atom name="0x00000000" type="UI32" value="2"/>
-				<atom name="0x00000001" type="CSTR" value="{OID='2.16.124.113590.3.1.3.3.1'}"/>
+				<atom name="0x00000000" type="UI32" value="2"></atom>
+				<atom name="0x00000001" type="CSTR" value="{OID=&#39;2.16.124.113590.3.1.3.3.1&#39;}"></atom>
 			</container>
 		</container>
 		<container name="GSIV">
-			<atom name="AVER" type="UI32" value="2"/>
-			<atom name="ATIM" type="UI64" value="1"/>
-			<atom name="AVTP" type="FC32" value="CSTR"/>
-			<atom name="APER" type="FC32" value="READ"/>
+			<atom name="AVER" type="UI32" value="2"></atom>
+			<atom name="ATIM" type="UI64" value="1"></atom>
+			<atom name="AVTP" type="FC32" value="CSTR"></atom>
+			<atom name="APER" type="FC32" value="READ"></atom>
 			<container name="AVAL">
-				<atom name="0x00000000" type="UI32" value="2"/>
-				<atom name="0x00000001" type="CSTR" value="10.4.0"/>
+				<atom name="0x00000000" type="UI32" value="2"></atom>
+				<atom name="0x00000001" type="CSTR" value="10.4.0"></atom>
 			</container>
 		</container>
 		<container name="GCAC">
-			<atom name="AVER" type="UI32" value="2"/>
-			<atom name="ATIM" type="UI64" value="1"/>
-			<atom name="AVTP" type="FC32" value="CSTR"/>
-			<atom name="APER" type="FC32" value="READ"/>
+			<atom name="AVER" type="UI32" value="2"></atom>
+			<atom name="ATIM" type="UI64" value="1"></atom>
+			<atom name="AVTP" type="FC32" value="CSTR"></atom>
+			<atom name="APER" type="FC32" value="READ"></atom>
 			<container name="AVAL">
-				<atom name="0x00000000" type="UI32" value="2"/>
-				<atom name="0x00000001" type="CSTR" value="-----BEGIN CERTIFICATE-----&#10;MIIETjCCAzagAwIBAgIJAOE1arE4z7MPMA0GCSqGSIb3DQEBCwUAMHcxCzAJBgNV&#10;BAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRIwEAYDVQQHEwlTdW5ueXZhbGUx&#10;FDASBgNVBAoTC05ldEFwcCBJbmMuMRswGQYDVQQLExJOZXRBcHAgU3RvcmFnZUdS&#10;SUQxDDAKBgNVBAMTA0dQVDAeFw0xNzAxMTgwNjUzMTVaFw0zODAxMTcwNjUzMTVa&#10;MHcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRIwEAYDVQQHEwlT&#10;dW5ueXZhbGUxFDASBgNVBAoTC05ldEFwcCBJbmMuMRswGQYDVQQLExJOZXRBcHAg&#10;U3RvcmFnZUdSSUQxDDAKBgNVBAMTA0dQVDCCASIwDQYJKoZIhvcNAQEBBQADggEP&#10;ADCCAQoCggEBAKpvmR7UnOaKMdDlAYTIqtK9sTkWLKE2bvNYnyPqUTrdSBix/KgN&#10;GvXD2OY84qWiSsAZ56MRxGSXbuN3h+NyLTWE1sNJ08Tb+lJQdSLlT/4x3iAPthm/&#10;vXBmUWCxeTJgbD+0S7zqIWXXagDxsSWAPRTc0JUL+22tgcJbHIADGfDahftHDwqU&#10;dnQQ41hniFSSFOS1vE/QgULlKdgpWJbZxBgl8QfP7r4KmdIVIuiCiVtTx9E37ksj&#10;vZQJ0Ay8Oa/r3HQxEvWvsTxA4uVzlzbiqFKTLaUXjtnemm0vQ/YCZgwg5SZoycGJ&#10;4xfVm6T/1e+fMxkyhK9FBo5WSKl9x6ngbBUCAwEAAaOB3DCB2TAdBgNVHQ4EFgQU&#10;9jxwKfewmcl5NjoSQaskinWkC7cwgakGA1UdIwSBoTCBnoAU9jxwKfewmcl5NjoS&#10;QaskinWkC7ehe6R5MHcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlh&#10;MRIwEAYDVQQHEwlTdW5ueXZhbGUxFDASBgNVBAoTC05ldEFwcCBJbmMuMRswGQYD&#10;VQQLExJOZXRBcHAgU3RvcmFnZUdSSUQxDDAKBgNVBAMTA0dQVIIJAOE1arE4z7MP&#10;MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAJViEjvBVtCR21EMbYW+&#10;MA3yTKaj3q9/2qKWYEkLiRAhHycnSAHivSnS6R7oDc+0Ye4st4OW4iN1glJPtB3E&#10;AH1vCLTfFU3pYP5DDaSMX3RUD2TotuMsfVwCvG7ZVISgRHAeVQIgqcRuv5zTNdeD&#10;gaTL0FiCjneGFP9U4XLNpB4lM3dBzGhV7/grMFhSl75jVh92PD+KmaCXB08nj8bx&#10;R4EQgvhCYp17uDzhDQbJD7CEut5wRyyD/dNpHLCu2lnKdaBEWCxEzdUcE3FWWoa+&#10;3e91PJ+8+eyjP1FYixY9JcjD1uODws7VlW9qRrxC29UXW4NCUFxZSImL7hRq7mW+&#10;zhY=&#10;-----END CERTIFICATE-----"/>
+				<atom name="0x00000000" type="UI32" value="2"></atom>
+				<atom name="0x00000001" type="CSTR" value="-----BEGIN CERTIFICATE-----\nMIIETjCCAzagAwIBAgIJAOE1arE4z7MPMA0GCSqGSIb3DQEBCwUAMHcxCzAJBgNV\nBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRIwEAYDVQQHEwlTdW5ueXZhbGUx\nFDASBgNVBAoTC05ldEFwcCBJbmMuMRswGQYDVQQLExJOZXRBcHAgU3RvcmFnZUdS\nSUQxDDAKBgNVBAMTA0dQVDAeFw0xNzAxMTgwNjUzMTVaFw0zODAxMTcwNjUzMTVa\nMHcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRIwEAYDVQQHEwlT\ndW5ueXZhbGUxFDASBgNVBAoTC05ldEFwcCBJbmMuMRswGQYDVQQLExJOZXRBcHAg\nU3RvcmFnZUdSSUQxDDAKBgNVBAMTA0dQVDCCASIwDQYJKoZIhvcNAQEBBQADggEP\nADCCAQoCggEBAKpvmR7UnOaKMdDlAYTIqtK9sTkWLKE2bvNYnyPqUTrdSBix/KgN\nGvXD2OY84qWiSsAZ56MRxGSXbuN3h+NyLTWE1sNJ08Tb+lJQdSLlT/4x3iAPthm/\nvXBmUWCxeTJgbD+0S7zqIWXXagDxsSWAPRTc0JUL+22tgcJbHIADGfDahftHDwqU\ndnQQ41hniFSSFOS1vE/QgULlKdgpWJbZxBgl8QfP7r4KmdIVIuiCiVtTx9E37ksj\nvZQJ0Ay8Oa/r3HQxEvWvsTxA4uVzlzbiqFKTLaUXjtnemm0vQ/YCZgwg5SZoycGJ\n4xfVm6T/1e+fMxkyhK9FBo5WSKl9x6ngbBUCAwEAAaOB3DCB2TAdBgNVHQ4EFgQU\n9jxwKfewmcl5NjoSQaskinWkC7cwgakGA1UdIwSBoTCBnoAU9jxwKfewmcl5NjoS\nQaskinWkC7ehe6R5MHcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlh\nMRIwEAYDVQQHEwlTdW5ueXZhbGUxFDASBgNVBAoTC05ldEFwcCBJbmMuMRswGQYD\nVQQLExJOZXRBcHAgU3RvcmFnZUdSSUQxDDAKBgNVBAMTA0dQVIIJAOE1arE4z7MP\nMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAJViEjvBVtCR21EMbYW+\nMA3yTKaj3q9/2qKWYEkLiRAhHycnSAHivSnS6R7oDc+0Ye4st4OW4iN1glJPtB3E\nAH1vCLTfFU3pYP5DDaSMX3RUD2TotuMsfVwCvG7ZVISgRHAeVQIgqcRuv5zTNdeD\ngaTL0FiCjneGFP9U4XLNpB4lM3dBzGhV7/grMFhSl75jVh92PD+KmaCXB08nj8bx\nR4EQgvhCYp17uDzhDQbJD7CEut5wRyyD/dNpHLCu2lnKdaBEWCxEzdUcE3FWWoa+\n3e91PJ+8+eyjP1FYixY9JcjD1uODws7VlW9qRrxC29UXW4NCUFxZSImL7hRq7mW+\nzhY=\n-----END CERTIFICATE-----"></atom>
 			</container>
 		</container>
 	</container>
