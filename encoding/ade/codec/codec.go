@@ -141,7 +141,7 @@ func errStrInvalid(t string, v string) error {
 	return fmt.Errorf("invalid string value for ADE type %s: \"%s\"", t, strconv.Quote(v))
 }
 func errInputInvalid(t string, v interface{}) error {
-	return fmt.Errorf("invalid input value for ADE type %s: \"%v\"", t, v)
+	return fmt.Errorf("invalid input value for ADE type %s: %q", t, v)
 }
 func errRange(t string, v interface{}) (e error) {
 	switch v := v.(type) {
@@ -1137,6 +1137,7 @@ func IPADToStringDelimited(buf []byte) (v string, e error) {
 // String types
 
 // CSTRToString accepts ADE CSTR data bytes, and expresses the value as a string.
+// The string is unescaped.
 func CSTRToString(buf []byte) (v string, e error) {
 	if bytes.IndexByte(buf, '\x00') != len(buf)-1 || len(buf) == 0 {
 		pos := bytes.IndexByte(buf, '\x00')
@@ -1163,6 +1164,7 @@ func CSTRToString(buf []byte) (v string, e error) {
 }
 
 // CSTRToStringDelimited accepts ADE CSTR data bytes, and expresses the value as a string.
+// The string includes escaping according to the ADE escaping rules.
 func CSTRToStringDelimited(buf []byte) (v string, e error) {
 	if bytes.IndexByte(buf, '\x00') != len(buf)-1 || len(buf) == 0 {
 		pos := bytes.IndexByte(buf, '\x00')
@@ -1178,6 +1180,7 @@ func CSTRToStringDelimited(buf []byte) (v string, e error) {
 }
 
 // USTRToString accepts ADE USTR data bytes, and expresses the value as a string.
+// The string is unescaped.
 //
 // These values are stored as UTF32 Big Endian. Each char represents the
 // integer value of the codepoint. Note that this is not just
@@ -1193,12 +1196,20 @@ func USTRToString(buf []byte) (v string, e error) {
 	var codepoint rune
 	for i := 0; i < len(buf); i += 4 {
 		codepoint = rune(binary.BigEndian.Uint32(buf[i : i+4]))
-		output.WriteRune(codepoint)
+		if utf8.ValidRune(codepoint) {
+			output.WriteRune(codepoint)
+		} else {
+			// invalid UTF-8 is handled here by escaping it, no error is returned.
+			output.WriteString(fmt.Sprintf("\\x%02X", codepoint))
+		}
+
 	}
 	return output.String(), nil
 }
 
-// USTRToStringDelimited accepts ADE USTR data bytes, and expresses the value as a string surrounded by double-quote delimiters.
+// USTRToStringDelimited accepts ADE USTR data bytes, and expresses the value
+// as a string surrounded by double-quote delimiters.
+// The string includes escaping according to the ADE escaping rules.
 func USTRToStringDelimited(buf []byte) (v string, e error) {
 	var output bytes.Buffer
 	var codepoint rune
@@ -2532,10 +2543,14 @@ func DelimitedStringToCSTRBytes(buf *[]byte, v string) (e error) {
 	return
 }
 
-// StringToCSTRBytes writes a string value to a byte slice pointer as ADE UI01 binary data.
+// StringToCSTRBytes writes a string value to byte slice pointer as ADE UI01 binary data.
+// Input string may not contain a NULL character.
 // A NULL terminator is appended to the string value.
 func StringToCSTRBytes(buf *[]byte, v string) (e error) {
-	*buf = ([]byte)(v)
+	if strings.ContainsRune(v, '\x00') {
+		return errInputInvalid("CSTR", v)
+	}
+	*buf = ([]byte)(v + "\x00")
 	return e
 }
 
@@ -2549,7 +2564,7 @@ func DelimitedStringToUSTRBytes(buf *[]byte, v string) (e error) {
 	return EscapedStringToUSTRBytes(buf, v[1:L-1])
 }
 
-// StringToUSTRBytes writes a string value to a byte slice pointer as ADE USTR binary data.
+// EscapedStringToUSTRBytes writes a string value to a byte slice pointer as ADE USTR binary data.
 //
 // The string is encoded as UTF32 big-endian (ie. 4 bytes for each rune, no
 // variable-length encoding allowed.)

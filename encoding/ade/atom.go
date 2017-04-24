@@ -38,6 +38,7 @@ var Log *log.Logger
 
 func init() {
 	Log = log.New(ioutil.Discard, "atom", log.LstdFlags)
+	//	Log.SetOutput(os.Stdout)
 }
 
 // Name returns a printable string version of the atoms's name.
@@ -163,7 +164,7 @@ func FromFile(path string) (a Atom, err error) {
 	return
 }
 
-// ValueString returns the atom data as a string, without delimiters.
+// ValueString returns the atom data as an unescaped string, without delimiters.
 func (a *Atom) ValueString() string {
 	output, _ := a.Value.String()
 	return output

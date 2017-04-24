@@ -21,11 +21,19 @@ type XMLContainer struct {
 	Children []*Atom
 }
 
-func (a *Atom) AsXmlObject() xmlElement {
+func (a *Atom) AsXmlObject() (xe xmlElement, err error) {
 	if a.Type() == "CONT" {
-		return XMLContainer{Name: a.Name(), Children: a.Children()}
+		xe = XMLContainer{Name: a.Name(), Children: a.Children()}
+		return
 	}
-	return XMLAtom{Name: a.Name(), Type: a.Type(), Value: a.ValueString()}
+	// Atom is not a container.  Take unescaped string representation of atom
+	// data, and add escape sequences for XML.
+	var buf bytes.Buffer
+	Log.Printf("Atom.AsXMLObject: Atom data %q", a.ValueString())
+	if err := xml.EscapeText(&buf, []byte(a.ValueString())); err != nil {
+		return nil, err
+	}
+	return XMLAtom{Name: a.Name(), Type: a.Type(), Value: a.ValueString()}, nil
 }
 
 // XMLName() funcs exist only to satisfy a common interface that can hold both Atoms
@@ -74,8 +82,10 @@ func XMLDocumentToAtom(data []byte) (a *Atom, e error) {
 
 // MarshalXML writes an Atom to containerxml, rooted in the startElement.
 func (a *Atom) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	err := e.Encode(a.AsXmlObject())
-	if err != nil {
+	if x, err := a.AsXmlObject(); err != nil {
+		return err
+	} else {
+		err := e.Encode(x)
 		return err
 	}
 	return nil
