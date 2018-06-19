@@ -85,7 +85,7 @@ func TestReadAtomsFromHex(t *testing.T) {
 			t.Errorf("TestReadAtomsFromHex(%s): could not run test, unable to generate expected result text", a.Name())
 		}
 		if string(gotText) != string(wantText) {
-			t.Errorf("TestReadAtomsFromHex(%s): Result mismatch for atom %s", a.Name())
+			t.Errorf("TestReadAtomsFromHex(%s): Result mismatch for atom", a.Name())
 		}
 	}
 }

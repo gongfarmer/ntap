@@ -62,7 +62,7 @@ func (s *containerStack) PopCompleted(pos uint32) (closedConts []*Atom, e error)
 			continue // next CONT might end too
 		}
 		if pos > p.end {
-			e = fmt.Errorf("%s:CONT wanted to end at byte %d, but read position is now %d", p.atomPtr.Name, p.end, pos)
+			e = fmt.Errorf("%s:CONT wanted to end at byte %d, but read position is now %d", p.atomPtr.Name(), p.end, pos)
 		}
 		break
 	}

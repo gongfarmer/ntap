@@ -1312,7 +1312,7 @@ func (pre *predicateEvaluator) evalVariable() (result iComparer) {
 	case "@name", "name":
 		return typeString(pre.AtomPtr.Name())
 	case "@name_hex":
-		return typeString(fmt.Sprint("0x%08X", pre.AtomPtr.NameAsUint32()))
+		return typeString(fmt.Sprintf("0x%08X", pre.AtomPtr.NameAsUint32()))
 	case "@type", "type":
 		return typeString(pre.AtomPtr.Type())
 	case "@data", "data":
