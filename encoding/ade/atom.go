@@ -34,10 +34,10 @@ type Atom struct {
 //
 // By default it discards log messages.
 // To see debug-level logging, redirect logging output by calling Log.SetOutput(w io.Writer), or set this to a different log.Logger object.
-var Log *log.Logger
+var Log log.Logger
 
 func init() {
-	Log = log.New(ioutil.Discard, "atom", log.LstdFlags)
+	Log = *log.New(ioutil.Discard, "", log.LstdFlags)
 	//	Log.SetOutput(os.Stdout)
 }
 

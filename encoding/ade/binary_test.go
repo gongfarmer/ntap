@@ -12,6 +12,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/gongfarmer/ntap/encoding/ade/codec"
@@ -40,6 +41,11 @@ func TestMarshalBinary(t *testing.T) {
 			t.Errorf("MarshalBinary(%s): expect no error, got %s", test.Name(), err.Error())
 		}
 
+		// Some binary inputs may contain extra garbage bytes that are discarded
+		// during round trip. These must skip the checks for identical original.
+		if strings.Contains(test.Name(), "noroundtrip") {
+			continue
+		}
 		// Verify that resulting bytes match original length
 		if len(got) != len(test.binBytes) {
 			t.Errorf("MarshalBinary: want %d bytes, got %d bytes for %s", len(test.binBytes), len(got), test.Name())

@@ -28,7 +28,7 @@ type cont struct {
 	end     uint32
 }
 
-// LIFO stack of Atoms of type container.
+// Stack of Atoms of type container.
 type containerStack []cont
 
 // Peek returns a pointer to the last (top) element of the stack, without
@@ -84,6 +84,12 @@ const headerSize = 12
 // isContainer returns true if this atomHeader's type is CONT.
 func (h atomHeader) isContainer() bool {
 	return codec.ADEType(h.Type[:]) == codec.CONT
+}
+
+// Return name of atom header in printable form
+func (h atomHeader) printableName() (name string) {
+	name, _ = codec.FC32ToString(h.Name[:])
+	return name
 }
 
 /**********************************************************/
@@ -145,6 +151,9 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 			break
 		}
 
+		// print header including size, for debugging structure problems
+		Log.Printf("atom header %6d  %10s:%s \n", h.Size, h.printableName(), h.Type)
+
 		// construct Atom object, read data
 		var data []byte
 		if !h.isContainer() {
@@ -157,6 +166,7 @@ func ReadAtomsFromBinary(r io.Reader) (atoms []*Atom, err error) {
 		if err != nil {
 			break
 		}
+		data = truncateDataToSize(adeType, data)
 		var a = Atom{
 			name: h.Name[:],
 			typ:  adeType,
@@ -198,6 +208,26 @@ func readAtomData(r io.Reader, length uint32, bytesRead *uint32) (data []byte, e
 	err = binary.Read(r, binary.BigEndian, &data)
 	*bytesRead += length
 	return
+}
+
+// Check that data size section does not exceed the expected size for
+// fixed-size types.
+//
+// Needed because the real ADE Atom library has a bug. On LDR resource files
+// from multiple grids, atom STOR/TRSP:UI64 has been found with encoded size
+// 140 instead of the expected 20 (20 == 4 bytes Size, 4 bytes Name, 4 bytes
+// Type, 8 bytes Data). Root cause of this is unknown.
+//
+// Real ctac accepts these mis-encoded containers as input and ignores the
+// extra bytes. A ctac/ccat round trip eliminates this.
+// So, this must be accepted as input.
+func truncateDataToSize(adeType codec.ADEType, data []byte) []byte {
+	var sizeExpected = codec.DataSize(adeType)
+	if sizeExpected == -1 || cap(data) == sizeExpected {
+		return data
+	}
+	Log.Printf(`data size %d exceeds expected size %d for ADE type %v, discarding extra bytes`, cap(data), sizeExpected, adeType)
+	return data[0:sizeExpected]
 }
 
 func errOddLength(len int, name string) error {

@@ -28,7 +28,15 @@ The files in from_grid/ were taken from a live grid running StorageGrid Webscale
 
 The files in invalid/ are supposed to be unparseable.  Some of them are actually parsed by ADE ccat though.
 
+Tests with "noroundtrip" in the test name will skip the tests for binary-identical original and output.
+
 Tests are run on the binary files (*.bin), which are generated from their
 corresponding text files (*.in).  The xml files are known good versions of the
 XML files produced by running a binary to xml conversion on each binary file.
 
+
+2018-06-25 
+Added resources.noroundrip test as part of handling mis-encoded inputs from StorageGRID.
+These are marked "noroundtrip" because the binary form has extra bytes that
+must be discarded when reading the binary stream. The binary output is lacks
+these garbage bytes and does not match the binary input.

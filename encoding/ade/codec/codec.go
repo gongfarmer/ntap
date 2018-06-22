@@ -70,6 +70,31 @@ func strPrintableChars() string {
 	return string(b)
 }
 
+// Return the number of bytes that this types data section should be.
+// Return -1 for variable-sized types.
+func DataSize(adeType ADEType) (bytes int) {
+	switch adeType {
+	case UI08, SI08:
+		bytes = 1
+	case UI16, SI16:
+		bytes = 2
+	case UI01, UI32, SI32, FP32, UF32, SF32, SR32, UR32, FC32, ENUM:
+		bytes = 4
+	case UI64, SI64, FP64, UF64, SF64, UR64, SR64:
+		bytes = 8
+	case NULL:
+		bytes = 0
+	case UUID:
+		bytes = 16
+	case IP32, IPAD, CSTR, USTR, DATA, CNCT, Cnct, CONT:
+		// IP32 is included because its alternate multi-value form may be 64 bits
+		bytes = -1
+	default:
+		panic(fmt.Sprintf(`unknown ADE type: "%v"`, adeType))
+	}
+	return bytes
+}
+
 //**********************************************************
 // Codec / Encoder / Decoder data structure definitions
 
@@ -323,8 +348,9 @@ func (c Codec) SetSliceOfByte(v []byte) error { return c.Encoder.SetSliceOfByte(
 /**********************************************************/
 
 // Initialize decoder table, which makes decoders accessible by ADE type.
-// Variable 'd' is used for assignment, because Go disallows assigning directly
-// to a struct member of a map value.  Example:
+// Variable 'dec' is used for creating the decoder before assignment, because
+// Go disallows assigning directly to a struct member of a map value.
+// Example:
 //    decoderByType[UI01] = newDecoder(UI01)
 //    decoderByType[UI01].Bool = UI32ToBool //illegal
 func init() {

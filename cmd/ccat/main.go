@@ -37,7 +37,7 @@ func usage() {
 	fmt.Fprintln(os.Stderr, `       # print grid ID from GINF bundle`)
 	fmt.Fprintln(os.Stderr, `       ccat -p="/GINF/GIDV/AVAL/*[@name > 0]" GINF.bin`)
 	fmt.Fprintln(os.Stderr, ``)
-	fmt.Fprintln(os.Stderr, `       # print all atoms data values exceed 0x2D000000`)
+	fmt.Fprintln(os.Stderr, `       # print all atoms with data values > 0x2D000000`)
 	fmt.Fprintln(os.Stderr, `       ccat -p="//*[data() > 0x2D000000]" test.FC32.bin`)
 
 	os.Exit(2)
@@ -58,8 +58,7 @@ func main() {
 		usage()
 	}
 	if *FlagVerbose {
-		fmt.Println("Verbose flag is now on")
-		ade.Log.SetOutput(os.Stdout)
+		ade.Log.SetOutput(os.Stderr)
 	}
 
 	// Read atom data
@@ -113,7 +112,7 @@ func printAtomDebug(w io.Writer, a *ade.Atom) {
 		col1 := bytes.NewBuffer([]byte{})
 		col2 := bytes.NewBuffer([]byte{})
 		fmt.Fprintf(col1, "%*s", depth, "")
-		fmt.Fprintf(col1, "%s:%s:", a.Name, a.Type())
+		fmt.Fprintf(col1, "%s:%s:", a.Name(), a.Type())
 
 		if string(a.Type()) == "CONT" {
 			fmt.Fprintf(col2, "")
