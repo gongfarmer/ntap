@@ -1,24 +1,26 @@
-# ntap
+== Encoding library for ADE Atom data format
 
-encoding/atom:
-decode.go  // Decoder interface
-encode.go  // Encoder interface
-codec.co   // ADE type <=> go type conversions
+Go implementation of a proprietary data format.
+Provides conversion tools useful for debugging.
 
+== Tools
+- ccat: converts binary format to text
+- ctac: converts text format to binary
 
-## Notes on layout
-
-# encoding/:
-Both encoding/json and encoding/gob have encode.go and decode.go implementing Encoder and Decoder interfaces
-
-
-# What to take from encoding/json:
-has scanner.go for reading text
-
-# What to take from encoding/gob:
-This is the only stdlib format that implements both BinaryEncoder and TextEncoder interfaces
-Has types.rb for containing type information
-
-# Other goals:
-* avoid exposing anything from reflect/
-* 
+== Encoding library
+- atom.go
+- text.go
+  * conversion of Atom to ADE Container Text format
+  * implements TextMarshaler, TextUnmarshaler interfaces
+- binary.go
+  * conversion of Atom to binary format
+  * implements BinaryMarshaler, BinaryUnmarshaler interfaces
+- xml.go
+  * conversion of Atom to XML format (work in progress)
+- path.go
+  * xpath for Atom
+  * returns a set of atoms or atom data based on a path expression
+  * strictly follows XPath documentation
+- codec/codec.go
+  * implements type system for all ADE data types
+  * handles conversion of data between ADE type and equivalent Go type
